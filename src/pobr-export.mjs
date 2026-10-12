@@ -9,7 +9,10 @@ const sorted = values => [...values].sort(compare);
 // detection. Never rewrite reviewed text or erase signs, constants or conditions.
 const identity = text => normalizeText(text).toLowerCase().replace(/\s/gu, '')
   .replace(/\{(\d+):d\}/g, '{$1}');
-const pairKey = (en, src) => JSON.stringify([identity(en), identity(src)]);
+const collisionPairKey = (en, src) => JSON.stringify([identity(en), identity(src)]);
+// Runtime literal matching is case-insensitive but distinguishes spaces from
+// their absence. Collision buckets must never double as output deduplication.
+const outputPairKey = (en, src) => JSON.stringify([en.toLowerCase(), src.toLowerCase()]);
 const sortRecords = records => records.sort((a, b) => compare(JSON.stringify(a), JSON.stringify(b)));
 
 function sourceUrl(value) {
@@ -54,7 +57,7 @@ function validateCurated(curated) {
     if (placeholders(row.src, row.id) !== placeholders(row.en, row.id)) {
       throw new Error(`Curated placeholder index set or format mismatch: ${row.id}`);
     }
-    const key = pairKey(row.en, row.src);
+    const key = outputPairKey(row.en, row.src);
     if (pairs.has(key)) throw new Error(`Duplicate curated template pair: ${row.id}`);
     pairs.add(key);
     const english = identity(row.en);
@@ -120,7 +123,7 @@ export function buildPobrExport({ snapshot, entries, curated }) {
   for (const template of templates) {
     addMapping(enToCn, identity(template.en), identity(template.src));
     addMapping(cnToEn, identity(template.src), identity(template.en));
-    curatedPairs.add(pairKey(template.en, template.src));
+    curatedPairs.add(collisionPairKey(template.en, template.src));
   }
   for (const entry of entries) {
     if (!object(entry) || !nonempty(entry.id) || !nonempty(entry.english)
@@ -146,11 +149,11 @@ export function buildPobrExport({ snapshot, entries, curated }) {
     }
     const en = normalizeText(entry.english).replace('#', '{0:d}');
     const src = normalizeText(entry.chinese).replace('#', '{0:d}');
-    const key = pairKey(en, src);
+    const key = outputPairKey(en, src);
     if (!candidates.has(key)) candidates.set(key, []);
     candidates.get(key).push({ en, src, provenance });
   }
-  for (const [key, records] of candidates) {
+  for (const records of candidates.values()) {
     // Stable representative and attribution regardless of catalog order; all
     // contributing full ID/text branches remain available in provenance.
     records.sort((a, b) => compare(a.src, b.src) || compare(a.en, b.en));
@@ -160,7 +163,7 @@ export function buildPobrExport({ snapshot, entries, curated }) {
     const reasons = [];
     if (enToCn.get(identity(en)).size > 1) reasons.push('ambiguous-en-to-cn');
     if (cnToEn.get(identity(src)).size > 1) reasons.push('ambiguous-cn-to-en');
-    if (curatedPairs.has(key)) reasons.push('curated-precedence');
+    if (curatedPairs.has(collisionPairKey(en, src))) reasons.push('curated-precedence');
     if (reasons.length) excluded.push({ reasons, src, en, provenance });
     else templates.push({ src, en, kind: 'trade', provenance });
   }

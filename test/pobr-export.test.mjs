@@ -68,17 +68,26 @@ test('unsafe automatic shapes are diagnostic exclusions, not generic string capt
   ]));
 });
 
-test('same text pairs deduplicate deterministically without dropping enum IDs or evidence', () => {
+test('case-only duplicates merge attribution while distinct literal whitespace forms survive', () => {
   const entries = [
     entry('  # to maximum Life ', '# 最大生命', 'explicit.stat_1|2'),
     entry('# to maximum Life', '# 最大生命', 'explicit.stat_1|1'),
     entry('# TO MAXIMUM LIFE', '#最大生命', 'fractured.stat_1', {
       method: 'explicit-reuse', evidence: [{ source: 'trade-cn', id: 'explicit.stat_1|1', text: '# 最大生命' }],
     }),
+    entry('# TO MAXIMUM LIFE', '# 最大生命', 'explicit.stat_1|3'),
+    entry('#to maximum Life', '# 最大生命', 'explicit.stat_1|4'),
   ];
   const result = build([...entries, entries[0]]);
-  assert.equal(result.templates.length, 1);
-  assert.equal(result.templates[0].provenance.entries.length, 3);
+  assert.equal(result.templates.length, 3);
+  const spaced = result.templates.find(row => row.src === '{0:d} 最大生命' && row.en.includes('{0:d} '));
+  const unspaced = result.templates.find(row => row.src === '{0:d}最大生命');
+  assert.deepEqual(spaced.provenance.entries.map(row => row.id), [
+    'explicit.stat_1|1', 'explicit.stat_1|2', 'explicit.stat_1|3',
+  ]);
+  assert.deepEqual(unspaced.provenance.entries.map(row => row.id), ['fractured.stat_1']);
+  const unspacedEnglish = result.templates.find(row => row.en === '{0:d}to maximum Life');
+  assert.deepEqual(unspacedEnglish.provenance.entries.map(row => row.id), ['explicit.stat_1|4']);
   assert.deepEqual(build([...entries].reverse()), result);
 });
 
