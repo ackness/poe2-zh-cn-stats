@@ -3,7 +3,7 @@ import path from 'node:path';
 import { buildDictionary } from './dictionary.mjs';
 import { extractPagePairs } from './poe2db.mjs';
 import { readSnapshot, sha256, activateSnapshot } from './sources.mjs';
-import { buildPobrExport } from './pobr-export.mjs';
+import { buildTemplateExport } from './template-export.mjs';
 
 const json = value => JSON.stringify(value, null, 2) + '\n';
 
@@ -51,7 +51,7 @@ export async function generateFiles(root, directory) {
     ['overrides.json', overridesRaw],
     ['translations.json', json(result.translations)],
     ['curated.json', curatedRaw],
-    ['pobr.json', json({ ...buildPobrExport({ snapshot: manifest.id, entries: result.entries, curated }),
+    ['templates.json', json({ ...buildTemplateExport({ snapshot: manifest.id, entries: result.entries, curated }),
       source_manifest: '../manifest.json', curated_sha256: meta.curated_sha256 })],
   ]);
 }

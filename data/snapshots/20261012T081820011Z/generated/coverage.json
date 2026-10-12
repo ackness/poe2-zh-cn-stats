@@ -1,0 +1,2897 @@
+{
+  "schema_version": 1,
+  "snapshot": "20261012T081820011Z",
+  "captured_at": "2026-10-12T05:03:22.466Z",
+  "source_manifest": "../manifest.json",
+  "overrides_sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+  "translation_table_sha256": "b0617e48d2f833f25fad4d463e22722146f69b2d60f5c039c2e7b1939207faa1",
+  "curated_sha256": "c5e87dfe89604af4d522e1e43c9bb313cdbec81817cf60a62a4079d6eb431c8d",
+  "scope": "Current English trade2 catalog, excluding pseudo; structural translation coverage, not numerical game-mechanic coverage.",
+  "totals": {
+    "entries": 8267,
+    "resolved_entries": 8002,
+    "ids": 8187,
+    "fully_resolved_ids": 7966,
+    "distinct_english": 3784,
+    "covered_english": 3612,
+    "text_coverage_percent": 95.45
+  },
+  "stages": {
+    "trade_only": {
+      "entries": 8267,
+      "resolved_entries": 7471,
+      "ids": 8187,
+      "fully_resolved_ids": 7471,
+      "distinct_english": 3784,
+      "covered_english": 3584,
+      "text_coverage_percent": 94.71
+    },
+    "explicit_reuse": {
+      "entries": 8267,
+      "resolved_entries": 7956,
+      "ids": 8187,
+      "fully_resolved_ids": 7956,
+      "distinct_english": 3784,
+      "covered_english": 3584,
+      "text_coverage_percent": 94.71
+    },
+    "poe2db": {
+      "entries": 8267,
+      "resolved_entries": 8002,
+      "ids": 8187,
+      "fully_resolved_ids": 7966,
+      "distinct_english": 3784,
+      "covered_english": 3612,
+      "text_coverage_percent": 95.45
+    },
+    "overrides": {
+      "entries": 8267,
+      "resolved_entries": 8002,
+      "ids": 8187,
+      "fully_resolved_ids": 7966,
+      "distinct_english": 3784,
+      "covered_english": 3612,
+      "text_coverage_percent": 95.45
+    },
+    "manual": {
+      "entries": 8267,
+      "resolved_entries": 8002,
+      "ids": 8187,
+      "fully_resolved_ids": 7966,
+      "distinct_english": 3784,
+      "covered_english": 3612,
+      "text_coverage_percent": 95.45
+    }
+  },
+  "methods": {
+    "trade": 7471,
+    "unresolved": 265,
+    "poe2db": 46,
+    "explicit-reuse": 485
+  },
+  "unresolved_reasons": {
+    "missing-cn": 141,
+    "ambiguous-en-branches": 124
+  },
+  "categories": {
+    "crafted": {
+      "entries": 1081,
+      "resolved_entries": 1044,
+      "ids": 1081,
+      "fully_resolved_ids": 1044,
+      "distinct_english": 1080,
+      "covered_english": 1043,
+      "text_coverage_percent": 96.57
+    },
+    "desecrated": {
+      "entries": 755,
+      "resolved_entries": 747,
+      "ids": 749,
+      "fully_resolved_ids": 743,
+      "distinct_english": 753,
+      "covered_english": 745,
+      "text_coverage_percent": 98.94
+    },
+    "enchant": {
+      "entries": 1001,
+      "resolved_entries": 996,
+      "ids": 999,
+      "fully_resolved_ids": 995,
+      "distinct_english": 1000,
+      "covered_english": 995,
+      "text_coverage_percent": 99.5
+    },
+    "explicit": {
+      "entries": 3108,
+      "resolved_entries": 2937,
+      "ids": 3042,
+      "fully_resolved_ids": 2908,
+      "distinct_english": 3082,
+      "covered_english": 2919,
+      "text_coverage_percent": 94.71
+    },
+    "fractured": {
+      "entries": 1250,
+      "resolved_entries": 1238,
+      "ids": 1248,
+      "fully_resolved_ids": 1237,
+      "distinct_english": 1247,
+      "covered_english": 1235,
+      "text_coverage_percent": 99.04
+    },
+    "implicit": {
+      "entries": 182,
+      "resolved_entries": 165,
+      "ids": 178,
+      "fully_resolved_ids": 164,
+      "distinct_english": 181,
+      "covered_english": 164,
+      "text_coverage_percent": 90.61
+    },
+    "rune": {
+      "entries": 595,
+      "resolved_entries": 581,
+      "ids": 595,
+      "fully_resolved_ids": 581,
+      "distinct_english": 592,
+      "covered_english": 578,
+      "text_coverage_percent": 97.64
+    },
+    "sanctum": {
+      "entries": 164,
+      "resolved_entries": 164,
+      "ids": 164,
+      "fully_resolved_ids": 164,
+      "distinct_english": 164,
+      "covered_english": 164,
+      "text_coverage_percent": 100
+    },
+    "skill": {
+      "entries": 131,
+      "resolved_entries": 130,
+      "ids": 131,
+      "fully_resolved_ids": 130,
+      "distinct_english": 128,
+      "covered_english": 127,
+      "text_coverage_percent": 99.22
+    }
+  },
+  "distinct_bilingual_pairs": 3617,
+  "ambiguous_text_translations": [
+    {
+      "english": "# to all Attributes",
+      "translations": [
+        "# 全属性",
+        "全属性 #"
+      ]
+    },
+    {
+      "english": "#% increased Armour, Evasion and Energy Shield",
+      "translations": [
+        "护甲、闪避和能量护盾提高 #%",
+        "护甲，闪避与能量护盾提高 #%"
+      ]
+    },
+    {
+      "english": "#% increased Spirit",
+      "translations": [
+        "精魂提高 #%",
+        "该装备精魂提高 #%"
+      ]
+    },
+    {
+      "english": "Vaal Pact",
+      "translations": [
+        "瓦尔冥约",
+        "瓦尔契约"
+      ]
+    },
+    {
+      "english": "Zealot's Oath",
+      "translations": [
+        "狂热者誓言",
+        "狂热誓言"
+      ]
+    }
+  ],
+  "cn_only": [
+    {
+      "id": "fractured.stat_160888068",
+      "category": "fractured",
+      "texts": [
+        "范围内的核心天赋同时提供 生命上限提高 #%"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|10499",
+      "category": "fractured",
+      "texts": [
+        "配置 灵能结界"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|10772",
+      "category": "fractured",
+      "texts": [
+        "配置 渴饮"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|10774",
+      "category": "fractured",
+      "texts": [
+        "配置 不屈"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|12964",
+      "category": "fractured",
+      "texts": [
+        "配置 独行战士"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|13708",
+      "category": "fractured",
+      "texts": [
+        "配置 曲刃战械"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|1420",
+      "category": "fractured",
+      "texts": [
+        "配置 荡魂横扫"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|20511",
+      "category": "fractured",
+      "texts": [
+        "配置 焚化战吼"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|22726",
+      "category": "fractured",
+      "texts": [
+        "配置 风暴斥责"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|27950",
+      "category": "fractured",
+      "texts": [
+        "配置 辉光之钢"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|34425",
+      "category": "fractured",
+      "texts": [
+        "配置 精确无常"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|34908",
+      "category": "fractured",
+      "texts": [
+        "配置 坚定偏转"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|37244",
+      "category": "fractured",
+      "texts": [
+        "配置 盾牌专长"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|37408",
+      "category": "fractured",
+      "texts": [
+        "配置 止血"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|42103",
+      "category": "fractured",
+      "texts": [
+        "配置 持久偏转"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|4295",
+      "category": "fractured",
+      "texts": [
+        "配置 逆向增生"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|4447",
+      "category": "fractured",
+      "texts": [
+        "配置 锁定动机"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|4579",
+      "category": "fractured",
+      "texts": [
+        "配置 无扰冰霜"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|47441",
+      "category": "fractured",
+      "texts": [
+        "配置 圣痕"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|48774",
+      "category": "fractured",
+      "texts": [
+        "配置 紧绷之躯"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|4931",
+      "category": "fractured",
+      "texts": [
+        "配置 可靠结界"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|49740",
+      "category": "fractured",
+      "texts": [
+        "配置 碎裂晶体"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|52229",
+      "category": "fractured",
+      "texts": [
+        "配置 法球之秘"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|55568",
+      "category": "fractured",
+      "texts": [
+        "配置 绵延不绝"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|56767",
+      "category": "fractured",
+      "texts": [
+        "配置 电殛恍惚"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|59387",
+      "category": "fractured",
+      "texts": [
+        "配置 力量灌注"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|59589",
+      "category": "fractured",
+      "texts": [
+        "配置 全副武装"
+      ]
+    },
+    {
+      "id": "fractured.stat_2954116742|8483",
+      "category": "fractured",
+      "texts": [
+        "配置 废灭"
+      ]
+    },
+    {
+      "id": "fractured.stat_3526763442",
+      "category": "fractured",
+      "texts": [
+        "过去 15 秒内每使用过一个不同的命令技能，召唤生物造成的伤害提高 #%"
+      ]
+    },
+    {
+      "id": "fractured.stat_3621874554",
+      "category": "fractured",
+      "texts": [
+        "你使用法术施加的元素异常状态强度提高 #%"
+      ]
+    },
+    {
+      "id": "fractured.stat_3984146263",
+      "category": "fractured",
+      "texts": [
+        "风雷钟在受到 # 次额外击中后被摧毁"
+      ]
+    },
+    {
+      "id": "fractured.stat_895564377",
+      "category": "fractured",
+      "texts": [
+        "范围内冰霜与火焰伤害的 增减转换成闪电伤害"
+      ]
+    },
+    {
+      "id": "rune.stat_3703496511",
+      "category": "rune",
+      "texts": [
+        "格挡时威吓敌人 # 秒"
+      ]
+    }
+  ],
+  "trade_issues": [
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_243380454",
+      "english": "# additional Rare Monsters are spawned from Abysses in Map",
+      "chineseTexts": [
+        "地图中的深渊额外生成 # 个稀有怪物",
+        "深渊额外生成 # 个稀有怪物"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_243380454",
+      "english": "# additional Rare Monsters are spawned from Abysses",
+      "chineseTexts": [
+        "地图中的深渊额外生成 # 个稀有怪物",
+        "深渊额外生成 # 个稀有怪物"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_2741291867",
+      "english": "Area is overrun by the Abyssal",
+      "chineseTexts": [
+        "区域被深渊占据",
+        "地图被深渊侵占"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_2741291867",
+      "english": "Map is overrun by the Abyssal",
+      "chineseTexts": [
+        "区域被深渊占据",
+        "地图被深渊侵占"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_3490187949",
+      "english": "Area contains # additional Abysses",
+      "chineseTexts": [
+        "区域额外包含 # 个深渊",
+        "地图额外包含 # 个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_3490187949",
+      "english": "Map contains # additional Abysses",
+      "chineseTexts": [
+        "区域额外包含 # 个深渊",
+        "地图额外包含 # 个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_360553763",
+      "english": "Abyssal Monsters have increased Difficulty and Reward for each closed Pit",
+      "chineseTexts": [
+        "每关闭一个巨坑，地图中的深渊怪物的难度与奖励都会提高",
+        "每关闭一个巨坑，深渊怪物的难度与奖励都会提高"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_360553763",
+      "english": "Abyssal Monsters in Map have increased Difficulty and Reward for each closed Pit",
+      "chineseTexts": [
+        "每关闭一个巨坑，地图中的深渊怪物的难度与奖励都会提高",
+        "每关闭一个巨坑，深渊怪物的难度与奖励都会提高"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_4256531808",
+      "english": "Abyss Pits in Area are twice as likely to have Rewards",
+      "chineseTexts": [
+        "区域内的深渊巨坑有双倍几率有奖励",
+        "地图中的深渊巨坑有双倍几率有奖励"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_4256531808",
+      "english": "Abyss Pits in Map are twice as likely to have Rewards",
+      "chineseTexts": [
+        "区域内的深渊巨坑有双倍几率有奖励",
+        "地图中的深渊巨坑有双倍几率有奖励"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_944630113",
+      "english": "Abysses in Map spawn #% increased Monsters",
+      "chineseTexts": [
+        "地图中的深渊生成的怪物数量提高 #%",
+        "深渊生成的怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "desecrated.stat_944630113",
+      "english": "Abysses spawn #% increased Monsters",
+      "chineseTexts": [
+        "地图中的深渊生成的怪物数量提高 #%",
+        "深渊生成的怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "enchant.stat_3732878551",
+      "english": "Rare Monsters have a #% Surpassing chance to have an additional Modifier",
+      "chineseTexts": [
+        "地图中的稀有怪物有 #% 的溢出几率有一个额外词缀",
+        "稀有怪物有 #% 的溢出几率额外有一个词缀"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "enchant.stat_3732878551",
+      "english": "Rare Monsters in Map have a #% Surpassing chance to have an additional Modifier",
+      "chineseTexts": [
+        "地图中的稀有怪物有 #% 的溢出几率有一个额外词缀",
+        "稀有怪物有 #% 的溢出几率额外有一个词缀"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "enchant.stat_3836551197",
+      "english": "#% increased Stack size of Simulacrum Splinters found in Area",
+      "chineseTexts": [
+        "区域内的梦魇拟像裂片堆叠数量提高 #%",
+        "地图内的梦魇拟像裂片堆叠数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "enchant.stat_3836551197",
+      "english": "#% increased Stack size of Simulacrum Splinters found in Map",
+      "chineseTexts": [
+        "区域内的梦魇拟像裂片堆叠数量提高 #%",
+        "地图内的梦魇拟像裂片堆叠数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1031644647",
+      "english": "Revived Monsters from Ritual Altars in Area have #% increased chance to be Magic",
+      "chineseTexts": [
+        "区域内的驱灵祭坛再生怪物为魔法怪物的几率提高 #%",
+        "地图内驱灵祭坛再生怪物为魔法怪物的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1031644647",
+      "english": "Revived Monsters from Ritual Altars in Map have #% increased chance to be Magic",
+      "chineseTexts": [
+        "区域内的驱灵祭坛再生怪物为魔法怪物的几率提高 #%",
+        "地图内驱灵祭坛再生怪物为魔法怪物的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1070816711",
+      "english": "Area contains an additional Abyss",
+      "chineseTexts": [
+        "区域额外包含一个深渊",
+        "地图额外包含一个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1070816711",
+      "english": "Map contains an additional Abyss",
+      "chineseTexts": [
+        "区域额外包含一个深渊",
+        "地图额外包含一个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1083387327",
+      "english": "#% increased Quantity of Expedition Logbooks dropped by Runic Monsters in Map",
+      "chineseTexts": [
+        "地图内符文怪物掉落的先祖秘藏日志数量提高 #%",
+        "符文怪物掉落的先祖秘藏日志数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1083387327",
+      "english": "#% increased Quantity of Expedition Logbooks dropped by Runic Monsters",
+      "chineseTexts": [
+        "地图内符文怪物掉落的先祖秘藏日志数量提高 #%",
+        "符文怪物掉落的先祖秘藏日志数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1090596078",
+      "english": "Breaches in Area spawn #% increased Magic Monsters",
+      "chineseTexts": [
+        "区域内的裂隙生成的魔法怪物数量提高 #%",
+        "地图内的裂隙生成的魔法怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1090596078",
+      "english": "Breaches in Map spawn #% increased Magic Monsters",
+      "chineseTexts": [
+        "区域内的裂隙生成的魔法怪物数量提高 #%",
+        "地图内的裂隙生成的魔法怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1174954559",
+      "english": "Delirium Fog in Area lasts # additional seconds before dissipating",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1174954559",
+      "english": "Delirium Fog in Map lasts # additional seconds before dissipating",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_120737942",
+      "english": "Ritual Altars in Area allow rerolling Favours an additional time",
+      "chineseTexts": [
+        "区域中的驱灵祭坛可以额外重置恩典一次",
+        "地图内的驱灵祭坛可以额外重置恩典一次"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_120737942",
+      "english": "Ritual Altars in Map allow rerolling Favours an additional time",
+      "chineseTexts": [
+        "区域中的驱灵祭坛可以额外重置恩典一次",
+        "地图内的驱灵祭坛可以额外重置恩典一次"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1210760818",
+      "english": "Breaches have #% increased Monster density",
+      "chineseTexts": [
+        "地图裂隙中的怪物群落规模提高 #%",
+        "裂隙的怪物密度提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1210760818",
+      "english": "Breaches in Map have #% increased Pack Size",
+      "chineseTexts": [
+        "地图裂隙中的怪物群落规模提高 #%",
+        "裂隙的怪物密度提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1276056105",
+      "english": "#% increased Gold found in Map (Gold Piles)",
+      "chineseTexts": [
+        "在此区域中可找到的金币数量提高 #% (金币堆)",
+        "地图内找到的金币数量提高 #% (金币堆)"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1276056105",
+      "english": "#% increased Gold found in this Area (Gold Piles)",
+      "chineseTexts": [
+        "在此区域中可找到的金币数量提高 #% (金币堆)",
+        "地图内找到的金币数量提高 #% (金币堆)"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1345835998",
+      "english": "Deferring Favours at Ritual Altars in Area costs #% increased Tribute",
+      "chineseTexts": [
+        "区域内在驱灵祭坛延时恩典消耗的贡品提高 #%",
+        "地图内在驱灵祭坛延时恩典消耗的贡品提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1345835998",
+      "english": "Deferring Favours at Ritual Altars in Map costs #% increased Tribute",
+      "chineseTexts": [
+        "区域内在驱灵祭坛延时恩典消耗的贡品提高 #%",
+        "地图内在驱灵祭坛延时恩典消耗的贡品提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1352729973",
+      "english": "Area has #% increased chance to contain Rogue Exiles",
+      "chineseTexts": [
+        "区域有盗贼流放者的几率提高 #%",
+        "地图有盗贼流放者的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1352729973",
+      "english": "Map has #% increased chance to contain Rogue Exiles",
+      "chineseTexts": [
+        "区域有盗贼流放者的几率提高 #%",
+        "地图有盗贼流放者的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1468737867",
+      "english": "Area contains an additional Shrine",
+      "chineseTexts": [
+        "地图包含一个额外的神龛",
+        "该区域包含一个额外的神龛"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1468737867",
+      "english": "Map contains an additional Shrine",
+      "chineseTexts": [
+        "地图包含一个额外的神龛",
+        "该区域包含一个额外的神龛"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1539368271",
+      "english": "#% increased Expedition Explosive Placement Range in Map",
+      "chineseTexts": [
+        "先祖秘藏炸药放置范围提高 #%",
+        "地图内先祖秘藏炸药放置范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1539368271",
+      "english": "#% increased Expedition Explosive Placement Range",
+      "chineseTexts": [
+        "先祖秘藏炸药放置范围提高 #%",
+        "地图内先祖秘藏炸药放置范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_159726667",
+      "english": "Monsters Sacrificed at Ritual Altars in Area grant #% increased Tribute",
+      "chineseTexts": [
+        "在区域中的驱灵祭坛处献祭怪物提供的贡品提高#%",
+        "地图内在驱灵祭坛献祭怪物提供的贡品提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_159726667",
+      "english": "Monsters Sacrificed at Ritual Altars in Map grant #% increased Tribute",
+      "chineseTexts": [
+        "在区域中的驱灵祭坛处献祭怪物提供的贡品提高#%",
+        "地图内在驱灵祭坛献祭怪物提供的贡品提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1640965354",
+      "english": "Area contains #% increased number of Runic Monster Markers",
+      "chineseTexts": [
+        "区域内符文怪物之印的数量提高 #%",
+        "地图内符文怪物标记的数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1640965354",
+      "english": "Map contains #% increased number of Runic Monster Markers",
+      "chineseTexts": [
+        "区域内符文怪物之印的数量提高 #%",
+        "地图内符文怪物标记的数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1653625239",
+      "english": "Breaches in Area spawn an additional Rare Monster",
+      "chineseTexts": [
+        "区域内的裂隙生成一个额外的稀有怪物",
+        "地图内的裂隙生成一个额外的稀有怪物"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1653625239",
+      "english": "Breaches in Map spawn an additional Rare Monster",
+      "chineseTexts": [
+        "区域内的裂隙生成一个额外的稀有怪物",
+        "地图内的裂隙生成一个额外的稀有怪物"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1769611692",
+      "english": "Delirium Fog in Area applies #% increased Deliriousness to Players",
+      "chineseTexts": [
+        "区域中的惊悸迷雾使玩家的亢奋度提高 #%",
+        "地图中的惊悸迷雾使玩家的亢奋度提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1769611692",
+      "english": "Delirium Fog in Map applies #% increased Deliriousness to Players",
+      "chineseTexts": [
+        "区域中的惊悸迷雾使玩家的亢奋度提高 #%",
+        "地图中的惊悸迷雾使玩家的亢奋度提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1770833858",
+      "english": "Delirium Encounters in Area have #% chance to generate an additional Reward",
+      "chineseTexts": [
+        "区域内惊悸迷雾遭遇战有 #% 几率产生额外奖励",
+        "受影响的地图内的惊悸迷雾遭遇战有 #% 的几率产生一个额外奖励"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1770833858",
+      "english": "Delirium Encounters in affected Map have #% chance to generate an additional Reward",
+      "chineseTexts": [
+        "区域内惊悸迷雾遭遇战有 #% 几率产生额外奖励",
+        "受影响的地图内的惊悸迷雾遭遇战有 #% 的几率产生一个额外奖励"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1825943485",
+      "english": "Area has #% increased chance to contain Essences",
+      "chineseTexts": [
+        "区域包含精华的几率提高 #%",
+        "地图包含精华的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_1825943485",
+      "english": "Map has #% increased chance to contain Essences",
+      "chineseTexts": [
+        "区域包含精华的几率提高 #%",
+        "地图包含精华的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2162684861",
+      "english": "Areas with Powerful Map Bosses contain an additional Essence",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的精华",
+        "地图包含一个额外的精华"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2162684861",
+      "english": "Map contains an additional Essence",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的精华",
+        "地图包含一个额外的精华"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2224050171",
+      "english": "Breaches in Area contain # additional Clasped Hand",
+      "chineseTexts": [
+        "地图内的裂隙额外包含 # 个紧握之手",
+        "该区域中的裂隙额外包含#个紧握之手"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2224050171",
+      "english": "Breaches in Map contain # additional Clasped Hand",
+      "chineseTexts": [
+        "地图内的裂隙额外包含 # 个紧握之手",
+        "该区域中的裂隙额外包含#个紧握之手"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2282052746",
+      "english": "Rerolling Favours at Ritual Altars in Area costs #% increased Tribute",
+      "chineseTexts": [
+        "区域内在驱灵祭坛重置恩典消耗的贡品提高 #%",
+        "地图内在驱灵祭坛重置恩典消耗的贡品提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2282052746",
+      "english": "Rerolling Favours at Ritual Altars in Map costs #% increased Tribute",
+      "chineseTexts": [
+        "区域内在驱灵祭坛重置恩典消耗的贡品提高 #%",
+        "地图内在驱灵祭坛重置恩典消耗的贡品提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_231864447",
+      "english": "Area contains an additional Rare Chest",
+      "chineseTexts": [
+        "地图包含一个额外的稀有宝箱",
+        "该区域会出现额外 1 个稀有箱子"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_231864447",
+      "english": "Map contains an additional Rare Chest",
+      "chineseTexts": [
+        "地图包含一个额外的稀有宝箱",
+        "该区域会出现额外 1 个稀有箱子"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2323782229",
+      "english": "Slaying Rare Monsters in Area pauses the Delirium Mirror Timer for 1 second",
+      "chineseTexts": [
+        "击败区域内的稀有怪物使惊悸迷雾之镜的倒计时暂停 1 秒",
+        "击败地图内的稀有怪物使惊悸迷雾之镜的倒计时暂停 1 秒"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2323782229",
+      "english": "Slaying Rare Monsters in Map pauses the Delirium Mirror Timer for 1 second",
+      "chineseTexts": [
+        "击败区域内的稀有怪物使惊悸迷雾之镜的倒计时暂停 1 秒",
+        "击败地图内的稀有怪物使惊悸迷雾之镜的倒计时暂停 1 秒"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_243380454",
+      "english": "# additional Rare Monsters are spawned from Abysses in Map",
+      "chineseTexts": [
+        "地图中的深渊额外生成 # 个稀有怪物",
+        "深渊额外生成 # 个稀有怪物"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_243380454",
+      "english": "# additional Rare Monsters are spawned from Abysses",
+      "chineseTexts": [
+        "地图中的深渊额外生成 # 个稀有怪物",
+        "深渊额外生成 # 个稀有怪物"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2440265466",
+      "english": "Areas which contain Breaches have #% chance to contain three additional Breaches",
+      "chineseTexts": [
+        "包含裂隙的区域有 #% 几率包含三个额外的裂隙",
+        "地图有 #% 的几率包含三个额外的裂隙"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2440265466",
+      "english": "Map has #% chance to contain three additional Breaches",
+      "chineseTexts": [
+        "包含裂隙的区域有 #% 几率包含三个额外的裂隙",
+        "地图有 #% 的几率包含三个额外的裂隙"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2504358770",
+      "english": "Breaches in Map open and close #% faster",
+      "chineseTexts": [
+        "地图内裂隙开合速度加快 #%",
+        "裂隙打开和关闭的速度加快#%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2504358770",
+      "english": "Breaches open and close #% faster",
+      "chineseTexts": [
+        "地图内裂隙开合速度加快 #%",
+        "裂隙打开和关闭的速度加快#%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_267210597",
+      "english": "Area has #% increased chance to contain a Summoning Circle",
+      "chineseTexts": [
+        "区域包含召唤法阵的几率提高 #%",
+        "地图包含召唤法阵的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_267210597",
+      "english": "Map has #% increased chance to contain a Summoning Circle",
+      "chineseTexts": [
+        "区域包含召唤法阵的几率提高 #%",
+        "地图包含召唤法阵的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2694800111",
+      "english": "#% increased number of Rare Expedition Monsters in Area",
+      "chineseTexts": [
+        "区域内的稀有先祖秘藏怪物数量提高 #%",
+        "地图内稀有先祖秘藏怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2694800111",
+      "english": "#% increased number of Rare Expedition Monsters in Map",
+      "chineseTexts": [
+        "区域内的稀有先祖秘藏怪物数量提高 #%",
+        "地图内稀有先祖秘藏怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2722831300",
+      "english": "Abysses in Area have #% increased chance to lead to an Abyssal Depths",
+      "chineseTexts": [
+        "区域内的深渊通往绝望深渊的几率提高 #%",
+        "地图中的深渊通往绝望深渊的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2722831300",
+      "english": "Abysses in Map have #% increased chance to lead to an Abyssal Depths",
+      "chineseTexts": [
+        "区域内的深渊通往绝望深渊的几率提高 #%",
+        "地图中的深渊通往绝望深渊的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2741291867",
+      "english": "Area is overrun by the Abyssal",
+      "chineseTexts": [
+        "区域被深渊占据",
+        "地图被深渊侵占"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2741291867",
+      "english": "Map is overrun by the Abyssal",
+      "chineseTexts": [
+        "区域被深渊占据",
+        "地图被深渊侵占"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2816104578",
+      "english": "Runic Monsters are Duplicated",
+      "chineseTexts": [
+        "你地图中的符文怪物被复制",
+        "符文怪物会复制"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2816104578",
+      "english": "Runic Monsters in your Maps are Duplicated",
+      "chineseTexts": [
+        "你地图中的符文怪物被复制",
+        "符文怪物会复制"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_28208665",
+      "english": "Favours Deferred at Ritual Altars in Area reappear #% sooner",
+      "chineseTexts": [
+        "区域内的驱灵祭坛上延时的恩典重现速度加快 #%",
+        "地图内驱灵祭坛上延时的恩典重现速度加快 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_28208665",
+      "english": "Favours Deferred at Ritual Altars in Map reappear #% sooner",
+      "chineseTexts": [
+        "区域内的驱灵祭坛上延时的恩典重现速度加快 #%",
+        "地图内驱灵祭坛上延时的恩典重现速度加快 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2839545956",
+      "english": "Area contains a Summoning Circle",
+      "chineseTexts": [
+        "区域内包含一个召唤法阵",
+        "地图包含一个额外的召唤法阵"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2839545956",
+      "english": "Map contains an additional Summoning Circle",
+      "chineseTexts": [
+        "区域内包含一个召唤法阵",
+        "地图包含一个额外的召唤法阵"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2890355696",
+      "english": "Area has #% chance to contain four additional Abysses",
+      "chineseTexts": [
+        "区域有 #% 的几率额外包含四个深渊",
+        "地图有 #% 的几率额外包含四个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_2890355696",
+      "english": "Map has #% chance to contain four additional Abysses",
+      "chineseTexts": [
+        "区域有 #% 的几率额外包含四个深渊",
+        "地图有 #% 的几率额外包含四个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3040603554",
+      "english": "Areas with Powerful Map Bosses contain an additional Strongbox",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的保险箱",
+        "地图包含一个额外的保险箱"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3040603554",
+      "english": "Map contains an additional Strongbox",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的保险箱",
+        "地图包含一个额外的保险箱"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3042527515",
+      "english": "Areas with Map Powerful Map Bosses contain an additional Shrine",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的神龛",
+        "地图包含一个额外的神龛"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3042527515",
+      "english": "Map contains an additional Shrine",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的神龛",
+        "地图包含一个额外的神龛"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3049505189",
+      "english": "Areas which contain Breaches have #% chance to contain an additional Breach",
+      "chineseTexts": [
+        "包含裂隙的区域有 #% 几率包含一个额外的裂隙",
+        "地图有 #% 的几率包含一个额外的裂隙"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3049505189",
+      "english": "Map has #% chance to contain an additional Breach",
+      "chineseTexts": [
+        "包含裂隙的区域有 #% 几率包含一个额外的裂隙",
+        "地图有 #% 的几率包含一个额外的裂隙"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3078574625",
+      "english": "#% increased Effect of Expedition Remnants in Map",
+      "chineseTexts": [
+        "区域内的残骸效果提高 #%",
+        "地图内先祖秘藏残骸效果提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3078574625",
+      "english": "#% increased Effect of Remnants in Area",
+      "chineseTexts": [
+        "区域内的残骸效果提高 #%",
+        "地图内先祖秘藏残骸效果提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3226351972",
+      "english": "Delirium Fog in Area lasts # additional seconds before dissipating",
+      "chineseTexts": [
+        "区域内的惊悸迷雾在消散前额外持续 # 秒",
+        "地图内的惊悸迷雾在消散前额外持续 # 秒"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3226351972",
+      "english": "Delirium Fog in Map lasts # additional seconds before dissipating",
+      "chineseTexts": [
+        "区域内的惊悸迷雾在消散前额外持续 # 秒",
+        "地图内的惊悸迷雾在消散前额外持续 # 秒"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3240183538",
+      "english": "Area contains an additional Strongbox",
+      "chineseTexts": [
+        "区域内有一个额外的保险箱",
+        "地图包含 # 个额外的保险箱"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3240183538",
+      "english": "Map contains # additional Strongboxes",
+      "chineseTexts": [
+        "区域内有一个额外的保险箱",
+        "地图包含 # 个额外的保险箱"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3289828378",
+      "english": "#% increased Expedition Explosive Radius in Map",
+      "chineseTexts": [
+        "先祖秘藏爆炸范围提高 #%",
+        "地图内先祖秘藏爆炸范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3289828378",
+      "english": "#% increased Expedition Explosive Radius",
+      "chineseTexts": [
+        "先祖秘藏爆炸范围提高 #%",
+        "地图内先祖秘藏爆炸范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3350944114",
+      "english": "Delirium Fog in Area dissipates #% faster",
+      "chineseTexts": [
+        "区域内惊悸迷雾的消散速度加快 #%",
+        "地图内惊悸迷雾消散速度加快 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3350944114",
+      "english": "Delirium Fog in Map dissipates #% faster",
+      "chineseTexts": [
+        "区域内惊悸迷雾的消散速度加快 #%",
+        "地图内惊悸迷雾消散速度加快 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3428124128",
+      "english": "Delirious Monsters Killed in Area provide #% increased Reward Progress",
+      "chineseTexts": [
+        "区域内击败的惊悸迷雾怪物提供的奖励进度提高 #%",
+        "地图内击败的惊悸迷雾怪物提供的奖励进度提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3428124128",
+      "english": "Delirious Monsters Killed in Map provide #% increased Reward Progress",
+      "chineseTexts": [
+        "区域内击败的惊悸迷雾怪物提供的奖励进度提高 #%",
+        "地图内击败的惊悸迷雾怪物提供的奖励进度提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3465791711",
+      "english": "Delirium Monsters in Area have #% increased Pack Size",
+      "chineseTexts": [
+        "区域内惊悸迷雾怪物的怪物群规模提高 #%",
+        "地图内惊悸迷雾怪物的怪物群规模提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3465791711",
+      "english": "Delirium Monsters in Map have #% increased Pack Size",
+      "chineseTexts": [
+        "区域内惊悸迷雾怪物的怪物群规模提高 #%",
+        "地图内惊悸迷雾怪物的怪物群规模提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3490187949",
+      "english": "Area contains # additional Abysses",
+      "chineseTexts": [
+        "区域额外包含 # 个深渊",
+        "地图额外包含 # 个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3490187949",
+      "english": "Map contains # additional Abysses",
+      "chineseTexts": [
+        "区域额外包含 # 个深渊",
+        "地图额外包含 # 个深渊"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3550168289",
+      "english": "Area is inhabited by # additional Rogue Exile",
+      "chineseTexts": [
+        "区域内会出现额外 # 个盗贼流放者",
+        "地图内会出现 # 个额外的盗贼流放者"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3550168289",
+      "english": "Map is inhabited by # additional Rogue Exile",
+      "chineseTexts": [
+        "区域内会出现额外 # 个盗贼流放者",
+        "地图内会出现 # 个额外的盗贼流放者"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_358129101",
+      "english": "Area contains # additional Azmeri Spirit",
+      "chineseTexts": [
+        "地图包含 # 个额外的阿兹莫里之灵",
+        "该区域会出现 # 个阿兹莫里之灵正在游荡"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_358129101",
+      "english": "Map contains # additional Azmeri Spirit",
+      "chineseTexts": [
+        "地图包含 # 个额外的阿兹莫里之灵",
+        "该区域会出现 # 个阿兹莫里之灵正在游荡"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_360553763",
+      "english": "Abyssal Monsters have increased Difficulty and Reward for each closed Pit",
+      "chineseTexts": [
+        "每关闭一个巨坑，地图中的深渊怪物的难度与奖励都会提高",
+        "每关闭一个巨坑，深渊怪物的难度与奖励都会提高"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_360553763",
+      "english": "Abyssal Monsters in Map have increased Difficulty and Reward for each closed Pit",
+      "chineseTexts": [
+        "每关闭一个巨坑，地图中的深渊怪物的难度与奖励都会提高",
+        "每关闭一个巨坑，深渊怪物的难度与奖励都会提高"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3732878551",
+      "english": "Rare Monsters have a #% Surpassing chance to have an additional Modifier",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3732878551",
+      "english": "Rare Monsters in Map have a #% Surpassing chance to have an additional Modifier",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3753446846",
+      "english": "Expeditions in Area have # Remnants",
+      "chineseTexts": [
+        "区域内的先祖秘藏残骸 #",
+        "地图内的先祖秘藏残骸 #"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3753446846",
+      "english": "Expeditions in Map have # Remnant",
+      "chineseTexts": [
+        "区域内的先祖秘藏残骸 #",
+        "地图内的先祖秘藏残骸 #"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3815617979",
+      "english": "Area has #% increased chance to contain Azmeri Spirits",
+      "chineseTexts": [
+        "区域内有阿兹莫里之灵的几率提高 #%",
+        "地图有阿兹莫里之灵的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3815617979",
+      "english": "Map has #% increased chance to contain Azmeri Spirits",
+      "chineseTexts": [
+        "区域内有阿兹莫里之灵的几率提高 #%",
+        "地图有阿兹莫里之灵的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3836551197",
+      "english": "#% increased Stack size of Simulacrum Splinters found in Area",
+      "chineseTexts": [
+        "区域内的梦魇拟像裂片堆叠数量提高 #%",
+        "地图内的梦魇拟像裂片堆叠数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3836551197",
+      "english": "#% increased Stack size of Simulacrum Splinters found in Map",
+      "chineseTexts": [
+        "区域内的梦魇拟像裂片堆叠数量提高 #%",
+        "地图内的梦魇拟像裂片堆叠数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_395808938",
+      "english": "Area contains an additional Essence",
+      "chineseTexts": [
+        "地图包含一个额外的精华",
+        "该区域会出现额外 1 个精华"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_395808938",
+      "english": "Map contains an additional Essence",
+      "chineseTexts": [
+        "地图包含一个额外的精华",
+        "该区域会出现额外 1 个精华"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3962960008",
+      "english": "Delirium Encounters in Area are #% more likely to spawn Unique Bosses",
+      "chineseTexts": [
+        "区域内的惊悸迷雾遭遇战生成传奇首领的几率总增 #%",
+        "地图内的惊悸迷雾遭遇战生成传奇首领的几率总增 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3962960008",
+      "english": "Delirium Encounters in Map are #% more likely to spawn Unique Bosses",
+      "chineseTexts": [
+        "区域内的惊悸迷雾遭遇战生成传奇首领的几率总增 #%",
+        "地图内的惊悸迷雾遭遇战生成传奇首领的几率总增 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3979184174",
+      "english": "Revived Monsters from Ritual Altars in Area have #% increased chance to be Rare",
+      "chineseTexts": [
+        "区域内的驱灵祭坛再生怪物为稀有怪物的几率提高 #%",
+        "地图内的驱灵祭坛再生怪物为稀有怪物的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_3979184174",
+      "english": "Revived Monsters from Ritual Altars in Map have #% increased chance to be Rare",
+      "chineseTexts": [
+        "区域内的驱灵祭坛再生怪物为稀有怪物的几率提高 #%",
+        "地图内的驱灵祭坛再生怪物为稀有怪物的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4219583418",
+      "english": "#% increased quantity of Artifacts dropped by Monsters",
+      "chineseTexts": [
+        "地图内怪物掉落的先祖秘藏神器数量提高 #%",
+        "怪物掉落的神器数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4219583418",
+      "english": "#% increased quantity of Expedition Artifacts dropped by Monsters in Map",
+      "chineseTexts": [
+        "地图内怪物掉落的先祖秘藏神器数量提高 #%",
+        "怪物掉落的神器数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4219853180",
+      "english": "Ritual Favours in Area have #% increased chance to be Omens",
+      "chineseTexts": [
+        "区域内的驱灵祭坛恩典为预兆的几率提高 #%",
+        "地图内驱灵恩典为预兆的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4219853180",
+      "english": "Ritual Favours in Map have #% increased chance to be Omens",
+      "chineseTexts": [
+        "区域内的驱灵祭坛恩典为预兆的几率提高 #%",
+        "地图内驱灵恩典为预兆的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4256531808",
+      "english": "Abyss Pits in Area are twice as likely to have Rewards",
+      "chineseTexts": [
+        "区域内的深渊巨坑有双倍几率有奖励",
+        "地图中的深渊巨坑有双倍几率有奖励"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4256531808",
+      "english": "Abyss Pits in Map are twice as likely to have Rewards",
+      "chineseTexts": [
+        "区域内的深渊巨坑有双倍几率有奖励",
+        "地图中的深渊巨坑有双倍几率有奖励"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4279535856",
+      "english": "Area has #% increased chance to contain Strongboxes",
+      "chineseTexts": [
+        "区域包含保险箱的几率提高 #%",
+        "地图包含保险箱的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_4279535856",
+      "english": "Map has #% increased chance to contain Strongboxes",
+      "chineseTexts": [
+        "区域包含保险箱的几率提高 #%",
+        "地图包含保险箱的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_551040294",
+      "english": "Delirium Fog in Area spawns #% increased Fracturing Mirrors",
+      "chineseTexts": [
+        "区域内的惊悸迷雾生成的破溃之镜数量提高 #%",
+        "地图内的惊悸迷雾生成的破溃之镜数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_551040294",
+      "english": "Delirium Fog in Map spawns #% increased Fracturing Mirrors",
+      "chineseTexts": [
+        "区域内的惊悸迷雾生成的破溃之镜数量提高 #%",
+        "地图内的惊悸迷雾生成的破溃之镜数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_57434274",
+      "english": "#% increased Experience gain in Map",
+      "chineseTexts": [
+        "地图内的经验值获取提高 #%",
+        "获得的经验值提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_57434274",
+      "english": "#% increased Experience gain",
+      "chineseTexts": [
+        "地图内的经验值获取提高 #%",
+        "获得的经验值提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_624534143",
+      "english": "#% increased Quantity of Breach Splinters dropped by Breach Monsters in Area",
+      "chineseTexts": [
+        "区域内的裂隙怪物掉落的裂隙碎片的数量提高 #%",
+        "地图内裂隙怪物掉落的裂隙碎片数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_624534143",
+      "english": "#% increased Quantity of Breach Splinters dropped by Breach Monsters in Map",
+      "chineseTexts": [
+        "区域内的裂隙怪物掉落的裂隙碎片的数量提高 #%",
+        "地图内裂隙怪物掉落的裂隙碎片数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_689816330",
+      "english": "Area has #% increased chance to contain Shrines",
+      "chineseTexts": [
+        "区域包含神龛的几率提高 #%",
+        "地图包含神龛的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_689816330",
+      "english": "Map has #% increased chance to contain Shrines",
+      "chineseTexts": [
+        "区域包含神龛的几率提高 #%",
+        "地图包含神龛的几率提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_775597083",
+      "english": "Areas with Powerful Map Bosses contain an additional Azmeri Spirit",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的阿兹莫里之灵",
+        "地图包含一个额外的阿兹莫里之灵"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_775597083",
+      "english": "Map contains an additional Azmeri Spirit",
+      "chineseTexts": [
+        "具有地图首领的区域包含一个额外的阿兹莫里之灵",
+        "地图包含一个额外的阿兹莫里之灵"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_937291386",
+      "english": "Favours Rerolled at Ritual Altars in Area have #% chance to cost no Tribute",
+      "chineseTexts": [
+        "区域内在驱灵祭坛重置恩典有 #% 几率不消耗贡品",
+        "地图内在驱灵祭坛重置恩典有 #% 几率不消耗贡品"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_937291386",
+      "english": "Favours Rerolled at Ritual Altars in Map have #% chance to cost no Tribute",
+      "chineseTexts": [
+        "区域内在驱灵祭坛重置恩典有 #% 几率不消耗贡品",
+        "地图内在驱灵祭坛重置恩典有 #% 几率不消耗贡品"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_944630113",
+      "english": "Abysses in Map spawn #% increased Monsters",
+      "chineseTexts": [
+        "地图中的深渊生成的怪物数量提高 #%",
+        "深渊生成的怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "explicit.stat_944630113",
+      "english": "Abysses spawn #% increased Monsters",
+      "chineseTexts": [
+        "地图中的深渊生成的怪物数量提高 #%",
+        "深渊生成的怪物数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "fractured.stat_1276056105",
+      "english": "#% increased Gold found in Map (Gold Piles)",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "fractured.stat_1276056105",
+      "english": "#% increased Gold found in this Area (Gold Piles)",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "fractured.stat_57434274",
+      "english": "#% increased Experience gain in Map",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "fractured.stat_57434274",
+      "english": "#% increased Experience gain",
+      "chineseTexts": []
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_1539368271",
+      "english": "#% increased Expedition Explosive Placement Range in Map",
+      "chineseTexts": [
+        "先祖秘藏炸药放置范围提高 #%",
+        "地图内先祖秘藏炸药放置范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_1539368271",
+      "english": "#% increased Expedition Explosive Placement Range",
+      "chineseTexts": [
+        "先祖秘藏炸药放置范围提高 #%",
+        "地图内先祖秘藏炸药放置范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_1640965354",
+      "english": "Area contains #% increased number of Runic Monster Markers",
+      "chineseTexts": [
+        "区域内符文怪物之印的数量提高 #%",
+        "地图内符文怪物标记的数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_1640965354",
+      "english": "Map contains #% increased number of Runic Monster Markers",
+      "chineseTexts": [
+        "区域内符文怪物之印的数量提高 #%",
+        "地图内符文怪物标记的数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_3289828378",
+      "english": "#% increased Expedition Explosive Radius in Map",
+      "chineseTexts": [
+        "先祖秘藏爆炸范围提高 #%",
+        "地图内先祖秘藏爆炸范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_3289828378",
+      "english": "#% increased Expedition Explosive Radius",
+      "chineseTexts": [
+        "先祖秘藏爆炸范围提高 #%",
+        "地图内先祖秘藏爆炸范围提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_4219583418",
+      "english": "#% increased quantity of Artifacts dropped by Monsters",
+      "chineseTexts": [
+        "地图内怪物掉落的先祖秘藏神器数量提高 #%",
+        "怪物掉落的神器数量提高 #%"
+      ]
+    },
+    {
+      "code": "ambiguous-en-branches",
+      "id": "implicit.stat_4219583418",
+      "english": "#% increased quantity of Expedition Artifacts dropped by Monsters in Map",
+      "chineseTexts": [
+        "地图内怪物掉落的先祖秘藏神器数量提高 #%",
+        "怪物掉落的神器数量提高 #%"
+      ]
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_1301765461",
+      "english": "#% to Maximum Chaos Resistance",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2888350852",
+      "english": "Gain #% of Damage as Extra Cold Damage while you are missing Runic Ward",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|12750",
+      "english": "Allocates Vale Shelter",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|13708",
+      "english": "Allocates Curved Weapon",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|22811",
+      "english": "Allocates The Wild Cat",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|261",
+      "english": "Allocates Toxic Sludge",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|32128",
+      "english": "Allocates Flow of Time",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|32448",
+      "english": "Allocates Shockproof",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|34553",
+      "english": "Allocates Emboldening Lead",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|34617",
+      "english": "Allocates Conall the Hunted",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|35743",
+      "english": "Allocates Saqawal's Hide",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|37244",
+      "english": "Allocates Shield Expertise",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|37302",
+      "english": "Allocates Kept at Bay",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|40117",
+      "english": "Allocates Spiked Armour",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|40325",
+      "english": "Allocates Resolution",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|43250",
+      "english": "Allocates Adaptive Skin",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|4331",
+      "english": "Allocates Guided Hand",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|44753",
+      "english": "Allocates One With Flame",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|44756",
+      "english": "Allocates Marked Agility",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|45713",
+      "english": "Allocates Savouring",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|46384",
+      "english": "Allocates Wide Barrier",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|4661",
+      "english": "Allocates Inspiring Leader",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|48103",
+      "english": "Allocates Forcewave",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|48240",
+      "english": "Allocates Quick Recovery",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|48649",
+      "english": "Allocates Insulating Hide",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|49984",
+      "english": "Allocates Spellblade",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|51105",
+      "english": "Allocates Spirit Bond",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|52180",
+      "english": "Allocates Trained Deflection",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|5335",
+      "english": "Allocates Shimmering Mirage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|53527",
+      "english": "Allocates Shattering Blow",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|5663",
+      "english": "Allocates Endurance",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|58817",
+      "english": "Allocates Artillery Strike",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|59433",
+      "english": "Allocates Thirst for Endurance",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|750",
+      "english": "Allocates Tribal Fury",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|8916",
+      "english": "Allocates Bashing Beast",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_2954116742|9736",
+      "english": "Allocates Insulated Treads",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "crafted.stat_4011431182",
+      "english": "Gain #% of Damage as Extra Chaos Damage while you are missing Runic Ward",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "desecrated.stat_262946222",
+      "english": "Allies in your Presence deal # to # added Attack Chaos Damage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "enchant.stat_2017682521",
+      "english": "#% increased Pack Size in Map",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "enchant.stat_2306002879",
+      "english": "#% increased Rarity of Items found in Map",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "enchant.stat_3233599707",
+      "english": "#% increased Weapon Swap Speed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "enchant.stat_3650992555",
+      "english": "Debuffs you inflict have #% increased Slow Magnitude",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "enchant.stat_836936635",
+      "english": "Regenerate #% of maximum Life per second",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1002973905",
+      "english": "Recover all Mana when Used",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1129429646",
+      "english": "Small Passive Skills in Radius also grant #% increased Weapon Swap Speed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1132041585",
+      "english": "Virtuous",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1133965702",
+      "english": "#% increased Gold found in this Area",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1157523820",
+      "english": "#% chance for Slam Skills to cause an additional Aftershock",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1176947534",
+      "english": "Undead Minions have #% reduced Reservation",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1247628870",
+      "english": "Small Passive Skills in Radius also grant #% increased maximum Mana",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1285684287",
+      "english": "Enemies in your Presence count as being on Low Life",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1314787770",
+      "english": "Map Boss has +#% chance to drop a Waystone of the current tier or higher",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1361645249",
+      "english": "Allies in your Presence have Block Chance equal to yours",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1414945937",
+      "english": "Manifested Dancing Dervishes die when Rampage ends",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1416292992",
+      "english": "Has # Charm Slot",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1538879632",
+      "english": "Inflict Fire Exposure on Shocking an Enemy",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1559935218",
+      "english": "Causes Daze buildup equal to #% of Damage dealt",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1708461270",
+      "english": "Monsters have #% increased Area of Effect",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1714706956",
+      "english": "#% increased Magic Pack Size",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1718147982",
+      "english": "#% increased Minion Accuracy Rating",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1761741119",
+      "english": "Banners always have maximum Valour",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1809641701",
+      "english": "Small Passive Skills in Radius also grant #% increased maximum Life",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1896726125",
+      "english": "# to maximum Valour",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_1949833742",
+      "english": "#% increased Daze Buildup",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2241560081",
+      "english": "#% increased Attack Speed per 25 Dexterity",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2388936716",
+      "english": "Area has #% chance to contain a Strongbox",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2396719220",
+      "english": "Area contains an additional Magic Chest",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2513318031",
+      "english": "#% increased Attributes per Socket filled",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2571125745",
+      "english": "Area has #% chance to contain a Shrine",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2624927319",
+      "english": "#% increased number of Monster Packs",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2625554454",
+      "english": "Every 10 seconds, gain a random non-damaging Shrine buff for 20 seconds",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2665488635",
+      "english": "Inflict Lightning Exposure on Critical Hit",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2675129731",
+      "english": "Notable Passive Skills in Radius also grant #% increased Warcry Buff Effect",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2702182380",
+      "english": "#% increased Maximum Life per Socket filled",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2793222406",
+      "english": "#% increased bonuses gained from Equipped Rings",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2888350852",
+      "english": "Gain #% of Damage as Extra Cold Damage while you are missing Runic Ward",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2889807051",
+      "english": "Melee Hits count as Rampage Kills Rampage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_289086688",
+      "english": "Hits Break # Armour",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2898517796",
+      "english": "#% increased amount of Magic Chests",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2930706364",
+      "english": "Permanently Intimidate enemies on Block",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2954116742|32128",
+      "english": "Allocates Flow of Time",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2954116742|34617",
+      "english": "Allocates Conall the Hunted",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_2954116742|35743",
+      "english": "Allocates Saqawal's Hide",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_3005701891",
+      "english": "Inflict Cold Exposure on Hit",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_3063814459",
+      "english": "Pin Enemies which are Primed for Pinning",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_313223231",
+      "english": "#% increased Rarity of Items found per Socket filled",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_3169585282",
+      "english": "Allies in your Presence have # to Accuracy Rating",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_3233599707",
+      "english": "#% increased Weapon Swap Speed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_3243034867",
+      "english": "Notable Passive Skills in Radius also grant Aura Skills have #% increased Magnitudes",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_3314536008",
+      "english": "Inflict Cold Exposure on Igniting an Enemy",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_359380213",
+      "english": "Inflicts Elemental Exposure when this Weapon Fully Breaks Armour",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_3749502527",
+      "english": "#% chance to gain Volatility on Kill",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_398335579",
+      "english": "Cannot be used while Manifested",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_4007938693",
+      "english": "Triggers Level # Manifest Dancing Dervishes on Rampage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_4011431182",
+      "english": "Gain #% of Damage as Extra Chaos Damage while you are missing Runic Ward",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_4098286334",
+      "english": "Area has #% chance to contain an Essence",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_4225700219",
+      "english": "Notable Passive Skills in Radius also grant #% chance to gain Volatility on Kill",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|160",
+      "english": "+# to Level of all Skeletal Sniper Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|186",
+      "english": "+# to Level of all Herald of Blood Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|193",
+      "english": "+# to Level of all Tamed Companion Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|64",
+      "english": "+# to Level of all Cast on Shock Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|65",
+      "english": "+# to Level of all Cast on Freeze Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|66",
+      "english": "+# to Level of all Cast on Ignite Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|80",
+      "english": "+# to Level of all Flammability Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|81",
+      "english": "+# to Level of all Hypothermia Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_448592698|82",
+      "english": "+# to Level of all Conductivity Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_65135897",
+      "english": "Cannot use Shield Skills",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_793875384",
+      "english": "Small Passive Skills in Radius also grant #% increased Minion Accuracy Rating",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_798469000",
+      "english": "#% increased amount of Rare Chests",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_911712882",
+      "english": "#% increased Maximum Mana per Socket filled",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "explicit.stat_915546383",
+      "english": "Gain #% of Physical Damage as Extra Damage of a random Element",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_1129429646",
+      "english": "Small Passive Skills in Radius also grant #% increased Weapon Swap Speed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_1714706956",
+      "english": "#% increased Magic Pack Size",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_1718147982",
+      "english": "#% increased Minion Accuracy Rating",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_3169585282",
+      "english": "Allies in your Presence have # to Accuracy Rating",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_3233599707",
+      "english": "#% increased Weapon Swap Speed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_3243034867",
+      "english": "Notable Passive Skills in Radius also grant Aura Skills have #% increased Magnitudes",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_3749502527",
+      "english": "#% chance to gain Volatility on Kill",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_4225700219",
+      "english": "Notable Passive Skills in Radius also grant #% chance to gain Volatility on Kill",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "fractured.stat_793875384",
+      "english": "Small Passive Skills in Radius also grant #% increased Minion Accuracy Rating",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1050883682",
+      "english": "Has no Accuracy Penalty from Range",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1137147997",
+      "english": "Unblockable",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1311130924",
+      "english": "#% of Damage taken from Hits bypasses Energy Shield if Energy Shield is below half",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1368271171",
+      "english": "Gain # Mana per enemy killed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1443060084",
+      "english": "#% reduced Enemy Stun Threshold",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1519615863",
+      "english": "#% chance to cause Bleeding on Hit",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1559935218",
+      "english": "Causes Daze buildup equal to #% of Damage dealt",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_1961849903",
+      "english": "Cannot use Projectile Attacks",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_3544050945",
+      "english": "#% of Spell Mana Cost Converted to Life Cost",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_3691641145",
+      "english": "#% increased Damage taken",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_3695891184",
+      "english": "Gain # Life per enemy killed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "implicit.stat_4270348114",
+      "english": "Breaks # Armour on Critical Hit",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_11014011",
+      "english": "Warcries Explode Corpses dealing #% of their Life as Physical Damage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_1466716929",
+      "english": "Gain # Rage when Critically Hit by an Enemy",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_1512261731",
+      "english": "Bonded: Knocks Enemies Back on Hit",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_1651083789",
+      "english": "Bonded: Triggered Spells deal #% increased Spell Damage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_1914815166",
+      "english": "Recover #% of maximum Life over 2 Seconds when you use a Command Skill",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_1936645603",
+      "english": "Gain #% of Physical Damage as Extra Fire Damage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_1940865751",
+      "english": "Adds # to # Physical Damage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_2091621414",
+      "english": "Causes Bleeding on Hit",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_2174054121",
+      "english": "#% chance to inflict Bleeding on Hit",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_2438634449",
+      "english": "#% chance to Aggravate Bleeding on targets you Critically Hit with Attacks",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_2621116283",
+      "english": "Gain #% of damage as Fire damage per 2% Chance to Block",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_3292710273",
+      "english": "Gain # Rage when Hit by an Enemy",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_3538915253",
+      "english": "On Hitting an enemy, gains maximum added Lightning damage equal to the enemy's Power for 20 seconds, up to a total of #",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_3675300253",
+      "english": "Strikes deal Splash Damage",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_3686997387",
+      "english": "Double Stun Threshold while Shield is Raised",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_3969727699",
+      "english": "Bonded: Warcry Skills have #% increased Area of Effect",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_841463428",
+      "english": "Bonded: #% increased Magnitude of Bleeding you inflict",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "rune.stat_939832726",
+      "english": "Recover #% of maximum Life for each Endurance Charge consumed",
+      "chineseTexts": []
+    },
+    {
+      "code": "missing-cn",
+      "id": "skill.living_bomb_player",
+      "english": "Grants Skill: Level # Living Bomb",
+      "chineseTexts": []
+    },
+    {
+      "code": "pseudo-skipped",
+      "locale": "cn",
+      "count": 36
+    },
+    {
+      "code": "pseudo-skipped",
+      "locale": "en",
+      "count": 36
+    }
+  ],
+  "supplemental_candidates": 3412,
+  "translation_worklist": {
+    "pending": 265,
+    "manual": 0,
+    "automatic": 0,
+    "override": 0,
+    "retired": 0,
+    "manual_differences": 0
+  },
+  "conflicts": 37,
+  "pages": [
+    {
+      "slug": "Amulets",
+      "pairs": 289,
+      "issues": 2
+    },
+    {
+      "slug": "Rings",
+      "pairs": 367,
+      "issues": 0
+    },
+    {
+      "slug": "Belts",
+      "pairs": 298,
+      "issues": 0
+    },
+    {
+      "slug": "Wands",
+      "pairs": 401,
+      "issues": 3
+    },
+    {
+      "slug": "Sceptres",
+      "pairs": 313,
+      "issues": 4
+    },
+    {
+      "slug": "Spears",
+      "pairs": 370,
+      "issues": 2
+    },
+    {
+      "slug": "Boots_str",
+      "pairs": 380,
+      "issues": 3
+    },
+    {
+      "slug": "Ruby",
+      "pairs": 105,
+      "issues": 0
+    },
+    {
+      "slug": "Emerald",
+      "pairs": 128,
+      "issues": 1
+    },
+    {
+      "slug": "Sapphire",
+      "pairs": 113,
+      "issues": 0
+    },
+    {
+      "slug": "Waystones_low_tier",
+      "pairs": 51,
+      "issues": 8
+    },
+    {
+      "slug": "Waystones_mid_tier",
+      "pairs": 43,
+      "issues": 2
+    },
+    {
+      "slug": "Waystones_top_tier",
+      "pairs": 44,
+      "issues": 2
+    },
+    {
+      "slug": "Strongbox",
+      "pairs": 63,
+      "issues": 53
+    },
+    {
+      "slug": "Expedition_Logbook",
+      "pairs": 0,
+      "issues": 2
+    },
+    {
+      "slug": "Relics",
+      "pairs": 139,
+      "issues": 0
+    },
+    {
+      "slug": "Breach_Tablet",
+      "pairs": 38,
+      "issues": 2
+    },
+    {
+      "slug": "Expedition_Tablet",
+      "pairs": 43,
+      "issues": 4
+    },
+    {
+      "slug": "Delirium_Tablet",
+      "pairs": 39,
+      "issues": 4
+    },
+    {
+      "slug": "Ritual_Tablet",
+      "pairs": 40,
+      "issues": 2
+    },
+    {
+      "slug": "Irradiated_Tablet",
+      "pairs": 31,
+      "issues": 2
+    },
+    {
+      "slug": "Overseer_Tablet",
+      "pairs": 39,
+      "issues": 2
+    },
+    {
+      "slug": "Abyss_Tablet",
+      "pairs": 40,
+      "issues": 2
+    },
+    {
+      "slug": "Temple_Tablet",
+      "pairs": 38,
+      "issues": 2
+    }
+  ],
+  "source_issues": 102
+}

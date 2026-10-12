@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { buildPobrExport } from '../src/pobr-export.mjs';
+import { buildTemplateExport } from '../src/template-export.mjs';
 import { generateFiles, writeGenerated, checkGenerated, activateGenerated } from '../src/snapshot.mjs';
 import { sha256 } from '../src/sources.mjs';
 
@@ -16,7 +16,7 @@ const entry = (english, chinese, id = 'explicit.stat_1', extra = {}) => ({
 const reviewed = (src, en, id = 'reviewed.test') => ({
   id, src, en, note: 'Reviewed indexed template', source_url: 'https://example.org/review',
 });
-const build = (entries = [], curated = empty()) => buildPobrExport({ snapshot, entries, curated });
+const build = (entries = [], curated = empty()) => buildTemplateExport({ snapshot, entries, curated });
 const reasons = result => result.excluded.flatMap(row => row.reasons ?? [row.reason]);
 
 test('zero/one-slot conversion preserves signs, constants, conditions and full attribution', () => {
@@ -187,7 +187,7 @@ test('curated words require reviewed attribution and unique English keys', () =>
 
 test('dictionary records without attribution or required fields fail rather than emit unverifiable templates', () => {
   for (const patch of [{ id: '' }, { english: '' }, { chinese: undefined }, { method: '' }, { evidence: [] }]) {
-    assert.throws(() => build([entry('# Life', '# 生命', 'explicit.stat_1', patch)]), /Malformed PoBR dictionary entry/);
+    assert.throws(() => build([entry('# Life', '# 生命', 'explicit.stat_1', patch)]), /Malformed dictionary entry/);
   }
 });
 
@@ -215,7 +215,7 @@ test('existing manual and supplemental dictionary workflow retains its attributi
 });
 
 async function snapshotFixture(t) {
-  const root = await mkdtemp(path.join(tmpdir(), 'poe2-pobr-export-'));
+  const root = await mkdtemp(path.join(tmpdir(), 'poe2-template-export-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   const directory = path.join(root, '.cache', `candidate-${snapshot}`);
   await mkdir(path.join(directory, 'raw'), { recursive: true });
@@ -243,7 +243,7 @@ test('snapshot generation copies and hashes curated input and activation checks 
   assert.equal(JSON.parse(translationsRaw)[0].status, 'pending');
   const files = await generateFiles(root, directory);
   assert.equal(files.get('curated.json'), curatedRaw);
-  const exported = JSON.parse(files.get('pobr.json'));
+  const exported = JSON.parse(files.get('templates.json'));
   assert.equal(exported.snapshot, snapshot);
   assert.equal(exported.curated_sha256, sha256(curatedRaw));
   assert.equal(exported.source_manifest, '../manifest.json');
@@ -254,15 +254,15 @@ test('snapshot generation copies and hashes curated input and activation checks 
   assert.equal(JSON.parse(files.get('translations.json'))[0].status, 'automatic');
   await writeGenerated(directory, files);
   await checkGenerated(root, directory);
-  await writeFile(path.join(directory, 'generated', 'pobr.json'), '{}\n');
-  await assert.rejects(activateGenerated(root, directory), /pobr.json/);
+  await writeFile(path.join(directory, 'generated', 'templates.json'), '{}\n');
+  await assert.rejects(activateGenerated(root, directory), /templates.json/);
   await assert.rejects(readFile(path.join(root, 'data', 'CURRENT')), { code: 'ENOENT' });
   assert.equal(await readFile(path.join(root, 'translations.json'), 'utf8'), translationsRaw);
   await writeGenerated(directory, files);
   await activateGenerated(root, directory);
   assert.equal(await readFile(path.join(root, 'data', 'CURRENT'), 'utf8'), snapshot + '\n');
   const published = path.join(root, 'data', 'snapshots', snapshot);
-  assert.equal(await readFile(path.join(published, 'generated', 'pobr.json'), 'utf8'), files.get('pobr.json'));
+  assert.equal(await readFile(path.join(published, 'generated', 'templates.json'), 'utf8'), files.get('templates.json'));
   assert.equal(await readFile(path.join(root, 'translations.json'), 'utf8'), files.get('translations.json'));
   await checkGenerated(root, published);
   await writeFile(path.join(root, 'curated.json'), curatedRaw + '\n');

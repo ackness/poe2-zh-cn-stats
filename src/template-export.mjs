@@ -108,8 +108,8 @@ function addMapping(map, from, to) {
  * Words are reviewed rare-name fallback patches: consumers apply them with ??=
  * to rareWords, not to skill, base-item, or other independently sourced names.
  */
-export function buildPobrExport({ snapshot, entries, curated }) {
-  if (!nonempty(snapshot) || !Array.isArray(entries)) throw new Error('PoBR export requires snapshot and dictionary entries');
+export function buildTemplateExport({ snapshot, entries, curated }) {
+  if (!nonempty(snapshot) || !Array.isArray(entries)) throw new Error('Template export requires snapshot and dictionary entries');
   validateCurated(curated);
   const templates = curated.templates.map(({ id, src, en, note, source_url }) => ({
     src, en, kind: 'curated', provenance: { id, note, source_url },
@@ -130,7 +130,7 @@ export function buildPobrExport({ snapshot, entries, curated }) {
         || (entry.chinese !== null && !nonempty(entry.chinese))
         || !nonempty(entry.method) || !Array.isArray(entry.evidence)
         || (entry.chinese !== null && !entry.evidence.length)) {
-      throw new Error('Malformed PoBR dictionary entry: requires full id, text, method and evidence');
+      throw new Error('Malformed dictionary entry: requires full id, text, method and evidence');
     }
     const provenance = { id: entry.id, english: entry.english, chinese: entry.chinese,
       method: entry.method, evidence: entry.evidence };

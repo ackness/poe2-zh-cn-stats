@@ -2,80 +2,80 @@
   "schema_version": 1,
   "templates": [
     {
-      "id": "pobr.passive-skill-point",
+      "id": "curated.passive-skill-point",
       "src": "获得 {0} 个天赋技能点",
       "en": "Grants {0} Passive Skill Point",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Reviewed singular/plural alias; both English forms intentionally share the Chinese template.",
+      "note": "Migrated verbatim from the linked source. Reviewed singular/plural alias; both English forms intentionally share the Chinese template.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L118"
     },
     {
-      "id": "pobr.passive-skill-points",
+      "id": "curated.passive-skill-points",
       "src": "获得 {0} 个天赋技能点",
       "en": "Grants {0} Passive Skill Points",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Reviewed singular/plural alias; both English forms intentionally share the Chinese template.",
+      "note": "Migrated verbatim from the linked source. Reviewed singular/plural alias; both English forms intentionally share the Chinese template.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L119"
     },
     {
-      "id": "pobr.weapon-set-skill-points",
+      "id": "curated.weapon-set-skill-points",
       "src": "100 个天赋技能点转变为武器组技能点",
       "en": "100 Passive Skill Points become Weapon Set Skill Points",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Tree-specific text with a literal constant, not a numeric placeholder.",
+      "note": "Migrated verbatim from the linked source. Tree-specific text with a literal constant, not a numeric placeholder.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L120-L123"
     },
     {
-      "id": "pobr.jewel-socket-passive-effect",
+      "id": "curated.jewel-socket-passive-effect",
       "src": "珠宝插槽天赋效果提高 {0}%",
       "en": "{0}% increased Effect of Jewel Socket Passive Skills",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Single-line Time-Lost jewel variant of the longer containing-clause template.",
+      "note": "Migrated verbatim from the linked source. Single-line Time-Lost jewel variant of the longer containing-clause template.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L124-L128"
     },
     {
-      "id": "pobr.bonded",
+      "id": "curated.bonded",
       "src": "纽带：{0}",
       "en": "Bonded: {0}",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. The bare placeholder captures a nested stat for recursive translation, not just a number.",
+      "note": "Migrated verbatim from the linked source. The bare placeholder captures a nested stat for recursive translation, not just a number.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L129-L130"
     },
     {
-      "id": "pobr.grants-skill-level",
+      "id": "curated.grants-skill-level",
       "src": "获得技能：{0} 级 {1}",
       "en": "Grants Skill: Level {0} {1}",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Two ordered captures preserve skill level and skill name; the name is translated through the noun dictionary.",
+      "note": "Migrated verbatim from the linked source. Two ordered captures preserve skill level and skill name; the name is translated through the noun dictionary.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L131-L132"
     },
     {
-      "id": "pobr.grants-skill",
+      "id": "curated.grants-skill",
       "src": "获得技能：{0}",
       "en": "Grants Skill: {0}",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Bare capture preserves the skill name for noun translation.",
+      "note": "Migrated verbatim from the linked source. Bare capture preserves the skill name for noun translation.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L131-L133"
     },
     {
-      "id": "pobr.notables-in-radius-grant",
+      "id": "curated.notables-in-radius-grant",
       "src": "范围内的核心天赋还会获得：{0}",
       "en": "Notable Passive Skills in Radius also grant {0}",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Bare capture holds an arbitrary nested stat for recursive translation.",
+      "note": "Migrated verbatim from the linked source. Bare capture holds an arbitrary nested stat for recursive translation.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L134-L138"
     },
     {
-      "id": "pobr.small-passives-in-radius-grant",
+      "id": "curated.small-passives-in-radius-grant",
       "src": "范围内的小型天赋还会获得：{0}",
       "en": "Small Passive Skills in Radius also grant {0}",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Bare capture holds an arbitrary nested stat for recursive translation.",
+      "note": "Migrated verbatim from the linked source. Bare capture holds an arbitrary nested stat for recursive translation.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L139-L142"
     },
     {
-      "id": "pobr.passives-in-radius-allocated",
+      "id": "curated.passives-in-radius-allocated",
       "src": "{0}范围内的天赋可以配置",
       "en": "Passives in Radius of {0} can be Allocated",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. First line of a radius-jewel keystone template; item text is translated line by line.",
+      "note": "Migrated verbatim from the linked source. First line of a radius-jewel keystone template; item text is translated line by line.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L143-L144"
     },
     {
-      "id": "pobr.without-tree-connection",
+      "id": "curated.without-tree-connection",
       "src": "而无需连结至你的天赋树",
       "en": "without being connected to your tree",
-      "note": "Migrated verbatim from PoBR EXTRA_PAIRS. Continuation line of the radius-jewel keystone template.",
+      "note": "Migrated verbatim from the linked source. Continuation line of the radius-jewel keystone template.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L143-L145"
     }
   ],
@@ -83,7 +83,7 @@
     {
       "english": "Maelstrom",
       "chinese": "漩涡",
-      "note": "Migrated verbatim from PoBR rareWords.Maelstrom fallback. A rare-name constituent; the original source cites the same word root in 消融漩涡, not a trade stat ID. Apply only when the existing rare-word dictionary has no entry.",
+      "note": "Migrated verbatim from the linked rare-word fallback. A rare-name constituent; the original source cites the same word root in 消融漩涡, not a trade stat ID. Apply only when the existing rare-word dictionary has no entry.",
       "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L108-L109"
     }
   ]
