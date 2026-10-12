@@ -195,7 +195,7 @@ node pipeline/gen-zh-cn.mjs --refresh
 node pipeline/gen-zh-cn.mjs --translations-dir /path/to/poe2-zh-cn-stats
 ```
 
-PoBR 对新自动模板再次执行运行时匹配骨架冲突检查，不让新译文抢占既有中英文模板。迁移的人工模板保留原行为；未覆盖的旧模板和完整名词表仍保留。`generated/translation-audit.json` 记录合入／排除情况，`i18n/zh-CN/_meta.json` 记录本库 commit、snapshot 与导出 SHA-256，并沿用 PoBR 候选快照、词条审计及验证通过后发布的流程。
+PoBR 对新自动模板再次执行运行时匹配骨架冲突检查，新模板不会抢占另一条不同的既有模板。同一英文模板在 PoBR 旧词典与本库中的中文不一致时，PoBR 采用本库的译文：只替换中文措辞，保留旧条目的英文模板和参数格式；人工模板、含换行的旧模板、仅字面数值不同的模板以及有歧义的新模板不替换。迁移的人工模板保留原行为；未覆盖的旧模板和完整名词表仍保留。`generated/translation-audit.json` 记录合入／替换（`replaced_legacy`）／排除情况，`i18n/zh-CN/_meta.json` 记录本库 commit、snapshot 与导出 SHA-256，并沿用 PoBR 候选快照、词条审计及验证通过后发布的流程。
 
 旧版 PoBR 的 `--dict` 仍要求旧词典的十个文件，不能直接指向本仓库。消费 PoBR 导出须选择包含 `generated/pobr.json` 的提交；上面的通用 JSON 读取示例固定的早期提交仅用于演示主词表读取。
 
