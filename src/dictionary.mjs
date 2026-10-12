@@ -1,5 +1,6 @@
 import { pairTrade } from './trade.mjs';
 import { entryKey, normalizeText, slotCount } from './text.mjs';
+import { reconcileTranslations } from './translations.mjs';
 
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const sorted = values => [...values].sort(compare);
@@ -21,7 +22,7 @@ function tally(entries) {
 }
 
 /** Official translations win. Supplemental candidates must agree; ambiguity is data. */
-export function buildDictionary({ english, chinese, supplementalPairs = [], overrides = [] }) {
+export function buildDictionary({ english, chinese, supplementalPairs = [], overrides = [], translations = [] }) {
   const trade = pairTrade(english, chinese);
   const entries = trade.entries;
   if (!entries.length) throw new Error('Refusing to generate an empty dictionary');
@@ -106,6 +107,9 @@ export function buildDictionary({ english, chinese, supplementalPairs = [], over
     entry.reason = null;
     entry.evidence = [{ source: 'manual', url: override.source_url, reason: override.reason }];
   }
+  stages.overrides = tally(entries);
+  const worklist = reconcileTranslations(entries, translations);
+  conflicts.push(...worklist.conflicts);
   stages.manual = tally(entries);
   const methods = {};
   const reasons = {};
@@ -141,8 +145,9 @@ export function buildDictionary({ english, chinese, supplementalPairs = [], over
     cn_only: trade.cnOnly,
     trade_issues: trade.issues,
     supplemental_candidates: supplementalPairs.length,
+    translation_worklist: worklist.counts,
     conflicts: conflicts.length,
   };
   conflicts.sort((a, b) => compare(JSON.stringify(a), JSON.stringify(b)));
-  return { entries, pairs, report, unresolved: entries.filter(e => e.chinese === null), conflicts };
+  return { entries, pairs, report, unresolved: entries.filter(e => e.chinese === null), conflicts, translations: worklist.table };
 }

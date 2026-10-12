@@ -2,8 +2,8 @@
 import { readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fetchSnapshot, activateSnapshot, currentSnapshot, cloneCandidate } from './sources.mjs';
-import { generateFiles, writeGenerated, checkGenerated, formatReport } from './snapshot.mjs';
+import { fetchSnapshot, currentSnapshot, cloneCandidate } from './sources.mjs';
+import { generateFiles, writeGenerated, checkGenerated, activateGenerated, formatReport } from './snapshot.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const help = `Usage: node src/cli.mjs <command>
@@ -31,8 +31,7 @@ async function main() {
     const { directory, manifest } = await fetchSnapshot(root, { tradeOnly });
     const files = await generateFiles(root, directory);
     await writeGenerated(directory, files);
-    const report = await checkGenerated(root, directory);
-    await activateSnapshot(root, directory, manifest.id);
+    const report = await activateGenerated(root, directory);
     console.log(formatReport(report));
     if (manifest.errors.length) console.warn('Some supplemental downloads failed; inspect source-issues.json. No old page was substituted.');
     return;
@@ -44,8 +43,7 @@ async function main() {
     const published = directory.startsWith(path.join(base, 'data', 'snapshots') + path.sep);
     const target = published ? (await cloneCandidate(root, directory)).directory : directory;
     await writeGenerated(target, await generateFiles(root, target));
-    const report = await checkGenerated(root, target);
-    if (published) await activateSnapshot(root, target, report.snapshot);
+    const report = published ? await activateGenerated(root, target) : await checkGenerated(root, target);
     console.log(formatReport(report));
   } else if (command === 'check') {
     console.log(formatReport(await checkGenerated(root, directory)));
@@ -54,8 +52,7 @@ async function main() {
     console.log(formatReport(JSON.parse(await readFile(path.join(directory, 'generated', 'coverage.json'), 'utf8'))));
   } else {
     if (!supplied || !directory.startsWith(path.join(base, '.cache') + path.sep)) throw new Error('activate requires a candidate under .cache');
-    const report = await checkGenerated(root, directory);
-    await activateSnapshot(root, directory, report.snapshot);
+    const report = await activateGenerated(root, directory);
     console.log(formatReport(report));
   }
 }

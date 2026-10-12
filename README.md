@@ -41,6 +41,8 @@ npm run report
 
 已发布快照不可原地写入。`build` 对当前或指定的 `data/snapshots/<ID>` 创建新候选，保留原始采集时间并记录 `rebuilt_from`，全部校验成功后切换 `CURRENT`；失败时旧快照不变。对 `.cache` 候选的构建不会自动激活。
 
+成功激活还会同步根目录的 `translations.json` 补译工作表。新缺口自动加入，已补全和已退出上游目录的条目保留状态与人工内容。快照内保存同一张表，便于追溯；检测到发布期间有人编辑工作表时，不覆盖这些编辑，按报错重新构建。
+
 `check` 重新核对原始响应的 SHA-256 和字节数，并离线再生成所有产物进行逐字节比较。它不会联网，不会修改数据。GitHub Actions 也只运行离线测试与校验，不定期抓取网站、不自动发布。
 
 ### 中断恢复
@@ -60,6 +62,7 @@ node src/cli.mjs activate --snapshot .cache/candidate-<时间戳>
 ```text
 sources.json                         官方入口及有限的 PoE2DB 页面清单
 overrides.json                       自己维护的、有来源的精确修正
+translations.json                    可编辑的持续补译表，含待办及已解决历史
 src/                                 采集、配对、补缺、生成、校验代码
 test/                                行为回归测试
 data/CURRENT                         当前快照目录名
@@ -77,6 +80,7 @@ data/snapshots/<时间戳>/
     source-issues.json               下载或页面提取诊断
     poe2db-evidence.json              提取出的双语候选及结构化证据
     overrides.json                   生成时使用的人工修正原文
+    translations.json                本快照的补译表、采用结果和人工记录
 ```
 
 主表记录示例：
@@ -108,7 +112,8 @@ data/snapshots/<时间戳>/
 1. **官方直接配对 `trade`**：完整 ID（包括 `|` 后的枚举值）相同；两边均只有一个不同文本；中文含汉字；占位符数量一致。相同重复行可去重，不同分支不得按数组顺序拼接。`pseudo` 综合统计不作为实际游戏词条进入主表。
 2. **普通词缀复用 `explicit-reuse`**：只对腾讯没有该完整分裂 ID 的情况使用；必须找到相同 stat 后缀的 `explicit.*`，英文完全一致，普通词缀本身已直接配对。有现存冲突的分裂中文时不覆盖它。记录保留 `fractured.*`，证据指向真实的 `explicit.*` 来源。复用译文不能改变交易过滤条件。
 3. **PoE2DB 补缺 `poe2db`**：从中英文页面内嵌的 JSON 修饰词池、或具有底层 Stats 信息的详情卡片提取。不得执行远程 JavaScript。依据非本地化结构、词缀族、等级、类型、标签、数值区间、关键字及作用域配对；不能用显示名称、页面顺序或语言相关缓存哈希作稳定 ID。只替换明确标记的数值片段，保留字面条件、符号、百分号及参数顺序。
-4. **精确人工修正 `manual`**：经维护者核实后，可显式覆盖前面的结果；保留理由和来源，覆盖旧值会出现在冲突报告中。
+4. **人工补缺 `manual-fallback`**：从根 `translations.json` 读取，仅在以上来源仍未解决时使用。后续可靠来源补齐后自动让位，不删除人工记录。
+5. **精确人工修正 `manual`**：从 `overrides.json` 读取，经维护者核实后可显式覆盖所有其他结果；保留理由和来源，覆盖旧值会出现在冲突报告中。
 
 PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯一且参数数量相同的情况下补入。它不会覆盖已解决的官方译文；若官方有多个中文分支，补充候选还必须属于这些分支。不同来源的措辞冲突保留在报告中，不凭多数投票抹平。
 
@@ -116,10 +121,55 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 ## 维护剩余缺口
 
+### 持续补译表
+
+根目录的 **[`translations.json`](translations.json)** 是日常维护入口。首次生成已将当前全部 265 条缺口放入表中，后续数量以 `npm run report` 为准。它不是每次清空的临时报表；已解决项会保留下来，便于核对人工内容与新来源的差异。
+
+只编辑这三个字段，不要改 `id`／`english` 来迁移译文：
+
+- `manual_chinese`：人工译文；`null` 或空字符串表示不提供人工补缺。
+- `manual_note`：核对说明；提供人工译文时必填，可以在未翻译时先记研究线索。
+- `manual_source_url`：可选 HTTPS 来源链接；自己翻译、没有外部来源时保留 `null`，不要编造链接。
+
+`status`、`chinese`、`method`、`reason`、`manual_differs` 和 `evidence` 都由生成器重算。`chinese` 是最终采用的译文，**不是输入栏**；手工补译请填写 `manual_chinese`。
+
+例如，找到对应行后填写如下内容，再运行 `npm run build` 和 `npm run check`。这是人工填写格式示例，不代表已经收入或认定为官方译文：
+
+```json
+{
+  "id": "crafted.stat_1301765461",
+  "english": "#% to Maximum Chaos Resistance",
+  "manual_chinese": "#% 混沌抗性上限",
+  "manual_note": "已人工核对词义，保留百分号和参数顺序",
+  "manual_source_url": null
+}
+```
+
+| `status` | 含义 |
+|---|---|
+| `pending` | 仍然缺少可采用的译文 |
+| `manual` | 正在使用人工补缺，主表 method 为 `manual-fallback` |
+| `automatic` | 当前 GGG／腾讯配对、分裂复用或 PoE2DB 已提供译文 |
+| `override` | 使用 `overrides.json` 中明确指定的修正 |
+| `retired` | 当前英文目录不再包含这个完整 ID＋英文组合，旧人工内容仅存档、不应用 |
+
+更新行为：
+
+- 每次 `npm run refresh` 自动重新对照来源：新缺口入表、已有缺口更新状态。现有 CI 只校验，不定时抓取网站。
+- 新来源译文优先于人工补缺；若与人工内容不同，`manual_differs` 为 `true`，并写入 `conflicts.json`，人工原文和备注不会被抹掉。
+- 来源再次缺失时，可重新使用仍匹配同一 ID＋英文的人工补缺；没有人工内容则回到 `pending`。上一次自动译文不会偷偷充当离线兜底。
+- ID 相同但英文变化时，旧行变为 `retired`；新英文仍缺译文则新增 `pending` 行，不自动套用旧翻译。原英文之后重新出现，才可重新使用对应人工记录。
+- 修改或移除某条人工译文后需重新构建。重复行、非中文译文、缺少备注、占位符数量不符会阻止生成，不切换当前快照。相同 ID 的不同英文分支、`|` 后的不同枚举值分别维护。
+- 提交时同时提交根工作表、`data/CURRENT` 和新快照；不能只提交人工修改而让生成数据保持旧版本。Git 快照保留每次完成更新时的状态与内容。
+
+`unresolved.json` 仍然只列当前未解决项；`translations.json` 则记录持续工作流。`coverage.json` 的 `translation_worklist` 汇总各状态及人工差异数量，它统计的是工作表中的条目，不是整个词典中所有自动翻译。
+
+### 扩展来源与固定修正
+
 先查看 `unresolved.json`、`conflicts.json` 与 `source-issues.json`，避免把交易类别缺失、重复分支和真正没有译文混为一谈。
 
-- **增加补充页面**：编辑 `sources.json` 的 `poe2db.pages`。每个 slug 对应 `/us/<slug>` 和 `/cn/<slug>`；使用已确认存在的公开页面。然后运行 `npm run refresh`。
-- **人工确认某一条**：在根 `overrides.json` 添加如下格式，再运行 `npm run build` 和 `npm run check`。示例只说明格式，不会自动加入数据。
+- **增加补充页面**：编辑 `sources.json` 的 `poe2db.pages`。每个 slug 对应 `/us/<slug>` 和 `/cn/<slug>`；使用已确认存在的公开页面。然后运行 `npm run refresh`，已有工作表自动对照这些新候选。
+- **明确覆盖官方或补充来源**：这与普通缺口补译不同。在根 `overrides.json` 添加如下格式，再运行 `npm run build` 和 `npm run check`。示例只说明格式，不会自动加入数据。
 
 ```json
 [
@@ -140,7 +190,7 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 - `entries`：完整 ID＋英文分支的记录数。
 - `fully_resolved_ids`：该 ID 的所有英文分支都已有候选译文。
 - `distinct_english`／`covered_english`：跨交易类别去重后的英文文本数与有候选译文的文本数。
-- `stages`：仅官方、分裂复用、PoE2DB 补缺、人工修正后的累计覆盖。
+- `stages`：仅官方、分裂复用、PoE2DB 补缺、固定修正（`overrides`）、加入人工补缺后的最终累计覆盖（`manual`）。
 
 分裂复用通常提升 ID 覆盖率，但不增加新的英文文本，不能重复计入文本覆盖收益。当前目录不包含完整的技能说明、天赋名称、任务或其他非交易文本；本仓库是**词缀／交易模板表**，不是完整游戏汉化包。
 
