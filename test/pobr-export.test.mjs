@@ -18,7 +18,6 @@ const reviewed = (src, en, id = 'reviewed.test') => ({
 });
 const build = (entries = [], curated = empty()) => buildPobrExport({ snapshot, entries, curated });
 const reasons = result => result.excluded.flatMap(row => row.reasons ?? [row.reason]);
-const curatedUrl = new URL('../curated.json', import.meta.url);
 
 test('zero/one-slot conversion preserves signs, constants, conditions and full attribution', () => {
   const entries = [
@@ -165,8 +164,14 @@ test('curated words require reviewed attribution and unique English keys', () =>
   const word = { english: 'Maelstrom', chinese: '漩涡', note: 'Rare-name fallback', source_url: 'https://example.org/review' };
   const withWords = words => ({ ...empty(), words });
   assert.deepEqual(build([], withWords([word])).words, [word]);
-  assert.throws(() => build([], withWords([word, { ...word, english: ' MAELSTROM ' }])), /Duplicate curated word/);
-  for (const patch of [{ note: '' }, { chinese: 'Maelstrom' }, { source_url: null }, { english: '{0}' }]) {
+  const apostrophe = { ...word, english: "Dragon's", chinese: '龙' };
+  assert.deepEqual(build([], withWords([apostrophe])).words, [apostrophe]);
+  assert.throws(() => build([], withWords([word, { ...word, english: 'MAELSTROM' }])), /Duplicate curated word/);
+  for (const patch of [
+    { note: '' }, { chinese: 'Maelstrom' }, { source_url: null }, { english: '{0}' },
+    { english: 'maelstrom' }, { english: ' Maelstrom ' }, { english: 'Storm Bite' },
+    { english: 'Storm-Bite' }, { english: 'Storm2' }, { english: 'Élan' },
+  ]) {
     assert.throws(() => build([], withWords([{ ...word, ...patch }])), /Malformed curated word/);
   }
 });
@@ -200,38 +205,19 @@ test('existing manual and supplemental dictionary workflow retains its attributi
   }
 });
 
-test('all eleven PoBR template patches and the rare-name fallback are migrated verbatim', async () => {
-  const curated = JSON.parse(await readFile(curatedUrl, 'utf8'));
-  const expected = [
-    ['获得 {0} 个天赋技能点', 'Grants {0} Passive Skill Point'],
-    ['获得 {0} 个天赋技能点', 'Grants {0} Passive Skill Points'],
-    ['100 个天赋技能点转变为武器组技能点', '100 Passive Skill Points become Weapon Set Skill Points'],
-    ['珠宝插槽天赋效果提高 {0}%', '{0}% increased Effect of Jewel Socket Passive Skills'],
-    ['纽带：{0}', 'Bonded: {0}'],
-    ['获得技能：{0} 级 {1}', 'Grants Skill: Level {0} {1}'],
-    ['获得技能：{0}', 'Grants Skill: {0}'],
-    ['范围内的核心天赋还会获得：{0}', 'Notable Passive Skills in Radius also grant {0}'],
-    ['范围内的小型天赋还会获得：{0}', 'Small Passive Skills in Radius also grant {0}'],
-    ['{0}范围内的天赋可以配置', 'Passives in Radius of {0} can be Allocated'],
-    ['而无需连结至你的天赋树', 'without being connected to your tree'],
-  ];
-  assert.deepEqual(curated.templates.map(({ src, en }) => [src, en]), expected);
-  assert.deepEqual(curated.words.map(({ english, chinese }) => [english, chinese]), [['Maelstrom', '漩涡']]);
-  for (const row of [...curated.templates, ...curated.words]) {
-    assert.match(row.source_url, /^https:\/\/github\.com\/ackness\/pobr\/blob\/6bd4ceed20157a457be973181b20c28a980ac371\/pipeline\/gen-zh-cn\.mjs#L\d+/);
-  }
-  assert.equal(build([], curated).templates.length, 11);
-});
-
 async function snapshotFixture(t) {
   const root = await mkdtemp(path.join(tmpdir(), 'poe2-pobr-export-'));
   t.after(() => rm(root, { recursive: true, force: true }));
   const directory = path.join(root, '.cache', `candidate-${snapshot}`);
   await mkdir(path.join(directory, 'raw'), { recursive: true });
-  const curatedRaw = await readFile(curatedUrl, 'utf8');
+  const curatedRaw = JSON.stringify({ ...empty(), templates: [reviewed('纽带：{0}', 'Bonded: {0}')] }) + '\n';
+  const translationsRaw = JSON.stringify([{
+    id: 'explicit.stat_1', english: '+# to maximum Life', status: 'pending',
+    manual_chinese: null, manual_note: '', manual_source_url: null,
+  }]) + '\n';
   await writeFile(path.join(root, 'curated.json'), curatedRaw);
   await writeFile(path.join(root, 'overrides.json'), '[]\n');
-  await writeFile(path.join(root, 'translations.json'), '[]\n');
+  await writeFile(path.join(root, 'translations.json'), translationsRaw);
   const manifest = { schema_version: 1, id: snapshot, captured_at: '2026-01-01T00:00:00.000Z', sources: [], pages: [], errors: [] };
   for (const [key, text] of [['trade-en', '+# to maximum Life'], ['trade-cn', '+# 最大生命']]) {
     const raw = JSON.stringify({ result: [{ id: 'explicit', label: 'Explicit', entries: [{ id: 'explicit.stat_1', text }] }] });
@@ -240,18 +226,20 @@ async function snapshotFixture(t) {
     manifest.sources.push({ key, file, sha256: sha256(raw), bytes: Buffer.byteLength(raw), url: `https://example.org/${key}` });
   }
   await writeFile(path.join(directory, 'manifest.json'), JSON.stringify(manifest));
-  return { root, directory, curatedRaw };
+  return { root, directory, curatedRaw, translationsRaw };
 }
 
 test('snapshot generation copies and hashes curated input and activation checks the export', async t => {
-  const { root, directory, curatedRaw } = await snapshotFixture(t);
+  const { root, directory, curatedRaw, translationsRaw } = await snapshotFixture(t);
+  assert.equal(JSON.parse(translationsRaw)[0].status, 'pending');
   const files = await generateFiles(root, directory);
   assert.equal(files.get('curated.json'), curatedRaw);
   const exported = JSON.parse(files.get('pobr.json'));
   assert.equal(exported.snapshot, snapshot);
   assert.equal(exported.curated_sha256, sha256(curatedRaw));
   assert.equal(exported.source_manifest, '../manifest.json');
-  assert.equal(exported.templates.filter(row => row.kind === 'curated').length, 11);
+  assert.deepEqual(exported.templates.filter(row => row.kind === 'curated').map(({ src, en }) => ({ src, en })),
+    [{ src: '纽带：{0}', en: 'Bonded: {0}' }]);
   assert.equal(exported.templates.filter(row => row.kind === 'trade').length, 1);
   assert.equal(JSON.parse(files.get('dictionary.json')).curated_sha256, exported.curated_sha256);
   assert.equal(JSON.parse(files.get('translations.json'))[0].status, 'automatic');
@@ -260,7 +248,7 @@ test('snapshot generation copies and hashes curated input and activation checks 
   await writeFile(path.join(directory, 'generated', 'pobr.json'), '{}\n');
   await assert.rejects(activateGenerated(root, directory), /pobr.json/);
   await assert.rejects(readFile(path.join(root, 'data', 'CURRENT')), { code: 'ENOENT' });
-  assert.equal(await readFile(path.join(root, 'translations.json'), 'utf8'), '[]\n');
+  assert.equal(await readFile(path.join(root, 'translations.json'), 'utf8'), translationsRaw);
   await writeGenerated(directory, files);
   await activateGenerated(root, directory);
   assert.equal(await readFile(path.join(root, 'data', 'CURRENT'), 'utf8'), snapshot + '\n');

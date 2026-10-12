@@ -66,10 +66,10 @@ function validateCurated(curated) {
   }
   const words = new Set();
   for (const row of curated.words) {
-    if (!object(row) || !nonempty(row.english) || !localized(row.chinese)
+    if (!object(row) || !nonempty(row.english) || !/^[A-Z][a-zA-Z']*$/u.test(row.english) || !localized(row.chinese)
         || !nonempty(row.note) || !sourceUrl(row.source_url)
         || /[{}#]/u.test(row.english + row.chinese)) {
-      throw new Error('Malformed curated word: requires english, Chinese chinese, note and HTTPS source_url without placeholders');
+      throw new Error('Malformed curated word: requires one capitalized ASCII english word, Chinese chinese, note and HTTPS source_url without placeholders');
     }
     const key = identity(row.english);
     if (words.has(key)) throw new Error(`Duplicate curated word: ${row.english}`);
