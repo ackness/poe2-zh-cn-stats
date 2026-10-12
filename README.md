@@ -108,7 +108,7 @@ data/snapshots/<时间戳>/
 
 **主键是完整 `id` 与 `english` 的组合，不是单独 `id`。** 同一个交易 ID 可能有不同英文分支；同一英文也可能在不同类别下有不同中文。不要把主表压成 `Map(id, chinese)`，也不要无条件取第一条翻译。
 
-未解决项的 `chinese` 为 `null`，`method` 为 `unresolved`，`reason` 说明原因。没有空字符串或假译文兜底。`#` 是交易模板的值槽；此仓库不把它自动转换为游戏原始 stat ID 或 PoBR 的 `{0}` 模板。
+未解决项的 `chinese` 为 `null`，`method` 为 `unresolved`，`reason` 说明原因。没有空字符串或假译文兜底。`#` 是交易模板的值槽；主表不把它转换为游戏原始 stat ID 或 `{0}` 编号模板；需要编号模板时见下文的编号模板导出。
 
 ## 其他仓库如何接入
 
@@ -155,9 +155,9 @@ console.log(translate('explicit.stat_3299347043', '# to maximum Life'));
 
 当前公开仓库无需私有访问 Token。若消费的是私有 fork，CI 可使用只读 deploy key、仅授权该仓库 Contents: read 的细粒度 Token，或 GitHub App 凭据；消费仓库的默认 `GITHUB_TOKEN` 不会自动获得另一个私有仓库的读取权。凭据不得进入前端代码或构建产物。打包翻译文本时仍需遵守上游来源的使用和再分发条件。
 
-### PoBR 消费接口与迁移的人工词条
+### 编号模板导出与人工词条
 
-`generated/pobr.json` 是构建期导出，不要求消费方重复实现交易模板转换：
+需要 `{0}` 形式编号模板的消费方可以直接读取 `generated/pobr.json`，不必自己实现交易模板转换。这是构建期导出：
 
 ```text
 schema_version: 1
@@ -172,7 +172,7 @@ curated_sha256: 人工模板输入的 SHA-256
 - `kind: "trade"` 表示从主交易词表转换，并不保证译文来自官方；完整 ID、人工补缺或 PoE2DB 证据均保留在 `provenance` 中。空格不同的可匹配模板不会合并丢失。
 - `kind: "curated"` 是人工审核的完整编号模板，可保留多参数、字符串和嵌套捕获。`words` 仅为稀有物品名组成词的缺省补丁，消费方采用 `rareWords[english] ??= chinese`，不覆盖其他名词来源。
 
-已将 PoBR 原有 **11 条 `EXTRA_PAIRS` 和 `Maelstrom → 漩涡`** 迁入根目录 **[`curated.json`](curated.json)**，保留原词句、编号及不可变源码链接。包括天赋点单复数、武器组技能点、珠宝插槽效果、Bonded 前缀、附赠技能、范围珠宝和连接条件。它们不需要伪造交易 ID。
+根目录的 **[`curated.json`](curated.json)** 目前有 11 条人工模板和 1 条稀有名补丁（`Maelstrom → 漩涡`），每条保留原词句、编号及不可变来源链接。包括天赋点单复数、武器组技能点、珠宝插槽效果、Bonded 前缀、附赠技能、范围珠宝和连接条件。它们不需要伪造交易 ID。
 
 日常维护分工：
 
@@ -182,24 +182,18 @@ curated_sha256: 人工模板输入的 SHA-256
 | `overrides.json` | 对现有交易词条明确指定高优先级修正 |
 | `curated.json` | 维护交易目录之外的文本、已审核多参数或字符串模板，以及稀有名组成词补丁 |
 
-修改 `curated.json` 后运行 `npm run build`、`npm run check`；生成、校验和激活均包含 PoBR 导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
+修改 `curated.json` 后运行 `npm run build`、`npm run check`；生成、校验和激活均包含编号模板导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
 
-**包含独立词表接入的 PoBR 版本**在 `pipeline/gen-zh-cn.mjs` 中读取此导出，继续使用 `StatLineTemplate` 和 `apps/pobr-wasm/src/zh.rs`，不在 Rust／WASM 运行时访问 GitHub。其默认版本由 PoBR 的 `pipeline/translation-source.json` 及已有数据 `_meta.json` 固定；更新命令为：
+消费方接入这份导出时的建议：
 
-```sh
-# 在 PoBR 仓库中执行：--ref 仍指旧名词/基础词典；新词表独立固定版本
-node pipeline/gen-zh-cn.mjs --translations-ref <完整提交SHA>
-# 同时更新两个来源
-node pipeline/gen-zh-cn.mjs --refresh
-# 从本库的本地 checkout 消费，元数据明确标注 local 而非伪造来源提交
-node pipeline/gen-zh-cn.mjs --translations-dir /path/to/poe2-zh-cn-stats
-```
+- 在构建期读取并固定提交，`data/CURRENT` 与导出文件取自同一提交；运行时不访问 GitHub。记录所用的 commit、snapshot 和导出文件的 SHA-256，便于追溯。
+- 先校验再使用：`schema_version` 为 1，`snapshot` 与 `data/CURRENT` 一致，每条模板的中英文参数编号集合相同。校验失败应终止，而不是带着部分数据继续。
+- 与已有词典合并时，按消费方实际匹配规则检查冲突，不要按输入顺序取第一条。同一英文模板两边中文不一致时由消费方决定采用哪一边；采用本库译文时，建议只替换中文措辞，保留原条目的英文模板和参数格式，并把替换和排除的条目写入自己的审计记录。
+- `excluded` 中的记录没有安全的自动转换结果，不要自行拼接后使用。
 
-PoBR 对新自动模板再次执行运行时匹配骨架冲突检查，新模板不会抢占另一条不同的既有模板。同一英文模板在 PoBR 旧词典与本库中的中文不一致时，PoBR 采用本库的译文：只替换中文措辞，保留旧条目的英文模板和参数格式；人工模板、含换行的旧模板、仅字面数值不同的模板以及有歧义的新模板不替换。迁移的人工模板保留原行为；未覆盖的旧模板和完整名词表仍保留。`generated/translation-audit.json` 记录合入／替换（`replaced_legacy`）／排除情况，`i18n/zh-CN/_meta.json` 记录本库 commit、snapshot 与导出 SHA-256，并沿用 PoBR 候选快照、词条审计及验证通过后发布的流程。
+编号模板导出须选择包含 `generated/pobr.json` 的提交；上面通用 JSON 读取示例固定的早期提交仅用于演示主词表读取。
 
-旧版 PoBR 的 `--dict` 仍要求旧词典的十个文件，不能直接指向本仓库。消费 PoBR 导出须选择包含 `generated/pobr.json` 的提交；上面的通用 JSON 读取示例固定的早期提交仅用于演示主词表读取。
-
-本库不提供完整的基底名、技能名、职业名、天赋名或词缀专名，因此不是整个中文数据源的替代品。交易 stat ID 也不等于 PoBR 计算 stat ID；翻译覆盖率不是解析或数值机制覆盖率。
+本库不提供完整的基底名、技能名、职业名、天赋名或词缀专名，因此不是整个中文数据源的替代品。交易 stat ID 也不等于消费方内部的计算 stat ID；翻译覆盖率不是解析或数值机制覆盖率。
 
 
 ## 配对与来源优先级
