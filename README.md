@@ -4,7 +4,7 @@
 
 主来源是 GGG 与腾讯的交易词条；分裂词缀在严格匹配时复用普通词缀译文；PoE2DB 的公开中英文页面补充缺口。没有依赖第三方成品翻译词典，也没有机器猜译。
 
-**仓库保持私有。** 脚本不修改 GitHub 可见性，不自动提交或推送。代码可运行不等于上游授权公开分发；公开仓库前需另行确认数据来源的使用和再分发条件。
+**仓库现已公开。** 脚本不修改 GitHub 可见性，不自动提交或推送。公开代码与数据快照不改变 GGG、腾讯及 PoE2DB 的权利归属，也不代表已获得上游的额外再分发授权；使用方仍需遵守来源方条件。
 
 ## 使用
 
@@ -63,6 +63,7 @@ node src/cli.mjs activate --snapshot .cache/candidate-<时间戳>
 sources.json                         官方入口及有限的 PoE2DB 页面清单
 overrides.json                       自己维护的、有来源的精确修正
 translations.json                    可编辑的持续补译表，含待办及已解决历史
+curated.json                         人工维护的编号模板与稀有物品名补丁
 src/                                 采集、配对、补缺、生成、校验代码
 test/                                行为回归测试
 data/CURRENT                         当前快照目录名
@@ -81,6 +82,8 @@ data/snapshots/<时间戳>/
     poe2db-evidence.json              提取出的双语候选及结构化证据
     overrides.json                   生成时使用的人工修正原文
     translations.json                本快照的补译表、采用结果和人工记录
+    curated.json                     本快照使用的人工模板原文
+    pobr.json                        编号模板、来源证据及保守转换排除报告
 ```
 
 主表记录示例：
@@ -150,35 +153,53 @@ console.log(translate('explicit.stat_3299347043', '# to maximum Life'));
 
 这里只查询模板，不负责将 `#` 替换成游戏数值。查不到时保留英文；不要把相近英文或相同 stat 后缀当成确定命中。若调用方只有英文、没有交易 ID，必须先检查该英文跨类别是否只有一个中文候选，不能简单忽略 ID 后取第一条。`pairs.json` 保留这些不同候选及其 IDs，供转换阶段审核。
 
-仓库私有时，开发者需要自己的 GitHub 读取权限。CI 可用只读 deploy key、仅授权本仓库 Contents: read 的细粒度 Token，或相应 GitHub App 凭据。消费仓库自己的默认 `GITHUB_TOKEN` 不会自动获得另一个私有仓库的读取权。凭据只进入 CI secrets，不进入前端代码、构建产物或本仓库；公开打包翻译文本前仍需确认上游再分发条件。
+当前公开仓库无需私有访问 Token。若消费的是私有 fork，CI 可使用只读 deploy key、仅授权该仓库 Contents: read 的细粒度 Token，或 GitHub App 凭据；消费仓库的默认 `GITHUB_TOKEN` 不会自动获得另一个私有仓库的读取权。凭据不得进入前端代码或构建产物。打包翻译文本时仍需遵守上游来源的使用和再分发条件。
 
-### PoBR 的实际接入位置
+### PoBR 消费接口与迁移的人工词条
 
-**目前 PoBR 尚未接入本库。** 已确认的现有路径是：
+`generated/pobr.json` 是构建期导出，不要求消费方重复实现交易模板转换：
 
-- `pipeline/gen-zh-cn.mjs` 从旧词典的 `lookup/stat_lines.json` 等十个输入生成 `data/<版本>/i18n/zh-CN/stat_lines.json`，以及基底、技能、职业、天赋等名词表。
-- 词条输出格式为 `[{ "src": "中文模板", "en": "英文模板" }]`，对应 `crates/pobr-data/src/catalog/i18n_stat_lines.rs` 的 `StatLineTemplate`。
-- `apps/pobr-wasm/src/zh.rs` 使用编号占位符模板进行中文输入转换；同一数据也用于反向显示翻译。计算引擎继续消费 canonical 英文，不需要交易 API 的 ID。
-
-因此，PoBR 应在**数据生成阶段增加本库到 `StatLineTemplate` 的转换**，继续交给现有加载器和翻译器，而不是让 Rust／WASM 运行时访问 GitHub。不能把现有 `--dict` 参数直接指向本仓库：两套输入目录与 schema 不同。
-
-例如，本库真实存在的单数值词条可以形成这样的候选模板：
-
-```json
-{
-  "src": "{0:d} 生命上限",
-  "en": "{0:d} to maximum Life"
-}
+```text
+schema_version: 1
+snapshot: 当前数据快照 ID
+templates: [{src, en, kind: "curated" | "trade", provenance}]
+words: [{english, chinese, note, source_url}]
+excluded: 未安全导出的记录及原因
+curated_sha256: 人工模板输入的 SHA-256
 ```
 
-这只是已验证的数据格式转换示例，不是已经导入 PoBR 的记录。批量接入需要在转换阶段落实以下约束：
+- `src` 是中文编号模板，`en` 是英文编号模板。自动转换仅接受零或一个 `#`，数值槽输出 `{0:d}`，保留符号、字面数值和条件；双向歧义、数值不一致、多参数和不支持的括号语法均列入 `excluded`。
+- `kind: "trade"` 表示从主交易词表转换，并不保证译文来自官方；完整 ID、人工补缺或 PoE2DB 证据均保留在 `provenance` 中。空格不同的可匹配模板不会合并丢失。
+- `kind: "curated"` 是人工审核的完整编号模板，可保留多参数、字符串和嵌套捕获。`words` 仅为稀有物品名组成词的缺省补丁，消费方采用 `rareWords[english] ??= chinese`，不覆盖其他名词来源。
 
-1. 先排除 `chinese: null`，按英文和中文两端检查歧义；交易类别相关的不同措辞不能按行顺序决定。同一张表用于双向翻译，尤其不能把中文误导向另一个英文机制。
-2. 验证数值槽编号、顺序、正负值分支、字面常量及作用域。交易 `#` 不携带完整的游戏 stat-description 元数据，不能把所有 `#` 机械编号后全量接受。先覆盖可验证的单值／无参数条目，多值条目需要参数对应证据与回归样例。
-3. 仅把经过校验、与既有模板不冲突的结果合入 `stat_lines.json`；冲突列报告审核，未覆盖的既有文本不丢弃。沿用 PoBR 的候选快照和词条审计流程，不原地覆盖活动数据。
-4. 在 PoBR 的 `_meta.json` 中记录本库固定 commit、snapshot 和校验信息，保留其他名词数据的实际来源。消费方更新依赖后重新生成、审核差异、验证中文导入与显示，再切换活动快照。
+已将 PoBR 原有 **11 条 `EXTRA_PAIRS` 和 `Maelstrom → 漩涡`** 迁入根目录 **[`curated.json`](curated.json)**，保留原词句、编号及不可变源码链接。包括天赋点单复数、武器组技能点、珠宝插槽效果、Bonded 前缀、附赠技能、范围珠宝和连接条件。它们不需要伪造交易 ID。
 
-本库目前不提供完整的基底名、技能名、职业名、天赋名或词缀名称（例如前缀／后缀的专名），因此不能替换 PoBR 整个中文数据源。交易 stat ID 也不等于 PoBR 的计算 stat ID；翻译覆盖率不能作为解析或数值机制覆盖率。
+日常维护分工：
+
+| 文件 | 用途 |
+|---|---|
+| `translations.json` | 为现有交易 ID＋英文分支补译；可靠来源补齐后自动让位 |
+| `overrides.json` | 对现有交易词条明确指定高优先级修正 |
+| `curated.json` | 维护交易目录之外的文本、已审核多参数或字符串模板，以及稀有名组成词补丁 |
+
+修改 `curated.json` 后运行 `npm run build`、`npm run check`；生成、校验和激活均包含 PoBR 导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
+
+**包含独立词表接入的 PoBR 版本**在 `pipeline/gen-zh-cn.mjs` 中读取此导出，继续使用 `StatLineTemplate` 和 `apps/pobr-wasm/src/zh.rs`，不在 Rust／WASM 运行时访问 GitHub。其默认版本由 PoBR 的 `pipeline/translation-source.json` 及已有数据 `_meta.json` 固定；更新命令为：
+
+```sh
+# 在 PoBR 仓库中执行：--ref 仍指旧名词/基础词典；新词表独立固定版本
+node pipeline/gen-zh-cn.mjs --translations-ref <完整提交SHA>
+# 同时更新两个来源
+node pipeline/gen-zh-cn.mjs --refresh
+# 从本库的本地 checkout 消费，元数据明确标注 local 而非伪造来源提交
+node pipeline/gen-zh-cn.mjs --translations-dir /path/to/poe2-zh-cn-stats
+```
+
+PoBR 对新自动模板再次执行运行时匹配骨架冲突检查，不让新译文抢占既有中英文模板。迁移的人工模板保留原行为；未覆盖的旧模板和完整名词表仍保留。`generated/translation-audit.json` 记录合入／排除情况，`i18n/zh-CN/_meta.json` 记录本库 commit、snapshot 与导出 SHA-256，并沿用 PoBR 候选快照、词条审计及验证通过后发布的流程。
+
+旧版 PoBR 的 `--dict` 仍要求旧词典的十个文件，不能直接指向本仓库。消费 PoBR 导出须选择包含 `generated/pobr.json` 的提交；上面的通用 JSON 读取示例固定的早期提交仅用于演示主词表读取。
+
+本库不提供完整的基底名、技能名、职业名、天赋名或词缀专名，因此不是整个中文数据源的替代品。交易 stat ID 也不等于 PoBR 计算 stat ID；翻译覆盖率不是解析或数值机制覆盖率。
 
 
 ## 配对与来源优先级

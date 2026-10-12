@@ -1,0 +1,782 @@
+{
+  "schema_version": 1,
+  "id": "20261012T055659533Z",
+  "captured_at": "2026-10-12T05:03:22.466Z",
+  "game_patch": null,
+  "note": "HTTP Last-Modified is not a game patch version. Sources can be on different patches.",
+  "config_sha256": "5c463004904373044be8ad6dde224490070a280178538b8e48143e673e90fc5a",
+  "config": {
+    "trade": {
+      "en": "https://www.pathofexile.com/api/trade2/data/stats",
+      "cn": "https://poe.game.qq.com/api/trade2/data/stats"
+    },
+    "poe2db": {
+      "pages": [
+        "Amulets",
+        "Rings",
+        "Belts",
+        "Wands",
+        "Sceptres",
+        "Spears",
+        "Boots_str",
+        "Ruby",
+        "Emerald",
+        "Sapphire",
+        "Waystones_low_tier",
+        "Waystones_mid_tier",
+        "Waystones_top_tier",
+        "Strongbox",
+        "Expedition_Logbook",
+        "Relics",
+        "Breach_Tablet",
+        "Expedition_Tablet",
+        "Delirium_Tablet",
+        "Ritual_Tablet",
+        "Irradiated_Tablet",
+        "Overseer_Tablet",
+        "Abyss_Tablet",
+        "Temple_Tablet"
+      ],
+      "request_interval_ms": 1000
+    }
+  },
+  "sources": [
+    {
+      "key": "trade-en",
+      "url": "https://www.pathofexile.com/api/trade2/data/stats",
+      "file": "raw/trade-en.json.gz",
+      "fetched_at": "2026-10-12T05:03:23.303Z",
+      "sha256": "3e601b7b31c4a5569912c7a35406a8a754453baf08f9e8702d0f73775cff6e82",
+      "bytes": 853713,
+      "status": 200,
+      "content_type": "application/json",
+      "last_modified": "Mon, 12 Oct 2026 04:56:18 GMT",
+      "etag": null
+    },
+    {
+      "key": "trade-cn",
+      "url": "https://poe.game.qq.com/api/trade2/data/stats",
+      "file": "raw/trade-cn.json.gz",
+      "fetched_at": "2026-10-12T05:03:23.658Z",
+      "sha256": "db26a1aa3e74fe110983b17478fca81661869d9c79c0ad4491fc7d5967204f34",
+      "bytes": 987947,
+      "status": 200,
+      "content_type": "application/json",
+      "last_modified": "Mon, 12 Oct 2026 04:34:17 GMT",
+      "etag": null
+    },
+    {
+      "key": "poe2db-robots",
+      "url": "https://poe2db.tw/robots.txt",
+      "file": "raw/poe2db-robots.txt.gz",
+      "fetched_at": "2026-10-12T05:03:24.104Z",
+      "sha256": "528ebafef0a89c3d99609925ad89d3bb8c3e5b0411fd1c469f23b5cecb7e39b9",
+      "bytes": 64,
+      "status": 200,
+      "content_type": "text/plain",
+      "last_modified": "Mon, 05 Oct 2026 11:24:38 GMT",
+      "etag": "\"6ac388f6-40\""
+    },
+    {
+      "key": "poe2db-Amulets-en",
+      "url": "https://poe2db.tw/us/Amulets",
+      "file": "raw/poe2db-Amulets-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:25.684Z",
+      "sha256": "07ebd043dd092c7cb328b575c8b413ac37324c0bff56be3459aadba7fac44d6a",
+      "bytes": 2706805,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Amulets-cn",
+      "url": "https://poe2db.tw/cn/Amulets",
+      "file": "raw/poe2db-Amulets-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:27.159Z",
+      "sha256": "7970a8dd13da49e909d11b096afd19571e0509ad129e729c2e3d0a065aba7bc7",
+      "bytes": 2685933,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Rings-en",
+      "url": "https://poe2db.tw/us/Rings",
+      "file": "raw/poe2db-Rings-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:28.520Z",
+      "sha256": "2189eeddd2fa92674c4c157504dcebfd8448ed3fef61779592e2831408303fec",
+      "bytes": 619775,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Rings-cn",
+      "url": "https://poe2db.tw/cn/Rings",
+      "file": "raw/poe2db-Rings-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:29.821Z",
+      "sha256": "5ae2f2f4d50509af9b96cbde35d0744ce9a533c23e91c3da6e38fada9fe95b1c",
+      "bytes": 607753,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Belts-en",
+      "url": "https://poe2db.tw/us/Belts",
+      "file": "raw/poe2db-Belts-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:31.240Z",
+      "sha256": "e6e0a3961a4c5224e74040b05cae218f723fd0f174d8f640e2c5fd6ed0d4aeeb",
+      "bytes": 430971,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Belts-cn",
+      "url": "https://poe2db.tw/cn/Belts",
+      "file": "raw/poe2db-Belts-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:32.500Z",
+      "sha256": "53a162edf187490e0ee1c638cafc7eb913c035469ef1fa3563c744e9f70121f1",
+      "bytes": 428418,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Wands-en",
+      "url": "https://poe2db.tw/us/Wands",
+      "file": "raw/poe2db-Wands-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:33.765Z",
+      "sha256": "9f850d6bc3c855410c07f126d034991d75d37dc2c2330b5f3569655dbca84e65",
+      "bytes": 598440,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Wands-cn",
+      "url": "https://poe2db.tw/cn/Wands",
+      "file": "raw/poe2db-Wands-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:35.218Z",
+      "sha256": "9bf6cdd47c4a7bafa17063f5d271fbf0df3753de1da91d84970e3673cc7970b9",
+      "bytes": 594957,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Sceptres-en",
+      "url": "https://poe2db.tw/us/Sceptres",
+      "file": "raw/poe2db-Sceptres-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:37.011Z",
+      "sha256": "e64ae64857830e60bd7eafbb4c42d60c1e0050d00f88389b72a07e4f1018f4e3",
+      "bytes": 485579,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Sceptres-cn",
+      "url": "https://poe2db.tw/cn/Sceptres",
+      "file": "raw/poe2db-Sceptres-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:38.556Z",
+      "sha256": "be384adf7f4e9eff50e2ba27b7aff948df3b99fcdb2a29556e5780ce704a86ee",
+      "bytes": 480851,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Spears-en",
+      "url": "https://poe2db.tw/us/Spears",
+      "file": "raw/poe2db-Spears-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:40.352Z",
+      "sha256": "fda43afcbe9599e58506a034d001d75b0837b04c0463eb6beb63127c68f135ab",
+      "bytes": 787104,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Spears-cn",
+      "url": "https://poe2db.tw/cn/Spears",
+      "file": "raw/poe2db-Spears-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:41.994Z",
+      "sha256": "d37e646d17efee18f65842baee77e849069bcba4785b78c2045c402e6d50731e",
+      "bytes": 784554,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Boots_str-en",
+      "url": "https://poe2db.tw/us/Boots_str",
+      "file": "raw/poe2db-Boots_str-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:43.370Z",
+      "sha256": "b8b9458fe38141f20412f951d8d8c89b8c36024645d46b264e41fdb39be47c72",
+      "bytes": 479321,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Boots_str-cn",
+      "url": "https://poe2db.tw/cn/Boots_str",
+      "file": "raw/poe2db-Boots_str-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:44.846Z",
+      "sha256": "cc008f4e6a5e751745c140c5b0d7cfacdba6ec136363f58e843c6779f51de10f",
+      "bytes": 475015,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Ruby-en",
+      "url": "https://poe2db.tw/us/Ruby",
+      "file": "raw/poe2db-Ruby-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:46.122Z",
+      "sha256": "782b961a22b6e4f44449d262b933c8efa66d1d737dd6fa13ed8e66b26ff6f6cf",
+      "bytes": 192285,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Ruby-cn",
+      "url": "https://poe2db.tw/cn/Ruby",
+      "file": "raw/poe2db-Ruby-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:47.410Z",
+      "sha256": "1e637311002862dde0345b2f5858a9c03b568c007c47ea8967f15f7d114b3e82",
+      "bytes": 191265,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Emerald-en",
+      "url": "https://poe2db.tw/us/Emerald",
+      "file": "raw/poe2db-Emerald-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:48.715Z",
+      "sha256": "c71d3c6cf1ecaaae93c11dbfe77434fa8c9d25cce339a4fb4d1fd87b8802f24d",
+      "bytes": 215060,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Emerald-cn",
+      "url": "https://poe2db.tw/cn/Emerald",
+      "file": "raw/poe2db-Emerald-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:50.088Z",
+      "sha256": "1e804d96c47b291958406a128d08973d2c70bee66ca2b13f020ea206e80422ec",
+      "bytes": 213777,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Sapphire-en",
+      "url": "https://poe2db.tw/us/Sapphire",
+      "file": "raw/poe2db-Sapphire-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:51.361Z",
+      "sha256": "5d28af1778062c12383c42dcb3ede7d3f0303d4f5126190d1e73977b04428951",
+      "bytes": 207879,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Sapphire-cn",
+      "url": "https://poe2db.tw/cn/Sapphire",
+      "file": "raw/poe2db-Sapphire-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:52.834Z",
+      "sha256": "0d4a90a49759c88b0eba8e3f64e1359e32d206039e3495cd2a61ad7bee439cc2",
+      "bytes": 206710,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Waystones_low_tier-en",
+      "url": "https://poe2db.tw/us/Waystones_low_tier",
+      "file": "raw/poe2db-Waystones_low_tier-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:54.087Z",
+      "sha256": "9160eb20534a12f1f5b553ebeabf9e88c98e7fd6de996a87c7f3e3f9f8ff1bb1",
+      "bytes": 108538,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Waystones_low_tier-cn",
+      "url": "https://poe2db.tw/cn/Waystones_low_tier",
+      "file": "raw/poe2db-Waystones_low_tier-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:55.352Z",
+      "sha256": "2186972e9fea12c6eb6f16e8a6cd34116a6537d859af3e1e132fa38f3e528aab",
+      "bytes": 108470,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Waystones_mid_tier-en",
+      "url": "https://poe2db.tw/us/Waystones_mid_tier",
+      "file": "raw/poe2db-Waystones_mid_tier-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:56.597Z",
+      "sha256": "8db026a05e61b67d5059815f8d8624ec051564dc6fc93f5d14420ee0b23571ed",
+      "bytes": 98044,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Waystones_mid_tier-cn",
+      "url": "https://poe2db.tw/cn/Waystones_mid_tier",
+      "file": "raw/poe2db-Waystones_mid_tier-cn.html.gz",
+      "fetched_at": "2026-10-12T05:03:57.873Z",
+      "sha256": "09f22c501f885fcffea345c5b267efb14cdea5529655c1642032be764a4021d9",
+      "bytes": 98004,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Waystones_top_tier-en",
+      "url": "https://poe2db.tw/us/Waystones_top_tier",
+      "file": "raw/poe2db-Waystones_top_tier-en.html.gz",
+      "fetched_at": "2026-10-12T05:03:59.174Z",
+      "sha256": "b142794eac328dd5007d216ea2fa108504fe6b75fd880a6dff60f899e59f3bfe",
+      "bytes": 99031,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Waystones_top_tier-cn",
+      "url": "https://poe2db.tw/cn/Waystones_top_tier",
+      "file": "raw/poe2db-Waystones_top_tier-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:00.530Z",
+      "sha256": "5772b85895efa9e2ea7544525bbefe755f3156b343c4106abf3e412be4964ee9",
+      "bytes": 99000,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Strongbox-en",
+      "url": "https://poe2db.tw/us/Strongbox",
+      "file": "raw/poe2db-Strongbox-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:01.837Z",
+      "sha256": "aa4e263deaf805ec3b621e57b94dbb9059949554b0e56a0eaa63d98254958d6e",
+      "bytes": 307641,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Strongbox-cn",
+      "url": "https://poe2db.tw/cn/Strongbox",
+      "file": "raw/poe2db-Strongbox-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:03.144Z",
+      "sha256": "e6e930ab0759c6fc8ad7f5c05d95ca7314d0b32b36844ca5afa1d2a29974a276",
+      "bytes": 304317,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Expedition_Logbook-en",
+      "url": "https://poe2db.tw/us/Expedition_Logbook",
+      "file": "raw/poe2db-Expedition_Logbook-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:04.484Z",
+      "sha256": "772cde7d852530378a777790328546b07c49917116665ce20f1ae7483e4593d6",
+      "bytes": 180092,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Expedition_Logbook-cn",
+      "url": "https://poe2db.tw/cn/Expedition_Logbook",
+      "file": "raw/poe2db-Expedition_Logbook-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:05.778Z",
+      "sha256": "51f71d6ca431f6ddc2a3dee08e411fad1649f8e6bca99190649a8ac38743a126",
+      "bytes": 180167,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Relics-en",
+      "url": "https://poe2db.tw/us/Relics",
+      "file": "raw/poe2db-Relics-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:07.069Z",
+      "sha256": "1d11e24b16fba821dfb828179e5bb275317cdabcd3871d1f5e983968095f691b",
+      "bytes": 160912,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Relics-cn",
+      "url": "https://poe2db.tw/cn/Relics",
+      "file": "raw/poe2db-Relics-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:08.442Z",
+      "sha256": "99cf161caf3e6c8e7fe514860a4b80b43f5aa6c3f0725b792f8d6e20a5673e49",
+      "bytes": 159883,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Breach_Tablet-en",
+      "url": "https://poe2db.tw/us/Breach_Tablet",
+      "file": "raw/poe2db-Breach_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:09.715Z",
+      "sha256": "e592cb264aa91771caf01005122806b6ce0eda639888b6cb0af15c814113b170",
+      "bytes": 94185,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Breach_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Breach_Tablet",
+      "file": "raw/poe2db-Breach_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:10.981Z",
+      "sha256": "ed12061bb6c577aed8a9ea4e374252193aa6225c36be09a113ac081d766911ff",
+      "bytes": 94078,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Expedition_Tablet-en",
+      "url": "https://poe2db.tw/us/Expedition_Tablet",
+      "file": "raw/poe2db-Expedition_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:12.350Z",
+      "sha256": "b459e72ef40635545ba03e9daecad11a6659b307a5cc7dec573785ffc6e26a9d",
+      "bytes": 99866,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Expedition_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Expedition_Tablet",
+      "file": "raw/poe2db-Expedition_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:13.620Z",
+      "sha256": "9ca3fa9db944c9a1e47b916732c5247addadc147d230315f2bf1942a3d9dc9fa",
+      "bytes": 99438,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Delirium_Tablet-en",
+      "url": "https://poe2db.tw/us/Delirium_Tablet",
+      "file": "raw/poe2db-Delirium_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:14.896Z",
+      "sha256": "aa78527ad81c792991e0fb044424d6e3ffc1384c8c569577af9858e972476b3a",
+      "bytes": 95918,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Delirium_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Delirium_Tablet",
+      "file": "raw/poe2db-Delirium_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:16.224Z",
+      "sha256": "abe15e56156acf83b8e6312fa5c0a08436cab4465958d678d38c0ec200a452e5",
+      "bytes": 95656,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Ritual_Tablet-en",
+      "url": "https://poe2db.tw/us/Ritual_Tablet",
+      "file": "raw/poe2db-Ritual_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:17.571Z",
+      "sha256": "d79961be66b47e0e0466442cd18fc774ab5800c679a7976cb919fd8c43f448a8",
+      "bytes": 93685,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Ritual_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Ritual_Tablet",
+      "file": "raw/poe2db-Ritual_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:18.848Z",
+      "sha256": "c27ae895eb6d058398bc0850d11a64ca1a2ef88b03684369101fb4ebcd1ec813",
+      "bytes": 93494,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Irradiated_Tablet-en",
+      "url": "https://poe2db.tw/us/Irradiated_Tablet",
+      "file": "raw/poe2db-Irradiated_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:20.129Z",
+      "sha256": "8ba8ee502ee76b9595a0a6855e7bb3977aecfe3b88d7111a4235c2a0cc379139",
+      "bytes": 81509,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Irradiated_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Irradiated_Tablet",
+      "file": "raw/poe2db-Irradiated_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:21.464Z",
+      "sha256": "4c55789dd09a6a82e129a9ac067f4c36455a213ef873cc4f7b511e14997e3090",
+      "bytes": 81515,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Overseer_Tablet-en",
+      "url": "https://poe2db.tw/us/Overseer_Tablet",
+      "file": "raw/poe2db-Overseer_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:22.855Z",
+      "sha256": "342feeebbceaafcea88f09fc0b811c6c56b9697d9d6a353261b5633a40ab2a26",
+      "bytes": 86822,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Overseer_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Overseer_Tablet",
+      "file": "raw/poe2db-Overseer_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:24.216Z",
+      "sha256": "0c11ef0c8c071d5fd028b558f6a1bb41709e49240a154104cf7b16dd641f8575",
+      "bytes": 86741,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Abyss_Tablet-en",
+      "url": "https://poe2db.tw/us/Abyss_Tablet",
+      "file": "raw/poe2db-Abyss_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:25.547Z",
+      "sha256": "ee0f5bc06f48a9807c996b1d4f9b13b7f1f7369ba29e65676c134cb44831baf8",
+      "bytes": 99961,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Abyss_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Abyss_Tablet",
+      "file": "raw/poe2db-Abyss_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:26.897Z",
+      "sha256": "7628ce0ad3002ad8f171b857415a0b7a597e7ba2293d38ad8faa2efd3488fcf9",
+      "bytes": 100015,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Temple_Tablet-en",
+      "url": "https://poe2db.tw/us/Temple_Tablet",
+      "file": "raw/poe2db-Temple_Tablet-en.html.gz",
+      "fetched_at": "2026-10-12T05:04:28.281Z",
+      "sha256": "8a622117d36532cca479dda0a451899d26cc0348d26ff32a7ea75e9615bcba3e",
+      "bytes": 82453,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    },
+    {
+      "key": "poe2db-Temple_Tablet-cn",
+      "url": "https://poe2db.tw/cn/Temple_Tablet",
+      "file": "raw/poe2db-Temple_Tablet-cn.html.gz",
+      "fetched_at": "2026-10-12T05:04:29.626Z",
+      "sha256": "f00087bda2a93f406d360608f62a5be2141371be2f556796ce015cc955c5441d",
+      "bytes": 82459,
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "last_modified": null,
+      "etag": null
+    }
+  ],
+  "pages": [
+    {
+      "slug": "Amulets",
+      "en": "poe2db-Amulets-en",
+      "cn": "poe2db-Amulets-cn"
+    },
+    {
+      "slug": "Rings",
+      "en": "poe2db-Rings-en",
+      "cn": "poe2db-Rings-cn"
+    },
+    {
+      "slug": "Belts",
+      "en": "poe2db-Belts-en",
+      "cn": "poe2db-Belts-cn"
+    },
+    {
+      "slug": "Wands",
+      "en": "poe2db-Wands-en",
+      "cn": "poe2db-Wands-cn"
+    },
+    {
+      "slug": "Sceptres",
+      "en": "poe2db-Sceptres-en",
+      "cn": "poe2db-Sceptres-cn"
+    },
+    {
+      "slug": "Spears",
+      "en": "poe2db-Spears-en",
+      "cn": "poe2db-Spears-cn"
+    },
+    {
+      "slug": "Boots_str",
+      "en": "poe2db-Boots_str-en",
+      "cn": "poe2db-Boots_str-cn"
+    },
+    {
+      "slug": "Ruby",
+      "en": "poe2db-Ruby-en",
+      "cn": "poe2db-Ruby-cn"
+    },
+    {
+      "slug": "Emerald",
+      "en": "poe2db-Emerald-en",
+      "cn": "poe2db-Emerald-cn"
+    },
+    {
+      "slug": "Sapphire",
+      "en": "poe2db-Sapphire-en",
+      "cn": "poe2db-Sapphire-cn"
+    },
+    {
+      "slug": "Waystones_low_tier",
+      "en": "poe2db-Waystones_low_tier-en",
+      "cn": "poe2db-Waystones_low_tier-cn"
+    },
+    {
+      "slug": "Waystones_mid_tier",
+      "en": "poe2db-Waystones_mid_tier-en",
+      "cn": "poe2db-Waystones_mid_tier-cn"
+    },
+    {
+      "slug": "Waystones_top_tier",
+      "en": "poe2db-Waystones_top_tier-en",
+      "cn": "poe2db-Waystones_top_tier-cn"
+    },
+    {
+      "slug": "Strongbox",
+      "en": "poe2db-Strongbox-en",
+      "cn": "poe2db-Strongbox-cn"
+    },
+    {
+      "slug": "Expedition_Logbook",
+      "en": "poe2db-Expedition_Logbook-en",
+      "cn": "poe2db-Expedition_Logbook-cn"
+    },
+    {
+      "slug": "Relics",
+      "en": "poe2db-Relics-en",
+      "cn": "poe2db-Relics-cn"
+    },
+    {
+      "slug": "Breach_Tablet",
+      "en": "poe2db-Breach_Tablet-en",
+      "cn": "poe2db-Breach_Tablet-cn"
+    },
+    {
+      "slug": "Expedition_Tablet",
+      "en": "poe2db-Expedition_Tablet-en",
+      "cn": "poe2db-Expedition_Tablet-cn"
+    },
+    {
+      "slug": "Delirium_Tablet",
+      "en": "poe2db-Delirium_Tablet-en",
+      "cn": "poe2db-Delirium_Tablet-cn"
+    },
+    {
+      "slug": "Ritual_Tablet",
+      "en": "poe2db-Ritual_Tablet-en",
+      "cn": "poe2db-Ritual_Tablet-cn"
+    },
+    {
+      "slug": "Irradiated_Tablet",
+      "en": "poe2db-Irradiated_Tablet-en",
+      "cn": "poe2db-Irradiated_Tablet-cn"
+    },
+    {
+      "slug": "Overseer_Tablet",
+      "en": "poe2db-Overseer_Tablet-en",
+      "cn": "poe2db-Overseer_Tablet-cn"
+    },
+    {
+      "slug": "Abyss_Tablet",
+      "en": "poe2db-Abyss_Tablet-en",
+      "cn": "poe2db-Abyss_Tablet-cn"
+    },
+    {
+      "slug": "Temple_Tablet",
+      "en": "poe2db-Temple_Tablet-en",
+      "cn": "poe2db-Temple_Tablet-cn"
+    }
+  ],
+  "errors": [],
+  "rebuilt_at": "2026-10-12T05:56:59.533Z",
+  "rebuilt_from": "20261012T052630426Z"
+}
