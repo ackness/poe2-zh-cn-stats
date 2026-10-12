@@ -1,0 +1,2387 @@
+[
+  {
+    "id": "crafted.stat_1301765461",
+    "category": "crafted",
+    "english": "#% to Maximum Chaos Resistance",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2888350852",
+    "category": "crafted",
+    "english": "Gain #% of Damage as Extra Cold Damage while you are missing Runic Ward",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|12750",
+    "category": "crafted",
+    "english": "Allocates Vale Shelter",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|13708",
+    "category": "crafted",
+    "english": "Allocates Curved Weapon",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|22811",
+    "category": "crafted",
+    "english": "Allocates The Wild Cat",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|261",
+    "category": "crafted",
+    "english": "Allocates Toxic Sludge",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|32128",
+    "category": "crafted",
+    "english": "Allocates Flow of Time",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|32448",
+    "category": "crafted",
+    "english": "Allocates Shockproof",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|34553",
+    "category": "crafted",
+    "english": "Allocates Emboldening Lead",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|34617",
+    "category": "crafted",
+    "english": "Allocates Conall the Hunted",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|35743",
+    "category": "crafted",
+    "english": "Allocates Saqawal's Hide",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|37244",
+    "category": "crafted",
+    "english": "Allocates Shield Expertise",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|37302",
+    "category": "crafted",
+    "english": "Allocates Kept at Bay",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|40117",
+    "category": "crafted",
+    "english": "Allocates Spiked Armour",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|40325",
+    "category": "crafted",
+    "english": "Allocates Resolution",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|43250",
+    "category": "crafted",
+    "english": "Allocates Adaptive Skin",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|4331",
+    "category": "crafted",
+    "english": "Allocates Guided Hand",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|44753",
+    "category": "crafted",
+    "english": "Allocates One With Flame",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|44756",
+    "category": "crafted",
+    "english": "Allocates Marked Agility",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|45713",
+    "category": "crafted",
+    "english": "Allocates Savouring",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|46384",
+    "category": "crafted",
+    "english": "Allocates Wide Barrier",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|4661",
+    "category": "crafted",
+    "english": "Allocates Inspiring Leader",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|48103",
+    "category": "crafted",
+    "english": "Allocates Forcewave",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|48240",
+    "category": "crafted",
+    "english": "Allocates Quick Recovery",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|48649",
+    "category": "crafted",
+    "english": "Allocates Insulating Hide",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|49984",
+    "category": "crafted",
+    "english": "Allocates Spellblade",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|51105",
+    "category": "crafted",
+    "english": "Allocates Spirit Bond",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|52180",
+    "category": "crafted",
+    "english": "Allocates Trained Deflection",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|5335",
+    "category": "crafted",
+    "english": "Allocates Shimmering Mirage",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|53527",
+    "category": "crafted",
+    "english": "Allocates Shattering Blow",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|5663",
+    "category": "crafted",
+    "english": "Allocates Endurance",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|58817",
+    "category": "crafted",
+    "english": "Allocates Artillery Strike",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|59433",
+    "category": "crafted",
+    "english": "Allocates Thirst for Endurance",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|750",
+    "category": "crafted",
+    "english": "Allocates Tribal Fury",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|8916",
+    "category": "crafted",
+    "english": "Allocates Bashing Beast",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_2954116742|9736",
+    "category": "crafted",
+    "english": "Allocates Insulated Treads",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "crafted.stat_4011431182",
+    "category": "crafted",
+    "english": "Gain #% of Damage as Extra Chaos Damage while you are missing Runic Ward",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_243380454",
+    "category": "desecrated",
+    "english": "# additional Rare Monsters are spawned from Abysses",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_2741291867",
+    "category": "desecrated",
+    "english": "Area is overrun by the Abyssal",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_2741291867",
+    "category": "desecrated",
+    "english": "Map is overrun by the Abyssal",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_3490187949",
+    "category": "desecrated",
+    "english": "Area contains # additional Abysses",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_360553763",
+    "category": "desecrated",
+    "english": "Abyssal Monsters have increased Difficulty and Reward for each closed Pit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_360553763",
+    "category": "desecrated",
+    "english": "Abyssal Monsters in Map have increased Difficulty and Reward for each closed Pit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_4256531808",
+    "category": "desecrated",
+    "english": "Abyss Pits in Area are twice as likely to have Rewards",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "desecrated.stat_944630113",
+    "category": "desecrated",
+    "english": "Abysses spawn #% increased Monsters",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "enchant.stat_3233599707",
+    "category": "enchant",
+    "english": "#% increased Weapon Swap Speed",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "enchant.stat_3650992555",
+    "category": "enchant",
+    "english": "Debuffs you inflict have #% increased Slow Magnitude",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "enchant.stat_3732878551",
+    "category": "enchant",
+    "english": "Rare Monsters have a #% Surpassing chance to have an additional Modifier",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "enchant.stat_3732878551",
+    "category": "enchant",
+    "english": "Rare Monsters in Map have a #% Surpassing chance to have an additional Modifier",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "enchant.stat_3836551197",
+    "category": "enchant",
+    "english": "#% increased Stack size of Simulacrum Splinters found in Area",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1002973905",
+    "category": "explicit",
+    "english": "Recover all Mana when Used",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1031644647",
+    "category": "explicit",
+    "english": "Revived Monsters from Ritual Altars in Area have #% increased chance to be Magic",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1070816711",
+    "category": "explicit",
+    "english": "Area contains an additional Abyss",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1070816711",
+    "category": "explicit",
+    "english": "Map contains an additional Abyss",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1083387327",
+    "category": "explicit",
+    "english": "#% increased Quantity of Expedition Logbooks dropped by Runic Monsters",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1090596078",
+    "category": "explicit",
+    "english": "Breaches in Area spawn #% increased Magic Monsters",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1090596078",
+    "category": "explicit",
+    "english": "Breaches in Map spawn #% increased Magic Monsters",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1129429646",
+    "category": "explicit",
+    "english": "Small Passive Skills in Radius also grant #% increased Weapon Swap Speed",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1132041585",
+    "category": "explicit",
+    "english": "Virtuous",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1133965702",
+    "category": "explicit",
+    "english": "#% increased Gold found in this Area",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1157523820",
+    "category": "explicit",
+    "english": "#% chance for Slam Skills to cause an additional Aftershock",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1174954559",
+    "category": "explicit",
+    "english": "Delirium Fog in Area lasts # additional seconds before dissipating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1176947534",
+    "category": "explicit",
+    "english": "Undead Minions have #% reduced Reservation",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_120737942",
+    "category": "explicit",
+    "english": "Ritual Altars in Area allow rerolling Favours an additional time",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_120737942",
+    "category": "explicit",
+    "english": "Ritual Altars in Map allow rerolling Favours an additional time",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1210760818",
+    "category": "explicit",
+    "english": "Breaches have #% increased Monster density",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1210760818",
+    "category": "explicit",
+    "english": "Breaches in Map have #% increased Pack Size",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1247628870",
+    "category": "explicit",
+    "english": "Small Passive Skills in Radius also grant #% increased maximum Mana",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1276056105",
+    "category": "explicit",
+    "english": "#% increased Gold found in Map (Gold Piles)",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1276056105",
+    "category": "explicit",
+    "english": "#% increased Gold found in this Area (Gold Piles)",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1285684287",
+    "category": "explicit",
+    "english": "Enemies in your Presence count as being on Low Life",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1314787770",
+    "category": "explicit",
+    "english": "Map Boss has +#% chance to drop a Waystone of the current tier or higher",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1345835998",
+    "category": "explicit",
+    "english": "Deferring Favours at Ritual Altars in Area costs #% increased Tribute",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1345835998",
+    "category": "explicit",
+    "english": "Deferring Favours at Ritual Altars in Map costs #% increased Tribute",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1352729973",
+    "category": "explicit",
+    "english": "Area has #% increased chance to contain Rogue Exiles",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1361645249",
+    "category": "explicit",
+    "english": "Allies in your Presence have Block Chance equal to yours",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1414945937",
+    "category": "explicit",
+    "english": "Manifested Dancing Dervishes die when Rampage ends",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1416292992",
+    "category": "explicit",
+    "english": "Has # Charm Slot",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1468737867",
+    "category": "explicit",
+    "english": "Area contains an additional Shrine",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1468737867",
+    "category": "explicit",
+    "english": "Map contains an additional Shrine",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1538879632",
+    "category": "explicit",
+    "english": "Inflict Fire Exposure on Shocking an Enemy",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1539368271",
+    "category": "explicit",
+    "english": "#% increased Expedition Explosive Placement Range",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1539368271",
+    "category": "explicit",
+    "english": "#% increased Expedition Explosive Placement Range in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1559935218",
+    "category": "explicit",
+    "english": "Causes Daze buildup equal to #% of Damage dealt",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_159726667",
+    "category": "explicit",
+    "english": "Monsters Sacrificed at Ritual Altars in Area grant #% increased Tribute",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1640965354",
+    "category": "explicit",
+    "english": "Area contains #% increased number of Runic Monster Markers",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1653625239",
+    "category": "explicit",
+    "english": "Breaches in Area spawn an additional Rare Monster",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1653625239",
+    "category": "explicit",
+    "english": "Breaches in Map spawn an additional Rare Monster",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1708461270",
+    "category": "explicit",
+    "english": "Monsters have #% increased Area of Effect",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1714706956",
+    "category": "explicit",
+    "english": "#% increased Magic Pack Size",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1718147982",
+    "category": "explicit",
+    "english": "#% increased Minion Accuracy Rating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1761741119",
+    "category": "explicit",
+    "english": "Banners always have maximum Valour",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1769611692",
+    "category": "explicit",
+    "english": "Delirium Fog in Area applies #% increased Deliriousness to Players",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1770833858",
+    "category": "explicit",
+    "english": "Delirium Encounters in Area have #% chance to generate an additional Reward",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1770833858",
+    "category": "explicit",
+    "english": "Delirium Encounters in affected Map have #% chance to generate an additional Reward",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1809641701",
+    "category": "explicit",
+    "english": "Small Passive Skills in Radius also grant #% increased maximum Life",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1825943485",
+    "category": "explicit",
+    "english": "Area has #% increased chance to contain Essences",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1896726125",
+    "category": "explicit",
+    "english": "# to maximum Valour",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_1949833742",
+    "category": "explicit",
+    "english": "#% increased Daze Buildup",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2162684861",
+    "category": "explicit",
+    "english": "Areas with Powerful Map Bosses contain an additional Essence",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2162684861",
+    "category": "explicit",
+    "english": "Map contains an additional Essence",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2224050171",
+    "category": "explicit",
+    "english": "Breaches in Area contain # additional Clasped Hand",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2224050171",
+    "category": "explicit",
+    "english": "Breaches in Map contain # additional Clasped Hand",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2241560081",
+    "category": "explicit",
+    "english": "#% increased Attack Speed per 25 Dexterity",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2282052746",
+    "category": "explicit",
+    "english": "Rerolling Favours at Ritual Altars in Area costs #% increased Tribute",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2282052746",
+    "category": "explicit",
+    "english": "Rerolling Favours at Ritual Altars in Map costs #% increased Tribute",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_231864447",
+    "category": "explicit",
+    "english": "Area contains an additional Rare Chest",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_231864447",
+    "category": "explicit",
+    "english": "Map contains an additional Rare Chest",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2323782229",
+    "category": "explicit",
+    "english": "Slaying Rare Monsters in Area pauses the Delirium Mirror Timer for 1 second",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2323782229",
+    "category": "explicit",
+    "english": "Slaying Rare Monsters in Map pauses the Delirium Mirror Timer for 1 second",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2388936716",
+    "category": "explicit",
+    "english": "Area has #% chance to contain a Strongbox",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2396719220",
+    "category": "explicit",
+    "english": "Area contains an additional Magic Chest",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_243380454",
+    "category": "explicit",
+    "english": "# additional Rare Monsters are spawned from Abysses",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2440265466",
+    "category": "explicit",
+    "english": "Areas which contain Breaches have #% chance to contain three additional Breaches",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2440265466",
+    "category": "explicit",
+    "english": "Map has #% chance to contain three additional Breaches",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2504358770",
+    "category": "explicit",
+    "english": "Breaches in Map open and close #% faster",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2504358770",
+    "category": "explicit",
+    "english": "Breaches open and close #% faster",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2513318031",
+    "category": "explicit",
+    "english": "#% increased Attributes per Socket filled",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2571125745",
+    "category": "explicit",
+    "english": "Area has #% chance to contain a Shrine",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2624927319",
+    "category": "explicit",
+    "english": "#% increased number of Monster Packs",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2625554454",
+    "category": "explicit",
+    "english": "Every 10 seconds, gain a random non-damaging Shrine buff for 20 seconds",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2665488635",
+    "category": "explicit",
+    "english": "Inflict Lightning Exposure on Critical Hit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_267210597",
+    "category": "explicit",
+    "english": "Area has #% increased chance to contain a Summoning Circle",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2675129731",
+    "category": "explicit",
+    "english": "Notable Passive Skills in Radius also grant #% increased Warcry Buff Effect",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2694800111",
+    "category": "explicit",
+    "english": "#% increased number of Rare Expedition Monsters in Area",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2694800111",
+    "category": "explicit",
+    "english": "#% increased number of Rare Expedition Monsters in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2702182380",
+    "category": "explicit",
+    "english": "#% increased Maximum Life per Socket filled",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2722831300",
+    "category": "explicit",
+    "english": "Abysses in Area have #% increased chance to lead to an Abyssal Depths",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2741291867",
+    "category": "explicit",
+    "english": "Area is overrun by the Abyssal",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2741291867",
+    "category": "explicit",
+    "english": "Map is overrun by the Abyssal",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2793222406",
+    "category": "explicit",
+    "english": "#% increased bonuses gained from Equipped Rings",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2816104578",
+    "category": "explicit",
+    "english": "Runic Monsters are Duplicated",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2816104578",
+    "category": "explicit",
+    "english": "Runic Monsters in your Maps are Duplicated",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_28208665",
+    "category": "explicit",
+    "english": "Favours Deferred at Ritual Altars in Area reappear #% sooner",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2839545956",
+    "category": "explicit",
+    "english": "Area contains a Summoning Circle",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2839545956",
+    "category": "explicit",
+    "english": "Map contains an additional Summoning Circle",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2888350852",
+    "category": "explicit",
+    "english": "Gain #% of Damage as Extra Cold Damage while you are missing Runic Ward",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2889807051",
+    "category": "explicit",
+    "english": "Melee Hits count as Rampage Kills Rampage",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2890355696",
+    "category": "explicit",
+    "english": "Area has #% chance to contain four additional Abysses",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_289086688",
+    "category": "explicit",
+    "english": "Hits Break # Armour",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2898517796",
+    "category": "explicit",
+    "english": "#% increased amount of Magic Chests",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2930706364",
+    "category": "explicit",
+    "english": "Permanently Intimidate enemies on Block",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2954116742|32128",
+    "category": "explicit",
+    "english": "Allocates Flow of Time",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2954116742|34617",
+    "category": "explicit",
+    "english": "Allocates Conall the Hunted",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_2954116742|35743",
+    "category": "explicit",
+    "english": "Allocates Saqawal's Hide",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3005701891",
+    "category": "explicit",
+    "english": "Inflict Cold Exposure on Hit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3040603554",
+    "category": "explicit",
+    "english": "Areas with Powerful Map Bosses contain an additional Strongbox",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3040603554",
+    "category": "explicit",
+    "english": "Map contains an additional Strongbox",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3042527515",
+    "category": "explicit",
+    "english": "Areas with Map Powerful Map Bosses contain an additional Shrine",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3042527515",
+    "category": "explicit",
+    "english": "Map contains an additional Shrine",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3049505189",
+    "category": "explicit",
+    "english": "Areas which contain Breaches have #% chance to contain an additional Breach",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3049505189",
+    "category": "explicit",
+    "english": "Map has #% chance to contain an additional Breach",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3063814459",
+    "category": "explicit",
+    "english": "Pin Enemies which are Primed for Pinning",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3078574625",
+    "category": "explicit",
+    "english": "#% increased Effect of Expedition Remnants in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3078574625",
+    "category": "explicit",
+    "english": "#% increased Effect of Remnants in Area",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_313223231",
+    "category": "explicit",
+    "english": "#% increased Rarity of Items found per Socket filled",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3169585282",
+    "category": "explicit",
+    "english": "Allies in your Presence have # to Accuracy Rating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3226351972",
+    "category": "explicit",
+    "english": "Delirium Fog in Area lasts # additional seconds before dissipating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3233599707",
+    "category": "explicit",
+    "english": "#% increased Weapon Swap Speed",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3240183538",
+    "category": "explicit",
+    "english": "Area contains an additional Strongbox",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3243034867",
+    "category": "explicit",
+    "english": "Notable Passive Skills in Radius also grant Aura Skills have #% increased Magnitudes",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3289828378",
+    "category": "explicit",
+    "english": "#% increased Expedition Explosive Radius",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3289828378",
+    "category": "explicit",
+    "english": "#% increased Expedition Explosive Radius in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3314536008",
+    "category": "explicit",
+    "english": "Inflict Cold Exposure on Igniting an Enemy",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3350944114",
+    "category": "explicit",
+    "english": "Delirium Fog in Area dissipates #% faster",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3350944114",
+    "category": "explicit",
+    "english": "Delirium Fog in Map dissipates #% faster",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3428124128",
+    "category": "explicit",
+    "english": "Delirious Monsters Killed in Area provide #% increased Reward Progress",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3428124128",
+    "category": "explicit",
+    "english": "Delirious Monsters Killed in Map provide #% increased Reward Progress",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3465791711",
+    "category": "explicit",
+    "english": "Delirium Monsters in Area have #% increased Pack Size",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3490187949",
+    "category": "explicit",
+    "english": "Area contains # additional Abysses",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3550168289",
+    "category": "explicit",
+    "english": "Area is inhabited by # additional Rogue Exile",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3550168289",
+    "category": "explicit",
+    "english": "Map is inhabited by # additional Rogue Exile",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_358129101",
+    "category": "explicit",
+    "english": "Area contains # additional Azmeri Spirit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_358129101",
+    "category": "explicit",
+    "english": "Map contains # additional Azmeri Spirit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_359380213",
+    "category": "explicit",
+    "english": "Inflicts Elemental Exposure when this Weapon Fully Breaks Armour",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_360553763",
+    "category": "explicit",
+    "english": "Abyssal Monsters have increased Difficulty and Reward for each closed Pit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_360553763",
+    "category": "explicit",
+    "english": "Abyssal Monsters in Map have increased Difficulty and Reward for each closed Pit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3732878551",
+    "category": "explicit",
+    "english": "Rare Monsters have a #% Surpassing chance to have an additional Modifier",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3732878551",
+    "category": "explicit",
+    "english": "Rare Monsters in Map have a #% Surpassing chance to have an additional Modifier",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3749502527",
+    "category": "explicit",
+    "english": "#% chance to gain Volatility on Kill",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3753446846",
+    "category": "explicit",
+    "english": "Expeditions in Area have # Remnants",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3753446846",
+    "category": "explicit",
+    "english": "Expeditions in Map have # Remnant",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3815617979",
+    "category": "explicit",
+    "english": "Area has #% increased chance to contain Azmeri Spirits",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3836551197",
+    "category": "explicit",
+    "english": "#% increased Stack size of Simulacrum Splinters found in Area",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_395808938",
+    "category": "explicit",
+    "english": "Area contains an additional Essence",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_395808938",
+    "category": "explicit",
+    "english": "Map contains an additional Essence",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3962960008",
+    "category": "explicit",
+    "english": "Delirium Encounters in Area are #% more likely to spawn Unique Bosses",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_3979184174",
+    "category": "explicit",
+    "english": "Revived Monsters from Ritual Altars in Area have #% increased chance to be Rare",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_398335579",
+    "category": "explicit",
+    "english": "Cannot be used while Manifested",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4007938693",
+    "category": "explicit",
+    "english": "Triggers Level # Manifest Dancing Dervishes on Rampage",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4011431182",
+    "category": "explicit",
+    "english": "Gain #% of Damage as Extra Chaos Damage while you are missing Runic Ward",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4098286334",
+    "category": "explicit",
+    "english": "Area has #% chance to contain an Essence",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4219583418",
+    "category": "explicit",
+    "english": "#% increased quantity of Artifacts dropped by Monsters",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4219583418",
+    "category": "explicit",
+    "english": "#% increased quantity of Expedition Artifacts dropped by Monsters in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4219853180",
+    "category": "explicit",
+    "english": "Ritual Favours in Area have #% increased chance to be Omens",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4225700219",
+    "category": "explicit",
+    "english": "Notable Passive Skills in Radius also grant #% chance to gain Volatility on Kill",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4256531808",
+    "category": "explicit",
+    "english": "Abyss Pits in Area are twice as likely to have Rewards",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_4279535856",
+    "category": "explicit",
+    "english": "Area has #% increased chance to contain Strongboxes",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|160",
+    "category": "explicit",
+    "english": "+# to Level of all Skeletal Sniper Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|186",
+    "category": "explicit",
+    "english": "+# to Level of all Herald of Blood Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|193",
+    "category": "explicit",
+    "english": "+# to Level of all Tamed Companion Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|64",
+    "category": "explicit",
+    "english": "+# to Level of all Cast on Shock Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|65",
+    "category": "explicit",
+    "english": "+# to Level of all Cast on Freeze Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|66",
+    "category": "explicit",
+    "english": "+# to Level of all Cast on Ignite Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|80",
+    "category": "explicit",
+    "english": "+# to Level of all Flammability Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|81",
+    "category": "explicit",
+    "english": "+# to Level of all Hypothermia Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_448592698|82",
+    "category": "explicit",
+    "english": "+# to Level of all Conductivity Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_551040294",
+    "category": "explicit",
+    "english": "Delirium Fog in Area spawns #% increased Fracturing Mirrors",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_57434274",
+    "category": "explicit",
+    "english": "#% increased Experience gain",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_624534143",
+    "category": "explicit",
+    "english": "#% increased Quantity of Breach Splinters dropped by Breach Monsters in Area",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_624534143",
+    "category": "explicit",
+    "english": "#% increased Quantity of Breach Splinters dropped by Breach Monsters in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_65135897",
+    "category": "explicit",
+    "english": "Cannot use Shield Skills",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_689816330",
+    "category": "explicit",
+    "english": "Area has #% increased chance to contain Shrines",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_775597083",
+    "category": "explicit",
+    "english": "Areas with Powerful Map Bosses contain an additional Azmeri Spirit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_775597083",
+    "category": "explicit",
+    "english": "Map contains an additional Azmeri Spirit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_793875384",
+    "category": "explicit",
+    "english": "Small Passive Skills in Radius also grant #% increased Minion Accuracy Rating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_798469000",
+    "category": "explicit",
+    "english": "#% increased amount of Rare Chests",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_911712882",
+    "category": "explicit",
+    "english": "#% increased Maximum Mana per Socket filled",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_915546383",
+    "category": "explicit",
+    "english": "Gain #% of Physical Damage as Extra Damage of a random Element",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_937291386",
+    "category": "explicit",
+    "english": "Favours Rerolled at Ritual Altars in Area have #% chance to cost no Tribute",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "explicit.stat_944630113",
+    "category": "explicit",
+    "english": "Abysses spawn #% increased Monsters",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_1129429646",
+    "category": "fractured",
+    "english": "Small Passive Skills in Radius also grant #% increased Weapon Swap Speed",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_1276056105",
+    "category": "fractured",
+    "english": "#% increased Gold found in Map (Gold Piles)",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_1276056105",
+    "category": "fractured",
+    "english": "#% increased Gold found in this Area (Gold Piles)",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_1714706956",
+    "category": "fractured",
+    "english": "#% increased Magic Pack Size",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_1718147982",
+    "category": "fractured",
+    "english": "#% increased Minion Accuracy Rating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_3169585282",
+    "category": "fractured",
+    "english": "Allies in your Presence have # to Accuracy Rating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_3233599707",
+    "category": "fractured",
+    "english": "#% increased Weapon Swap Speed",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_3243034867",
+    "category": "fractured",
+    "english": "Notable Passive Skills in Radius also grant Aura Skills have #% increased Magnitudes",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_3749502527",
+    "category": "fractured",
+    "english": "#% chance to gain Volatility on Kill",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_4225700219",
+    "category": "fractured",
+    "english": "Notable Passive Skills in Radius also grant #% chance to gain Volatility on Kill",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_57434274",
+    "category": "fractured",
+    "english": "#% increased Experience gain",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "fractured.stat_793875384",
+    "category": "fractured",
+    "english": "Small Passive Skills in Radius also grant #% increased Minion Accuracy Rating",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1050883682",
+    "category": "implicit",
+    "english": "Has no Accuracy Penalty from Range",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1137147997",
+    "category": "implicit",
+    "english": "Unblockable",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1311130924",
+    "category": "implicit",
+    "english": "#% of Damage taken from Hits bypasses Energy Shield if Energy Shield is below half",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1443060084",
+    "category": "implicit",
+    "english": "#% reduced Enemy Stun Threshold",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1519615863",
+    "category": "implicit",
+    "english": "#% chance to cause Bleeding on Hit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1539368271",
+    "category": "implicit",
+    "english": "#% increased Expedition Explosive Placement Range",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1539368271",
+    "category": "implicit",
+    "english": "#% increased Expedition Explosive Placement Range in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1559935218",
+    "category": "implicit",
+    "english": "Causes Daze buildup equal to #% of Damage dealt",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1640965354",
+    "category": "implicit",
+    "english": "Area contains #% increased number of Runic Monster Markers",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_1961849903",
+    "category": "implicit",
+    "english": "Cannot use Projectile Attacks",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_3289828378",
+    "category": "implicit",
+    "english": "#% increased Expedition Explosive Radius",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_3289828378",
+    "category": "implicit",
+    "english": "#% increased Expedition Explosive Radius in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_3544050945",
+    "category": "implicit",
+    "english": "#% of Spell Mana Cost Converted to Life Cost",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_3691641145",
+    "category": "implicit",
+    "english": "#% increased Damage taken",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_4219583418",
+    "category": "implicit",
+    "english": "#% increased quantity of Artifacts dropped by Monsters",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_4219583418",
+    "category": "implicit",
+    "english": "#% increased quantity of Expedition Artifacts dropped by Monsters in Map",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "ambiguous-en-branches",
+    "evidence": []
+  },
+  {
+    "id": "implicit.stat_4270348114",
+    "category": "implicit",
+    "english": "Breaks # Armour on Critical Hit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_11014011",
+    "category": "rune",
+    "english": "Warcries Explode Corpses dealing #% of their Life as Physical Damage",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_1466716929",
+    "category": "rune",
+    "english": "Gain # Rage when Critically Hit by an Enemy",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_1512261731",
+    "category": "rune",
+    "english": "Bonded: Knocks Enemies Back on Hit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_1651083789",
+    "category": "rune",
+    "english": "Bonded: Triggered Spells deal #% increased Spell Damage",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_1914815166",
+    "category": "rune",
+    "english": "Recover #% of maximum Life over 2 Seconds when you use a Command Skill",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_1936645603",
+    "category": "rune",
+    "english": "Gain #% of Physical Damage as Extra Fire Damage",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_2091621414",
+    "category": "rune",
+    "english": "Causes Bleeding on Hit",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_2438634449",
+    "category": "rune",
+    "english": "#% chance to Aggravate Bleeding on targets you Critically Hit with Attacks",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_2621116283",
+    "category": "rune",
+    "english": "Gain #% of damage as Fire damage per 2% Chance to Block",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_3538915253",
+    "category": "rune",
+    "english": "On Hitting an enemy, gains maximum added Lightning damage equal to the enemy's Power for 20 seconds, up to a total of #",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_3686997387",
+    "category": "rune",
+    "english": "Double Stun Threshold while Shield is Raised",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_3969727699",
+    "category": "rune",
+    "english": "Bonded: Warcry Skills have #% increased Area of Effect",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_841463428",
+    "category": "rune",
+    "english": "Bonded: #% increased Magnitude of Bleeding you inflict",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "rune.stat_939832726",
+    "category": "rune",
+    "english": "Recover #% of maximum Life for each Endurance Charge consumed",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  },
+  {
+    "id": "skill.living_bomb_player",
+    "category": "skill",
+    "english": "Grants Skill: Level # Living Bomb",
+    "chinese": null,
+    "method": "unresolved",
+    "reason": "missing-cn",
+    "evidence": []
+  }
+]

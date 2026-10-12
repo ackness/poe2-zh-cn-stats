@@ -1,0 +1,18 @@
+{
+  "trade": {
+    "en": "https://www.pathofexile.com/api/trade2/data/stats",
+    "cn": "https://poe.game.qq.com/api/trade2/data/stats"
+  },
+  "poe2db": {
+    "pages": [
+      "Amulets", "Rings", "Belts", "Wands", "Sceptres", "Spears",
+      "Boots_str", "Ruby", "Emerald", "Sapphire",
+      "Waystones_low_tier", "Waystones_mid_tier", "Waystones_top_tier",
+      "Strongbox", "Expedition_Logbook", "Relics",
+      "Breach_Tablet", "Expedition_Tablet", "Delirium_Tablet",
+      "Ritual_Tablet", "Irradiated_Tablet", "Overseer_Tablet",
+      "Abyss_Tablet", "Temple_Tablet"
+    ],
+    "request_interval_ms": 1000
+  }
+}
