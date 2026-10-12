@@ -3,6 +3,7 @@ import path from 'node:path';
 import { buildDictionary } from './dictionary.mjs';
 import { extractPagePairs } from './poe2db.mjs';
 import { readSnapshot, sha256, activateSnapshot } from './sources.mjs';
+import { buildPobrExport } from './pobr-export.mjs';
 
 const json = value => JSON.stringify(value, null, 2) + '\n';
 
@@ -11,6 +12,8 @@ export async function generateFiles(root, directory) {
   const overridesRaw = await readFile(path.join(root, 'overrides.json'), 'utf8');
   const overrides = JSON.parse(overridesRaw);
   const translations = JSON.parse(await readFile(path.join(root, 'translations.json'), 'utf8'));
+  const curatedRaw = await readFile(path.join(root, 'curated.json'), 'utf8');
+  const curated = JSON.parse(curatedRaw);
   const pairs = [];
   const pages = [];
   const issues = [...manifest.errors];
@@ -35,7 +38,8 @@ export async function generateFiles(root, directory) {
   });
   const meta = { schema_version: 1, snapshot: manifest.id, captured_at: manifest.captured_at,
     source_manifest: '../manifest.json', overrides_sha256: sha256(overridesRaw),
-    translation_table_sha256: sha256(json(result.translations)) };
+    translation_table_sha256: sha256(json(result.translations)),
+    curated_sha256: sha256(curatedRaw) };
   return new Map([
     ['dictionary.json', json({ ...meta, entries: result.entries })],
     ['pairs.json', json({ ...meta, pairs: result.pairs })],
@@ -46,6 +50,9 @@ export async function generateFiles(root, directory) {
     ['poe2db-evidence.json', json(pairs)],
     ['overrides.json', overridesRaw],
     ['translations.json', json(result.translations)],
+    ['curated.json', curatedRaw],
+    ['pobr.json', json({ ...buildPobrExport({ snapshot: manifest.id, entries: result.entries, curated }),
+      source_manifest: '../manifest.json', curated_sha256: meta.curated_sha256 })],
   ]);
 }
 
