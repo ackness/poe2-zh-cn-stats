@@ -107,6 +107,80 @@ data/snapshots/<时间戳>/
 
 未解决项的 `chinese` 为 `null`，`method` 为 `unresolved`，`reason` 说明原因。没有空字符串或假译文兜底。`#` 是交易模板的值槽；此仓库不把它自动转换为游戏原始 stat ID 或 PoBR 的 `{0}` 模板。
 
+## 其他仓库如何接入
+
+这是可版本固定的 **JSON 数据依赖**，不是已发布的 npm SDK，也不是运行时翻译服务。消费方不需要安装本项目的 Node 依赖；只需读取生成结果。建议在构建阶段读数据，打包所需部分，运行时不联网。
+
+### 固定提交并读取
+
+可以用 Git submodule 将数据版本纳入消费仓库的提交记录。例如，在消费仓库中执行：
+
+```sh
+git submodule add git@github.com:ackness/poe2-zh-cn-stats.git third_party/poe2-zh-cn-stats
+git -C third_party/poe2-zh-cn-stats checkout 02281344e0064c73a9145e81ed5f16dc776fad28
+git add .gitmodules third_party/poe2-zh-cn-stats
+```
+
+以上 commit 已包含补译工作表。之后升级时显式 checkout 新 commit，再提交 submodule 指针；不要在每次产品构建时追踪浮动 `main`。也可以在构建脚本中下载同一固定 commit 的文件，不必使用 submodule；`data/CURRENT` 和词典必须取自同一提交。
+
+保存下面示例为消费仓库中的 `example.mjs`，执行 `node example.mjs third_party/poe2-zh-cn-stats`：
+
+```js
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = process.argv[2];
+const snapshot = fs.readFileSync(path.join(root, 'data/CURRENT'), 'utf8').trim();
+const dictionary = JSON.parse(fs.readFileSync(
+  path.join(root, 'data/snapshots', snapshot, 'generated/dictionary.json'), 'utf8',
+));
+if (dictionary.schema_version !== 1 || dictionary.snapshot !== snapshot) {
+  throw new Error('Unsupported or inconsistent dictionary');
+}
+const normalize = text => text.replace(/\s+/gu, ' ').trim();
+const key = (id, english) => JSON.stringify([id, normalize(english)]);
+const index = new Map(dictionary.entries
+  .filter(row => row.chinese !== null)
+  .map(row => [key(row.id, row.english), row.chinese]));
+const translate = (id, english) => index.get(key(id, english)) ?? english;
+
+console.log(translate('explicit.stat_3299347043', '# to maximum Life'));
+// # 生命上限
+```
+
+这里只查询模板，不负责将 `#` 替换成游戏数值。查不到时保留英文；不要把相近英文或相同 stat 后缀当成确定命中。若调用方只有英文、没有交易 ID，必须先检查该英文跨类别是否只有一个中文候选，不能简单忽略 ID 后取第一条。`pairs.json` 保留这些不同候选及其 IDs，供转换阶段审核。
+
+仓库私有时，开发者需要自己的 GitHub 读取权限。CI 可用只读 deploy key、仅授权本仓库 Contents: read 的细粒度 Token，或相应 GitHub App 凭据。消费仓库自己的默认 `GITHUB_TOKEN` 不会自动获得另一个私有仓库的读取权。凭据只进入 CI secrets，不进入前端代码、构建产物或本仓库；公开打包翻译文本前仍需确认上游再分发条件。
+
+### PoBR 的实际接入位置
+
+**目前 PoBR 尚未接入本库。** 已确认的现有路径是：
+
+- `pipeline/gen-zh-cn.mjs` 从旧词典的 `lookup/stat_lines.json` 等十个输入生成 `data/<版本>/i18n/zh-CN/stat_lines.json`，以及基底、技能、职业、天赋等名词表。
+- 词条输出格式为 `[{ "src": "中文模板", "en": "英文模板" }]`，对应 `crates/pobr-data/src/catalog/i18n_stat_lines.rs` 的 `StatLineTemplate`。
+- `apps/pobr-wasm/src/zh.rs` 使用编号占位符模板进行中文输入转换；同一数据也用于反向显示翻译。计算引擎继续消费 canonical 英文，不需要交易 API 的 ID。
+
+因此，PoBR 应在**数据生成阶段增加本库到 `StatLineTemplate` 的转换**，继续交给现有加载器和翻译器，而不是让 Rust／WASM 运行时访问 GitHub。不能把现有 `--dict` 参数直接指向本仓库：两套输入目录与 schema 不同。
+
+例如，本库真实存在的单数值词条可以形成这样的候选模板：
+
+```json
+{
+  "src": "{0:d} 生命上限",
+  "en": "{0:d} to maximum Life"
+}
+```
+
+这只是已验证的数据格式转换示例，不是已经导入 PoBR 的记录。批量接入需要在转换阶段落实以下约束：
+
+1. 先排除 `chinese: null`，按英文和中文两端检查歧义；交易类别相关的不同措辞不能按行顺序决定。同一张表用于双向翻译，尤其不能把中文误导向另一个英文机制。
+2. 验证数值槽编号、顺序、正负值分支、字面常量及作用域。交易 `#` 不携带完整的游戏 stat-description 元数据，不能把所有 `#` 机械编号后全量接受。先覆盖可验证的单值／无参数条目，多值条目需要参数对应证据与回归样例。
+3. 仅把经过校验、与既有模板不冲突的结果合入 `stat_lines.json`；冲突列报告审核，未覆盖的既有文本不丢弃。沿用 PoBR 的候选快照和词条审计流程，不原地覆盖活动数据。
+4. 在 PoBR 的 `_meta.json` 中记录本库固定 commit、snapshot 和校验信息，保留其他名词数据的实际来源。消费方更新依赖后重新生成、审核差异、验证中文导入与显示，再切换活动快照。
+
+本库目前不提供完整的基底名、技能名、职业名、天赋名或词缀名称（例如前缀／后缀的专名），因此不能替换 PoBR 整个中文数据源。交易 stat ID 也不等于 PoBR 的计算 stat ID；翻译覆盖率不能作为解析或数值机制覆盖率。
+
+
 ## 配对与来源优先级
 
 1. **官方直接配对 `trade`**：完整 ID（包括 `|` 后的枚举值）相同；两边均只有一个不同文本；中文含汉字；占位符数量一致。相同重复行可去重，不同分支不得按数组顺序拼接。`pseudo` 综合统计不作为实际游戏词条进入主表。
