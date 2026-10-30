@@ -22,14 +22,16 @@ const lexicalOrder = (left, right) => {
 export function canonical(value) {
   if (Array.isArray(value)) return `[${value.map(canonical).join(',')}]`;
   if (object(value)) return `{${Object.keys(value).sort(lexicalOrder).map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`;
-  return JSON.stringify(value);
+  const encoded = JSON.stringify(value);
+  require(typeof encoded === 'string' && (typeof value !== 'number' || Number.isFinite(value)), 'Unsupported canonical JSON value');
+  return encoded;
 }
 export const nativeBytes = value => Buffer.from(canonical(value) + '\n');
 
 const PAYLOADS = ['descriptions.json', 'diagnostics.json', 'source-lock.json'];
 const MAX_PAYLOAD = 256 * 1024 * 1024;
 async function readBounded(file, limit) {
-  const handle = await open(file, constants.O_RDONLY | constants.O_NOFOLLOW);
+  const handle = await open(file, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
   try {
     const stat = await handle.stat();
     require(stat.isFile() && stat.size <= limit, 'Native input is not a bounded regular file');
@@ -201,6 +203,8 @@ export async function readNativeDescriptions(directory, expectedManifestSha256) 
   require(manifest.format === 'repoe-native-descriptions/v1' && manifest.status === 'partial-candidate'
     && manifest.production_ready === false && object(manifest.source_identity) && object(manifest.summary)
     && object(manifest.files) && same(Object.keys(manifest.files).sort(), [...PAYLOADS].sort()), 'Unsupported native package');
+  require(object(manifest.producer) && Object.keys(manifest.producer).length > 0
+    && Object.entries(manifest.producer).every(([name, hash]) => text(name) && digest(hash)), 'Invalid native producer metadata');
   const retained = new Map();
   let total = 0;
   for (const name of PAYLOADS) {
@@ -241,7 +245,7 @@ function signature(branch) {
   const characters = Array.from(branch.template_raw);
   return canonical({ conditions: branch.condition_tokens_raw, restrictions: branch.restrictions_raw,
     handlers: branch.quantifier_tokens_raw, slots: branch.placeholders.map(p => [p.index_token_raw, p.format_raw,
-      /[+-]$/u.exec(characters.slice(0, p.template_character_span[0]).join('').trimEnd())?.[0] ?? ''])
+      /[+\-−]$/u.exec(characters.slice(0, p.template_character_span[0]).join('').trimEnd())?.[0] ?? ''])
       .sort((a, b) => lexicalOrder(canonical(a), canonical(b))) });
 }
 function reason(branch) {
@@ -251,7 +255,7 @@ function reason(branch) {
 }
 const literals = branch => {
   let text = branch.template_raw.replace(/\{[^{}]*\}/gu, '').replace(/\[[^\]]*\]/gu, '');
-  return (text.match(/[+-]?\d+(?:\.\d+)?/gu) ?? []).sort();
+  return (text.match(/[+\-−]?\d+(?:\.\d+)?/gu) ?? []).sort();
 };
 
 /** Contextual native-ID candidates; no trade-ID inference or source precedence. */

@@ -207,3 +207,52 @@ test('generation preserves compiler fingerprint and input package bytes', async 
   assert.deepEqual(await readFile(path.join(fixture, 'descriptions.json')), before);
   for (const [name, digest] of Object.entries(result.consumer.files)) assert.equal(sha(await readFile(path.join(root, name))), digest);
 });
+
+test('canonical JSON and producer metadata cannot generate undefined output', async t => {
+  for (const value of [undefined, { producer: undefined }, [undefined], Number.NaN, Infinity]) {
+    assert.throws(() => nativeBytes(value), /Unsupported canonical JSON value/u);
+  }
+  for (const producer of [undefined, {}, { 'producer.py': 'invalid' }]) {
+    const directory = await ownFixture(t);
+    const manifest = JSON.parse(await readFile(path.join(directory, 'manifest.json')));
+    if (producer === undefined) delete manifest.producer; else manifest.producer = producer;
+    await writeFile(path.join(directory, 'manifest.json'), nativeBytes(manifest));
+    await assert.rejects(generateNativeLocalization(directory, await pin(directory)), /producer metadata/u);
+  }
+});
+
+test('mathematical minus remains part of literal and placeholder sign signatures', async () => {
+  const verified = await read();
+  const description = descriptions(verified.document).find(record => record.ids.includes('sign'));
+  assert.ok(description);
+  const defaults = description.groups.find(group => group.declared_language === null);
+  const chinese = description.groups.find(group => group.declared_language === 'Simplified Chinese');
+  for (const group of [defaults, chinese]) assert.ok(group);
+  const template = (branch, text, token = '{0}') => {
+    branch.template_raw = text;
+    branch.placeholders = token ? [{ token_raw: token, index_token_raw: '0', format_raw: '', syntax_status: 'recognized-lexical',
+      template_character_span: [text.indexOf(token), text.indexOf(token) + token.length] }] : [];
+    branch.template_syntax_diagnostics = [];
+  };
+  for (const [left, right, token] of [['−{0} Life', '生命 {0}', '{0}'], ['−5 Life', '生命 5', null]]) {
+    template(defaults.branches[0], left, token); template(chinese.branches[0], right, token);
+    const result = buildNativeLocalization(verified);
+    assert.ok(!result.pairs.some(row => row.stat_ids.includes('sign')));
+  }
+  template(defaults.branches[0], '−{0} Life'); template(chinese.branches[0], '生命 −{0}');
+  assert.ok(buildNativeLocalization(verified).pairs.some(row => row.stat_ids.includes('sign')));
+});
+
+test('native-check rejects a FIFO candidate promptly without waiting for a writer', { skip: process.platform === 'win32' }, async t => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'native-fifo-'));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const fifo = path.join(directory, 'candidate');
+  execFileSync('mkfifo', [fifo]);
+  const args = ['src/cli.mjs', 'native-check', '--facts', fixture, '--expected-manifest-sha256', await pin(fixture), '--candidate', fifo];
+  assert.throws(() => execFileSync(process.execPath, args, { cwd: root, timeout: 2000, stdio: 'pipe' }), error => {
+    assert.notEqual(error.code, 'ETIMEDOUT');
+    assert.equal(error.status, 1);
+    assert.match(error.stderr.toString(), /bounded regular file/u);
+    return true;
+  });
+});
