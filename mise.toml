@@ -19,3 +19,11 @@ run = ["npm test", "npm run check"]
 [tasks.report]
 description = "Read the saved coverage and unresolved-source report without fetching data"
 run = "npm run report"
+
+[tasks."native:candidate"]
+description = "Emit offline native-ID localization candidates from an explicitly pinned RePoE description package"
+run = "node src/cli.mjs native"
+
+[tasks."native:check"]
+description = "Verify a saved native localization candidate against the same pinned RePoE input"
+run = "node src/cli.mjs native-check"
