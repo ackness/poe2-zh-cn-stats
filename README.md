@@ -8,14 +8,19 @@
 
 ## 使用
 
-需要 Node.js 22 或更新版本、npm。初次克隆已经带有经过校验的数据快照，离线构建无需访问游戏网站。
+本地开发统一使用 mise，`mise.toml` 固定 Node.js 26.13.0（与 PoBR 一致），npm 随该 Node 版本提供。
+首次使用先安装 mise，并执行 `mise trust`、`mise install`。初次克隆已经带有经过校验的数据快照，离线校验无需访问游戏网站。
 
 ```sh
-npm ci --ignore-scripts
-npm test
-npm run check
-npm run report
+mise run setup
+mise run check
+mise run report
 ```
+
+`setup` 按 `package-lock.json` 安装依赖，不运行依赖包的生命周期脚本；首次安装需要访问 npm registry。
+`check` 顺序运行现有测试和当前快照的离线校验；只跑测试可用 `mise run test`。
+GitHub Actions 使用同一份 mise 工具版本和任务入口，不另外维护一套 Node 版本或校验命令。
+以下数据维护命令在 mise 环境执行，例如 `mise exec -- npm run build`；已激活 mise 时也可直接使用原有 npm 命令。
 
 更新官方目录与配置中的 PoE2DB 页面：
 
