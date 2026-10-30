@@ -1,0 +1,21 @@
+min_version = "2026.10.23"
+
+[tools]
+# Keep the development runtime aligned with PoBR. npm ships with this Node release.
+node = "26.13.0"
+
+[tasks.setup]
+description = "Install frozen npm dependencies without running package lifecycle scripts"
+run = "npm ci --ignore-scripts --no-audit --no-fund"
+
+[tasks.test]
+description = "Run the offline translation and source-provenance regression tests"
+run = "npm test"
+
+[tasks.check]
+description = "Run tests, then verify current source hashes and byte-identical offline regeneration"
+run = ["npm test", "npm run check"]
+
+[tasks.report]
+description = "Read the saved coverage and unresolved-source report without fetching data"
+run = "npm run report"
