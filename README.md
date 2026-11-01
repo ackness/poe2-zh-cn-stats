@@ -2,7 +2,7 @@
 
 独立维护的英文／简体中文 PoE2 交易词条数据与可复现生成代码。
 
-主来源是 GGG 与腾讯的交易词条；分裂词缀在严格匹配时复用普通词缀译文；PoE2DB 的公开中英文页面补充缺口。没有依赖第三方成品翻译词典，也没有机器猜译。
+主来源是 GGG 与腾讯的交易词条；分裂词缀在严格匹配时复用普通词缀译文；PoE2DB 的公开中英文页面补充缺口。原生文本另有带来源、审核和版本状态的 agent／人工补译工作表，草稿与官方译文分别保存。没有依赖第三方成品翻译词典。
 
 **仓库现已公开。** 脚本不修改 GitHub 可见性，不自动提交或推送。公开代码与数据快照不改变 GGG、腾讯及 PoE2DB 的权利归属，也不代表已获得上游的额外再分发授权；使用方仍需遵守来源方条件。
 
@@ -22,8 +22,8 @@ PoBR 负责固定产物接入、显示/输入边界和 Rust 计算。游戏 stat
 
 ## 使用
 
-本地开发统一使用 mise，`mise.toml` 固定 Node.js 26.13.0（与 PoBR 一致），npm 随该 Node 版本提供。
-首次使用先安装 mise，并执行 `mise trust`、`mise install`。初次克隆已经带有经过校验的数据快照，离线校验无需访问游戏网站。
+本地开发统一使用 mise，`mise.toml` 请求 `node = "latest"`，提交的 `mise.lock` 固定实际稳定版本（与 PoBR 对齐），npm 随该 Node 版本提供。
+首次使用先安装 mise，并执行 `mise trust`、`mise install --locked`。显式升级时运行 `mise lock --bump --platform linux-x64,macos-arm64 node`，检查并提交锁文件；不隐式更新 npm 依赖锁或已有数据收据。初次克隆已经带有经过校验的数据快照，离线校验无需访问游戏网站。
 
 ```sh
 mise run setup
@@ -216,6 +216,8 @@ curated_sha256: 人工模板输入的 SHA-256
 
 ### RePoE 原件名称候选
 
+原生客户端 stat 描述通过单独的[原生接入口](docs/native-localization.md)读取固定 RePoE 包。它保留原生 ID、语言、条件及逐分支证据，输出可离线复核的简中候选；不修改交易配对或工作表。该编译器移植自本库 coordinator 的 `e2ad475e9213ca0c9be5ab14f07eaea3bb5b18f8`，解析和分支配对代码及合成原件测试保持原样。`native` / `native-check` 只用 Node 标准库。
+
 `src/native-names.mjs` 可离线配对同游戏、补丁、服别与 schema 的英文事实及显式语言事实，不修改交易快照或 `CURRENT`：
 
 ```sh
@@ -228,6 +230,8 @@ mise exec -- node --test test/native-names.test.mjs
 输出 `names.json`（`poe2-native-names/v1`）按表、字段及原件身份保留英文、译文、两侧物理行和来源 manifest。八表按精确 `Id` 配对；Words 的 `Text` 实际存在重名，因此按同补丁内唯一 `HASH32` 加精确 `Text`、`Wordlist` 对应，不将物理行当稳定 ID，也不推断跨版本 hash 永久性。空值、缺行、原文未译与英文同名多译分别列入 `excluded` / `conflicts`。消费方只有英文文本时不能随意挑选冲突中的译文；能保留表与 ID 时可精确消费。
 
 这个入口不抓取资源、不猜译、不繁转简、不认证数值适用性，也不晋升采集状态。国际服索引中指定简中表路径缺失时应另列来源缺口，不能以繁中候选充当简中。候选存在不等于已发布名称覆盖；现有交易、CSD、旧名称兼容来源分别保留身份。
+
+需要名称之外的技能说明、职业/天赋风味文本和 inflection 时，使用[原件显示目录](docs/native-catalog.md)。该目录覆盖九表的 18 个明确显示列，保留逐字段来源列、稳定身份、消歧上下文、完整原文和模板诊断，另提供会诚实回退的精确查询；支持显式部分表范围。它不改变现有名称 v1 的配对规则，也不代替 PoBR 的 DTO、加载与显示接线。
 
 
 ## 配对与来源优先级
@@ -246,6 +250,12 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 结构配对与数值检查不是语义正确性的完整证明，尤其是数值相同的多个参数。使用方应保留证据与作用域，不能将这些指标理解为所有游戏机制都已支持。
 
 ## 维护剩余缺口
+
+原生名称／描述使用[补译与区服工作表](docs/translation-workbench.md)：
+[`native-translation-worklist.json`](native-translation-worklist.json) 可直接查看官方缺译、待办和 agent 草稿；
+[`native-translations.json`](native-translations.json) 是可编辑的补译输入，官方补译优先，版本变化要求复核。
+[`native-regional-candidates.json`](native-regional-candidates.json) 独立列出区服或版本差异待确认项。
+国服与国际服按独立身份保存，语言不代替区服证据。下面的 `translations.json` 继续只维护交易 ID。
 
 ### 持续补译表
 

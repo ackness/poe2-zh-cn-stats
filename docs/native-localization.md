@@ -7,10 +7,10 @@
 
 ```sh
 mkdir -p .cache/native
-mise run native:candidate -- \
+node src/cli.mjs native \
   --facts /path/to/repoe-description-package \
   --expected-manifest-sha256 <trusted-manifest-sha256> > .cache/native/candidate.json
-mise run native:check -- \
+node src/cli.mjs native-check \
   --facts /path/to/repoe-description-package \
   --expected-manifest-sha256 <same-trusted-manifest-sha256> \
   --candidate .cache/native/candidate.json
@@ -29,6 +29,14 @@ producer 必须是非空的文件／SHA-256 指纹表。候选检查以非阻塞
 
 每个描述只在同一文件、同一记录内配对隐式默认语言与显式 `Simplified Chinese`。
 条件、限制、按序 handler、参数编号／格式／出现次数和显式符号必须一致，允许参数重排。
+参数编号按固定 PyPoE `66d1` 的 `TranslationString._set_string` 解释：每个模板的
+next_index 从 0 开始，显式 `{k}` 使用 k 并将 next_index 设为 k+1，`{}` / `{:fmt}`
+使用 next_index 后递增。因此 `{1}` 后的 `{}` 指向 2。该投影只用于配对比较；
+输出的 raw 模板、token、位置与分支引用不改写，消费方共享 renderer 生成其显式参数投影。
+仅接受默认格式、`d`、`-d`、`+d`，并检查编号小于有序 stat_ids 的长度。
+`d` / `-d` 不给正数添加 `+`；`+d` 表示显式正号。这里不替换参数或计算 formatter。
+`{{` / `}}` 在编号扫描中是字面括号，不消费自动参数编号；但原件 lexer 已给出的
+语法诊断仍完整保留并阻止配对，不在本层修补或抹去来源诊断。
 ASCII `+`／`-` 和数学负号 `−` 都保留在显式符号比较中；不会将负号当作无符号。
 两边匹配必须各自唯一；多分支不能按位置配对。字面数字不一致、缺少中文、重复候选、
 未解释占位符、无汉字的中文声明等保留为 `excluded`。原有源诊断完整保留。

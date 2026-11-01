@@ -3,7 +3,6 @@ import { readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fetchSnapshot, currentSnapshot, cloneCandidate } from './sources.mjs';
-import { generateFiles, writeGenerated, checkGenerated, activateGenerated, formatReport } from './snapshot.mjs';
 import { checkNativeLocalizationCandidate, generateNativeLocalization, nativeBytes } from './native-localization.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -12,6 +11,12 @@ const help = `Usage: node src/cli.mjs <command>
   build [--snapshot PATH]     Offline rebuild; published snapshots become new revisions
   check [--snapshot PATH]     Check source hashes and byte-for-byte generated output
   report [--snapshot PATH]    Print the saved coverage report
+  workbench --config PATH --out .cache/FRESH
+                             Reconcile official/agent translations and region/version queues
+  workbench-list --file PATH [--status pending] [--realm china] [--locale zh-CN] [--limit 50]
+                             List exact native entries without activating a snapshot
+  workbench-export --config PATH --out .cache/FRESH
+                             Replay compact effective reviewed supplements from pinned inputs
   activate --snapshot PATH   Verify and activate a previously fetched candidate
   native --facts PATH --expected-manifest-sha256 SHA
                              Emit contextual native-ID localization candidates to stdout
@@ -23,6 +28,11 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift();
   if (!command || command === '--help' || command === 'help') { console.log(help); return; }
+  if (['workbench', 'workbench-list', 'workbench-export'].includes(command)) {
+    const { workbenchCommand } = await import('./translation-workbench.mjs');
+    console.log(JSON.stringify(await workbenchCommand(command, args), null, 2));
+    return;
+  }
   if (command === 'native' || command === 'native-check') {
     const options = new Map();
     while (args.length) {
@@ -42,6 +52,8 @@ async function main() {
     return;
   }
   if (!['refresh', 'build', 'check', 'report', 'activate'].includes(command)) throw new Error(help);
+  // Native compilation is stdlib-only; do not load the HTML parser for it.
+  const { generateFiles, writeGenerated, checkGenerated, activateGenerated, formatReport } = await import('./snapshot.mjs');
   let tradeOnly = false;
   let supplied;
   while (args.length) {

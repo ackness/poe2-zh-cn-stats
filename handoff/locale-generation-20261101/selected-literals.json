@@ -1,0 +1,99 @@
+{
+  "schema": "poe2-selected-literal-layer/v1",
+  "source_receipt": {
+    "sha256": "f140212c41570d990e287d2f0c5d6a0e8dd8db28296144a3ed5db8b1e162a53b",
+    "bytes": 4799513
+  },
+  "baseline": {
+    "bytes": 3875309,
+    "sha256": "76d4af1898a92963e205534f5020c8bf48477c3c844d59e263c53f1bc5e8fb83",
+    "pairs": 28036
+  },
+  "output": {
+    "bytes": 3875636,
+    "sha256": "1d51e0a2e58bb0fe46dfde331bd004140250eeed70d4e16f683b180c06eba301"
+  },
+  "added": [
+    {
+      "en": "Gain a Vivid Wisp for every 10 metres you move, up to a maximum of 3",
+      "src": "每移动 10 米，获得一个活性鬼灵，上限为 3 个",
+      "provenance": [
+        {
+          "id": "AscendancyHuntress2Notable1",
+          "packet": "node",
+          "source_row": 6667,
+          "reference": {
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "record": 20965,
+            "branch": 1
+          },
+          "values": [
+            10,
+            3
+          ],
+          "formatted_values": [
+            "10",
+            "3"
+          ],
+          "equivalent_english_descriptors": [],
+          "chinese_reference": {
+            "branch": 1,
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "group": 8,
+            "record": 20965
+          },
+          "stat_ids": [
+            "vivid_stag_metres_travled_per_wisp_gain",
+            "vivid_stag_maximum_stag_wisps_allowed"
+          ],
+          "line": 0
+        }
+      ]
+    },
+    {
+      "en": "Expend all Vivid Wisps to trigger Vivid Stampede when you Attack",
+      "src": "攻击时，消耗所有的活性鬼灵以触发雄鹿践踏",
+      "provenance": [
+        {
+          "id": "AscendancyHuntress2Notable1",
+          "packet": "node",
+          "source_row": 6667,
+          "reference": {
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "record": 20965,
+            "branch": 1
+          },
+          "values": [
+            10,
+            3
+          ],
+          "formatted_values": [
+            "10",
+            "3"
+          ],
+          "equivalent_english_descriptors": [],
+          "chinese_reference": {
+            "branch": 1,
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "group": 8,
+            "record": 20965
+          },
+          "stat_ids": [
+            "vivid_stag_metres_travled_per_wisp_gain",
+            "vivid_stag_maximum_stag_wisps_allowed"
+          ],
+          "line": 1
+        }
+      ]
+    }
+  ],
+  "excluded_counts": {
+    "client-string-requires-separate-language-binding": 52,
+    "context-free-translation-would-be-ambiguous": 450,
+    "existing-template-preserved": 2359,
+    "literal-translation-conflict": 2,
+    "multiline-alignment-unproven": 9,
+    "no-library-pair-for-selected-branch": 35
+  },
+  "scope": "Selected, unambiguous literal effect text only. Existing templates and untranslatable effects remain intact; no name translation or CN numeric equivalence claim."
+}
