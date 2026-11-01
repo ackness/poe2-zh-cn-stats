@@ -8,6 +8,7 @@ import { isDeepStrictEqual as same } from 'node:util';
 import { NAME_FIELDS, readNamePackage, keyNameRows } from './native-names.mjs';
 import { strictJson } from './strict-json.mjs';
 import { verifyObservedBindings } from './native-catalog-binding.mjs';
+import { FK_POLICY, verifyFkBindings, projectFkBinding } from './native-catalog-fk-binding.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const locales = { 'Traditional Chinese': 'zh-TW', 'Simplified Chinese': 'zh-CN' };
@@ -183,16 +184,17 @@ function column(table, field) {
 }
 
 export async function createNativeCatalog(config, out) {
-  require(['poe2-native-catalog-request/v1', 'poe2-native-catalog-request/v2'].includes(config?.schema)
+  require(['poe2-native-catalog-request/v1', 'poe2-native-catalog-request/v2', 'poe2-native-catalog-request/v3'].includes(config?.schema)
     && Object.hasOwn(locales, config.language), 'Invalid catalog request/language');
-  const observed = config.schema === 'poe2-native-catalog-request/v2';
+  const fk = config.schema === 'poe2-native-catalog-request/v3';
+  const observed = fk || config.schema === 'poe2-native-catalog-request/v2';
   const tables = selectedTables(config.tables);
   require(Array.isArray(config.english) && config.english.length > 0 && config.english.length <= 9, 'Explicit English packages required');
   const output = path.resolve(out), cache = path.join(ROOT, '.cache');
   require(inside(cache, output), 'Output must be a fresh candidate in this repository .cache');
   try { await lstat(output); throw new Error('Output already exists'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
   const reads = new Map(), english = {}, owners = {}, sources = [];
-  const target = await readNamePackage(config.localized, config.language, tables, reads, { observed });
+  const target = await readNamePackage(config.localized, config.language, tables, reads, { observed, fk });
   sources.push(target.provenance);
   for (const input of config.english) {
     require(Array.isArray(input.tables) && input.tables.length > 0
@@ -205,7 +207,7 @@ export async function createNativeCatalog(config, out) {
     for (const name of input.tables) owners[name] = source;
     Object.assign(english, source.tables); sources.push(source.provenance);
   }
-  const verified = observed ? verifyObservedBindings(target, owners, tables, CATALOG_FIELDS) : null;
+  const verified = observed ? (fk ? verifyFkBindings : verifyObservedBindings)(target, owners, tables, CATALOG_FIELDS) : null;
   const identity = verified?.target ?? target.identity;
   const paired = observed ? pairBoundDisplayCatalog(verified, tables) : pairDisplayCatalog(english, target.tables, config.language, tables);
   const bindings = {};
@@ -222,8 +224,8 @@ export async function createNativeCatalog(config, out) {
   }
   const producer = {};
   for (const file of ['src/native-catalog.mjs', 'src/native-names.mjs', 'src/strict-json.mjs',
-    'src/native-catalog-binding.mjs', 'src/native-localization.mjs']) producer[file] = hash(await readFile(path.join(ROOT, file)));
-  const result = { schema: observed ? 'poe2-native-catalog/v2' : 'poe2-native-catalog/v1', status: 'candidate', production_ready: false,
+    'src/native-catalog-binding.mjs', 'src/native-catalog-fk-binding.mjs', 'src/native-localization.mjs']) producer[file] = hash(await readFile(path.join(ROOT, file)));
+  const result = { schema: fk ? 'poe2-native-catalog/v3' : observed ? 'poe2-native-catalog/v2' : 'poe2-native-catalog/v1', status: 'candidate', production_ready: false,
     game: identity.game, game_patch: identity.game_patch, realm: identity.realm,
     language: config.language, locale: locales[config.language], ...paired, bindings, sources, producer,
     ...(observed ? { observed_client: target.observedClient, target_binding: verified.evidence } : {}),
@@ -233,18 +235,33 @@ export async function createNativeCatalog(config, out) {
       templates: 'Raw placeholder indices, formats, signs, multiplicity, references and literal numbers retained. Lexical agreement is not renderer or semantic approval.',
       context: 'Raw display disambiguation evidence only; foreign row numbers require the owning facts package to resolve.',
       applicability: 'Display only. No Chinese client numeric equivalence, source approval, CURRENT activation or locale conversion.' } };
+  let verificationRaw;
+  if (fk) {
+    // Each physical table occurs once in this verification input. Wire receipts
+    // remain byte-pinned in the complete source archive; they are not FK values.
+    const retained = Object.fromEntries(Object.entries(target.retained).filter(([file]) =>
+      !['tables.json', 'default-tables.json', 'target_binding.json', 'wire-observations.json', 'fk-source-wire-observations.json'].includes(file)));
+    const verification = { observed: { ...target, retained },
+      owners: Object.fromEntries(tables.map(name => [name, { ...owners[name], tables: { [name]: owners[name].tables[name] },
+        tablePayloads: { [name]: owners[name].tablePayloads[name] } }])) };
+    verificationRaw = Buffer.from(JSON.stringify(verification) + '\n');
+    result.target_binding = projectFkBinding(verified.evidence);
+    result.fk_verification = { file: 'verification.json', bytes: verificationRaw.length, sha256: hash(verificationRaw) };
+  }
   for (const [file, digest] of reads) require(hash(await readFile(file)) === digest, `Input changed: ${file}`);
   for (const file of reads.keys()) require(!inside(path.dirname(file), output), 'Output is inside a source package');
   await mkdir(path.dirname(output), { recursive: true });
   require(await realpath(path.dirname(output)) === path.dirname(output), 'Output parent contains symlink');
   await mkdir(output);
-  const raw = json(result), request = json(config);
+  const raw = fk ? JSON.stringify(result) + '\n' : json(result), request = json(config);
   await writeFile(path.join(output, 'catalog.json'), raw, { flag: 'wx' });
+  if (fk) await writeFile(path.join(output, 'verification.json'), verificationRaw, { flag: 'wx' });
   await writeFile(path.join(output, 'request.json'), request, { flag: 'wx' });
-  const manifest = { schema: observed ? 'poe2-native-catalog-manifest/v2' : 'poe2-native-catalog-manifest/v1', status: 'candidate', production_ready: false,
+  const manifest = { schema: fk ? 'poe2-native-catalog-manifest/v3' : observed ? 'poe2-native-catalog-manifest/v2' : 'poe2-native-catalog-manifest/v1', status: 'candidate', production_ready: false,
     game: result.game, game_patch: result.game_patch, realm: result.realm, language: result.language, locale: result.locale,
     ...(observed ? { observed_client: target.observedClient, target_identity: verified.target, binding_policy: verified.evidence.policy_id } : {}),
-    files: { 'catalog.json': { bytes: Buffer.byteLength(raw), sha256: hash(raw) },
+    files: { ...(fk ? { 'verification.json': { bytes: verificationRaw.length, sha256: hash(verificationRaw) } } : {}),
+      'catalog.json': { bytes: Buffer.byteLength(raw), sha256: hash(raw) },
       'request.json': { bytes: Buffer.byteLength(request), sha256: hash(request) } }, producer };
   await writeFile(path.join(output, 'manifest.json'), json(manifest), { flag: 'wx' });
   return result;
@@ -255,7 +272,7 @@ function validateBoundRecord(catalog, row) {
   require(Number.isSafeInteger(index) && index >= 0 && index < (scope?.records?.length ?? 0), 'Invalid catalog binding reference');
   const binding = scope.records[index];
   require(binding.table === row.table && binding.key_field === row.key_field && same(binding.id, row.id)
-    && ['accepted', 'rejected'].includes(binding.decision) && ['resource-bound', 'record-bound'].includes(binding.binding_kind)
+    && ['accepted', 'rejected'].includes(binding.decision) && ['resource-bound', 'record-bound', ...(catalog.schema === 'poe2-native-catalog/v3' ? ['fk-structure-bound'] : [])].includes(binding.binding_kind)
     && Array.isArray(binding.reason_codes) && binding.reason_codes.every(r => typeof r === 'string')
     && same(row.applicability, { binding_record: index, decision: binding.decision,
       binding_kind: binding.binding_kind, reason_codes: binding.reason_codes }), 'Invalid catalog applicability');
@@ -292,17 +309,28 @@ function validateBoundRecord(catalog, row) {
 
 /** Validate once, then query by exact identity or unambiguous text + context. */
 export function createCatalogLookup(catalog, expected) {
-  require(['poe2-native-catalog/v1', 'poe2-native-catalog/v2'].includes(catalog?.schema) && catalog.status === 'candidate' && catalog.production_ready === false
+  require(['poe2-native-catalog/v1', 'poe2-native-catalog/v2', 'poe2-native-catalog/v3'].includes(catalog?.schema) && catalog.status === 'candidate' && catalog.production_ready === false
     && catalog.game === 'poe2' && locales[catalog.language] === catalog.locale, 'Invalid catalog envelope');
   for (const key of ['game_patch', 'realm', 'locale']) require(typeof expected?.[key] === 'string' && expected[key] === catalog[key], `Catalog identity differs: ${key}`);
-  const observed = catalog.schema === 'poe2-native-catalog/v2';
+  const fk = catalog.schema === 'poe2-native-catalog/v3';
+  const observed = fk || catalog.schema === 'poe2-native-catalog/v2';
   if (observed) {
     require(catalog.language === 'Simplified Chinese' && catalog.observed_client?.game === 'poe2'
       && catalog.observed_client.game_patch === null && catalog.observed_client.realm === null
-      && catalog.target_binding?.policy_id === 'stable-key-current-english-all-nontext/v1'
+      && catalog.target_binding?.policy_id === (fk ? FK_POLICY : 'stable-key-current-english-all-nontext/v1')
       && same(catalog.target_binding.target_identity, { game: catalog.game, game_patch: catalog.game_patch, realm: catalog.realm }), 'Invalid observed/target catalog identity');
   }
   const tables = selectedTables(catalog.selected_tables);
+  if (fk) {
+    const pin = catalog.fk_verification, raw = expected.verification;
+    require(pin?.file === 'verification.json' && Buffer.isBuffer(raw) && raw.length === pin.bytes && hash(raw) === pin.sha256, 'Missing/mismatched pinned FK verification sidecar');
+    const input = strictJson(raw);
+    require(input?.observed && input?.owners, 'Missing full FK verification inputs');
+    const source = input.observed;
+    source.retained = { ...source.retained, 'tables.json': source.tables, 'default-tables.json': source.defaultTables, 'target_binding.json': source.binding };
+    const verified = verifyFkBindings(source, input.owners, tables, CATALOG_FIELDS);
+    require(same(projectFkBinding(verified.evidence), catalog.target_binding), 'Catalog binding projection differs from independently verified sidecar');
+  }
   require(same(tables, catalog.selected_tables) && same(sorted(Object.keys(catalog.coverage ?? {})), sorted(tables)), 'Invalid catalog table inventory');
   const byIdentity = new Map(), byEnglish = new Map(), counts = {};
   require(Array.isArray(catalog.records), 'Missing catalog records');
