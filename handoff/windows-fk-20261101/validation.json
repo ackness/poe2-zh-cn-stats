@@ -1,0 +1,111 @@
+{
+  "format": "windows-fk-validation/v1",
+  "runtime": {
+    "node": "v26.12.1",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "seconds": 67.9705039,
+  "peak_rss_bytes": 3487387648,
+  "manifest_sha256": "0ef819f9628ae6341ce4f940ede093cdfaf6921b4b647c13d38912c1456e6a4e",
+  "files": {
+    "verification.json": {
+      "bytes": 335031638,
+      "sha256": "3963d8f40f5da7fb3f2217083b12cf5f316cdc7ef8565820e8f8616fad9d7850"
+    },
+    "catalog.json": {
+      "bytes": 56845333,
+      "sha256": "2da387f47bb91633761bc49dd64684966877dc255709e1e06b6be3f89683bec4"
+    },
+    "request.json": {
+      "bytes": 1815,
+      "sha256": "3acbfb5baf39f004eb631d5e7bad1116d33bf9deda3a9c255125e568442d6c3e"
+    }
+  },
+  "independent_fk_recomputed": true,
+  "queries": {
+    "exact": 58588,
+    "translated": 25097,
+    "rejected": 26,
+    "changedEnglish": 25097,
+    "uniqueEnglish": 12983
+  },
+  "negative_checks": [
+    "missing-sidecar",
+    "damaged-sidecar",
+    "same-key-wrong-dependency-pin",
+    "wrong-package-namespace",
+    "wrong-Key3-physical-column",
+    "actual-Mods-numeric-change-remains-rejected"
+  ],
+  "size_breakdown": {
+    "accounting": "UTF-8 compact JSON component bytes; component totals exclude containing-array commas. No fields omitted from declared full-structure validation.",
+    "catalog_top_level": {
+      "schema": 24,
+      "status": 11,
+      "production_ready": 5,
+      "game": 6,
+      "game_patch": 9,
+      "realm": 15,
+      "language": 20,
+      "locale": 7,
+      "selected_tables": 127,
+      "records": 39744213,
+      "conflicts": 189576,
+      "coverage": 2463,
+      "bindings": 24286,
+      "sources": 23400,
+      "producer": 572,
+      "observed_client": 2599,
+      "target_binding": 16856954,
+      "policy": 673,
+      "fk_verification": 122
+    },
+    "record_components": {
+      "candidates": 5250,
+      "applicability": 6561994,
+      "context": 5269446,
+      "templates": 13564908
+    },
+    "verification_top_level": {
+      "observed": 289680134,
+      "owners": 45351480
+    },
+    "source_default_rows": 44930585,
+    "source_localized_rows": 44886881,
+    "target_primary_rows": 44928729,
+    "dependency_source_tables": 44323940,
+    "dependency_target_payloads": {
+      "ItemVisualIdentity": 31283481,
+      "ModType": 1338242,
+      "Stats": 11634007
+    },
+    "full_binding": 93685537,
+    "closure_nodes_shared": 45832985,
+    "per_record_fk_witnesses": 21243207,
+    "retained_input_documents": {
+      "fk-dependencies.json": 6586,
+      "fk-policy-lock.json": 2206,
+      "fk-source-acquisition.json": 42406,
+      "fk-source-index-lookup.json": 5056,
+      "fk-source-manifest.json": 2122,
+      "fk-source-tables.json": 44323940,
+      "fk-target-ItemVisualIdentity-manifest.json": 16348,
+      "fk-target-ItemVisualIdentity.json": 31283481,
+      "fk-target-ModType-manifest.json": 37474,
+      "fk-target-ModType.json": 1338242,
+      "fk-target-Stats-manifest.json": 37474,
+      "fk-target-Stats.json": 11634007,
+      "strict-binding.json": 17353016,
+      "strict-manifest.json": 20486,
+      "target-lock.json": 2721,
+      "transfer-receipt.json": 34381
+    }
+  },
+  "boundaries": {
+    "observed_patch": null,
+    "observed_realm": null,
+    "official_client_semantics_verified": false,
+    "production_ready": false
+  }
+}

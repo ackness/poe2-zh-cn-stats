@@ -1,0 +1,118 @@
+{
+  "schema": "poe2-native-catalog-manifest/v3",
+  "status": "candidate",
+  "production_ready": false,
+  "game": "poe2",
+  "game_patch": "0.5.5.5",
+  "realm": "international",
+  "language": "Simplified Chinese",
+  "locale": "zh-CN",
+  "observed_client": {
+    "game": "poe2",
+    "game_patch": null,
+    "index_sha256": "1fa59396c8f9a57de082098ec024f680dd9218c78ca11497f7887032f54e1578",
+    "realm": null,
+    "resources": {
+      "data/balance/activeskills.datc64": {
+        "bytes": 1376430,
+        "sha256": "c187cf977c93386f732584c7e7c4ac019caddd03f7ef3918b0d688c0e318f2f3"
+      },
+      "data/balance/alternatequalitytypes.datc64": {
+        "bytes": 4428,
+        "sha256": "ed052926bee4d781911948402e526d1bcaa453dae427849edfec497448dd4afc"
+      },
+      "data/balance/ascendancy.datc64": {
+        "bytes": 15255,
+        "sha256": "9cd8bfe9c74115f12cb0ae6cba1bef6f9289ff58276239c888a6d62c2b851635"
+      },
+      "data/balance/baseitemtypes.datc64": {
+        "bytes": 2831654,
+        "sha256": "218522cf42feb37740bc44983dad069cd42efc39353dcc0c67fcbcc92fb66ec6"
+      },
+      "data/balance/characters.datc64": {
+        "bytes": 26480,
+        "sha256": "f87256563082603361021de249e7594b9db9a6ac264e923d8f2f428b33a8f152"
+      },
+      "data/balance/itemclasses.datc64": {
+        "bytes": 23564,
+        "sha256": "1aee2b9b8107cce9eb9237733e4177777809aa276ea0dbda55521d86ea3886f3"
+      },
+      "data/balance/mods.datc64": {
+        "bytes": 13891196,
+        "sha256": "25f272b3da3435df74511bbea49bcfc3ce4b37d1086c52422c1ed37401159a43"
+      },
+      "data/balance/passiveskills.datc64": {
+        "bytes": 5497515,
+        "sha256": "49af4f7dfab787b57efa22e06e2673c268cbd90c4f40140aa085cb8fbb602bc2"
+      },
+      "data/balance/simplified chinese/activeskills.datc64": {
+        "bytes": 1157138,
+        "sha256": "c34ddfdb223627d4ebe7ffc0879a0b14fa0cdff4befcdb0d7c9f2795989a660d"
+      },
+      "data/balance/simplified chinese/alternatequalitytypes.datc64": {
+        "bytes": 3966,
+        "sha256": "5fc06b282d41270daa5b068216e3077cb74957b41f6ba78ea0ba9789a531ebc9"
+      },
+      "data/balance/simplified chinese/ascendancy.datc64": {
+        "bytes": 12771,
+        "sha256": "78656ac3382e0eaf307156f16ab22c4c1a4b6f19813e5bbd30fc5ad5096852fc"
+      },
+      "data/balance/simplified chinese/baseitemtypes.datc64": {
+        "bytes": 2716584,
+        "sha256": "20409beb94b5901d81c0593bd97809dc67283ec785b1f739596a0851aa48c604"
+      },
+      "data/balance/simplified chinese/characters.datc64": {
+        "bytes": 22744,
+        "sha256": "67ed40327e8685b679dd3afd3a1e0ea1b5d2d7abce0c810539863cafa44b1844"
+      },
+      "data/balance/simplified chinese/itemclasses.datc64": {
+        "bytes": 22218,
+        "sha256": "659bc63c138a01d8ffef10ee058a6dfd93f7a4ed52f327752fd1e7ab43e5875d"
+      },
+      "data/balance/simplified chinese/mods.datc64": {
+        "bytes": 13846416,
+        "sha256": "240c2bf5121a1e47e98a50be1f9e7ccc2cfc044f81bbd5e8f94afe80b65f8b82"
+      },
+      "data/balance/simplified chinese/passiveskills.datc64": {
+        "bytes": 5409159,
+        "sha256": "89e8ed30a0939753f99ad779ff070c841f09e9f862ed44a3c0369b184243c936"
+      },
+      "data/balance/simplified chinese/words.datc64": {
+        "bytes": 472064,
+        "sha256": "88867218a823236c1c9667bd510c892003aa118464dfe48bbe5f4432c917619c"
+      },
+      "data/balance/words.datc64": {
+        "bytes": 442540,
+        "sha256": "30d8da1fd6033a834c74051d9625373e04d8c7a8975e41dc30e46d79fb16aa2a"
+      }
+    }
+  },
+  "target_identity": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "binding_policy": "stable-key-pinned-fk-structure/v1",
+  "files": {
+    "verification.json": {
+      "bytes": 335031638,
+      "sha256": "3963d8f40f5da7fb3f2217083b12cf5f316cdc7ef8565820e8f8616fad9d7850"
+    },
+    "catalog.json": {
+      "bytes": 56845333,
+      "sha256": "2da387f47bb91633761bc49dd64684966877dc255709e1e06b6be3f89683bec4"
+    },
+    "request.json": {
+      "bytes": 1815,
+      "sha256": "3acbfb5baf39f004eb631d5e7bad1116d33bf9deda3a9c255125e568442d6c3e"
+    }
+  },
+  "producer": {
+    "src/native-catalog.mjs": "92ae5e732170648c66529df09dfb003e5e3e1b35a6384f171e91beef0923ca9a",
+    "src/native-names.mjs": "62f2060682577b0c617b62b399166e72fe5fda650d1de63e732c43b773863c42",
+    "src/strict-json.mjs": "679d91bb84e0bfa88c1e3cb25bfe11f27a1e0c17e85f11b58130a63b2aec6cdb",
+    "src/native-catalog-binding.mjs": "49664e47f7bcfe324cdec13cdd97b36668b2956337a16f83ed0ba86fb58529a6",
+    "src/native-catalog-fk-binding.mjs": "fd1678e34e6b02c2b9055c21e3548eab6d4fdbf3841eefa52d2e302bd0ec83cb",
+    "src/native-localization.mjs": "d89f3137e44d957e987e3e01619793228bf3fc5cb740376810b103a5b3c5136b"
+  }
+}
