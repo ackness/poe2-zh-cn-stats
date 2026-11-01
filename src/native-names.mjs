@@ -24,7 +24,7 @@ async function pinned(file, pin, reads, maxBytes) {
   requireValue(stat.isFile() && !stat.isSymbolicLink() && stat.size <= maxBytes, `Invalid bounded file: ${file}`);
   requireValue(/^[a-f0-9]{64}$/.test(pin?.sha256) && (pin.bytes === undefined || stat.size === pin.bytes), `Invalid byte pin: ${file}`);
   const raw = await readFile(file);
-  requireValue(raw.length <= maxBytes && sha(raw) === pin.sha256, `Fingerprint mismatch: ${file}`);
+  requireValue(raw.length === stat.size && raw.length <= maxBytes && sha(raw) === pin.sha256, `Fingerprint mismatch: ${file}`);
   reads.set(file, sha(raw));
   return strictJson(raw);
 }
@@ -32,12 +32,12 @@ async function pinned(file, pin, reads, maxBytes) {
 // Shared pinned physical-table ingress for the richer display catalog.
 export { readPackage as readNamePackage, keyed as keyNameRows };
 
-async function readPackage(input, language, names, reads, { observed = false } = {}) {
+async function readPackage(input, language, names, reads, { observed = false, fk = false } = {}) {
   const file = path.resolve(input.manifest);
   const root = await realpath(path.dirname(file));
   requireValue(await realpath(file) === path.join(root, 'manifest.json'), 'Manifest must be the package manifest.json');
   const manifest = await pinned(file, { sha256: input.sha256 }, reads, 2 * 1024 * 1024);
-  const formats = observed ? ['repoe-localized-tables/v2'] : language === 'English'
+  const formats = observed ? [fk ? 'repoe-localized-tables/v3' : 'repoe-localized-tables/v2'] : language === 'English'
     ? ['repoe-native-facts/v4', 'repoe-native-tables/v1'] : ['repoe-localized-tables/v1'];
   requireValue(formats.includes(manifest.format) && manifest.status === (observed ? 'partial-observation-candidate' : 'partial-candidate')
     && manifest.production_ready === false, 'Unsupported facts format/status');
@@ -50,15 +50,16 @@ async function readPackage(input, language, names, reads, { observed = false } =
   const payload = async name => {
     const target = path.join(root, name);
     requireValue(inside(root, await realpath(target)) && await realpath(target) === target, 'Payload escapes package or is a symlink');
-    return pinned(target, manifest.files[name], reads, 128 * 1024 * 1024);
+    requireValue(Number.isSafeInteger(manifest.files[name]?.bytes) && manifest.files[name].bytes > 0, 'Missing exact payload size');
+    return pinned(target, manifest.files[name], reads, fk ? manifest.files[name].bytes : 128 * 1024 * 1024);
   };
   if (observed) {
     const required = ['tables.json', 'default-tables.json', 'target_binding.json', 'transfer-receipt.json', 'target-lock.json', 'wire-observations.json'];
     requireValue(required.every(f => Object.hasOwn(manifest.files ?? {}, f))
-      && Object.keys(manifest.files).length === required.length
-      && required.reduce((total, f) => total + manifest.files[f].bytes, 0) <= 256 * 1024 * 1024, 'Invalid observed payload inventory/bound');
+      && (fk || Object.keys(manifest.files).length === required.length
+      && required.reduce((total, f) => total + manifest.files[f].bytes, 0) <= 256 * 1024 * 1024), 'Invalid observed payload inventory/bound');
     const retained = {};
-    for (const name of required) retained[name] = await payload(name);
+    for (const name of fk ? Object.keys(manifest.files) : required) retained[name] = await payload(name);
     const client = manifest.observed_client, receipt = retained['transfer-receipt.json'];
     requireValue(client?.game === 'poe2' && client.game_patch === null && client.realm === null
       && /^[a-f0-9]{64}$/.test(client.index_sha256) && manifest.decoder?.method === 'stdlib-memory-schema-decoder/v2'
@@ -88,6 +89,7 @@ async function readPackage(input, language, names, reads, { observed = false } =
         && identity.raw_resources[raw].bytes === pin.bytes, 'Observed localized raw pin differs');
     }
     return { tables: localized, defaultTables: defaults, identity, schema: manifest.schema, manifest,
+      ...(fk ? { retained } : {}),
       binding: retained['target_binding.json'], observedClient: client,
       provenance: { manifest_sha256: input.sha256, source_identity: identity, schema: manifest.schema,
         observed_client: client, decoder: manifest.decoder, ingest: manifest.ingest, producer: manifest.producer, files: manifest.files } };
