@@ -1,0 +1,21 @@
+{
+  "schema": "poe2-support-display-publication/v1",
+  "target": { "game": "poe2", "version": "0.5.5.5", "realm": "international" },
+  "locale": "zh-CN",
+  "catalog_sha256": "de57e010c8bf93f18bf557c650d6cdc06d98bc3fbde58049227b31feda9deea6",
+  "files": {
+    "supportDescriptions.zh-CN.json": {
+      "bytes": 183816,
+      "sha256": "57602ecb59184e5ba239531b5f47faa6c0c9f836530b3f516a976ed2041e3b49"
+    }
+  },
+  "provenance": {
+    "kind": "retained-generated-asset",
+    "generation_data_version": "0.5.5.4.2",
+    "source": "https://github.com/vagrant-soul/poe2-en-cn-dict",
+    "source_commit": "288d8b9d999c5ea5664149e408847156dbd83ff4",
+    "source_file": "tables/GemEffects.json",
+    "source_sha256": "1a5b039482e09193b41b1d30e68066906a174c834ffe4974d5784203494322f7"
+  },
+  "applicability": "Retained output generated for 0.5.5.4.2; the target catalog has the same recorded SHA-256. Apply entries only with matching skill_id and exact English description. This is not official client certification or evidence of cross-version semantic equivalence."
+}
