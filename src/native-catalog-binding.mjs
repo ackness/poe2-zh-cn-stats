@@ -83,10 +83,13 @@ export function verifyObservedBindings(observed, owners, tables, catalogFields) 
       && Array.isArray(entry.records), `Bound field scope differs: ${name}`);
     const file = source.tablePayloads[name], payload = source.manifest.files[file];
     const raw = source.identity.raw_resources[current.raw_resource];
+    // The binding contract pins these three schema identities. Additional package
+    // metadata remains in provenance and is already sealed by the manifest hash.
+    const schema = Object.fromEntries(['revision', 'sha256', 'native_specification_sha256'].map(k => [k, source.schema[k]]));
     const pins = { ...target, language: 'English', manifest_sha256: source.provenance.manifest_sha256,
       payload: file, payload_bytes: payload.bytes, payload_sha256: payload.sha256,
       table_pointer: file === 'tables.json' ? '/' + name : '', raw_resource: current.raw_resource,
-      raw_identity: raw, schema: source.schema, columns_sha256: sha(nativeBytes(current.columns.map(c => c.schema))) };
+      raw_identity: raw, schema, columns_sha256: sha(nativeBytes(current.columns.map(c => c.schema))) };
     require(same(entry.target_pins, pins), `Target pins differ: ${name}`);
     require(same(declaration.tables?.[name], { target_pins: pins, text_fields: textFields, nontext_fields: nontext }), `Target manifest/table declaration differs: ${name}`);
     const resourceEqual = same(observed.observedClient.resources[defaults.raw_resource], raw);

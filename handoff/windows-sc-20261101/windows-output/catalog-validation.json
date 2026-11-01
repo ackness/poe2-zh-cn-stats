@@ -1,0 +1,304 @@
+{
+  "schema": "pobr-windows-catalog-validation/v1",
+  "runtime": {
+    "node": "v26.12.1",
+    "platform": "win32",
+    "arch": "x64",
+    "release": "10.0.26300"
+  },
+  "replay_byte_identical": true,
+  "files": {
+    "catalog.json": {
+      "bytes": 113952335,
+      "sha256": "19165e1591ba3952fe04f6474c743c5cbd8e32790bca43eeaea783de7e26eef4"
+    },
+    "manifest.json": {
+      "bytes": 4501,
+      "sha256": "bbdf750ac33a2e9af20160d6894c0fadb408116c0d5495389638ead569c278aa"
+    },
+    "request.json": {
+      "bytes": 1830,
+      "sha256": "1cd87560ca744508e845f5dcc6f24cadb94922f9b6c11d7bae89e8602ccd9dfe"
+    }
+  },
+  "source_manifest_sha256": "9ae5f1ee55174b82ab2de660c4bbe3a692c434de1e21876fa14490d6d55edaf0",
+  "observed_patch": null,
+  "observed_realm": null,
+  "target_identity": {
+    "game_patch": "0.5.5.5",
+    "realm": "international",
+    "locale": "zh-CN"
+  },
+  "total_records": 58588,
+  "translated": 16488,
+  "unresolved": 42100,
+  "conflicts": 490,
+  "display_fields": {
+    "BaseItemTypes.Name": {
+      "records": 5503,
+      "translated": 259,
+      "unresolved": 5244,
+      "binding_rejected": 4817
+    },
+    "BaseItemTypes.Inflection": {
+      "records": 5503,
+      "translated": 0,
+      "unresolved": 5503,
+      "binding_rejected": 4817
+    },
+    "ActiveSkills.DisplayedName": {
+      "records": 1147,
+      "translated": 808,
+      "unresolved": 339,
+      "binding_rejected": 0
+    },
+    "ActiveSkills.Description": {
+      "records": 1147,
+      "translated": 747,
+      "unresolved": 400,
+      "binding_rejected": 0
+    },
+    "ActiveSkills.ShortDescription": {
+      "records": 1147,
+      "translated": 368,
+      "unresolved": 779,
+      "binding_rejected": 0
+    },
+    "ActiveSkills.WebsiteDescription": {
+      "records": 1147,
+      "translated": 0,
+      "unresolved": 1147,
+      "binding_rejected": 0
+    },
+    "Mods.Name": {
+      "records": 16786,
+      "translated": 2485,
+      "unresolved": 14301,
+      "binding_rejected": 10271
+    },
+    "Words.Text2": {
+      "records": 3246,
+      "translated": 3213,
+      "unresolved": 33,
+      "binding_rejected": 0
+    },
+    "Words.Inflection": {
+      "records": 3246,
+      "translated": 0,
+      "unresolved": 3246,
+      "binding_rejected": 0
+    },
+    "Characters.Name": {
+      "records": 12,
+      "translated": 0,
+      "unresolved": 12,
+      "binding_rejected": 12
+    },
+    "Characters.Description": {
+      "records": 12,
+      "translated": 0,
+      "unresolved": 12,
+      "binding_rejected": 12
+    },
+    "Characters.TraitDescription": {
+      "records": 12,
+      "translated": 0,
+      "unresolved": 12,
+      "binding_rejected": 12
+    },
+    "Ascendancy.Name": {
+      "records": 37,
+      "translated": 23,
+      "unresolved": 14,
+      "binding_rejected": 0
+    },
+    "Ascendancy.FlavourText": {
+      "records": 37,
+      "translated": 23,
+      "unresolved": 14,
+      "binding_rejected": 0
+    },
+    "PassiveSkills.Name": {
+      "records": 9731,
+      "translated": 8424,
+      "unresolved": 1307,
+      "binding_rejected": 0
+    },
+    "PassiveSkills.FlavourText": {
+      "records": 9731,
+      "translated": 45,
+      "unresolved": 9686,
+      "binding_rejected": 0
+    },
+    "ItemClasses.Name": {
+      "records": 118,
+      "translated": 93,
+      "unresolved": 25,
+      "binding_rejected": 0
+    },
+    "AlternateQualityTypes.Description": {
+      "records": 26,
+      "translated": 0,
+      "unresolved": 26,
+      "binding_rejected": 26
+    }
+  },
+  "unresolved_reasons": {
+    "target-binding-rejected": 19967,
+    "reference-mismatch": 210,
+    "unchanged-text": 1219,
+    "empty-english-text": 20690,
+    "no-han-in-localized-text": 4,
+    "literal-number-mismatch": 3,
+    "unresolved-template-syntax": 7
+  },
+  "queries": {
+    "exact": 58588,
+    "changed_english": 16488,
+    "unique_english": 15996
+  },
+  "independent_binding_validation": "Both actual CLI runs independently recomputed full source/default/target bindings",
+  "samples": [
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet1",
+      "english": "Simple Rope Net",
+      "localized": "普通的粗绳猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet10",
+      "english": "Thaumaturgical Net",
+      "localized": "奇术猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet11",
+      "english": "Necromancy Net",
+      "localized": "召唤师猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet2",
+      "english": "Reinforced Rope Net",
+      "localized": "精炼的粗绳猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet3",
+      "english": "Strong Rope Net",
+      "localized": "强力的粗绳猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet4",
+      "english": "Simple Iron Net",
+      "localized": "普通的锻铁猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet5",
+      "english": "Reinforced Iron Net",
+      "localized": "精炼的锻铁猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet6",
+      "english": "Strong Iron Net",
+      "localized": "强力的锻铁猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet7",
+      "english": "Simple Steel Net",
+      "localized": "普通的炼钢猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet8",
+      "english": "Reinforced Steel Net",
+      "localized": "精炼的炼钢猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/Bestiary/BestiaryNet9",
+      "english": "Strong Steel Net",
+      "localized": "强力的炼钢猎魔夹"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddEquipmentSocket",
+      "english": "Artificer's Orb",
+      "localized": "巧匠石"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddEquipmentSocketShard",
+      "english": "Artificer's Shard",
+      "localized": "巧匠石碎片"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddModToMagic",
+      "english": "Orb of Augmentation",
+      "localized": "增幅石"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddModToMagic2",
+      "english": "Greater Orb of Augmentation",
+      "localized": "高级增幅石"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddModToMagic3",
+      "english": "Perfect Orb of Augmentation",
+      "localized": "完美增幅石"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddModToRare",
+      "english": "Exalted Orb",
+      "localized": "崇高石"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddModToRare2",
+      "english": "Greater Exalted Orb",
+      "localized": "高级崇高石"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddModToRare3",
+      "english": "Perfect Exalted Orb",
+      "localized": "完美崇高石"
+    },
+    {
+      "table": "BaseItemTypes",
+      "field": "Name",
+      "id": "Metadata/Items/Currency/CurrencyAddModToRareShard",
+      "english": "Exalted Shard",
+      "localized": "崇高石碎片"
+    }
+  ],
+  "production_ready": false
+}
