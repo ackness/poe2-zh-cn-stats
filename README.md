@@ -198,7 +198,22 @@ curated_sha256: 人工模板输入的 SHA-256
 
 编号模板导出须选择包含 `generated/templates.json` 的提交；上面通用 JSON 读取示例固定的早期提交仅用于演示主词表读取。
 
-本库不提供完整的基底名、技能名、职业名、天赋名或词缀专名，因此不是整个中文数据源的替代品。交易 stat ID 也不等于消费方内部的计算 stat ID；翻译覆盖率不是解析或数值机制覆盖率。
+当前已发布的交易快照不提供完整的基底名、技能名、职业名、天赋名或词缀专名，因此不是整个中文数据源的替代品。交易 stat ID 也不等于消费方内部的计算 stat ID；翻译覆盖率不是解析或数值机制覆盖率。
+
+### RePoE 原件名称候选
+
+`src/native-names.mjs` 可离线配对同游戏、补丁、服别与 schema 的英文事实及显式语言事实，不修改交易快照或 `CURRENT`：
+
+```sh
+mise exec -- node src/native-names.mjs --config /absolute/name-request.json --out .cache/names/example
+mise exec -- node --test test/native-names.test.mjs
+```
+
+请求 schema 为 `poe2-native-name-request/v1`：`language` 必须是 `Traditional Chinese` 或 `Simplified Chinese`；`localized: {manifest, sha256}` 指定 RePoE `repoe-localized-tables/v1`；`english` 是 `{manifest, sha256, tables}` 数组，支持 `repoe-native-facts/v4` 或 `repoe-native-tables/v1`，每张表只有一个明确 owner。九张必需表为 BaseItemTypes、ActiveSkills、Mods、Words、Characters、Ascendancy、PassiveSkills、ItemClasses、AlternateQualityTypes。每个 manifest 及实际读取 payload 均先验外部摘要，解析后再次检查输入未变。
+
+输出 `names.json`（`poe2-native-names/v1`）按表、字段及原件身份保留英文、译文、两侧物理行和来源 manifest。八表按精确 `Id` 配对；Words 的 `Text` 实际存在重名，因此按同补丁内唯一 `HASH32` 加精确 `Text`、`Wordlist` 对应，不将物理行当稳定 ID，也不推断跨版本 hash 永久性。空值、缺行、原文未译与英文同名多译分别列入 `excluded` / `conflicts`。消费方只有英文文本时不能随意挑选冲突中的译文；能保留表与 ID 时可精确消费。
+
+这个入口不抓取资源、不猜译、不繁转简、不认证数值适用性，也不晋升采集状态。国际服索引中指定简中表路径缺失时应另列来源缺口，不能以繁中候选充当简中。候选存在不等于已发布名称覆盖；现有交易、CSD、旧名称兼容来源分别保留身份。
 
 
 ## 配对与来源优先级
