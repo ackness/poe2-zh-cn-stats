@@ -38,3 +38,5 @@ ref 的完整词典副本。导出器校验整个清单、显式目标、locale�
 RePoE binding 与 reviewed workbench 的构建时校验；生成新投影时仍必须运行原有完整
 guard。sidecar 属于构建校验输入，不能塞进运行时显示投影。导出不改变 PoBR 的锁、
 CURRENT、来源接受决定或发布状态；消费接线及清除 PoBR 旧副本由协调者处理。
+
+实际旧词典投影及固定选取层的独立生成契约见 [locale-generation.md](locale-generation.md)；本导出器仍只重放固定字节。
