@@ -11,6 +11,10 @@ const help = `Usage: node src/cli.mjs <command>
   build [--snapshot PATH]     Offline rebuild; published snapshots become new revisions
   check [--snapshot PATH]     Check source hashes and byte-for-byte generated output
   report [--snapshot PATH]    Print the saved coverage report
+  workbench --config PATH --out .cache/FRESH
+                             Reconcile official/agent translations and region/version queues
+  workbench-list --file PATH [--status pending] [--realm china] [--locale zh-CN] [--limit 50]
+                             List exact native entries without activating a snapshot
   activate --snapshot PATH   Verify and activate a previously fetched candidate
   native --facts PATH --expected-manifest-sha256 SHA
                              Emit contextual native-ID localization candidates to stdout
@@ -22,6 +26,11 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift();
   if (!command || command === '--help' || command === 'help') { console.log(help); return; }
+  if (command === 'workbench' || command === 'workbench-list') {
+    const { workbenchCommand } = await import('./translation-workbench.mjs');
+    console.log(JSON.stringify(await workbenchCommand(command, args), null, 2));
+    return;
+  }
   if (command === 'native' || command === 'native-check') {
     const options = new Map();
     while (args.length) {
