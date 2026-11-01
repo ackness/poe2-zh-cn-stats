@@ -8,8 +8,8 @@
 
 ## 使用
 
-本地开发统一使用 mise，`mise.toml` 固定 Node.js 26.13.0（与 PoBR 一致），npm 随该 Node 版本提供。
-首次使用先安装 mise，并执行 `mise trust`、`mise install`。初次克隆已经带有经过校验的数据快照，离线校验无需访问游戏网站。
+本地开发统一使用 mise，`mise.toml` 请求 `node = "latest"`，提交的 `mise.lock` 固定实际稳定版本（与 PoBR 对齐），npm 随该 Node 版本提供。
+首次使用先安装 mise，并执行 `mise trust`、`mise install --locked`。显式升级时运行 `mise lock --bump --platform linux-x64,macos-arm64 node`，检查并提交锁文件；不隐式更新 npm 依赖锁或已有数据收据。初次克隆已经带有经过校验的数据快照，离线校验无需访问游戏网站。
 
 ```sh
 mise run setup
