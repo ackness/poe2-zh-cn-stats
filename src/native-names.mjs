@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile, writeFile, mkdir, lstat, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isDeepStrictEqual as same } from 'node:util';
 import { strictJson } from './strict-json.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -31,22 +32,66 @@ async function pinned(file, pin, reads, maxBytes) {
 // Shared pinned physical-table ingress for the richer display catalog.
 export { readPackage as readNamePackage, keyed as keyNameRows };
 
-async function readPackage(input, language, names, reads) {
+async function readPackage(input, language, names, reads, { observed = false } = {}) {
   const file = path.resolve(input.manifest);
   const root = await realpath(path.dirname(file));
   requireValue(await realpath(file) === path.join(root, 'manifest.json'), 'Manifest must be the package manifest.json');
   const manifest = await pinned(file, { sha256: input.sha256 }, reads, 2 * 1024 * 1024);
-  const formats = language === 'English' ? ['repoe-native-facts/v4', 'repoe-native-tables/v1'] : ['repoe-localized-tables/v1'];
-  requireValue(formats.includes(manifest.format) && manifest.status === 'partial-candidate' && manifest.production_ready === false, 'Unsupported facts format/status');
+  const formats = observed ? ['repoe-localized-tables/v2'] : language === 'English'
+    ? ['repoe-native-facts/v4', 'repoe-native-tables/v1'] : ['repoe-localized-tables/v1'];
+  requireValue(formats.includes(manifest.format) && manifest.status === (observed ? 'partial-observation-candidate' : 'partial-candidate')
+    && manifest.production_ready === false, 'Unsupported facts format/status');
   const identity = manifest.source_identity;
-  requireValue(identity?.game === 'poe2' && /^\d+(?:\.\d+){2,5}$/.test(identity.game_patch)
+  requireValue(identity?.game === 'poe2' && (observed ? language === 'Simplified Chinese'
+    && identity.language === language && identity.game_patch === null && identity.realm === null
+    : /^\d+(?:\.\d+){2,5}$/.test(identity.game_patch)
     && ['international', 'china'].includes(identity.realm)
-    && (identity.language ?? 'English') === language, 'Invalid facts language/game identity');
+    && (identity.language ?? 'English') === language), 'Invalid facts language/game identity');
   const payload = async name => {
     const target = path.join(root, name);
     requireValue(inside(root, await realpath(target)) && await realpath(target) === target, 'Payload escapes package or is a symlink');
     return pinned(target, manifest.files[name], reads, 128 * 1024 * 1024);
   };
+  if (observed) {
+    const required = ['tables.json', 'default-tables.json', 'target_binding.json', 'transfer-receipt.json', 'target-lock.json', 'wire-observations.json'];
+    requireValue(required.every(f => Object.hasOwn(manifest.files ?? {}, f))
+      && Object.keys(manifest.files).length === required.length
+      && required.reduce((total, f) => total + manifest.files[f].bytes, 0) <= 256 * 1024 * 1024, 'Invalid observed payload inventory/bound');
+    const retained = {};
+    for (const name of required) retained[name] = await payload(name);
+    const client = manifest.observed_client, receipt = retained['transfer-receipt.json'];
+    requireValue(client?.game === 'poe2' && client.game_patch === null && client.realm === null
+      && /^[a-f0-9]{64}$/.test(client.index_sha256) && manifest.decoder?.method === 'stdlib-memory-schema-decoder/v2'
+      && /^[a-f0-9]{64}$/.test(manifest.decoder.source_sha256)
+      && same(manifest.decoder, receipt.decoder)
+      && identity.observation_receipt_sha256 === manifest.files['transfer-receipt.json'].sha256
+      && manifest.ingest?.transfer_receipt_sha256 === manifest.files['transfer-receipt.json'].sha256
+      && manifest.ingest?.target_lock_sha256 === manifest.files['target-lock.json'].sha256
+      && manifest.ingest.method === 'decoded-observation-validation/v1' && manifest.ingest.raw_dat_redecoded === false,
+    'Invalid observed decoder/receipt binding');
+    for (const key of ['game', 'game_patch', 'realm', 'index_sha256']) requireValue(client[key] === receipt.observed_client?.[key], 'Observed client/receipt identity differs');
+    for (const key of ['revision', 'sha256']) requireValue(manifest.schema?.[key] === receipt.schema?.[key]
+      && typeof manifest.schema?.[key] === 'string', 'Observed receipt/schema identity differs');
+    requireValue(receipt.language === language && receipt.patch_certified === false && receipt.realm_certified === false, 'Invalid observed language/certification');
+    const localized = retained['tables.json'], defaults = retained['default-tables.json'];
+    const paths = Object.keys(client.resources ?? {});
+    requireValue(new Set(paths.map(p => p.toLowerCase())).size === paths.length, 'Observed resource case collision');
+    for (const name of names) for (const [role, all] of [['localized', localized], ['default', defaults]]) {
+      const table = all[name], resource = `data/balance/${role === 'localized' ? 'simplified chinese/' : ''}${name.toLowerCase()}.datc64`;
+      const raw = table?.raw_resource, pin = client.resources?.[raw];
+      requireValue(table?.table === name && Array.isArray(table.rows) && typeof raw === 'string' && raw.toLowerCase() === resource
+        && /^[a-f0-9]{64}$/.test(pin?.sha256) && Number.isSafeInteger(pin.bytes) && pin.bytes > 0
+        && receipt.tables?.[name]?.[role]?.raw_resource === raw
+        && receipt.tables[name][role].raw_identity?.sha256 === pin.sha256
+        && receipt.tables[name][role].raw_identity?.bytes === pin.bytes, `Wrong observed raw resource: ${name}/${role}`);
+      if (role === 'localized') requireValue(identity.raw_resources?.[raw]?.sha256 === pin.sha256
+        && identity.raw_resources[raw].bytes === pin.bytes, 'Observed localized raw pin differs');
+    }
+    return { tables: localized, defaultTables: defaults, identity, schema: manifest.schema, manifest,
+      binding: retained['target_binding.json'], observedClient: client,
+      provenance: { manifest_sha256: input.sha256, source_identity: identity, schema: manifest.schema,
+        observed_client: client, decoder: manifest.decoder, ingest: manifest.ingest, producer: manifest.producer, files: manifest.files } };
+  }
   const combined = manifest.format === 'repoe-native-facts/v4' ? null : await payload('tables.json');
   const tables = {};
   for (const name of names) {
@@ -58,7 +103,9 @@ async function readPackage(input, language, names, reads) {
       && Number.isSafeInteger(rawPin.bytes) && rawPin.bytes > 0, `Wrong raw resource: ${name}`);
     tables[name] = table;
   }
-  return { tables, identity, schema: manifest.schema, provenance: { manifest_sha256: input.sha256,
+  return { tables, identity, schema: manifest.schema, manifest,
+    tablePayloads: Object.fromEntries(names.map(n => [n, combined ? 'tables.json' : `tables/${n}.json`])),
+    provenance: { manifest_sha256: input.sha256,
     source_identity: identity, schema: manifest.schema } };
 }
 

@@ -1,0 +1,186 @@
+{
+  "synthetic": true,
+  "origin": {
+    "metadata_manifest_sha256": "a9597d71ed0f7086d552dfd1213615ce79bd5c05e0f2af1ed8e2e72e6fef15e6",
+    "note": "Column metadata only; row is newly synthetic. No acquired Words rows retained."
+  },
+  "schema": {
+    "compatibility_views": 0,
+    "native_specification_sha256": "c9417f03e2205ff649721c3dbf9620ee0c703bf905b3cf53469ce3eda86f1e25",
+    "revision": "6034b071846ef61b39046ebdb59e6d5717179509",
+    "sha256": "50e098543345cf8323aeb294e2cfef1b6b44842faccf560ada935cebe22727df"
+  },
+  "table": {
+    "columns": [
+      {
+        "physical_fields": [
+          "Wordlist"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "Wordlist",
+          "references": {
+            "table": "Wordlists"
+          },
+          "type": "enumrow",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 0
+      },
+      {
+        "physical_fields": [
+          "Text"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "Text",
+          "references": null,
+          "type": "string",
+          "unique": true,
+          "until": null
+        },
+        "source_column": 1
+      },
+      {
+        "physical_fields": [
+          "SpawnWeight_Tags"
+        ],
+        "schema": {
+          "array": true,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "SpawnWeight_Tags",
+          "references": {
+            "table": "Tags"
+          },
+          "type": "foreignrow",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 2
+      },
+      {
+        "physical_fields": [
+          "SpawnWeight_Values"
+        ],
+        "schema": {
+          "array": true,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "SpawnWeight_Values",
+          "references": null,
+          "type": "i32",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 3
+      },
+      {
+        "physical_fields": [
+          "HASH32"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "HASH32",
+          "references": null,
+          "type": "u32",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 4
+      },
+      {
+        "physical_fields": [
+          "Text2"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "Text2",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 5
+      },
+      {
+        "physical_fields": [
+          "Inflection"
+        ],
+        "schema": {
+          "array": false,
+          "description": "the inflection identifier used for i18n in related fields",
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "Inflection",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 6
+      }
+    ],
+    "physical_fields": [
+      "Wordlist",
+      "Text",
+      "SpawnWeight_Tags",
+      "SpawnWeight_Values",
+      "HASH32",
+      "Text2",
+      "Inflection"
+    ],
+    "raw_resource": "Data/Balance/Words.datc64",
+    "row_key": "Zero-based physical source row; ephemeral within these exact raw bytes, never a stable game ID.",
+    "rows": [
+      {
+        "_row": 0,
+        "values": {
+          "Wordlist": 1,
+          "Text": "FixtureWord",
+          "SpawnWeight_Tags": [],
+          "SpawnWeight_Values": [],
+          "HASH32": 42,
+          "Text2": "FixtureWord",
+          "Inflection": ""
+        }
+      }
+    ],
+    "table": "Words",
+    "validation": {
+      "actual_row_bytes": 64,
+      "rows": 1,
+      "schema_row_bytes": 64,
+      "warnings": []
+    }
+  }
+}

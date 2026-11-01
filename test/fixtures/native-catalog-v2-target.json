@@ -1,0 +1,444 @@
+{
+  "synthetic": true,
+  "origin": {
+    "source_manifest_sha256": "90417fe20cd7070bd44372873ad3fe43de8cc03c44ea3c8d683817a0b1e8b553",
+    "source_target_manifest_sha256": "486a1abb6764df3c530ecaa2338650bb196229744dad157e254f231080f69943",
+    "note": "Synthetic source-owner example; physical metadata retained, no acquired game rows."
+  },
+  "schema": {
+    "native_specification_sha256": "c9417f03e2205ff649721c3dbf9620ee0c703bf905b3cf53469ce3eda86f1e25",
+    "revision": "6034b071846ef61b39046ebdb59e6d5717179509",
+    "sha256": "50e098543345cf8323aeb294e2cfef1b6b44842faccf560ada935cebe22727df"
+  },
+  "table": {
+    "columns": [
+      {
+        "physical_fields": [
+          "Id"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "Id",
+          "references": null,
+          "type": "string",
+          "unique": true,
+          "until": null
+        },
+        "source_column": 0
+      },
+      {
+        "physical_fields": [
+          "ClassNo"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "ClassNo",
+          "references": null,
+          "type": "i32",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 1
+      },
+      {
+        "physical_fields": [
+          "Character"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "Character",
+          "references": {
+            "table": "Characters"
+          },
+          "type": "foreignrow",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 2
+      },
+      {
+        "physical_fields": [
+          "CoordinateRect"
+        ],
+        "schema": {
+          "array": false,
+          "description": "Coordinates in 'x1, y1, x2, y2' format",
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "CoordinateRect",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 3
+      },
+      {
+        "physical_fields": [
+          "RGBFlavourTextColour"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "RGBFlavourTextColour",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 4
+      },
+      {
+        "physical_fields": [
+          "Name"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": true,
+          "name": "Name",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 5
+      },
+      {
+        "physical_fields": [
+          "FlavourText"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": true,
+          "name": "FlavourText",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 6
+      },
+      {
+        "physical_fields": [
+          "OGGFile"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": ".ogg",
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "OGGFile",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 7
+      },
+      {
+        "physical_fields": [
+          "PassiveTreeImage"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": ".dds",
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "PassiveTreeImage",
+          "references": null,
+          "type": "string",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 8
+      },
+      {
+        "physical_fields": [
+          "TreeRegionVector"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "TreeRegionVector",
+          "references": null,
+          "type": "i32",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 9
+      },
+      {
+        "physical_fields": [
+          "TreeRegionAngle"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "TreeRegionAngle",
+          "references": null,
+          "type": "i32",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 10
+      },
+      {
+        "physical_fields": [
+          "BackgroundImage"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "BackgroundImage",
+          "references": null,
+          "type": "i32",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 11
+      },
+      {
+        "physical_fields": [
+          "Unknown0"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": null,
+          "references": null,
+          "type": "i32",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 12
+      },
+      {
+        "physical_fields": [
+          "Disabled"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "Disabled",
+          "references": null,
+          "type": "bool",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 13
+      },
+      {
+        "physical_fields": [
+          "BaseAscendancy"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "BaseAscendancy",
+          "references": {
+            "table": "Ascendancy"
+          },
+          "type": "row",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 14
+      },
+      {
+        "physical_fields": [
+          "UIArt"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "UIArt",
+          "references": {
+            "table": "PassiveSkillTreeUIArt"
+          },
+          "type": "foreignrow",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 15
+      },
+      {
+        "physical_fields": [
+          "SelectSound"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "SelectSound",
+          "references": {
+            "table": "SoundEffects"
+          },
+          "type": "foreignrow",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 16
+      },
+      {
+        "physical_fields": [
+          "ConfirmDownSound"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "ConfirmDownSound",
+          "references": {
+            "table": "SoundEffects"
+          },
+          "type": "foreignrow",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 17
+      },
+      {
+        "physical_fields": [
+          "ConfirmUpSound"
+        ],
+        "schema": {
+          "array": false,
+          "description": null,
+          "file": null,
+          "files": null,
+          "interval": false,
+          "localized": false,
+          "name": "ConfirmUpSound",
+          "references": {
+            "table": "SoundEffects"
+          },
+          "type": "foreignrow",
+          "unique": false,
+          "until": null
+        },
+        "source_column": 18
+      }
+    ],
+    "physical_fields": [
+      "Id",
+      "ClassNo",
+      "Character",
+      "CoordinateRect",
+      "RGBFlavourTextColour",
+      "Name",
+      "FlavourText",
+      "OGGFile",
+      "PassiveTreeImage",
+      "TreeRegionVector",
+      "TreeRegionAngle",
+      "BackgroundImage",
+      "Unknown0",
+      "Disabled",
+      "BaseAscendancy",
+      "UIArt",
+      "SelectSound",
+      "ConfirmDownSound",
+      "ConfirmUpSound"
+    ],
+    "raw_resource": "Data/Balance/Ascendancy.datc64",
+    "rows": [
+      {
+        "_row": 0,
+        "values": {
+          "BackgroundImage": 0,
+          "BaseAscendancy": null,
+          "Character": null,
+          "ClassNo": 0,
+          "ConfirmDownSound": null,
+          "ConfirmUpSound": null,
+          "CoordinateRect": "",
+          "Disabled": false,
+          "FlavourText": "Fixture English",
+          "Id": "FixtureLich",
+          "Name": "Lich",
+          "OGGFile": "",
+          "PassiveTreeImage": "",
+          "RGBFlavourTextColour": "",
+          "SelectSound": null,
+          "TreeRegionAngle": 0,
+          "TreeRegionVector": 0,
+          "UIArt": null,
+          "Unknown0": -7
+        }
+      }
+    ],
+    "table": "Ascendancy",
+    "validation": {
+      "actual_row_bytes": 165,
+      "rows": 1,
+      "schema_row_bytes": 165
+    }
+  }
+}
