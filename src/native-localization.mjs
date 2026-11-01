@@ -241,20 +241,50 @@ export async function readNativeDescriptions(directory, expectedManifestSha256) 
   return { manifest, manifestBytes, manifestSha256: expectedManifestSha256, document, diagnostics: diagnostics.diagnostics };
 }
 
-function signature(branch) {
+// PyPoE 66d1 TranslationString._set_string: explicit k resets the next
+// automatic index to k+1. This is a comparison projection, never a rewrite of
+// the source template/placeholders, and does not substitute or format values.
+function resolvedPlaceholders(branch, arity) {
+  const characters = Array.from(branch.template_raw), slots = [];
+  let nextIndex = 0, literal = '';
+  for (let offset = 0; offset < characters.length;) {
+    const character = characters[offset];
+    if ((character === '{' || character === '}') && characters[offset + 1] === character) {
+      literal += character; offset += 2; continue;
+    }
+    if (character === '}') return { issue: 'unresolved-template-syntax' };
+    if (character !== '{') { literal += character; offset++; continue; }
+    const end = characters.indexOf('}', offset + 1);
+    if (end < 0) return { issue: 'unresolved-template-syntax' };
+    const token = characters.slice(offset, end + 1).join('');
+    const match = /^\{([0-9]*)(?::([^{}]*))?\}$/u.exec(token);
+    if (!match) return { issue: 'unresolved-template-syntax' };
+    const index = match[1] === '' ? nextIndex : Number(match[1]);
+    if (!integer(index) || index >= arity) return { issue: 'placeholder-index-out-of-range' };
+    const format = match[2] ?? null;
+    if (![null, 'd', '-d', '+d'].includes(format)) return { issue: 'unsupported-placeholder-format' };
+    nextIndex = index + 1;
+    const sign = /[+\-−]$/u.exec(characters.slice(0, offset).join('').trimEnd())?.[0] ?? '';
+    slots.push([index, format, sign]);
+    offset = end + 1;
+  }
+  return { issue: null, slots, literal };
+}
+
+function signature(branch, resolved) {
   const characters = Array.from(branch.template_raw);
   return canonical({ conditions: branch.condition_tokens_raw, restrictions: branch.restrictions_raw,
-    handlers: branch.quantifier_tokens_raw, slots: branch.placeholders.map(p => [p.index_token_raw, p.format_raw,
+    handlers: branch.quantifier_tokens_raw, slots: (resolved.issue ? branch.placeholders.map(p => [p.index_token_raw, p.format_raw,
       /[+\-−]$/u.exec(characters.slice(0, p.template_character_span[0]).join('').trimEnd())?.[0] ?? ''])
+      : resolved.slots)
       .sort((a, b) => lexicalOrder(canonical(a), canonical(b))) });
 }
-function reason(branch) {
+function reason(branch, resolved) {
   if (branch.template_syntax_diagnostics.length || branch.placeholders.some(p => p.syntax_status !== 'recognized-lexical')) return 'unresolved-template-syntax';
-  if (branch.placeholders.some(p => !/^[0-9]+$/u.test(p.index_token_raw))) return 'implicit-placeholder-index';
-  return null;
+  return resolved.issue;
 }
-const literals = branch => {
-  let text = branch.template_raw.replace(/\{[^{}]*\}/gu, '').replace(/\[[^\]]*\]/gu, '');
+const literals = resolved => {
+  const text = resolved.literal.replace(/\[[^\]]*\]/gu, '');
   return (text.match(/[+\-−]?\d+(?:\.\d+)?/gu) ?? []).sort();
 };
 
@@ -278,9 +308,10 @@ export function buildNativeLocalization({ manifest, manifestSha256, document, di
       const buckets = new Map();
       for (const [language, groups] of [['implicit-default', defaults], ['Simplified Chinese', chinese]]) {
         for (const [group, gi] of groups) for (let bi = 0; bi < group.branches.length; bi++) {
-          const branch = group.branches[bi]; const key = signature(branch);
+          const branch = group.branches[bi], resolved = resolvedPlaceholders(branch, record.ids.length);
+          const key = signature(branch, resolved);
           if (!buckets.has(key)) buckets.set(key, { 'implicit-default': [], 'Simplified Chinese': [] });
-          buckets.get(key)[language].push({ branch, reference: reference(file, ri, gi, bi) });
+          buckets.get(key)[language].push({ branch, resolved, reference: reference(file, ri, gi, bi) });
         }
       }
       for (const bucket of buckets.values()) {
@@ -290,9 +321,9 @@ export function buildNativeLocalization({ manifest, manifestSha256, document, di
             default_refs: en.map(item => item.reference), chinese_refs: cn.map(item => item.reference) });
           continue;
         }
-        const issue = reason(en[0].branch) ?? reason(cn[0].branch)
+        const issue = reason(en[0].branch, en[0].resolved) ?? reason(cn[0].branch, cn[0].resolved)
           ?? (!/\p{Script=Han}/u.test(cn[0].branch.template_raw) ? 'no-han-in-declared-chinese' : null)
-          ?? (!same(literals(en[0].branch), literals(cn[0].branch)) ? 'literal-number-mismatch' : null);
+          ?? (!same(literals(en[0].resolved), literals(cn[0].resolved)) ? 'literal-number-mismatch' : null);
         if (issue) { excluded.push({ ...scope, reason: issue, default_refs: [en[0].reference], chinese_refs: [cn[0].reference] }); continue; }
         pairs.push({ ...scope, default_reference: en[0].reference, chinese_reference: cn[0].reference,
           default_language_origin: 'implicit-default; English interpretation is a project convention, not an explicit lang token',
@@ -307,6 +338,7 @@ export function buildNativeLocalization({ manifest, manifestSha256, document, di
   return { format: 'poe2-native-localization-candidate/v1', status: 'structurally-matched-candidates', production_ready: false,
     input: { manifest_sha256: manifestSha256, source_identity: manifest.source_identity, producer: manifest.producer },
     policy: { language_pairing: 'same file/description, exact conditions/restrictions/ordered handlers and placeholder multiset; unique on both sides',
+      placeholder_indices: 'PyPoE 66d1: next index starts at 0, explicit k sets next to k+1; automatic slots consume next. Resolved only for comparison; raw tokens unchanged. Source syntax diagnostics still exclude.',
       precedence: 'none; includes and suppressions remain in the canonical input', trade_id_mapping: 'none',
       cn_numerical_equivalence: 'not established by international Simplified Chinese text' },
     roots: document.roots, pairs, excluded, source_diagnostics: diagnostics,
