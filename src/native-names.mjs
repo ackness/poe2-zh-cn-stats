@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile, writeFile, mkdir, lstat, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { strictJson } from './strict-json.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -24,8 +25,11 @@ async function pinned(file, pin, reads, maxBytes) {
   const raw = await readFile(file);
   requireValue(raw.length <= maxBytes && sha(raw) === pin.sha256, `Fingerprint mismatch: ${file}`);
   reads.set(file, sha(raw));
-  return JSON.parse(raw.toString('utf8'));
+  return strictJson(raw);
 }
+
+// Shared pinned physical-table ingress for the richer display catalog.
+export { readPackage as readNamePackage, keyed as keyNameRows };
 
 async function readPackage(input, language, names, reads) {
   const file = path.resolve(input.manifest);
@@ -141,7 +145,8 @@ export async function createNativeNames(config, out) {
   const result = { schema: 'poe2-native-names/v1', status: 'candidate', production_ready: false,
     game: target.identity.game, game_patch: target.identity.game_patch, realm: target.identity.realm,
     language: config.language, locale: locales[config.language], ...paired, sources,
-    producer: { 'src/native-names.mjs': sha(await readFile(fileURLToPath(import.meta.url))) },
+    producer: { 'src/native-names.mjs': sha(await readFile(fileURLToPath(import.meta.url))),
+      'src/strict-json.mjs': sha(await readFile(new URL('./strict-json.mjs', import.meta.url))) },
     limits: ['Display text only; no numeric or release applicability inference.',
       'Exact declared key joins; Words uses unique HASH32 plus matching Text and Wordlist within this patch. Physical rows are provenance only.',
       'Unchanged, missing and empty strings are excluded, not fabricated translations.',
