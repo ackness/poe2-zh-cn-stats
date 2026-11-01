@@ -35,12 +35,19 @@ mise exec -- node src/cli.mjs workbench-list --file .cache/workbench/new/workben
 
 输出包括完整 `workbench.json`、按状态列 ID 的 `queues.json`、简要 `report.md`、
 可补译的 `worklist.json`、单列来源差异的 `regional-candidates.json`，以及输入 edits 副本、
-请求和最后写入的 manifest。目录必须在本库 `.cache` 且尚不存在；命令不联网、不覆盖旧目录，
+紧凑 `supplements.json`、请求和最后写入的 manifest。目录必须在本库 `.cache` 且尚不存在；命令不联网、不覆盖旧目录，
 不改 CURRENT。可将新 worklist 和 regional-candidates 作为根目录两份可读快照提交，
 完整证据留 cache 或固定数据分支。快照保留输入身份，不能冒充生产采用。
 
 机器之间通过 Git 同步数据和证据，线程消息只传提交、路径及摘要。读取器不设置固定的
 JSON 文件大小上限；仍核对 manifest 声明的字节数、SHA 和实际文件，并拒绝读取中变化的大小。
+
+v1/v2 catalog 的行为保留。v3 manifest 还必须固定同目录的原始 `verification.json`，
+其 `{bytes, sha256}` 必须与 catalog 的 `fk_verification` 完全一致。读取器每个输入只读取一份
+原始 Buffer，交给 `createCatalogLookup(catalog, {game_patch, realm, locale, verification})` 完整验证
+FK 结构及绑定投影；不能重新 stringify 后替代原件，也不能只信投影上的 accepted 标记。
+sidecar 留在原输入目录，不复制到输出或每条 workbench entry；`sources[].fk_verification`
+只保留一个文件名／字节数／摘要。观察源 patch/realm 的 null 不会被目标身份填充。
 
 每次接入新版本 catalog，带上原 edits 和 previous 重跑即可。来源暂时未提供的区服、
 英文／上下文改变、退出当前目录的旧条目都会保留历史，且不会输出旧补译。
@@ -92,10 +99,90 @@ agent 只翻译所提供的完整英文，使用同区服／语言的现有术�
 `createSupplementedLookup({bytes, sha256}, edits)` 返回显式补译查询入口。查询必须声明
 `game_patch`、`realm`、`locale`，agent 补译还要求精确 table/field/ID/English 和完整 context。
 返回结果增加 `origin: official | agent | human | null`，不会改现有官方 `createCatalogLookup`
-的签名、行为或五模块闭包。PoBR 现有官方目录不会因工作表有草稿就暗中加载它们。
+的官方优先行为。v3 官方查询按其原有契约额外传入固定 sidecar；它仍只返回官方文本。
+PoBR 现有官方目录不会因工作表有草稿或运行包就暗中加载它们。
 
 官方补译会自动优先，旧 agent 文本及差异标记仍保留。catalog 摘要或版本变化后，旧补译
 须重新核对；英文或 context 变化会产生新的 entry_id，旧条目进入历史，禁止自动套用。
+
+## 紧凑 reviewed 运行接口（v1）
+
+PoBR 的显示／显式范围消费者可使用本库 `src/translation-workbench.mjs` 的独立接口。
+这只是可接入接口；本提交没有修改 PoBR，也不证明它已经消费补译。
+
+```js
+import { exportReviewedSupplements, createReviewedSupplementLookup } from './src/translation-workbench.mjs';
+
+// bytes 是原 catalog Buffer；sha256 必须来自调用者信任的固定 manifest。
+// v3 verification 是该输入原始 sidecar Buffer；v1/v2 可省略。
+const inputs = [{ bytes: catalogBytes, sha256: catalogSha256, verification: originalVerificationBuffer }];
+const runtime = exportReviewedSupplements(inputs, editsDocument);
+// 持久化字节格式：JSON.stringify(runtime) + '\n'（UTF-8，无缩进）。
+// 消费时使用 manifest 中固定的原字节与摘要，不能在加载时自行算摘要当作信任依据。
+const lookup = createReviewedSupplementLookup(inputs, { bytes: runtimeBytes, sha256: trustedRuntimeSha256 });
+lookup({ game_patch: '0.5.5.5', realm: 'international', locale: 'zh-CN',
+  table: 'ActiveSkills', field: 'WebsiteDescription', id: 'exact-native-id',
+  english: 'Exact supplied English', context: { GrantedEffect: 'exact-context' } });
+```
+
+`inputs` 必须包含运行包声明的所有源，每个 realm/locale 只有一个当前 catalog；顺序可不同。
+构造 lookup 时固定、验证 catalog 和运行包 SHA，以及 v3 完整 sidecar，之后只查索引。
+`reconcileNativeTranslations`、`exportReviewedSupplements` 和旧 `createSupplementedLookup`
+同样接受这一个 `verification` Buffer 字段。`manifest_sha256` 是可选的工作表溯源字段。
+
+精确稳定的运行 JSON 形状如下。`source` 是 `sources` 的零基索引；它把每条审核记录绑定到
+唯一的 patch/catalog/realm/locale 和 sidecar pin，避免逐条重复来源信息。`id` 保留 catalog 的
+原始字符串或数字类型；`context` 必须是该字段完整的英文 context 对象，保留 null 值。
+
+```json
+{
+  "schema": "poe2-reviewed-native-supplements/v1",
+  "status": "candidate",
+  "production_ready": false,
+  "sources": [{
+    "game": "poe2", "game_patch": "0.5.5.5", "realm": "international", "locale": "zh-CN",
+    "catalog_sha256": "<64 lowercase hex>",
+    "verification": {"bytes": 335031638, "sha256": "<64 lowercase hex>"}
+  }],
+  "records": [{
+    "source": 0, "entry_id": "<64 lowercase hex>",
+    "table": "ItemClasses", "field": "Name", "id": "synthetic-fixture",
+    "english": "Flask", "context": {}, "text": "药剂",
+    "origin": "agent", "author": "fixture-agent", "note": "Synthetic example only",
+    "status": "reviewed", "review": {"by": "fixture-reviewer", "note": "Synthetic example review"}
+  }]
+}
+```
+
+v1/v2 源的 `verification` 为 null。空的 `records: []` 是有效运行包，表示当前没有有效
+已审核补译。记录只含当前生效的 reviewed agent/human 补译；不含官方文本、草稿、内部占位、
+历史队列、物理表、候选和 FK witnesses。完整历史、null 阻断、全部 source reason codes
+仍由工作表保留。上面的审核者和文本仅为合成示例，不是对真实草稿的批准。
+
+加载器对来源清单逐项核对；旧 patch/catalog/sidecar、未知或重复来源、越界 source 索引、
+重复 entry/原件身份、缺少实际审核人、草稿、英文/context/ID 摘要不符、参数或数字冲突、
+非官方缺译及未验证的源绑定都会拒绝整个运行包。`entry_id` 的规则保持原工作表定义：
+对 `[identity, english, context]` 的递归排序键 JSON 做 UTF-8 SHA256，其中 identity 包括
+`game, realm, locale, table, field, id`。运行包的外部 SHA 同时固定译文与审核说明。
+
+查询必须显式给出当前 `game_patch/realm/locale`，跨范围请求抛错。官方可用译文始终先返回
+`{status:'translated', text, reason:null, ids, origin:'official'}`。补译必须再命中精确
+table/field/id/English/完整 context，返回
+`{status:'translated', text, reason:'reviewed-supplement', ids:[id], origin:'agent'|'human'}`。
+其余返回原官方 fallback 的 `{status, text, reason, ids}` 并加 `origin:null`，保留英文与诊断；
+不会利用文本同名、部分 context 或未知 ID 去猜补译。缺少／冲突绑定不是 official-missing。
+加载失败由调用者保留官方独立入口，不得把未验证运行包降级为可用补译。
+
+可从同一个固定请求重放紧凑导出：
+
+```sh
+mise exec -- node src/cli.mjs workbench-export --config request.json --out .cache/workbench/runtime-replay
+```
+
+导出重验当前 catalog、原始 sidecar 和 edits，输出 `supplements.json`、`request.json` 和
+`poe2-reviewed-native-supplements-manifest/v1` 的 `manifest.json`。manifest 固定文件字节／SHA、
+edits SHA 和全部七个 producer 模块 SHA。导出忽略 `previous`，因为历史条目永不生效；
+完整 workbench 同时生成的 `supplements.json` 应逐字节相同。两种命令均不复制重型证据。
 
 ## 国服专属内容
 

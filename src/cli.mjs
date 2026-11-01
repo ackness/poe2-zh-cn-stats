@@ -15,6 +15,8 @@ const help = `Usage: node src/cli.mjs <command>
                              Reconcile official/agent translations and region/version queues
   workbench-list --file PATH [--status pending] [--realm china] [--locale zh-CN] [--limit 50]
                              List exact native entries without activating a snapshot
+  workbench-export --config PATH --out .cache/FRESH
+                             Replay compact effective reviewed supplements from pinned inputs
   activate --snapshot PATH   Verify and activate a previously fetched candidate
   native --facts PATH --expected-manifest-sha256 SHA
                              Emit contextual native-ID localization candidates to stdout
@@ -26,7 +28,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift();
   if (!command || command === '--help' || command === 'help') { console.log(help); return; }
-  if (command === 'workbench' || command === 'workbench-list') {
+  if (['workbench', 'workbench-list', 'workbench-export'].includes(command)) {
     const { workbenchCommand } = await import('./translation-workbench.mjs');
     console.log(JSON.stringify(await workbenchCommand(command, args), null, 2));
     return;

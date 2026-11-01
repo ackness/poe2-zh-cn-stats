@@ -20,6 +20,7 @@ const identityKey = identity => canonical(identity);
 export const entryId = (identity, english, context) => hash(canonical([identity, english, context]));
 const annotationSchema = 'poe2-native-translation-edits/v1';
 const workbenchSchema = 'poe2-translation-workbench/v1';
+const runtimeSchema = 'poe2-reviewed-native-supplements/v1';
 
 function parseEdits(document) {
   require(document?.schema === annotationSchema && Array.isArray(document.entries), 'Invalid native translation edits');
@@ -80,10 +81,40 @@ function editState(edit, entry) {
   return { status: edit.status, reason: null };
 }
 
-/** Each input is an externally pinned native catalog body, not a partial record list. */
-export function reconcileNativeTranslations(inputs, document = { schema: annotationSchema, entries: [] }, previous = null) {
+function agentBlocker(row, state = officialState(row)) {
+  const internal = /\[(?:DNT[^\]]*|UNUSED)\]|\bWIP\b|^(?:NAME|TBD|\?+)$/u.test(row.english ?? '');
+  return state !== 'missing' ? 'official-' + state : internal ? 'internal-placeholder' : safetyIssue(row.english, row.english);
+}
+
+// Keep the original sidecar Buffer only here, once per input. Entries and runtime
+// sources carry pins, never physical tables, FK witnesses or copied sidecars.
+function validatedCatalogs(inputs) {
   require(Array.isArray(inputs) && inputs.length > 0, 'At least one pinned catalog is required');
-  const edits = parseEdits(document), old = new Map(), entries = new Map(), families = new Set(), sources = [];
+  const families = new Set();
+  return inputs.map(input => {
+    require(pin(input.sha256) && hash(input.bytes) === input.sha256, 'Catalog SHA256 mismatch');
+    const catalog = strictJson(input.bytes);
+    require(['international', 'china'].includes(catalog.realm) && /^\d+(?:\.\d+)+$/u.test(catalog.game_patch), 'Known target realm/patch required');
+    const official = createCatalogLookup(catalog, { ...catalog, verification: input.verification });
+    const family = canonical([catalog.game, catalog.realm, catalog.locale]);
+    require(!families.has(family), 'Only one current catalog per realm/locale; combine selected tables upstream');
+    families.add(family);
+    const source = { game: catalog.game, realm: catalog.realm, locale: catalog.locale,
+      game_patch: catalog.game_patch, catalog_sha256: input.sha256, manifest_sha256: input.manifest_sha256 ?? null,
+      observed_client: catalog.observed_client ?? null,
+      ...(catalog.fk_verification ? { fk_verification: catalog.fk_verification } : {}) };
+    return { catalog, official, source, family };
+  });
+}
+
+/** Each input is {bytes, sha256, verification?: original Buffer, manifest_sha256?}. */
+export function reconcileNativeTranslations(inputs, document = { schema: annotationSchema, entries: [] }, previous = null) {
+  return reconcile(validatedCatalogs(inputs), document, previous);
+}
+
+function reconcile(catalogs, document, previous = null) {
+  const edits = parseEdits(document), old = new Map(), entries = new Map();
+  const families = new Set(catalogs.map(c => c.family)), sources = catalogs.map(c => c.source);
   if (previous !== null) {
     require(previous.schema === workbenchSchema && Array.isArray(previous.entries), 'Invalid previous workbench');
     for (const entry of previous.entries) {
@@ -92,23 +123,13 @@ export function reconcileNativeTranslations(inputs, document = { schema: annotat
       old.set(entry.entry_id, entry);
     }
   }
-  for (const input of inputs) {
-    require(pin(input.sha256) && hash(input.bytes) === input.sha256, 'Catalog SHA256 mismatch');
-    const catalog = strictJson(input.bytes);
-    require(['international', 'china'].includes(catalog.realm) && /^\d+(?:\.\d+)+$/u.test(catalog.game_patch), 'Known target realm/patch required');
-    createCatalogLookup(catalog, catalog); // Reuse the authoritative record/binding/template validation.
-    const family = canonical([catalog.game, catalog.realm, catalog.locale]);
-    require(!families.has(family), 'Only one current catalog per realm/locale; combine selected tables upstream');
-    families.add(family);
-    sources.push({ game: catalog.game, realm: catalog.realm, locale: catalog.locale,
-      game_patch: catalog.game_patch, catalog_sha256: input.sha256, manifest_sha256: input.manifest_sha256 ?? null,
-      observed_client: catalog.observed_client ?? null });
+  for (const { catalog, source } of catalogs) {
     for (const row of catalog.records) {
       const identity = { game: catalog.game, realm: catalog.realm, locale: catalog.locale,
         table: row.table, field: row.field, id: row.id };
       const id = entryId(identity, row.english, row.context.english), before = old.get(id);
       require(!entries.has(id), 'Duplicate workbench identity');
-      const state = officialState(row), current = { game_patch: catalog.game_patch, catalog_sha256: input.sha256 };
+      const state = officialState(row), current = { game_patch: catalog.game_patch, catalog_sha256: source.catalog_sha256 };
       const seen = [...(before?.seen_in ?? [])];
       if (!seen.some(r => same(r, current))) seen.push(current);
       const entry = { entry_id: id, identity, english: row.english, context: row.context.english, current, seen_in: seen,
@@ -120,9 +141,7 @@ export function reconcileNativeTranslations(inputs, document = { schema: annotat
           observed_candidates: row.applicability?.reason_codes.includes('target-missing-key') ? row.candidates : null },
         translation: edits.get(id) ?? null, lifecycle: 'current' };
       entry.translation_review = editState(entry.translation, entry);
-      const internal = /\[(?:DNT[^\]]*|UNUSED)\]|\bWIP\b|^(?:NAME|TBD|\?+)$/u.test(row.english ?? '');
-      entry.agent_blocker = state !== 'missing' ? 'official-' + state : internal ? 'internal-placeholder'
-        : safetyIssue(row.english, row.english);
+      entry.agent_blocker = agentBlocker(row, state);
       entry.agent_eligible = entry.agent_blocker === null;
       const usable = entry.agent_eligible && entry.translation_review.status === 'reviewed';
       entry.effective_translation = { text: state === 'available' ? row.localized : usable ? entry.translation.text : null,
@@ -152,21 +171,78 @@ export function reconcileNativeTranslations(inputs, document = { schema: annotat
     policy: 'Official translations win. Only reviewed supplements for exact catalog/patch/realm/locale/ID/English/context apply. Missing target rows are not proof of China-exclusive content. Drafts never become official or numeric facts.' };
 }
 
-/** Exact identity only. Never let curated text defeat an official binding rejection. */
-export function createSupplementedLookup(input, edits) {
-  const book = reconcileNativeTranslations([input], edits);
-  const catalog = strictJson(input.bytes), official = createCatalogLookup(catalog, catalog);
-  const entries = new Map(book.entries.map(r => [r.entry_id, r]));
+const runtimeSource = source => ({ game: source.game, game_patch: source.game_patch, realm: source.realm,
+  locale: source.locale, catalog_sha256: source.catalog_sha256,
+  verification: source.fk_verification ? { bytes: source.fk_verification.bytes, sha256: source.fk_verification.sha256 } : null });
+
+function compact(book) {
+  const sources = book.sources.map(runtimeSource);
+  const records = book.entries.filter(r => r.lifecycle === 'current' && r.agent_eligible
+    && r.translation_review.status === 'reviewed' && ['agent', 'human'].includes(r.effective_translation.origin))
+    .map(r => ({ source: sources.findIndex(s => s.catalog_sha256 === r.current.catalog_sha256
+      && s.realm === r.identity.realm && s.locale === r.identity.locale), entry_id: r.entry_id,
+    table: r.identity.table, field: r.identity.field, id: r.identity.id, english: r.english, context: r.context,
+    text: r.translation.text, origin: r.translation.origin, author: r.translation.author, note: r.translation.note,
+    status: 'reviewed', review: r.translation.review }));
+  return { schema: runtimeSchema, status: 'candidate', production_ready: false, sources, records };
+}
+
+/** Export only effective current reviewed supplements; no history/evidence payloads. */
+export function exportReviewedSupplements(inputs, edits = { schema: annotationSchema, entries: [] }) {
+  return compact(reconcile(validatedCatalogs(inputs), edits));
+}
+
+function runtimeLookup(catalogs, runtime) {
+  require(runtime?.schema === runtimeSchema && runtime.status === 'candidate' && runtime.production_ready === false
+    && Array.isArray(runtime.sources) && Array.isArray(runtime.records), 'Invalid reviewed supplement runtime');
+  const scopes = new Map(catalogs.map(c => [c.family, c])), used = new Set();
+  const sources = runtime.sources.map(source => {
+    const family = canonical([source.game, source.realm, source.locale]), current = scopes.get(family);
+    require(current && !used.has(family) && same(source, runtimeSource(current.source)), 'Unknown/duplicate/stale runtime source');
+    used.add(family); return current;
+  });
+  require(used.size === catalogs.length, 'Runtime source inventory differs');
+  const catalogRows = sources.map(c => new Map(c.catalog.records.map(row => [canonical([row.table, row.field, row.id]), row])));
+  const entries = new Map(), identities = new Set();
+  for (const record of runtime.records) {
+    require(Number.isSafeInteger(record.source) && sources[record.source], 'Unknown runtime record source');
+    const { catalog, source } = sources[record.source];
+    const identity = { game: catalog.game, realm: catalog.realm, locale: catalog.locale,
+      table: record.table, field: record.field, id: record.id };
+    const based_on = { game_patch: source.game_patch, catalog_sha256: source.catalog_sha256 };
+    const edit = parseEdits({ schema: annotationSchema, entries: [{ ...record, identity, based_on }] }).get(record.entry_id);
+    const row = catalogRows[record.source].get(canonical([record.table, record.field, record.id]));
+    require(record.status === 'reviewed' && row && row.english === record.english && same(row.context.english, record.context),
+      'Runtime supplement English/context/identity differs');
+    require(agentBlocker(row) === null && safetyIssue(row.english, record.text) === null, 'Runtime supplement is not effective for source');
+    require(!entries.has(record.entry_id) && !identities.has(identityKey(identity)), 'Duplicate runtime supplement identity');
+    entries.set(record.entry_id, edit); identities.add(identityKey(identity));
+  }
   return query => {
-    for (const key of ['game_patch', 'realm', 'locale']) require(query[key] === catalog[key], `Supplement query ${key} differs`);
+    const scope = scopes.get(canonical(['poe2', query?.realm, query?.locale]));
+    require(scope, 'Supplement query realm/locale differs');
+    const { catalog, official } = scope;
+    require(query.game_patch === catalog.game_patch, 'Supplement query game_patch differs');
     const result = official(query);
     if (result.status === 'translated') return { ...result, origin: 'official' };
     if (!Object.hasOwn(query, 'id') || !Object.hasOwn(query, 'context')) return { ...result, origin: null };
     const identity = { game: catalog.game, realm: catalog.realm, locale: catalog.locale, table: query.table, field: query.field, id: query.id };
-    const row = entries.get(entryId(identity, query.english, query.context));
-    return row?.effective_translation.origin ? { status: 'translated', text: row.effective_translation.text,
-      origin: row.effective_translation.origin, reason: 'reviewed-supplement', ids: [query.id] } : { ...result, origin: null };
+    const edit = entries.get(entryId(identity, query.english, query.context));
+    return edit ? { status: 'translated', text: edit.text, origin: edit.origin,
+      reason: 'reviewed-supplement', ids: [query.id] } : { ...result, origin: null };
   };
+}
+
+/** Pinned compact runtime + pinned original catalogs; validate once, then query. */
+export function createReviewedSupplementLookup(inputs, runtime) {
+  require(pin(runtime?.sha256) && hash(runtime.bytes) === runtime.sha256, 'Runtime SHA256 mismatch');
+  return runtimeLookup(validatedCatalogs(inputs), strictJson(runtime.bytes));
+}
+
+/** Existing edits API, with the same validation/policy as the compact consumer. */
+export function createSupplementedLookup(input, edits = { schema: annotationSchema, entries: [] }) {
+  const catalogs = validatedCatalogs([input]);
+  return runtimeLookup(catalogs, compact(reconcile(catalogs, edits)));
 }
 
 async function readInput(file, expected) {
@@ -183,7 +259,7 @@ async function readInput(file, expected) {
   } finally { await fd.close(); }
 }
 
-export async function writeWorkbench(config, out) {
+async function readWorkbenchInputs(config) {
   require(config?.schema === 'poe2-translation-workbench-request/v1' && Array.isArray(config.catalogs)
     && config.catalogs.length > 0 && config.catalogs.length <= 4, 'Invalid workbench request');
   const inputs = [];
@@ -191,7 +267,7 @@ export async function writeWorkbench(config, out) {
     const raw = await readInput(source.manifest);
     require(pin(source.sha256) && hash(raw) === source.sha256, 'Manifest SHA256 mismatch');
     const manifest = strictJson(raw);
-    require(['poe2-native-catalog-manifest/v1', 'poe2-native-catalog-manifest/v2'].includes(manifest.schema)
+    require(['poe2-native-catalog-manifest/v1', 'poe2-native-catalog-manifest/v2', 'poe2-native-catalog-manifest/v3'].includes(manifest.schema)
       && manifest.status === 'candidate' && manifest.production_ready === false, 'Invalid catalog manifest');
     const catalogPin = manifest.files?.['catalog.json'];
     require(catalogPin && pin(catalogPin.sha256), 'Missing pinned catalog identity');
@@ -199,15 +275,33 @@ export async function writeWorkbench(config, out) {
     const catalog = strictJson(bytes);
     require(catalog.schema === manifest.schema.replace('-manifest', '')
       && ['game', 'game_patch', 'realm', 'locale'].every(k => catalog[k] === manifest[k]), 'Manifest/catalog identity differs');
-    inputs.push({ bytes, sha256: manifest.files['catalog.json'].sha256, manifest_sha256: source.sha256 });
+    let verification;
+    if (catalog.schema === 'poe2-native-catalog/v3') {
+      const sidecar = manifest.files['verification.json'];
+      require(sidecar && same(catalog.fk_verification, { file: 'verification.json', ...sidecar }), 'Manifest/catalog verification pin differs');
+      verification = await readInput(path.join(path.dirname(source.manifest), 'verification.json'), sidecar);
+    }
+    inputs.push({ bytes, sha256: catalogPin.sha256, manifest_sha256: source.sha256, verification });
   }
+  return inputs;
+}
+
+export async function writeWorkbench(config, out) { return writeWorkbenchOutput(config, out, false); }
+export async function writeReviewedSupplements(config, out) { return writeWorkbenchOutput(config, out, true); }
+
+async function writeWorkbenchOutput(config, out, runtimeOnly) {
+  const inputs = await readWorkbenchInputs(config);
   const editsRaw = config.edits ? await readInput(config.edits) : Buffer.from(serialize({ schema: annotationSchema, entries: [] }));
-  const previousRaw = config.previous ? await readInput(config.previous) : null;
+  // A compact replay depends only on current catalog + edits. Retired/out-of-scope
+  // history is retained by the full workbench and can never contribute runtime text.
+  const previousRaw = !runtimeOnly && config.previous ? await readInput(config.previous) : null;
   const book = reconcileNativeTranslations(inputs, strictJson(editsRaw), previousRaw ? strictJson(previousRaw) : null);
+  const runtime = compact(book);
   const output = path.resolve(out), cache = path.join(ROOT, '.cache');
   require(output.startsWith(cache + path.sep) && await realpath(path.dirname(output)) === path.dirname(output), 'Output must be a fresh repository cache directory');
   await mkdir(output); // Existing outputs are never overwritten.
-  const files = { 'workbench.json': serialize(book), 'queues.json': serialize(book.queues),
+  const runtimeFiles = { 'supplements.json': JSON.stringify(runtime) + '\n', 'request.json': serialize(config) };
+  const files = runtimeOnly ? runtimeFiles : { 'workbench.json': serialize(book), 'queues.json': serialize(book.queues),
     'worklist.json': serialize({ schema: 'poe2-native-translation-worklist/v1', sources: book.sources,
       counts: Object.fromEntries(Object.entries(book.queues).map(([k, v]) => [k, v.length])),
       entries: book.entries.filter(r => r.lifecycle === 'current' && r.agent_eligible) }),
@@ -217,28 +311,31 @@ export async function writeWorkbench(config, out) {
     'report.md': '# 原件补译工作表\n\n官方、补译、区服和版本状态分别保留。此候选未激活。\n\n'
       + '| 状态 | 条数 |\n| --- | ---: |\n' + Object.entries(book.queues).map(([k, v]) => `| ${k} | ${v.length} |`).join('\n')
       + '\n\n`regional-review` 与工作流状态可重叠；不是国服专属数量。使用 `workbench-list --file workbench.json --status pending` 查看完整条目。\n',
-    'edits.json': editsRaw, 'request.json': serialize(config) };
+    'edits.json': editsRaw, ...runtimeFiles };
   for (const [file, bytes] of Object.entries(files)) await writeFile(path.join(output, file), bytes, { flag: 'wx' });
-  const manifest = { schema: 'poe2-translation-workbench-manifest/v1', status: 'candidate', production_ready: false,
+  const manifest = { schema: runtimeOnly ? 'poe2-reviewed-native-supplements-manifest/v1' : 'poe2-translation-workbench-manifest/v1', status: 'candidate', production_ready: false,
     edits_sha256: hash(editsRaw), previous_sha256: previousRaw ? hash(previousRaw) : null,
     files: Object.fromEntries(Object.entries(files).map(([file, bytes]) => [file, { bytes: Buffer.byteLength(bytes), sha256: hash(bytes) }])),
-    producer: Object.fromEntries(await Promise.all(['translation-workbench.mjs', 'native-catalog.mjs', 'native-catalog-binding.mjs', 'native-names.mjs', 'native-localization.mjs', 'strict-json.mjs']
+    producer: Object.fromEntries(await Promise.all(['translation-workbench.mjs', 'native-catalog.mjs', 'native-catalog-binding.mjs', 'native-catalog-fk-binding.mjs', 'native-names.mjs', 'native-localization.mjs', 'strict-json.mjs']
       .map(async file => [file, hash(await readFile(path.join(ROOT, 'src', file)))]))) };
   await writeFile(path.join(output, 'manifest.json'), serialize(manifest), { flag: 'wx' });
-  return { manifest, counts: Object.fromEntries(Object.entries(book.queues).map(([k, v]) => [k, v.length])), orphaned_edits: book.orphaned_edits.length };
+  return { manifest, records: runtime.records.length,
+    counts: Object.fromEntries(Object.entries(book.queues).map(([k, v]) => [k, v.length])), orphaned_edits: book.orphaned_edits.length };
 }
 
 export async function workbenchCommand(command, args) {
-  const allowed = command === 'workbench' ? ['--config', '--out'] : ['--file', '--status', '--realm', '--locale', '--limit'];
+  require(['workbench', 'workbench-export', 'workbench-list'].includes(command), 'Unknown workbench command');
+  const writing = command !== 'workbench-list';
+  const allowed = writing ? ['--config', '--out'] : ['--file', '--status', '--realm', '--locale', '--limit'];
   const options = new Map();
   while (args.length) {
     const flag = args.shift();
     require(allowed.includes(flag) && !options.has(flag) && args[0] && !args[0].startsWith('--'), 'Unknown/incomplete workbench option');
     options.set(flag, args.shift());
   }
-  if (command === 'workbench') {
-    require(options.has('--config') && options.has('--out'), 'workbench requires --config and --out');
-    return writeWorkbench(strictJson(await readInput(options.get('--config'))), options.get('--out'));
+  if (writing) {
+    require(options.has('--config') && options.has('--out'), `${command} requires --config and --out`);
+    return (command === 'workbench' ? writeWorkbench : writeReviewedSupplements)(strictJson(await readInput(options.get('--config'))), options.get('--out'));
   }
   require(options.has('--file'), 'workbench-list requires --file');
   const book = strictJson(await readInput(options.get('--file')));

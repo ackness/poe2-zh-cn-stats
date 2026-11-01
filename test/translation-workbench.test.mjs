@@ -4,8 +4,9 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { pairDisplayCatalog } from '../src/native-catalog.mjs';
-import { reconcileNativeTranslations, createSupplementedLookup, writeWorkbench, workbenchCommand } from '../src/translation-workbench.mjs';
+import { pairDisplayCatalog, createCatalogLookup } from '../src/native-catalog.mjs';
+import { reconcileNativeTranslations, createSupplementedLookup, exportReviewedSupplements,
+  createReviewedSupplementLookup, entryId, writeWorkbench, workbenchCommand } from '../src/translation-workbench.mjs';
 
 const hash = raw => createHash('sha256').update(raw).digest('hex');
 const edits = entries => ({ schema: 'poe2-native-translation-edits/v1', entries });
@@ -27,6 +28,30 @@ function edit(source, more = {}) {
 }
 const reviewed = { status: 'reviewed', review: { by: 'fixture-reviewer', note: 'Checked meaning and placeholders' } };
 const query = more => ({ game_patch: '0.5.5.5', realm: 'international', locale: 'zh-CN', table: 'ItemClasses', field: 'Name', id: 'stable', english: 'Flask', context: {}, ...more });
+const pinned = value => { const bytes = Buffer.from(JSON.stringify(value) + '\n'); return { bytes, sha256: hash(bytes) }; };
+
+// A synthetic v2 projection, including all reasons and raw candidate strings.
+// It exercises the existing reader contract without acquiring/building data.
+function observedInput(reasons = []) {
+  const catalog = JSON.parse(input().bytes), row = catalog.records[0];
+  catalog.schema = 'poe2-native-catalog/v2';
+  catalog.observed_client = { game: 'poe2', game_patch: null, realm: null };
+  catalog.target_binding = { policy_id: 'stable-key-current-english-all-nontext/v1',
+    target_identity: { game: 'poe2', game_patch: catalog.game_patch, realm: catalog.realm },
+    tables: { ItemClasses: { records: [{ table: row.table, key_field: row.key_field, id: row.id,
+      decision: reasons.length ? 'rejected' : 'accepted', binding_kind: 'record-bound', reason_codes: reasons,
+      source_default_rows: [0], source_localized_rows: [0], target_rows: [0], english: { Name: row.english },
+      comparison: { source_nontext_equal: true, target_nontext_equal: true, target_english_equal: true },
+      differing_fields: { source_nontext: [], target_nontext: [], target_english: [] } }] } } };
+  row.applicability = { binding_record: 0, decision: reasons.length ? 'rejected' : 'accepted', binding_kind: 'record-bound', reason_codes: reasons };
+  if (reasons.length) {
+    row.reason = 'target-binding-rejected';
+    row.candidates = Object.fromEntries(['english', 'localized', 'default'].map(side => [side,
+      [{ row: 0, text: row.english, context: {} }]]));
+  }
+  catalog.coverage.ItemClasses.Name.source_default_rows = 1;
+  return pinned(catalog);
+}
 
 test('official missing, source unverified, empty and internal strings remain distinct', () => {
   assert.equal(entry(input()).official_translation.status, 'missing');
@@ -134,6 +159,12 @@ test('fresh workbench CLI files replay exactly, list by region/status, never ove
   const config = { schema: 'poe2-translation-workbench-request/v1', catalogs: [{ manifest: path.join(base, 'manifest.json'), sha256: hash(manifest) }] };
   const a = await writeWorkbench(config, path.join(base, 'a')); await writeWorkbench(config, path.join(base, 'b'));
   for (const file of [...Object.keys(a.manifest.files), 'manifest.json']) assert.deepEqual(await readFile(path.join(base, 'a', file)), await readFile(path.join(base, 'b', file)));
+  const exported = await workbenchCommand('workbench-export', ['--config', await (async () => {
+    const file = path.join(base, 'request.json'); await writeFile(file, JSON.stringify(config)); return file;
+  })(), '--out', path.join(base, 'export')]);
+  assert.equal(exported.manifest.schema, 'poe2-reviewed-native-supplements-manifest/v1');
+  assert.deepEqual(Object.keys(exported.manifest.files).sort(), ['request.json', 'supplements.json']);
+  assert.deepEqual(await readFile(path.join(base, 'a/supplements.json')), await readFile(path.join(base, 'export/supplements.json')));
   const result = await workbenchCommand('workbench-list', ['--file', path.join(base, 'a/workbench.json'), '--status', 'pending', '--realm', 'international']);
   assert.equal(result.total, 1); assert.equal(result.entries[0].english, 'Flask');
   await assert.rejects(writeWorkbench(config, path.join(base, 'a')), /EEXIST/);
@@ -161,4 +192,152 @@ test('Git JSON inputs have no fixed cap while catalog byte and hash pins remain 
   await assert.rejects(writeWorkbench(await publish(''), path.join(base, 'wrong-hash')), /Pinned input differs/);
   delete manifest.files['catalog.json'];
   await assert.rejects(writeWorkbench(await publish(''), path.join(base, 'missing-pin')), /Missing pinned catalog/);
+});
+
+test('compact synthetic reviewed export is pinned, scoped, deterministic and keeps official lookup official-only', () => {
+  const source = input(), manual = edit(source, reviewed);
+  const runtime = exportReviewedSupplements([source], edits([manual]));
+  assert.deepEqual(runtime, exportReviewedSupplements([source], edits([manual])));
+  assert.equal(runtime.schema, 'poe2-reviewed-native-supplements/v1');
+  assert.deepEqual(runtime.sources, [{ game: 'poe2', game_patch: '0.5.5.5', realm: 'international', locale: 'zh-CN',
+    catalog_sha256: source.sha256, verification: null }]);
+  assert.equal(runtime.records.length, 1);
+  assert.deepEqual(runtime.records[0].review, reviewed.review);
+  assert.equal(runtime.records[0].entry_id, manual.entry_id);
+  assert.equal(runtime.records[0].source, 0);
+  assert(!Object.hasOwn(runtime.records[0], 'seen_in'));
+  assert(!Object.hasOwn(runtime.records[0], 'effective_translation'));
+  const catalog = JSON.parse(source.bytes);
+  assert.equal(createCatalogLookup(catalog, catalog)(query()).reason, 'unchanged-text');
+  const lookup = createReviewedSupplementLookup([source], pinned(runtime));
+  assert.deepEqual(lookup(query()), { status: 'translated', text: '药剂', origin: 'agent', reason: 'reviewed-supplement', ids: ['stable'] });
+  assert.equal(lookup(query({ id: 'unknown' })).reason, 'missing-identity-or-text');
+  assert.equal(lookup(query({ english: 'Old English' })).reason, 'source-english-changed');
+  assert.equal(lookup(query({ context: undefined })).origin, null);
+  assert.throws(() => lookup(query({ game_patch: '0.5.5.6' })), /game_patch/);
+  assert.throws(() => lookup(query({ realm: 'china' })), /realm/);
+  assert.throws(() => lookup(query({ locale: 'zh-TW' })), /locale/);
+  const china = input({ realm: 'china' }), tw = input({ locale: 'zh-TW' });
+  const multiEdits = edits([manual, edit(china, { ...reviewed, origin: 'human', text: '国服药剂' })]);
+  const multi = pinned(exportReviewedSupplements([source, china, tw], multiEdits));
+  const scoped = createReviewedSupplementLookup([tw, china, source], multi);
+  assert.equal(scoped(query({ realm: 'china' })).text, '国服药剂');
+  assert.equal(scoped(query({ realm: 'china' })).origin, 'human');
+  assert.equal(scoped(query()).text, '药剂');
+  assert.equal(scoped(query({ locale: 'zh-TW' })).origin, null);
+});
+
+test('runtime excludes drafts, rejected/stale edits, blockers and official text; source rejection is unverified', () => {
+  for (const source of [input(), input({ missing: true }), input({ english: '[DNT] Flask' }),
+    input({ english: 'Gain {} Life' }), input({ localized: '官方药瓶' }), observedInput(['target_nontext-mismatch', 'fk-key-mismatch'])]) {
+    for (const state of [{}, { status: 'rejected' }, reviewed]) {
+      const manual = edit(source, state), runtime = exportReviewedSupplements([source], edits([manual]));
+      if (source.sha256 === input().sha256 && state === reviewed) assert.equal(runtime.records.length, 1);
+      else assert.equal(runtime.records.length, 0);
+    }
+  }
+  const source = observedInput(['target_nontext-mismatch', 'fk-key-mismatch']);
+  const previous = reconcileNativeTranslations([source], edits([edit(source, reviewed)]));
+  assert.equal(previous.entries[0].official_translation.status, 'unverified');
+  assert.equal(previous.entries[0].effective_translation.text, null);
+  assert.deepEqual(previous.entries[0].regional_scope.reason_codes, ['target_nontext-mismatch', 'fk-key-mismatch']);
+  const retired = reconcileNativeTranslations([input({ locale: 'zh-TW' })], edits([edit(source, reviewed)]), previous)
+    .entries.find(r => r.lifecycle === 'out-of-scope');
+  assert.deepEqual(retired.regional_scope.reason_codes, previous.entries[0].regional_scope.reason_codes);
+  assert.equal(retired.translation.review.by, 'fixture-reviewer');
+  const lookup = createReviewedSupplementLookup([source], pinned(exportReviewedSupplements([source])));
+  assert.equal(lookup(query()).reason, 'target-binding-rejected');
+  assert.equal(lookup(query()).origin, null);
+  // Accepted v2 missing text still supports reviewed supplements.
+  const accepted = observedInput();
+  assert.equal(createReviewedSupplementLookup([accepted], pinned(exportReviewedSupplements([accepted], edits([edit(accepted, reviewed)]))))(query()).text, '药剂');
+});
+
+test('runtime rejects stale catalog/patch, unknown sources, duplicate identities and forged review bindings', () => {
+  const source = input(), runtime = exportReviewedSupplements([source], edits([edit(source, reviewed)]));
+  assert.throws(() => createReviewedSupplementLookup([source], { ...pinned(runtime), sha256: 'f'.repeat(64) }), /Runtime SHA256/);
+  for (const mutate of [
+    r => { r.sources[0].catalog_sha256 = 'a'.repeat(64); },
+    r => { r.sources[0].game_patch = '0.5.5.6'; },
+    r => { r.sources[0].realm = 'china'; },
+    r => { r.sources[0].locale = 'zh-TW'; },
+    r => { r.sources.push(r.sources[0]); },
+    r => { r.sources = []; },
+    r => { r.records[0].source = 2; },
+    r => { r.records.push(r.records[0]); },
+    r => { r.records[0].review = null; },
+    r => { r.records[0].status = 'draft'; },
+    r => { r.records[0].english = 'Wrong English'; },
+    r => { r.records[0].english = 'Wrong English'; r.records[0].entry_id = entryId(edit(source).identity, r.records[0].english, r.records[0].context); },
+    r => { r.records[0].id = 'unknown'; },
+    r => { r.records[0].context = { unknown: 1 }; },
+    r => { r.records[0].text = '药剂 999'; },
+  ]) {
+    const forged = structuredClone(runtime); mutate(forged);
+    assert.throws(() => createReviewedSupplementLookup([source], pinned(forged)), /runtime|Runtime|reviewer|entry_id/);
+  }
+  for (const update of [input({ patch: '0.5.5.6' }), input({ localized: '' }), input({ realm: 'china' })]) {
+    assert.throws(() => createReviewedSupplementLookup([update], pinned(runtime)), /runtime source/);
+    assert.equal(exportReviewedSupplements([update], edits([edit(source, reviewed)])).records.length, 0);
+  }
+});
+
+test('new official text overrides supplements, while prior review/history remains in workbench only', () => {
+  const source = input(), manual = edit(source, reviewed), update = input({ localized: '官方药瓶' });
+  const previous = reconcileNativeTranslations([source], edits([manual]));
+  const book = reconcileNativeTranslations([update], edits([manual]), previous);
+  const runtime = exportReviewedSupplements([update], edits([manual]));
+  assert.equal(runtime.records.length, 0);
+  assert.equal(book.entries[0].translation.text, '药剂');
+  assert.equal(book.entries[0].seen_in.length, 2);
+  assert.equal(book.entries[0].supplement_differs, true);
+  assert.deepEqual(createReviewedSupplementLookup([update], pinned(runtime))(query()), {
+    status: 'translated', text: '官方药瓶', reason: null, ids: ['stable'], origin: 'official' });
+});
+
+test('compact exact supplements preserve homonym/conflict fallback and require complete context', () => {
+  const row = (id, Name, ItemClass) => ({ _row: id === 'stable' ? 0 : 1, values: { Id: id, Name, Inflection: '', ItemClass } });
+  const c = JSON.parse(input().bytes);
+  Object.assign(c, pairDisplayCatalog({ BaseItemTypes: { rows: [row('stable', 'Flask', 2), row('other', 'Flask', 3)] } },
+    { BaseItemTypes: { rows: [row('stable', 'Flask', 2), row('other', '另一官方名', 3)] } }, c.language, ['BaseItemTypes']));
+  const source = pinned(c), e = reconcileNativeTranslations([source]).entries.find(r => r.identity.id === 'stable' && r.identity.field === 'Name');
+  const manual = { ...edit(input(), reviewed), entry_id: e.entry_id, identity: e.identity, english: e.english, context: e.context, based_on: e.current };
+  const lookup = createReviewedSupplementLookup([source], pinned(exportReviewedSupplements([source], edits([manual]))));
+  const q = query({ table: 'BaseItemTypes', context: { ItemClass: 2 } });
+  assert.equal(lookup(q).text, '药剂');
+  assert.equal(lookup({ ...q, context: {} }).origin, null);
+  assert.equal(lookup({ ...q, context: { ItemClass: 3 } }).reason, 'context-mismatch');
+  assert.equal(lookup({ ...q, id: 'other', context: { ItemClass: 3 } }).origin, 'official');
+  const { id, context, ...textOnly } = q;
+  assert.equal(lookup(textOnly).reason, 'unresolved-homonym');
+});
+
+test('v3 ingress requires original pinned Buffer and independently verifies its contents', async t => {
+  const c = JSON.parse(input().bytes);
+  c.schema = 'poe2-native-catalog/v3';
+  c.observed_client = { game: 'poe2', game_patch: null, realm: null };
+  c.target_binding = { policy_id: 'stable-key-pinned-fk-structure/v1',
+    target_identity: { game: 'poe2', game_patch: c.game_patch, realm: c.realm } };
+  const verification = Buffer.from('{"observed":{"retained":{},"manifest":{"format":"forged"}},"owners":{}}\n');
+  c.fk_verification = { file: 'verification.json', bytes: verification.length, sha256: hash(verification) };
+  const source = pinned(c);
+  assert.throws(() => reconcileNativeTranslations([source]), /pinned FK verification sidecar/);
+  assert.throws(() => reconcileNativeTranslations([{ ...source, verification: Buffer.from('tampered') }]), /pinned FK verification sidecar/);
+  assert.throws(() => reconcileNativeTranslations([{ ...source, verification: verification.toString() }]), /pinned FK verification sidecar/);
+  assert.throws(() => reconcileNativeTranslations([{ ...source, verification }]), /Invalid strict v2 parent/);
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const base = await mkdtemp(path.join(root, '.cache/workbench-test-')); t.after(() => rm(base, { recursive: true, force: true }));
+  await writeFile(path.join(base, 'catalog.json'), source.bytes);
+  const manifest = { schema: 'poe2-native-catalog-manifest/v3', status: c.status, production_ready: false,
+    game: c.game, game_patch: c.game_patch, realm: c.realm, locale: c.locale,
+    files: { 'catalog.json': { bytes: source.bytes.length, sha256: source.sha256 },
+      'verification.json': { bytes: verification.length, sha256: hash(verification) } } };
+  const publish = async () => {
+    const raw = Buffer.from(JSON.stringify(manifest)); await writeFile(path.join(base, 'manifest.json'), raw);
+    return { schema: 'poe2-translation-workbench-request/v1', catalogs: [{ manifest: path.join(base, 'manifest.json'), sha256: hash(raw) }] };
+  };
+  await writeFile(path.join(base, 'verification.json'), verification);
+  await assert.rejects(writeWorkbench(await publish(), path.join(base, 'forged')), /Invalid strict v2 parent/);
+  manifest.files['verification.json'].sha256 = '0'.repeat(64);
+  await assert.rejects(writeWorkbench(await publish(), path.join(base, 'wrong-pin')), /verification pin differs/);
 });
