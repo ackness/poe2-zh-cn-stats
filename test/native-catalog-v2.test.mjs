@@ -38,7 +38,7 @@ function record(d, id, overrides = {}) {
     differing_fields: { source_nontext: [], target_nontext: [], target_english: [] }, ...overrides };
 }
 const emptyComparison = { source_nontext_equal: null, target_nontext_equal: null, target_english_equal: null };
-async function fixture(t, name = 'Ascendancy') {
+async function fixture(t, name = 'Ascendancy', targetSchemaMetadata = {}) {
   await mkdir(path.join(root, '.cache'), { recursive: true });
   const dir = await mkdtemp(path.join(root, '.cache/catalog-v2-test-'));
   t.after(() => rm(dir, { recursive: true, force: true }));
@@ -49,7 +49,7 @@ async function fixture(t, name = 'Ascendancy') {
     for (const table of Object.values(d)) table.validation.rows = table.rows.length;
     const enRaw = nativeBytes({ [name]: d.target });
     const enManifest = { format: 'repoe-native-tables/v1', status: 'partial-candidate', production_ready: false,
-      schema: seed.schema, source_identity: { ...targetIdentity, raw_resources: { [d.target.raw_resource]: rawPin(d.target) } },
+      schema: { ...seed.schema, ...targetSchemaMetadata }, source_identity: { ...targetIdentity, raw_resources: { [d.target.raw_resource]: rawPin(d.target) } },
       files: { 'tables.json': fp(enRaw) } };
     const enManifestRaw = nativeBytes(enManifest);
     await writeFile(path.join(dir, 'target/tables.json'), enRaw); await writeFile(path.join(dir, 'target/manifest.json'), enManifestRaw);
@@ -95,6 +95,16 @@ async function fixture(t, name = 'Ascendancy') {
   } };
 }
 const query = (c, more = {}) => ({ table: 'Ascendancy', field: 'Name', id: c.records[0].id, english: c.records[0].english, ...more });
+
+test('v2 pins schema identity separately from sealed native package metadata', async t => {
+  const f = await fixture(t, 'Ascendancy', { compatibility_views: 0 }), config = await f.seal();
+  const c = await createNativeCatalog(config, path.join(f.dir, 'catalog'));
+  assert.equal(c.sources[1].schema.compatibility_views, 0);
+  assert.deepEqual(c.target_binding.tables.Ascendancy.target_pins.schema, seed.schema);
+  assert.equal(createCatalogLookup(c, expected)(query(c)).text, '夹具译名');
+  const wrong = await fixture(t, 'Ascendancy', { compatibility_views: 0, sha256: 'f'.repeat(64) });
+  await assert.rejects(createNativeCatalog(await wrong.seal(), path.join(wrong.dir, 'catalog')), /schema differs/);
+});
 
 test('v2 resource-bound SC text keeps null observation identity and explicit target runtime; deterministic files', async t => {
   const f = await fixture(t), config = await f.seal();
