@@ -169,13 +169,15 @@ export function createSupplementedLookup(input, edits) {
   };
 }
 
-async function readBounded(file, maximum, expected) {
+async function readInput(file, expected) {
+  if (expected) require(Number.isSafeInteger(expected.bytes) && expected.bytes >= 0 && pin(expected.sha256), 'Invalid declared input identity');
   const absolute = path.resolve(file);
   require(await realpath(absolute) === absolute, 'Input contains a symlink');
   const fd = await open(absolute, 'r');
   try {
-    const stat = await fd.stat(); require(stat.isFile() && stat.size <= maximum, 'Invalid bounded input');
-    const bytes = await fd.readFile(); require(bytes.length <= maximum, 'Input exceeds bound');
+    const stat = await fd.stat(); require(stat.isFile(), 'Input must be a regular file');
+    if (expected) require(stat.size === expected.bytes, 'Input size differs from manifest');
+    const bytes = await fd.readFile(); require(bytes.length === stat.size, 'Input size changed while reading');
     if (expected) require(bytes.length === expected.bytes && hash(bytes) === expected.sha256, 'Pinned input differs');
     return bytes;
   } finally { await fd.close(); }
@@ -186,19 +188,21 @@ export async function writeWorkbench(config, out) {
     && config.catalogs.length > 0 && config.catalogs.length <= 4, 'Invalid workbench request');
   const inputs = [];
   for (const source of config.catalogs) {
-    const raw = await readBounded(source.manifest, 1024 * 1024);
+    const raw = await readInput(source.manifest);
     require(pin(source.sha256) && hash(raw) === source.sha256, 'Manifest SHA256 mismatch');
     const manifest = strictJson(raw);
     require(['poe2-native-catalog-manifest/v1', 'poe2-native-catalog-manifest/v2'].includes(manifest.schema)
       && manifest.status === 'candidate' && manifest.production_ready === false, 'Invalid catalog manifest');
-    const bytes = await readBounded(path.join(path.dirname(source.manifest), 'catalog.json'), 128 * 1024 * 1024, manifest.files['catalog.json']);
+    const catalogPin = manifest.files?.['catalog.json'];
+    require(catalogPin && pin(catalogPin.sha256), 'Missing pinned catalog identity');
+    const bytes = await readInput(path.join(path.dirname(source.manifest), 'catalog.json'), catalogPin);
     const catalog = strictJson(bytes);
     require(catalog.schema === manifest.schema.replace('-manifest', '')
       && ['game', 'game_patch', 'realm', 'locale'].every(k => catalog[k] === manifest[k]), 'Manifest/catalog identity differs');
     inputs.push({ bytes, sha256: manifest.files['catalog.json'].sha256, manifest_sha256: source.sha256 });
   }
-  const editsRaw = config.edits ? await readBounded(config.edits, 16 * 1024 * 1024) : Buffer.from(serialize({ schema: annotationSchema, entries: [] }));
-  const previousRaw = config.previous ? await readBounded(config.previous, 256 * 1024 * 1024) : null;
+  const editsRaw = config.edits ? await readInput(config.edits) : Buffer.from(serialize({ schema: annotationSchema, entries: [] }));
+  const previousRaw = config.previous ? await readInput(config.previous) : null;
   const book = reconcileNativeTranslations(inputs, strictJson(editsRaw), previousRaw ? strictJson(previousRaw) : null);
   const output = path.resolve(out), cache = path.join(ROOT, '.cache');
   require(output.startsWith(cache + path.sep) && await realpath(path.dirname(output)) === path.dirname(output), 'Output must be a fresh repository cache directory');
@@ -234,10 +238,10 @@ export async function workbenchCommand(command, args) {
   }
   if (command === 'workbench') {
     require(options.has('--config') && options.has('--out'), 'workbench requires --config and --out');
-    return writeWorkbench(strictJson(await readBounded(options.get('--config'), 1024 * 1024)), options.get('--out'));
+    return writeWorkbench(strictJson(await readInput(options.get('--config'))), options.get('--out'));
   }
   require(options.has('--file'), 'workbench-list requires --file');
-  const book = strictJson(await readBounded(options.get('--file'), 256 * 1024 * 1024));
+  const book = strictJson(await readInput(options.get('--file')));
   require(book.schema === workbenchSchema, 'Invalid workbench');
   if (options.has('--status')) require(Object.hasOwn(book.queues, options.get('--status')), 'Unknown workbench status');
   if (options.has('--realm')) require(['china', 'international'].includes(options.get('--realm')), 'Unknown realm');

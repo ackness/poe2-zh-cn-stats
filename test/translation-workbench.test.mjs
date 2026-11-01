@@ -139,3 +139,26 @@ test('fresh workbench CLI files replay exactly, list by region/status, never ove
   await assert.rejects(writeWorkbench(config, path.join(base, 'a')), /EEXIST/);
   await assert.rejects(workbenchCommand('workbench-list', ['--file', path.join(base, 'a/workbench.json'), '--status', 'typo']), /Unknown/);
 });
+
+test('Git JSON inputs have no fixed cap while catalog byte and hash pins remain mandatory', async t => {
+  const root = fileURLToPath(new URL('../', import.meta.url));
+  const base = await mkdtemp(path.join(root, '.cache/workbench-test-')); t.after(() => rm(base, { recursive: true, force: true }));
+  const source = input(), c = JSON.parse(source.bytes);
+  await writeFile(path.join(base, 'catalog.json'), source.bytes);
+  const manifest = { schema: 'poe2-native-catalog-manifest/v1', status: c.status, production_ready: false,
+    game: c.game, game_patch: c.game_patch, realm: c.realm, locale: c.locale,
+    files: { 'catalog.json': { bytes: source.bytes.length, sha256: source.sha256 } } };
+  const publish = async suffix => {
+    const raw = Buffer.from(JSON.stringify(manifest) + suffix);
+    await writeFile(path.join(base, 'manifest.json'), raw);
+    return { schema: 'poe2-translation-workbench-request/v1', catalogs: [{ manifest: path.join(base, 'manifest.json'), sha256: hash(raw) }] };
+  };
+  await writeWorkbench(await publish(' '.repeat(1024 * 1024)), path.join(base, 'accepted'));
+  manifest.files['catalog.json'].bytes += 1;
+  await assert.rejects(writeWorkbench(await publish(''), path.join(base, 'wrong-size')), /size differs/);
+  manifest.files['catalog.json'].bytes -= 1;
+  manifest.files['catalog.json'].sha256 = '0'.repeat(64);
+  await assert.rejects(writeWorkbench(await publish(''), path.join(base, 'wrong-hash')), /Pinned input differs/);
+  delete manifest.files['catalog.json'];
+  await assert.rejects(writeWorkbench(await publish(''), path.join(base, 'missing-pin')), /Missing pinned catalog/);
+});

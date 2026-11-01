@@ -39,6 +39,9 @@ mise exec -- node src/cli.mjs workbench-list --file .cache/workbench/new/workben
 不改 CURRENT。可将新 worklist 和 regional-candidates 作为根目录两份可读快照提交，
 完整证据留 cache 或固定数据分支。快照保留输入身份，不能冒充生产采用。
 
+机器之间通过 Git 同步数据和证据，线程消息只传提交、路径及摘要。读取器不设置固定的
+JSON 文件大小上限；仍核对 manifest 声明的字节数、SHA 和实际文件，并拒绝读取中变化的大小。
+
 每次接入新版本 catalog，带上原 edits 和 previous 重跑即可。来源暂时未提供的区服、
 英文／上下文改变、退出当前目录的旧条目都会保留历史，且不会输出旧补译。
 
