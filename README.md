@@ -20,6 +20,12 @@ PoBR 负责固定产物接入、显示/输入边界和 Rust 计算。游戏 stat
 源码合并、本库快照激活和 PoBR 采用分别处理；不得因为本库更新而让 PoBR 自动追踪浮动 HEAD。
 同一文件的中英文或双端字节一致，也不等于已认证国服与国际服全部数值。
 
+当前完整语言 owner 声明通过 [`publication/index.json`](publication/index.json) 的显式序号发现，
+再冻结为完整 descriptor Git pin，支持同 patch 的语言、审核输入和工具发布。
+七角色契约、bootstrap／登记 API 及边界见 [发布索引](docs/publication-index.md)。
+`mise run publication:check` 仅离线核对登记声明和既有证据；真实上游发现、重新生产、完整 guard、
+远端发布及 PoBR 验证采用仍各自执行，不能据此声称永远自动同步已完成。
+
 ## 使用
 
 本地开发统一使用 mise，`mise.toml` 请求 `node = "latest"`，提交的 `mise.lock` 固定实际稳定版本（与 PoBR 对齐），npm 随该 Node 版本提供。

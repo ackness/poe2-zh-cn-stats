@@ -28,3 +28,11 @@ run = "node src/cli.mjs native"
 [tasks."native:check"]
 description = "Verify a saved native localization candidate against the same pinned RePoE input"
 run = "node src/cli.mjs native-check"
+
+[tasks."publication:check"]
+description = "Validate the pinned complete language-owner publication declarations offline"
+run = "npm run publication:check"
+
+[tasks."publication:test"]
+description = "Run only the small synthetic publication registry regressions"
+run = "npm run test:publication"
