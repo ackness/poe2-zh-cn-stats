@@ -156,6 +156,35 @@ test('same-patch new language advances only that role and uses exact predecessor
   await assert.rejects(registerPublication({ repo: f.repo, head: old }), /sequence|predecessor/u);
 });
 
+test('same-patch source-binding-only publication preserves every unchanged role frontier', async () => {
+  const f = await fixture(), first = await bootstrapPublication(f.locks), old = f.publish(first);
+  await registerPublication({ repo: f.repo, head: old });
+  const next = structuredClone(first); next.sequence = 2; next.previous = old;
+  next.bindings.display_source.revision = 'e'.repeat(40);
+  const head = f.publish(next);
+  await registerPublication({ repo: f.repo, head });
+  const actual = await checkPublication({ repo: f.repo });
+  assert.equal(actual.index.sequence, 2);
+  assert.deepEqual(actual.descriptor.components, first.components);
+  assert.deepEqual(actual.descriptor.bindings, next.bindings);
+  assert.deepEqual(actual.descriptor.evidence, first.evidence);
+  const before = await readFile(path.join(f.repo, 'publication/index.json'));
+  const bad = structuredClone(next); bad.sequence = 3; bad.previous = head;
+  bad.bindings.display_source.manifest.sha256 = 'a'.repeat(64);
+  await assert.rejects(registerPublication({ repo: f.repo, head: f.publish(bad) }), /source-catalog/u);
+  assert.deepEqual(await readFile(path.join(f.repo, 'publication/index.json')), before);
+});
+
+test('empty publication advancement keeps the existing index and no success residue', async () => {
+  const f = await fixture(), first = await bootstrapPublication(f.locks), old = f.publish(first);
+  await registerPublication({ repo: f.repo, head: old });
+  const before = await readFile(path.join(f.repo, 'publication/index.json'));
+  const next = structuredClone(first); next.sequence = 2; next.previous = old;
+  await assert.rejects(registerPublication({ repo: f.repo, head: f.publish(next) }), /no changed role input/u);
+  assert.deepEqual(await readFile(path.join(f.repo, 'publication/index.json')), before);
+  assert.deepEqual(await readdir(path.join(f.repo, 'publication')), ['index.json']);
+});
+
 test('fixed publication revisions ignore local replacement refs', async () => {
   const f = await fixture(), descriptor = await bootstrapPublication(f.locks), head = f.publish(descriptor);
   await registerPublication({ repo: f.repo, head });

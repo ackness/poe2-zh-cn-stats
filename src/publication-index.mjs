@@ -275,7 +275,9 @@ function transition(next, previous, previousPin) {
     const a = next.components[r], b = previous.components[r];
     assert(a.sequence === b.sequence + (same(a.input, b.input) ? 0 : 1), `${r}: role sequence must advance only for changed input`);
   }
-  assert(ROLES.some(r => !same(next.components[r].input, previous.components[r].input)), 'publication has no changed role input');
+  assert(ROLES.some(r => !same(next.components[r].input, previous.components[r].input))
+    || !same(next.bindings, previous.bindings) || !same(next.evidence, previous.evidence),
+    'publication has no changed role input, binding or evidence');
 }
 async function checkHead(head, reader) {
   gitPin(head, 'head');

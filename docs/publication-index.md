@@ -46,7 +46,8 @@ bootstrap 对应当前三个真实消费锁，完整复制以下 JSON 子对象�
 | `locale_generation` | `locale-generation.lock.json` 整份文档，含 schema、target、三模块 producer 和 input manifest |
 
 bootstrap 的所有角色 sequence 均为 1。后续将完整 `input` 作结构比较（JSON key 顺序不影响比较），
-未变角色保留序号，变化角色恰好 +1。全局新发布须至少一个角色 input 改变。
+未变角色保留序号，变化角色恰好 +1。全局新发布须至少有角色 input、完整绑定或验证证据改变；
+仅绑定或证据更新时，未变角色的序号保持不变。三者均未变化的空推进拒绝。
 同序号不同 descriptor pin、回退、跳序、缺前驱或错误前驱均拒绝。
 已登记的同一精确 head 再登记为 `unchanged`，不重写索引。
 新 patch 仍沿相同 game/realm 通道递增，各角色实际 metadata 必须与新 target 相符。
