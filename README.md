@@ -255,6 +255,15 @@ mise exec -- node --test test/native-names.test.mjs
 
 需要名称之外的技能说明、职业/天赋风味文本和 inflection 时，使用[原件显示目录](docs/native-catalog.md)。该目录覆盖九表的 18 个明确显示列，保留逐字段来源列、稳定身份、消歧上下文、完整原文和模板诊断，另提供会诚实回退的精确查询；支持显式部分表范围。它不改变现有名称 v1 的配对规则，也不代替 PoBR 的 DTO、加载与显示接线。
 
+### PoBR 运行时语言文件
+
+PoBR 不再自行生成语言数据。它读取的 `i18n/zh-CN/display_texts.json`、
+`i18n/zh-CN/stat_lines.json` 和 `i18n/zh-TW/{base_items,skills,mods}.json`
+由本库的 `mise run pobr:display-texts`、`pobr:stat-lines`、`pobr:names` 生成到
+`.cache/` 候选目录，再经 `handoff/<name>` 目录与 tag 发布。请求格式、取舍规则和
+与 `handoff/locale-retained-20261101` 的逐字节重放记录见
+[PoBR 语言文件生产者](docs/pobr-locale-producers.md)。
+
 
 ## 配对与来源优先级
 
