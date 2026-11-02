@@ -37,6 +37,7 @@ ref 的完整词典副本。导出器校验整个清单、显式目标、locale�
 这只是固定已接受投影的重放，不替代现有 v3 catalog、原始大 verification sidecar、
 RePoE binding 与 reviewed workbench 的构建时校验；生成新投影时仍必须运行原有完整
 guard。sidecar 属于构建校验输入，不能塞进运行时显示投影。导出不改变 PoBR 的锁、
-CURRENT、来源接受决定或发布状态；消费接线及清除 PoBR 旧副本由协调者处理。
+CURRENT、来源接受决定或发布状态。当前固定消费接线及 PoBR 完整语言副本迁出已完成（PoBR PR218／219）；
+后续语言产物变化仍需更新精确消费锁并验证，不能把重放成功当作新的接受或采用。
 
 实际旧词典投影及固定选取层的独立生成契约见 [locale-generation.md](locale-generation.md)；本导出器仍只重放固定字节。
