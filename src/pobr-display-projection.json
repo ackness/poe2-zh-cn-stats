@@ -1,0 +1,8 @@
+{
+  "scopes": [
+    "BaseItemTypes.Name",
+    "Characters.Name",
+    "Ascendancy.Name"
+  ],
+  "literals": "all-catalog-conflict-participants"
+}
