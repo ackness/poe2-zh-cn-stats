@@ -130,7 +130,8 @@ export function validateIndex(bytes) {
 // Git reads never resolve a branch, follow filesystem symlinks, fetch, or inflate tables.
 function gitReader(repo) {
   const cache = new Map();
-  const git = async args => (await run('git', ['-C', repo, ...args], { encoding: 'buffer', maxBuffer: ARCHIVE_LIMIT + META_LIMIT })).stdout;
+  const git = async args => (await run('git', ['--no-lazy-fetch', '--no-replace-objects', '-C', repo, ...args],
+    { encoding: 'buffer', maxBuffer: ARCHIVE_LIMIT + META_LIMIT })).stdout;
   async function stat(revision, name) {
     assert(fullrev(revision), 'full revision required'); safePath(name);
     assert((await git(['cat-file', '-t', revision])).toString().trim() === 'commit', 'revision is not a commit');

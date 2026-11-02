@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdir, mkdtemp, readFile, writeFile, symlink, readdir } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, writeFile, symlink, readdir, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { bootstrapPublication, bytePin, checkPublication, registerPublication,
   validateDescriptor, validateIndex, OWNER, ROLES, SCOPE } from '../src/publication-index.mjs';
@@ -154,6 +154,39 @@ test('same-patch new language advances only that role and uses exact predecessor
   assert.equal(result.descriptor.components.language.sequence, 2);
   for (const r of ROLES.filter(r => r !== 'language')) assert.deepEqual(result.descriptor.components[r], first.components[r]);
   await assert.rejects(registerPublication({ repo: f.repo, head: old }), /sequence|predecessor/u);
+});
+
+test('fixed publication revisions ignore local replacement refs', async () => {
+  const f = await fixture(), descriptor = await bootstrapPublication(f.locks), head = f.publish(descriptor);
+  await registerPublication({ repo: f.repo, head });
+  const replacement = f.publish({ ...descriptor, owner: 'synthetic/replacement' });
+  execFileSync('git', ['-C', f.repo, 'replace', head.revision, replacement.revision]);
+  const checked = await checkPublication({ repo: f.repo });
+  assert.deepEqual(checked.descriptor, descriptor);
+  assert.deepEqual(checked.index.head, head);
+});
+
+test('missing local metadata fails without lazy-fetching from a promisor remote', async () => {
+  const f = await fixture(), descriptor = await bootstrapPublication(f.locks), head = f.publish(descriptor);
+  await registerPublication({ repo: f.repo, head });
+  const git = args => execFileSync('git', ['-C', f.repo, ...args], { encoding: 'utf8' }).trim();
+  git(['update-ref', 'refs/heads/synthetic', head.revision]);
+  git(['symbolic-ref', 'HEAD', 'refs/heads/synthetic']);
+  const remote = `${f.repo}-promisor.git`;
+  execFileSync('git', ['clone', '--mirror', '--no-hardlinks', f.repo, remote], { stdio: 'pipe' });
+  const validation = descriptor.evidence.catalog_validation;
+  const oid = git(['rev-parse', `${validation.revision}:${validation.path}`]);
+  execFileSync('git', ['-C', remote, 'cat-file', '-e', oid]);
+  git(['config', 'core.repositoryFormatVersion', '1']);
+  git(['config', 'extensions.partialClone', 'origin']);
+  git(['config', 'remote.origin.url', remote]);
+  git(['config', 'remote.origin.promisor', 'true']);
+  git(['config', 'remote.origin.partialCloneFilter', 'blob:none']);
+  git(['config', 'protocol.file.allow', 'always']);
+  await unlink(path.join(f.repo, 'objects', oid.slice(0, 2), oid.slice(2)));
+  await assert.rejects(checkPublication({ repo: f.repo }), /Git|git|object|missing|non-regular/u);
+  assert.notEqual(spawnSync('git', ['--no-lazy-fetch', '-C', f.repo, 'cat-file', '-e', oid]).status, 0,
+    'the absent local object must remain absent; only synthetic local Git was available');
 });
 
 test('bad declarations fail closed without an index or a leftover success marker', async t => {
