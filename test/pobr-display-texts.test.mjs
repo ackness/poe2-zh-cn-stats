@@ -403,3 +403,41 @@ test('official-only requests still publish the same sidecar without a supplement
     { Flask: null, Sword: null });
   assert.deepEqual(globalThis.supplementQueries, undefined);
 });
+
+test('omitting the library runs this checkout only for v3 and still compares the producer closure', async t => {
+  const repo = fileURLToPath(new URL('..', import.meta.url));
+  for (const [version, modules] of [[1, 3], [2, 5]]) {
+    const input = fixture(t, version, modules);
+    delete input.request.library;
+    await assert.rejects(createDisplayTexts(input.request, input.out), /require an explicit library closure/);
+    assert.equal(fs.existsSync(input.out), false);
+  }
+  // The fixture's stub modules produced this catalog, so this checkout's six
+  // modules do not match its producer and nothing is executed.
+  const stub = fixture(t, 3, 6);
+  delete stub.request.library;
+  await assert.rejects(createDisplayTexts(stub.request, stub.out), /producer closure mismatch/);
+  // A producer equal to this checkout's modules selects them: the real
+  // native-catalog.mjs runs and rejects the stub-shaped catalog envelope.
+  const local = fixture(t, 3, 6);
+  delete local.request.library;
+  local.manifest.producer = Object.fromEntries(Object.keys(local.library.files).map(file =>
+    [file, createHash('sha256').update(fs.readFileSync(path.join(repo, file))).digest('hex')]));
+  Object.assign(local.request.catalog, local.write('manifest.json', JSON.stringify(local.manifest)));
+  await assert.rejects(createDisplayTexts(local.request, local.out), /Invalid catalog envelope/);
+  assert.equal(fs.existsSync(local.out), false);
+});
+
+test('omitting the projection pins and applies src/pobr-display-projection.json', async t => {
+  const file = fileURLToPath(new URL('../src/pobr-display-projection.json', import.meta.url));
+  const declared = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const records = ['BaseItemTypes', 'Characters', 'Ascendancy', 'PassiveSkills'].map((table, i) =>
+    row(`r${i}`, `Text ${i}`, null, { table }));
+  const input = fixture(t, 3, 6, { records });
+  const receipt = await createDisplayTexts(input.request, input.out);
+  assert.deepEqual(receipt.runtime_scopes, [...declared.scopes].sort());
+  const raw = fs.readFileSync(file);
+  assert.deepEqual(receipt.inputs[file], { sha256: createHash('sha256').update(raw).digest('hex'), bytes: raw.length });
+  assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json'))).scopes).sort(),
+    [...declared.scopes].sort());
+});

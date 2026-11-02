@@ -44,6 +44,8 @@ test('writes the appended pairs and a receipt into a fresh cache candidate', t =
   assert.deepEqual(JSON.parse(raw), [{ src: '+12 点护甲', en: '+12 to Armour' }, { src: '旧', en: 'Old' }]);
   assert.deepEqual(receipt.files['stat_lines.json'], { bytes: raw.length, sha256: digest(raw) });
   assert.equal(receipt.adoption, 'not-adopted');
+  for (const file of ['src/pobr-stat-lines.mjs', 'src/native-selected-translations.mjs'])
+    assert.equal(receipt.implementation[file], digest(fs.readFileSync(new URL(`../${file}`, import.meta.url))));
   assert.deepEqual(fs.readdirSync(options.out).sort(), ['receipt.json', 'stat_lines.json']);
   assert.throws(() => createStatLines(options), /EEXIST/);
 });
@@ -54,6 +56,10 @@ test('rejects changed inputs, outputs outside .cache and malformed arguments', t
   assert.throws(() => createStatLines({ ...options, out: path.join(path.dirname(fileURLToPath(import.meta.url)), 'fresh') }),
     /fresh repository cache candidate/);
   assert.equal(fs.existsSync(options.out), false);
+  fs.mkdirSync(path.join(root, 'real'));
+  fs.symlinkSync(path.join(root, 'real'), path.join(root, 'link'));
+  assert.throws(() => createStatLines({ ...options, out: path.join(root, 'link', 'out') }), /parent contains a symlink/);
+  assert.deepEqual(fs.readdirSync(path.join(root, 'real')), []);
   const argv = Object.entries(options).flatMap(([key, value]) => [`--${key}`, value]);
   assert.deepEqual(parseStatLineArgs(argv), options);
   assert.throws(() => parseStatLineArgs([...argv, '--out', root]), /duplicate/);
