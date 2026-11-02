@@ -109,8 +109,44 @@ v2 被拒绝的记录为 unresolved，原因 `target-binding-rejected`，`applic
 英文查询会把重复目标 key 的每一个当前英文候选作为未决 blocker；不能因为 `row.english === null` 而省略它们。
 scope/literalMap 投影也必须保留这些 null blocker 及去除显示标记后产生的 alias。
 
-这个版本的实际本地模块闭包是 `native-catalog.mjs`、`native-names.mjs`、`strict-json.mjs`、
+v2 初批固定证据的模块闭包是 `native-catalog.mjs`、`native-names.mjs`、`strict-json.mjs`、
 `native-catalog-binding.mjs`、`native-localization.mjs`（均在 src 下），除 Node 标准库外无其他依赖。
 后两者用于独立绑定校验与已有 canonical JSON 工具，不增加 CSD renderer 或 DAT 解码器。
-消费方需固定并核验全部五文件，再导入查询 API。旧 v1 三模块证据要用其原固定源码分别重放，
+重放该批历史 v2 证据时需固定并核验全部五文件，再导入查询 API。当前实现的六模块闭包见下节；旧 v1 三模块证据要用其原固定源码分别重放，
 不能把新源码和旧闭包摘要混用。synthetic fixture 仅证明接口；正式 SC 覆盖依实际九表包另验。
+
+## 当前 SC FK 绑定 v3
+
+当前发布目录使用 `poe2-native-catalog-request/v3`、`poe2-native-catalog/v3` 及
+`poe2-native-catalog-manifest/v3`。源码入口仍是 `native-catalog.mjs`，新增的
+`native-catalog-fk-binding.mjs` 与原五模块共同组成六模块 producer／lookup 闭包；
+消费方固定并核验完整六文件，不能混用历史 v1／v2 producer 摘要。
+
+v3 读取 `repoe-localized-tables/v3`，按显式 `stable-key-pinned-fk-structure/v1` 政策，
+在 source default、source localized、target 三个独立命名空间中验证引用闭包。
+选定关系涉及 `BaseItemTypes`、`Mods`、`Characters`、`AlternateQualityTypes` 及
+`ItemVisualIdentity`／`ModType`／`Stats` 依赖；不是对任意外键的通用语义推断。
+物理列、类型、稳定键、列表顺序／重复、空值、非 text 标量和完整可达约束均须匹配，
+循环引用须完成闭包验证后才可接受；同 key、相同行号或半条匹配不能代替结构绑定。
+政策使用固定社区 reader 的语言回退解释，保留 `official_client_semantics_verified: false`。
+
+输出增加 `verification.json`，保存重新核对所需的完整三侧输入。
+manifest 的文件 pin 必须与 catalog 的 `fk_verification` 完全一致。查询入口要求其原始 Buffer：
+
+```js
+const lookup = createCatalogLookup(catalog, {
+  game_patch: '0.5.5.5', realm: 'international', locale: 'zh-CN',
+  verification: originalVerificationBuffer,
+});
+```
+
+加载时先核原字节长度／SHA，再独立重建 FK binding，并与目录投影比较；
+缺失、错误 sidecar 或伪造 accepted 投影均拒绝。拒绝的记录、英文同名 null blocker、
+完整上下文和查询回退继续保留。不能重新 stringify 后替代验证原件。
+
+当前固定 SC 产物有 58588 字段／18 列，lookup 状态为 25097 translated／33491 fallback；
+这是该固定目录的结果，不是全游戏汉化率。观察客户端 patch／realm 仍为 null，
+目标 `0.5.5.5/international` 绑定不认证整个观察客户端或国服数值。
+当前 descriptor 固定 catalog、六模块库和原 validation 收据；发布索引只复核声明与小证据，
+完整 v3 guard 仍负责内容验证。PoBR 已导入该目录并生成精简显示资产，
+原大 sidecar 留作构建／离线校验输入，不进入玩家运行包。

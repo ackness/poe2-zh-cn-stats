@@ -5,6 +5,15 @@
 `head` 的 revision/path/bytes/SHA-256 读取 descriptor。源码 HEAD、分支时间和 patch
 字符串都不是数据包排序规则。同 patch 新语言、reviewed 输入或工具也必须发布新序号。
 
+## 产物身份与保活
+
+产物只由完整 commit `revision`、`path` 与 bytes/SHA-256 定位；消费者按 revision 取该提交里的文件，
+不按分支名选数据。未并入 `main` 的产物提交由同名 tag `refs/tags/handoff/<name>` 保持可取，
+本库只保留 `main` 一个分支（原 `handoff/*` 分支已于 2026-11-02 换成同名 tag，revision 不变）。
+发布新产物时推送 tag：`git push origin <revision>:refs/tags/handoff/<name>`，再用
+`git fetch --depth=1 origin <revision>` 从远端核对。已被 descriptor、证据或下游锁引用的 `handoff/*` tag
+不得删除或移动。
+
 ## v2 契约
 
 索引恰有 `schema: owned-data-publication-index/v2`、
