@@ -8,6 +8,9 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { nativeSelectedTranslations } from './native-selected-translations.mjs';
 
+// The receipt pins every module this producer executes.
+const IMPLEMENTATION = ['pobr-stat-lines.mjs', 'native-selected-translations.mjs'];
+
 const required = (ok, message) => { if (!ok) throw new Error(message); };
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const FLAGS = ['selection', 'selection-sha256', 'native', 'native-sha256', 'legacy', 'legacy-sha256', 'out'];
@@ -41,12 +44,15 @@ export function createStatLines(options) {
   const out = path.resolve(options.out), cache = path.resolve(fileURLToPath(new URL('../.cache', import.meta.url)));
   // A fresh candidate directory prevents in-place edits to this repository or a runtime snapshot.
   required(out.startsWith(cache + path.sep), 'Output must be a fresh repository cache candidate');
+  required(fs.realpathSync(path.dirname(out)) === path.dirname(out), 'Output parent contains a symlink');
   fs.mkdirSync(out);
   const lines = JSON.stringify(result.pairs, null, 2) + '\n';
   fs.writeFileSync(path.join(out, 'stat_lines.json'), lines, { flag: 'wx' });
   const receipt = { ...result.report, inputs: options,
     files: { 'stat_lines.json': { bytes: Buffer.byteLength(lines), sha256: digest(lines) } },
-    implementation_sha256: digest(fs.readFileSync(fileURLToPath(import.meta.url))), adoption: 'not-adopted' };
+    implementation: Object.fromEntries(IMPLEMENTATION.map(file =>
+      [`src/${file}`, digest(fs.readFileSync(fileURLToPath(new URL(`./${file}`, import.meta.url))))])),
+    adoption: 'not-adopted' };
   fs.writeFileSync(path.join(out, 'receipt.json'), JSON.stringify(receipt, null, 2) + '\n', { flag: 'wx' });
   return receipt;
 }

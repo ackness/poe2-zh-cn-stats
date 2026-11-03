@@ -22,9 +22,9 @@ const REPO_ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 // fields can supply literal text, but do not need a second per-ID browser index.
 const PROJECTION_PATH = fileURLToPath(new URL('./pobr-display-projection.json', import.meta.url));
 const defaultProjection = () => JSON.parse(fs.readFileSync(PROJECTION_PATH, 'utf8'));
-// Without an explicit closure, run this checkout's own modules. Their hashes
-// still have to equal the catalog's producer closure (v3), so a catalog made by
-// different modules needs `library.root` pointing at a checkout of its revision.
+// Without an explicit closure, a v3 catalog runs this checkout's six modules,
+// whose hashes still have to equal the manifest's producer closure. v1/v2
+// manifests record no producer to compare, so they must name their library.
 const localLibrary = () => ({ root: REPO_ROOT, files: Object.fromEntries(FK_LIBRARY_FILES.map(file =>
   [file, digest(fs.readFileSync(path.join(REPO_ROOT, file)))])) });
 const strip = text => text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu,
@@ -117,7 +117,6 @@ function readPinned(file, pin, reads) {
 export async function createDisplayTexts(request, out) {
   requireValue(request.schema === 'pobr-native-display-texts-request/v1', 'Invalid display request');
   const reads = new Map();
-  const library = request.library ?? localLibrary();
   const manifest = JSON.parse(readPinned(request.catalog.manifest, request.catalog, reads));
   const version = new Map([
     ['poe2-native-catalog-manifest/v1', 'poe2-native-catalog/v1'],
@@ -128,6 +127,8 @@ export async function createDisplayTexts(request, out) {
     && manifest.production_ready === false && manifest.game === 'poe2', 'Invalid catalog manifest');
   for (const field of ['game_patch', 'realm', 'locale']) requireValue(manifest[field] === request[field], `Catalog ${field} mismatch`);
   const fk = version === 'poe2-native-catalog/v3';
+  requireValue(request.library || fk, 'v1/v2 catalogs require an explicit library closure');
+  const library = request.library ?? localLibrary();
   const supplement = request.supplement;
   requireValue(!supplement || fk, 'Reviewed supplements require a v3 catalog');
   const payloads = ['catalog.json', 'request.json', ...(fk ? ['verification.json'] : [])];

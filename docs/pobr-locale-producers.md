@@ -12,7 +12,7 @@ PoBR 只消费本库发布的固定语言文件，不再生成语言数据。下
 | `i18n/zh-CN/stat_lines.json` | `src/pobr-stat-lines.mjs` | `mise run pobr:stat-lines` |
 
 三个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
-产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、实现自身的 SHA-256
+产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、所执行实现的 SHA-256
 和逐条取舍，`adoption` 固定为 `not-adopted`。交付给 PoBR 仍走既有流程：把产物
 放进新的 `handoff/<name>` 目录与 tag，在 `manifest.json` 固定字节数和 SHA-256，
 再由 PoBR 在 `pipeline/data.lock.json` 引用该 commit。生成本身不修改任何已发布目录。
@@ -29,12 +29,13 @@ mise run pobr:display-texts --request /absolute/request.json --out .cache/fresh-
 执行的模块与默认投影文件都先校验摘要，生成后再复核一次。输入没有固定字节上限，
 但声明的字节数、实际大小和 SHA-256 必须一致。
 
-- `library` 可省略。省略时执行本 checkout 的六个模块（`native-catalog`、
-  `native-names`、`strict-json`、`native-catalog-binding`、`native-localization`、
-  `native-catalog-fk-binding`），并以它们的实际 SHA-256 作为闭包。v3 catalog 的
-  manifest `producer` 必须等于这组摘要；catalog 若由其他版本的模块产出，就传
-  `library: {root, files}`，`root` 指向该 producer 修订的 checkout。v1／v2 仍接受
-  它们原有的三模块或五模块闭包。
+- `library: {root, files}` 只有 v3 可以省略。省略时执行本 checkout 的六个模块
+  （`native-catalog`、`native-names`、`strict-json`、`native-catalog-binding`、
+  `native-localization`、`native-catalog-fk-binding`），以它们的实际 SHA-256 作为
+  闭包，并且 manifest 的 `producer` 必须等于这组摘要；catalog 若由其他版本的模块
+  产出，就传 `library`，`root` 指向该 producer 修订的 checkout。v1／v2 的 manifest
+  不记录 `producer`，无从比对，所以必须显式传 `library`，沿用它们原有的三模块或
+  五模块闭包。
 - v3 还要求 catalog 和 manifest 都固定的原始 `verification.json`。这份字节作为
   `expected.verification` 交给 `createCatalogLookup`，由库重新校验严格绑定与 FK
   绑定。验证文件缺失或被改动时，整次导入失败。它只作构建输入，不进入玩家资产。
@@ -95,6 +96,7 @@ mise run pobr:stat-lines --selection <receipt.json> --selection-sha256 <sha> \
 （符文 `RunesDef` 或天赋树 `PassiveNodeDef[]` 两种），`--native` 是 `native` 命令产出的
 `poe2-native-localization-candidate/v1`，`--legacy` 是上一份 `stat_lines.json`。
 只追加按实际 CSD 分支选取、且英文和中文都无歧义的整行译文；已有模板保持不变。
+receipt 的 `implementation` 固定本入口和 `native-selected-translations.mjs` 两个文件。
 
 ## 验证记录（2026-11-02）
 
@@ -104,7 +106,8 @@ mise run pobr:stat-lines --selection <receipt.json> --selection-sha256 <sha> \
   （SHA-256 `f4bbbd01…`），补译为 `5d019466` 的
   `handoff/reviewed-supplements-20261101/runtime.zip`（`989293a6…`），workbench
   模块为 `0e7778c4` 的版本，其余模块用本 checkout，与该 catalog 的 producer 闭包
-  一致；产出 `display_texts.json` 1649082 字节，SHA-256 `381d827a…`，58588 条决定、415 个冲突。
+  一致；请求不含 `library`，使用默认的六模块闭包。产出 `display_texts.json`
+  1649082 字节，SHA-256 `381d827a…`，58588 条决定、415 个冲突。
 - 繁中名称：`legacy` 为 PoBR `7942e6db` 的 `data/0.5.5.4.2/i18n/zh-TW/*`，
   `native` 为 `names.json`（`0b2ff2e2…`）；三个文件分别为 `67c3db66…`、`af64e24e…`、
   `c0212690…`，receipt 的 records、sources 与 files 与已发布的
