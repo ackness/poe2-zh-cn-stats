@@ -5,6 +5,11 @@
 `head` 的 revision/path/bytes/SHA-256 读取 descriptor。源码 HEAD、分支时间和 patch
 字符串都不是数据包排序规则。同 patch 新语言、reviewed 输入或工具也必须发布新序号。
 
+当前 sequence 2 的[发布声明](../publication/releases/poe2-international/2.json)
+迁移 RePoE 截断 fork 前历史后变化的 `bindings.display_source.revision`。
+原件、目录和语言产物字节均未改变，七个语言角色的序号保持 1；sequence 1 原声明继续保留。
+RePoE 的旧 SHA 与新 SHA 关系见其[历史迁移说明](https://github.com/ackness/repoe/blob/master/RePoE/docs/history.md)。
+
 ## 产物身份与保活
 
 产物只由完整 commit `revision`、`path` 与 bytes/SHA-256 定位；消费者按 revision 取该提交里的文件，
