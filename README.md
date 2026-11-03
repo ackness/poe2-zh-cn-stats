@@ -94,6 +94,7 @@ native-regional-candidates.json  区服／版本差异待核对项
 src/                          采集、配对、生成与验证代码
 test/                         离线回归用例
 docs/                         数据契约和维护指南
+sources/                      语言来源台账（自 PoBR 迁入）与说明
 handoff/                      当前检出可见的交付文件
 .cache/                       本地候选与临时文件，不提交
 ```
