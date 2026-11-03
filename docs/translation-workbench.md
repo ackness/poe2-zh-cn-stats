@@ -108,7 +108,8 @@ PoBR 现有官方目录不会因工作表有草稿或运行包就暗中加载它
 ## 紧凑 reviewed 运行接口（v1）
 
 PoBR 的显示／显式范围消费者可使用本库 `src/translation-workbench.mjs` 的独立接口。
-该接口已由 PoBR 的固定 importer 和显示 producer 接入，消费锁见其 `pipeline/imports/data-imports.lock.json`。
+该接口已由[本库的显示 producer](pobr-locale-producers.md#显示文本display_textsjson)接入；
+PoBR 通过唯一的 `pipeline/data.lock.json` 固定并导入语言产物，不再运行显示 producer。
 当前真实包仍为 0 条，两个草稿不生效；非空补译的行为验证来自合成用例，不能据接口接线声称已有真实审核译文或浏览器收益。
 
 ```js
