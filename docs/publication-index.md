@@ -42,7 +42,7 @@ descriptor 恰有以下字段：
 不认证客户端、官方来源资格、翻译质量或上游新鲜度；不将目标身份填进观察身份。
 繁中保持独立 retained 来源，不声称由简中生成。
 
-bootstrap 对应当前三个真实消费锁，完整复制以下 JSON 子对象，不改嵌套 key、bytes 或 SHA：
+bootstrap 对应 sequence 1 的三个历史消费锁，完整复制以下 JSON 子对象，不改嵌套 key、bytes 或 SHA：
 
 | 角色 | `input` 原声明 |
 | --- | --- |
@@ -74,13 +74,18 @@ bootstrap 的所有角色 sequence 均为 1。后续将完整 `input` 作结构�
   Git commit，全部检查成功后原子替换小索引；返回 `{changed, index, descriptor}`。
 - `bytePin(bytes)`、`OWNER`、`ROLES`、`SCOPE`：计算精确 bytes/SHA 及读取固定契约常量。
 
-CLI 不接受未知/重复选项；以下锁路径由调用方显式指定，不猜测其他 checkout：
+CLI 不接受未知/重复选项。下面是历史 bootstrap 的重放接口：三份锁须从
+[固定 PoBR 版本](https://github.com/ackness/pobr/tree/0fb6f913cc3fac980f9d84e855b26103860d6b96/pipeline)
+分别取 `runtime/build-data.lock.json`、`imports/data-imports.lock.json` 和
+`imports/locale-generation.lock.json`，导出到调用方显式指定的证据目录。
+PoBR 当前只使用 `pipeline/data.lock.json`，本 bootstrap 不读取该格式；不要将当前数据锁改名冒充旧锁，
+也不要用此重放接口代替新的 owner 生产与发布。
 
 ```sh
 node src/publication-index.mjs bootstrap \
-  --build-lock /path/to/pipeline/build-data.lock.json \
-  --imports-lock /path/to/pipeline/data-imports.lock.json \
-  --locale-generation-lock /path/to/pipeline/locale-generation.lock.json \
+  --build-lock /path/to/bootstrap-evidence/build-data.lock.json \
+  --imports-lock /path/to/bootstrap-evidence/data-imports.lock.json \
+  --locale-generation-lock /path/to/bootstrap-evidence/locale-generation.lock.json \
   --out publication/releases/poe2-international/1.json
 ```
 

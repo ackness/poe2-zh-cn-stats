@@ -16,7 +16,7 @@ PoBR 负责固定产物接入、显示/输入边界和 Rust 计算。游戏 stat
 
 交易词条模板、客户端描述、固定名词/说明词典是不同来源域。本库目前不是完整技能说明或名词库。
 已有译文未接入或基础标签漏翻属于 PoBR 消费问题；原始描述转录错误先修 RePoE；配对和人工补译问题在本库维护。
-消费方可生成带来源摘要的只读显示资产，不复制第二份人工补译工作表；字形转换和英文回退保留明确状态。
+只读显示资产由本库生产并记录来源摘要，PoBR 按锁导入，不复制第二份人工补译工作表；字形转换和英文回退保留明确状态。
 
 跨仓更新交接固定提交、快照/产物摘要、schema、语言与服别、来源和覆盖变化、实际验证及未解决项。
 源码合并、本库快照激活和 PoBR 采用分别处理；不得因为本库更新而让 PoBR 自动追踪浮动 HEAD。
@@ -28,19 +28,20 @@ PoBR 负责固定产物接入、显示/输入边界和 Rust 计算。游戏 stat
 `mise run publication:check` 仅离线核对登记声明和既有证据；真实上游发现、重新生产、完整 guard、
 远端发布及 PoBR 验证采用仍各自执行，不能据此声称永远自动同步已完成。
 
-## 当前交付状态（2026-11-02 UTC）
+## 当前交付状态（2026-11-03 UTC）
 
-默认 `main` 为 `cec78f1a`，PR6 的七角色发布索引已合并，当前 sequence 为 1；
-[该提交的离线 CI](https://github.com/ackness/poe2-zh-cn-stats/actions/runs/41393427223)成功，
-本次 `mise run publication:check` 也通过。PoBR 已按精确锁消费当前 retained locale、
-SC FK v3 目录与查询闭包、reviewed 接口、support 资产和独立 SC producer；
-不再将这些接线列作未实现。各角色实际修订见 [descriptor](publication/releases/poe2-international/1.json)，
+PR6 的七角色发布索引仍为 sequence 1；PR8／9 已迁入并修正 PoBR 的三个语言生产入口，
+[合并提交 `ecee7914` 的离线 CI](https://github.com/ackness/poe2-zh-cn-stats/actions/runs/41562710392)成功。
+代码迁移没有替换已发布的语言字节或推进发布序号。PoBR 通过唯一的 `pipeline/data.lock.json` 消费
+`language` 与 `support_display` 两个角色，导入固定语言文件与辅助说明。
+SC FK v3 目录、查询闭包、reviewed 接口及独立 SC producer 留在本库生产侧，PoBR 不再下载这些原料或执行生产代码。
+各角色实际修订见 [descriptor](publication/releases/poe2-international/1.json)，
 不以此处源码 HEAD 代替它们。
 
 真实审核补译仍为 0 条，两条草稿不生效；SC 观察客户端 patch／realm 仍未知。
 新一轮原始语言输入、完整 guard、不可变产物发布和后继索引推进尚非无人值守流程；
 索引校验不重跑完整 FK sidecar，不证明全部 UI、国服数值或译文质量。
-跨仓剩余工作统一见 [PoBR 当前架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md#5-当前已有数据与实际缺口)。
+跨仓剩余工作统一见 [PoBR 数据现状](https://github.com/ackness/pobr/blob/master/docs/data-status.md)。
 
 ## 使用
 
