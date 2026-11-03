@@ -1,0 +1,304 @@
+# 交易词典：采集、补译与消费
+
+GGG／腾讯交易目录、分裂词缀复用和 PoE2DB 补缺组成独立的交易词典。
+原生客户端语言、名称目录与 PoBR 语言文件另见[仓库首页](../README.md)。
+
+## 使用
+
+本地开发统一使用 mise，`mise.toml` 请求 `node = "latest"`，提交的 `mise.lock` 固定实际稳定版本（与 PoBR 对齐），npm 随该 Node 版本提供。
+首次使用先安装 mise，并执行 `mise trust`、`mise install --locked`。显式升级时运行 `mise lock --bump --platform linux-x64,macos-arm64 node`，检查并提交锁文件；不隐式更新 npm 依赖锁或已有数据收据。初次克隆已经带有经过校验的数据快照，离线校验无需访问游戏网站。
+
+```sh
+mise run setup
+mise run check
+mise run report
+```
+
+`setup` 按 `package-lock.json` 安装依赖，不运行依赖包的生命周期脚本；首次安装需要访问 npm registry。
+`check` 顺序运行现有测试和当前快照的离线校验；只跑测试可用 `mise run test`。
+GitHub Actions 使用同一份 mise 工具版本和任务入口，不另外维护一套 Node 版本或校验命令。
+以下数据维护命令在 mise 环境执行，例如 `mise exec -- npm run build`；已激活 mise 时也可直接使用原有 npm 命令。
+
+更新官方目录与配置中的 PoE2DB 页面：
+
+```sh
+npm run refresh
+```
+
+只获取官方交易目录，不访问 PoE2DB：
+
+```sh
+npm run refresh -- --trade-only
+```
+
+`--trade-only` 生成不含 PoE2DB 证据的新快照，覆盖率可能下降，不会暗中沿用旧页面。每次成功更新会创建独立快照并切换 `data/CURRENT`。旧快照保留，可通过 Git 历史比较。
+
+修改匹配规则或人工修正后，从当前原始响应重建：
+
+```sh
+npm run build
+npm run check
+npm run report
+```
+
+已发布快照不可原地写入。`build` 对当前或指定的 `data/snapshots/<ID>` 创建新候选，保留原始采集时间并记录 `rebuilt_from`，全部校验成功后切换 `CURRENT`；失败时旧快照不变。对 `.cache` 候选的构建不会自动激活。
+
+成功激活还会同步根目录的 `translations.json` 补译工作表。新缺口自动加入，已补全和已退出上游目录的条目保留状态与人工内容。快照内保存同一张表，便于追溯；检测到发布期间有人编辑工作表时，不覆盖这些编辑，按报错重新构建。
+
+`check` 重新核对原始响应的 SHA-256 和字节数，并离线再生成所有产物进行逐字节比较。它不会联网，不会修改数据。GitHub Actions 也只运行离线测试与校验，不定期抓取网站、不自动发布。
+
+### 中断恢复
+
+抓取的候选位于 `.cache/candidate-<时间戳>/`。两个官方目录有任一失败，候选不会激活。若采集成功但解析或生成失败，可修正规则后使用同一份响应，不必再次下载：
+
+```sh
+npm run build -- --snapshot .cache/candidate-<时间戳>
+npm run check -- --snapshot .cache/candidate-<时间戳>
+node src/cli.mjs activate --snapshot .cache/candidate-<时间戳>
+```
+
+激活只接受仓库 `.cache` 内已经生成并通过校验的候选。`data/CURRENT` 在完整校验成功后才原子切换。
+
+## 数据结构
+
+```text
+sources.json                         官方入口及有限的 PoE2DB 页面清单
+overrides.json                       自己维护的、有来源的精确修正
+translations.json                    可编辑的持续补译表，含待办及已解决历史
+curated.json                         人工维护的编号模板与稀有物品名补丁
+src/                                 采集、配对、补缺、生成、校验代码
+test/                                行为回归测试
+data/CURRENT                         当前快照目录名
+data/snapshots/<时间戳>/
+  manifest.json                      URL、采集时间、响应摘要、校验和、失败记录
+  raw/*.json.gz                      原始 GGG／腾讯响应，非重新序列化的副本
+  raw/*.html.gz                      采集成功的 PoE2DB 原始页面
+  raw/*.txt.gz                       当次获取的 robots.txt
+  generated/
+    dictionary.json                  主表：每个完整 ID＋英文分支一条记录
+    pairs.json                       去重文本对，仍保留 IDs 和来源方式
+    coverage.json                    分阶段、分类别的覆盖与诊断汇总
+    unresolved.json                  未解决的 ID／英文分支和原因
+    conflicts.json                   来源间的译文差异、配对冲突、人工覆盖
+    source-issues.json               下载或页面提取诊断
+    poe2db-evidence.json              提取出的双语候选及结构化证据
+    overrides.json                   生成时使用的人工修正原文
+    translations.json                本快照的补译表、采用结果和人工记录
+    curated.json                     本快照使用的人工模板原文
+    templates.json                   编号模板、来源证据及保守转换排除报告
+```
+
+主表记录示例：
+
+```json
+{
+  "id": "explicit.stat_3299347043",
+  "category": "explicit",
+  "english": "# to maximum Life",
+  "chinese": "# 生命上限",
+  "method": "trade",
+  "reason": null,
+  "evidence": [
+    {
+      "source": "trade-cn",
+      "id": "explicit.stat_3299347043",
+      "text": "# 生命上限"
+    }
+  ]
+}
+```
+
+**主键是完整 `id` 与 `english` 的组合，不是单独 `id`。** 同一个交易 ID 可能有不同英文分支；同一英文也可能在不同类别下有不同中文。不要把主表压成 `Map(id, chinese)`，也不要无条件取第一条翻译。
+
+未解决项的 `chinese` 为 `null`，`method` 为 `unresolved`，`reason` 说明原因。没有空字符串或假译文兜底。`#` 是交易模板的值槽；主表不把它转换为游戏原始 stat ID 或 `{0}` 编号模板；需要编号模板时见下文的编号模板导出。
+
+## 其他仓库如何接入
+
+这是可版本固定的 **JSON 数据依赖**，不是已发布的 npm SDK，也不是运行时翻译服务。消费方不需要安装本项目的 Node 依赖；只需读取生成结果。建议在构建阶段读数据，打包所需部分，运行时不联网。
+
+### 固定提交并读取
+
+从选定的完整 Git commit 读取 `data/CURRENT` 与其指向的快照，两者必须来自同一提交。
+可以使用固定 commit 的本地检出或下载原文件；产品构建不要追踪浮动 `main`。
+本节只介绍独立交易词典；PoBR 的完整语言交付使用[发布索引](publication-index.md)。
+
+保存下面示例为消费仓库中的 `example.mjs`，执行 `node example.mjs third_party/poe2-zh-cn-stats`：
+
+```js
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = process.argv[2];
+const snapshot = fs.readFileSync(path.join(root, 'data/CURRENT'), 'utf8').trim();
+const dictionary = JSON.parse(fs.readFileSync(
+  path.join(root, 'data/snapshots', snapshot, 'generated/dictionary.json'), 'utf8',
+));
+if (dictionary.schema_version !== 1 || dictionary.snapshot !== snapshot) {
+  throw new Error('Unsupported or inconsistent dictionary');
+}
+const normalize = text => text.replace(/\s+/gu, ' ').trim();
+const key = (id, english) => JSON.stringify([id, normalize(english)]);
+const index = new Map(dictionary.entries
+  .filter(row => row.chinese !== null)
+  .map(row => [key(row.id, row.english), row.chinese]));
+const translate = (id, english) => index.get(key(id, english)) ?? english;
+
+console.log(translate('explicit.stat_3299347043', '# to maximum Life'));
+// # 生命上限
+```
+
+这里只查询模板，不负责将 `#` 替换成游戏数值。查不到时保留英文；不要把相近英文或相同 stat 后缀当成确定命中。若调用方只有英文、没有交易 ID，必须先检查该英文跨类别是否只有一个中文候选，不能简单忽略 ID 后取第一条。`pairs.json` 保留这些不同候选及其 IDs，供转换阶段审核。
+
+当前公开仓库无需私有访问 Token。若消费的是私有 fork，CI 可使用只读 deploy key、仅授权该仓库 Contents: read 的细粒度 Token，或 GitHub App 凭据；消费仓库的默认 `GITHUB_TOKEN` 不会自动获得另一个私有仓库的读取权。凭据不得进入前端代码或构建产物。打包翻译文本时仍需遵守上游来源的使用和再分发条件。
+
+### 编号模板导出与人工词条
+
+需要 `{0}` 形式编号模板的消费方可以直接读取 `generated/templates.json`，不必自己实现交易模板转换。这是构建期导出：
+
+```text
+schema_version: 1
+snapshot: 当前数据快照 ID
+templates: [{src, en, kind: "curated" | "trade", provenance}]
+words: [{english, chinese, note, source_url}]
+excluded: 未安全导出的记录及原因
+curated_sha256: 人工模板输入的 SHA-256
+```
+
+- `src` 是中文编号模板，`en` 是英文编号模板。自动转换仅接受零或一个 `#`，数值槽输出 `{0:d}`，保留符号、字面数值和条件；双向歧义、数值不一致、多参数和不支持的括号语法均列入 `excluded`。
+- `kind: "trade"` 表示从主交易词表转换，并不保证译文来自官方；完整 ID、人工补缺或 PoE2DB 证据均保留在 `provenance` 中。空格不同的可匹配模板不会合并丢失。
+- `kind: "curated"` 是人工审核的完整编号模板，可保留多参数、字符串和嵌套捕获。`words` 仅为稀有物品名组成词的缺省补丁，消费方采用 `rareWords[english] ??= chinese`，不覆盖其他名词来源。
+
+根目录的 **[`curated.json`](../curated.json)** 目前有 11 条人工模板和 1 条稀有名补丁（`Maelstrom → 漩涡`），每条保留原词句、编号及不可变来源链接。包括天赋点单复数、武器组技能点、珠宝插槽效果、Bonded 前缀、附赠技能、范围珠宝和连接条件。它们不需要伪造交易 ID。
+
+日常维护分工：
+
+| 文件 | 用途 |
+|---|---|
+| `translations.json` | 为现有交易 ID＋英文分支补译；可靠来源补齐后自动让位 |
+| `overrides.json` | 对现有交易词条明确指定高优先级修正 |
+| `curated.json` | 维护交易目录之外的文本、已审核多参数或字符串模板，以及稀有名组成词补丁 |
+
+修改 `curated.json` 后运行 `npm run build`、`npm run check`；生成、校验和激活均包含编号模板导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
+
+消费方接入这份导出时的建议：
+
+- 在构建期读取并固定提交，`data/CURRENT` 与导出文件取自同一提交；运行时不访问 GitHub。记录所用的 commit、snapshot 和导出文件的 SHA-256，便于追溯。
+- 先校验再使用：`schema_version` 为 1，`snapshot` 与 `data/CURRENT` 一致，每条模板的中英文参数编号集合相同。校验失败应终止，而不是带着部分数据继续。
+- 与已有词典合并时，按消费方实际匹配规则检查冲突，不要按输入顺序取第一条。同一英文模板两边中文不一致时由消费方决定采用哪一边；采用本库译文时，建议只替换中文措辞，保留原条目的英文模板和参数格式，并把替换和排除的条目写入自己的审计记录。
+- `excluded` 中的记录没有安全的自动转换结果，不要自行拼接后使用。
+
+编号模板导出须选择包含 `generated/templates.json` 的提交，并核对 schema、快照 ID 与参数契约。
+
+当前已发布的交易快照不提供完整的基底名、技能名、职业名、天赋名或词缀专名，因此不是整个中文数据源的替代品。交易 stat ID 也不等于消费方内部的计算 stat ID；翻译覆盖率不是解析或数值机制覆盖率。
+
+## 配对与来源优先级
+
+原生客户端 stat 描述通过单独的[原生接入口](native-localization.md)读取固定 RePoE 包。
+它保留原生 ID、语言、条件及逐分支证据，输出可离线复核的候选；不会修改下面的交易配对优先级或人工工作表。
+
+1. **官方直接配对 `trade`**：完整 ID（包括 `|` 后的枚举值）相同；两边均只有一个不同文本；中文含汉字；占位符数量一致。相同重复行可去重，不同分支不得按数组顺序拼接。`pseudo` 综合统计不作为实际游戏词条进入主表。
+2. **普通词缀复用 `explicit-reuse`**：只对腾讯没有该完整分裂 ID 的情况使用；必须找到相同 stat 后缀的 `explicit.*`，英文完全一致，普通词缀本身已直接配对。有现存冲突的分裂中文时不覆盖它。记录保留 `fractured.*`，证据指向真实的 `explicit.*` 来源。复用译文不能改变交易过滤条件。
+3. **PoE2DB 补缺 `poe2db`**：从中英文页面内嵌的 JSON 修饰词池、或具有底层 Stats 信息的详情卡片提取。不得执行远程 JavaScript。依据非本地化结构、词缀族、等级、类型、标签、数值区间、关键字及作用域配对；不能用显示名称、页面顺序或语言相关缓存哈希作稳定 ID。只替换明确标记的数值片段，保留字面条件、符号、百分号及参数顺序。
+4. **人工补缺 `manual-fallback`**：从根 `translations.json` 读取，仅在以上来源仍未解决时使用。后续可靠来源补齐后自动让位，不删除人工记录。
+5. **精确人工修正 `manual`**：从 `overrides.json` 读取，经维护者核实后可显式覆盖所有其他结果；保留理由和来源，覆盖旧值会出现在冲突报告中。
+
+PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯一且参数数量相同的情况下补入。它不会覆盖已解决的官方译文；若官方有多个中文分支，补充候选还必须属于这些分支。不同来源的措辞冲突保留在报告中，不凭多数投票抹平。
+
+结构配对与数值检查不是语义正确性的完整证明，尤其是数值相同的多个参数。使用方应保留证据与作用域，不能将这些指标理解为所有游戏机制都已支持。
+
+## 维护剩余缺口
+
+原生名称／描述使用[补译与区服工作表](translation-workbench.md)：
+[`native-translation-worklist.json`](../native-translation-worklist.json) 可直接查看官方缺译、待办和 agent 草稿；
+[`native-translations.json`](../native-translations.json) 是可编辑的补译输入，官方补译优先，版本变化要求复核。
+[`native-regional-candidates.json`](../native-regional-candidates.json) 独立列出区服或版本差异待确认项。
+国服与国际服按独立身份保存，语言不代替区服证据。下面的 `translations.json` 继续只维护交易 ID。
+
+### 持续补译表
+
+根目录的 **[`translations.json`](../translations.json)** 是日常维护入口。首次生成已将当前全部 265 条缺口放入表中，后续数量以 `npm run report` 为准。它不是每次清空的临时报表；已解决项会保留下来，便于核对人工内容与新来源的差异。
+
+只编辑这三个字段，不要改 `id`／`english` 来迁移译文：
+
+- `manual_chinese`：人工译文；`null` 或空字符串表示不提供人工补缺。
+- `manual_note`：核对说明；提供人工译文时必填，可以在未翻译时先记研究线索。
+- `manual_source_url`：可选 HTTPS 来源链接；自己翻译、没有外部来源时保留 `null`，不要编造链接。
+
+`status`、`chinese`、`method`、`reason`、`manual_differs` 和 `evidence` 都由生成器重算。`chinese` 是最终采用的译文，**不是输入栏**；手工补译请填写 `manual_chinese`。
+
+例如，找到对应行后填写如下内容，再运行 `npm run build` 和 `npm run check`。这是人工填写格式示例，不代表已经收入或认定为官方译文：
+
+```json
+{
+  "id": "crafted.stat_1301765461",
+  "english": "#% to Maximum Chaos Resistance",
+  "manual_chinese": "#% 混沌抗性上限",
+  "manual_note": "已人工核对词义，保留百分号和参数顺序",
+  "manual_source_url": null
+}
+```
+
+| `status` | 含义 |
+|---|---|
+| `pending` | 仍然缺少可采用的译文 |
+| `manual` | 正在使用人工补缺，主表 method 为 `manual-fallback` |
+| `automatic` | 当前 GGG／腾讯配对、分裂复用或 PoE2DB 已提供译文 |
+| `override` | 使用 `overrides.json` 中明确指定的修正 |
+| `retired` | 当前英文目录不再包含这个完整 ID＋英文组合，旧人工内容仅存档、不应用 |
+
+更新行为：
+
+- 每次 `npm run refresh` 自动重新对照来源：新缺口入表、已有缺口更新状态。现有 CI 只校验，不定时抓取网站。
+- 新来源译文优先于人工补缺；若与人工内容不同，`manual_differs` 为 `true`，并写入 `conflicts.json`，人工原文和备注不会被抹掉。
+- 来源再次缺失时，可重新使用仍匹配同一 ID＋英文的人工补缺；没有人工内容则回到 `pending`。上一次自动译文不会偷偷充当离线兜底。
+- ID 相同但英文变化时，旧行变为 `retired`；新英文仍缺译文则新增 `pending` 行，不自动套用旧翻译。原英文之后重新出现，才可重新使用对应人工记录。
+- 修改或移除某条人工译文后需重新构建。重复行、非中文译文、缺少备注、占位符数量不符会阻止生成，不切换当前快照。相同 ID 的不同英文分支、`|` 后的不同枚举值分别维护。
+- 提交时同时提交根工作表、`data/CURRENT` 和新快照；不能只提交人工修改而让生成数据保持旧版本。Git 快照保留每次完成更新时的状态与内容。
+
+`unresolved.json` 仍然只列当前未解决项；`translations.json` 则记录持续工作流。`coverage.json` 的 `translation_worklist` 汇总各状态及人工差异数量，它统计的是工作表中的条目，不是整个词典中所有自动翻译。
+
+### 扩展来源与固定修正
+
+先查看 `unresolved.json`、`conflicts.json` 与 `source-issues.json`，避免把交易类别缺失、重复分支和真正没有译文混为一谈。
+
+- **增加补充页面**：编辑 `sources.json` 的 `poe2db.pages`。每个 slug 对应 `/us/<slug>` 和 `/cn/<slug>`；使用已确认存在的公开页面。然后运行 `npm run refresh`，已有工作表自动对照这些新候选。
+- **明确覆盖官方或补充来源**：这与普通缺口补译不同。在根 `overrides.json` 添加如下格式，再运行 `npm run build` 和 `npm run check`。示例只说明格式，不会自动加入数据。
+
+```json
+[
+  {
+    "id": "explicit.stat_3299347043",
+    "english": "# to maximum Life",
+    "chinese": "# 生命上限",
+    "reason": "核对当前来源页面并确认数值含义与顺序",
+    "source_url": "https://poe.game.qq.com/api/trade2/data/stats"
+  }
+]
+```
+
+修正必须精确对应当前 ID＋英文分支，必须有中文、HTTPS 来源与理由，且值槽数量一致。重复修正、过期英文或参数数量不符都会使生成失败，不会静默套用。
+
+## 覆盖率的含义
+
+- `entries`：完整 ID＋英文分支的记录数。
+- `fully_resolved_ids`：该 ID 的所有英文分支都已有候选译文。
+- `distinct_english`／`covered_english`：跨交易类别去重后的英文文本数与有候选译文的文本数。
+- `stages`：仅官方、分裂复用、PoE2DB 补缺、固定修正（`overrides`）、加入人工补缺后的最终累计覆盖（`manual`）。
+
+分裂复用通常提升 ID 覆盖率，但不增加新的英文文本，不能重复计入文本覆盖收益。上述交易目录的覆盖率不包含完整技能说明、天赋名称、任务等非交易文本；仓库另有原生显示目录和固定语言资产，它们独立统计，仍不构成完整游戏汉化包。
+
+## 来源与访问边界
+
+- GGG：<https://www.pathofexile.com/api/trade2/data/stats>
+- 腾讯：<https://poe.game.qq.com/api/trade2/data/stats>
+- PoE2DB：<https://poe2db.tw/>，语言入口 `/us/` 与 `/cn/`。
+
+请求串行执行，PoE2DB 请求间隔至少一秒，使用可识别的 User-Agent。只访问配置中有限的页面，不进行全站搜索／爬取；不发送登录凭据，不跟随重定向，不绕过验证码，不自动重试 403 或 429。PoE2DB 明确拒绝请求时停止后续页面采集，失败和缺失保留在快照中。
+
+每次读取 PoE2DB 的 robots.txt；若其规则与已审查版本不同，停止补充采集，要求维护者重新审核。robots 规则不是许可证。页面的 Wiki 授权也不能直接视作整个游戏数据集的再分发许可。
+
+PoE2DB 是补充来源：下载或访问策略失败会记录原因，并允许用完整的官方目录及本次成功取得的页面生成快照，覆盖率可能降低。详情页中不能安全配对的内容同样只记诊断，不猜译。相反，任一官方目录缺失或没有非 `pseudo` 词条，或识别出的嵌入 JSON 无法安全解析，均使候选失败，不切换当前版本。
+
+官方交易端点未提供游戏补丁版本。`Last-Modified` 与下载时间不是游戏版本号，快照的 `game_patch` 因此为 `null`；不得把国服、国际服及 PoE2DB 自动当成同一补丁。HTTP 200 也不是官方承诺长期提供公开 API。
+
+原始 HTML 仅保存为压缩证据，不执行其中脚本。仓库没有为上游游戏文本、网页或素材授予新许可证。本项目不隶属于 GGG、腾讯或 PoE2DB，也未声称获得它们背书。
