@@ -201,12 +201,44 @@ export function ghProblem(run) {
   }
 }
 
-export function releaseExists(run, tag, repository = REPOSITORY) {
-  const result = run(['gh', 'release', 'view', tag, '--repo', repository, '--json', 'tagName'], { capture: true });
-  if (result.status === 0) return true;
+// A Release's draft state and asset metadata, or null when there is none.
+export function releaseState(run, tag, repository = REPOSITORY) {
+  const result = run(['gh', 'release', 'view', tag, '--repo', repository, '--json', 'tagName,isDraft,assets'], { capture: true });
+  if (result.status === 0) {
+    const view = JSON.parse(result.stdout.toString());
+    return { draft: view.isDraft === true, assets: view.assets ?? [] };
+  }
   const stderr = result.stderr.toString();
   require(stderr.toLowerCase().includes('not found'), `gh release view ${tag} failed: ${stderr.trim()}`);
-  return false;
+  return null;
+}
+
+// `gh release create` uploads into a draft first; an interrupted run leaves it behind.
+// Null when the draft holds exactly the staged assets (finish it), else the remedy.
+export function draftProblem(release, staged, tag, repository = REPOSITORY) {
+  const found = Object.fromEntries(release.assets.map(asset => [asset.name, asset]));
+  const differs = Object.entries(staged.assets).filter(([name, expected]) => {
+    const asset = found[name];
+    return !asset || asset.state !== 'uploaded' || asset.size !== expected.bytes || asset.digest !== `sha256:${expected.sha256}`;
+  }).map(([name]) => name);
+  differs.push(...Object.keys(found).filter(name => !staged.assets[name]));
+  if (!differs.length) return null;
+  return `${tag} is a draft Release whose assets are incomplete or differ from the staged ones (${differs.sort()}); `
+    + `delete the draft with \`gh release delete ${tag} --repo ${repository} --yes\` (keeps the tag) and rerun`;
+}
+
+export const finishDraft = (tag, repository = REPOSITORY) => ['gh', 'release', 'edit', tag, '--repo', repository, '--draft=false'];
+
+// {name: sha256} from a Release's SHA256SUMS, or null when the tag has no such Release.
+export function releaseSums(run, tag, repository = REPOSITORY) {
+  const result = run(['gh', 'release', 'download', tag, '--repo', repository, '--pattern', 'SHA256SUMS', '--output', '-'], { capture: true });
+  if (result.status !== 0) {
+    const stderr = result.stderr.toString();
+    require(/not found|no assets match/iu.test(stderr), `gh release download ${tag} SHA256SUMS failed: ${stderr.trim()}`);
+    return null;
+  }
+  return Object.fromEntries(result.stdout.toString().split('\n').filter(Boolean)
+    .map(line => line.match(/^([0-9a-f]{64}) [ *](.+)$/u)).filter(Boolean).map(([, digest, name]) => [name, digest]));
 }
 
 // Download a Release's assets into `directory`; {name: pin}.
@@ -255,10 +287,11 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
   const patch = config.target.game_patch;
   const decision = plan(repo, patch, commit, listRemoteTags(repo));
   problems.push(...decision.problems);
-  if (values.yes) {
-    const problem = ghProblem(run);
-    if (problem) problems.push(problem);
-    if (problems.length || warnings.length) throw new Error(`refusing to publish:\n${bullets([...problems, ...warnings])}`);
+  // Read-only in a dry run too: existing Releases are only visible through gh.
+  const ghIssue = ghProblem(run);
+  if (ghIssue) problems.push(ghIssue);
+  if (values.yes && (problems.length || warnings.length)) {
+    throw new Error(`refusing to publish:\n${bullets([...problems, ...warnings])}`);
   }
   // The build and what it says about HEAD.
   const staged = stage(built(repo, configFile, values.reuse), path.join(repo, '.cache/release/publish', targetName(config.target)));
@@ -275,16 +308,33 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
   writeFileSync(path.join(directory, 'release-notes.md'), releaseBody(staged, tag, sequence ?? '<n>'));
   writeFileSync(path.join(directory, 'tag-message.txt'), tagMessage(staged, tag));
   let steps = commands(staged, tag, commit);
+  let done = null;
   if (action === 'resume-push') steps = steps.slice(1);
   else if (action === 'remote-tag') {
-    if (releaseExists(run, tag)) {
+    const release = ghIssue ? null : releaseState(run, tag);
+    if (!release) steps = steps.slice(2);
+    else if (release.draft) {
+      const problem = draftProblem(release, staged, tag);
+      if (problem) problems.push(problem);
+      steps = problem ? [] : [finishDraft(tag)];
+    } else {
       const published = publishedAssets(run, tag, path.join(directory, 'published'));
       require(JSON.stringify(published) === JSON.stringify(staged.assets),
         `${tag} is already released with other assets: ${Object.keys(published)} differ from the staged ${Object.keys(staged.assets)} (or their SHA-256)`);
-      print(`already published: ${tag} names HEAD and its Release assets equal the staged ones`);
-      return 0;
+      done = `already published: ${tag} names HEAD and its Release assets equal the staged ones`;
     }
-    steps = steps.slice(2);
+  } else if (action === 'new' && sequence > 1 && !ghIssue) {
+    // The same bytes never get a second number, whichever commit built them.
+    const previous = tagName(patch, sequence - 1);
+    if (releaseSums(run, previous)?.[staged.asset] === staged.assets[staged.asset].sha256) {
+      problems.push(`these exact bytes are already published as ${previous}; pin that Release instead`);
+    }
+  }
+  if (done) {
+    print(done);
+    for (const warning of warnings) print(`warning: ${warning}`);
+    if (problems.length) print(`problems:\n${bullets(problems)}`);
+    return problems.length ? 1 : 0;
   }
 
   print(`staged: ${directory}`);
@@ -293,7 +343,8 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
   const resumed = { 'resume-push': ' (tagged locally; resuming from the push)', 'remote-tag': ' (pushed; resuming)' }[action] ?? '';
   print(`tag: ${tag} -> ${commit}${resumed}`);
   print(`release body: ${path.join(directory, 'release-notes.md')}`);
-  print('commands:\n' + steps.map(step => `  ${shellJoin(step)}\n`).join(''));
+  print(steps.length ? 'commands:\n' + steps.map(step => `  ${shellJoin(step)}\n`).join('')
+    : 'commands: none until the problems below are resolved');
   for (const warning of warnings) print(`warning: ${warning}`);
   if (problems.length) {
     print(`publish refused:\n${bullets(problems)}`);

@@ -5,7 +5,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { strictJson } from '../src/strict-json.mjs';
 import { crc32, readZip, storedZip } from '../src/stored-zip.mjs';
-import { ROOT, build, check, checkRelease, defaultConfig, loadConfig, pin, releaseUrl, sha256 } from '../src/locale-release.mjs';
+import { ROOT, build, check, checkRelease, defaultConfig, download, loadConfig, pin, releaseUrl, sha256 } from '../src/locale-release.mjs';
 import { SOURCE_DIR, SOURCE_FILES, TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './locale-release-fixture.mjs';
 
 const members = () => new Map([['b.json', Buffer.from('{"b":1}\n')], ['a/x.json', Buffer.from('[]')], ['manifest.json', Buffer.from('{}\n')]]);
@@ -185,4 +185,40 @@ test('the committed release config builds its pinned publication unchanged', t =
   assert.deepEqual(manifest.files, Object.fromEntries(i18n.map(([n, p]) => [`data/${declared.target.game_patch}/${n}`, p])
     .sort(([a], [b]) => (a < b ? -1 : 1))));
   assert.equal(Object.keys(built.receipt.source.files).length, Object.keys(source.files).length);
+});
+
+test('config: a published tag must name the config patch', t => {
+  const { root, repo, manifestRaw } = fixture();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const published = tag => ({ tag, asset: 'pobr-locale-9.9.zip', bytes: 1, sha256: '0'.repeat(64) });
+  const file = path.join(repo, 'release/9.9.json');
+  for (const tag of ['locale/9.8-1', 'locale/9.9-0', 'locale/9.9-1x', 'game/9.9-1', 'locale/9.99-1']) {
+    write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published: published(tag) })));
+    assert.throws(() => loadConfig(file, repo), /Invalid published package pin/u, tag);
+  }
+  write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published: published('locale/9.9-12') })));
+  assert.equal(loadConfig(file, repo).config.published.tag, 'locale/9.9-12');
+});
+
+test('download retries network errors, 429 and 5xx, never other HTTP errors', async () => {
+  const response = (status, body = '') => ({ ok: status === 200, status, arrayBuffer: async () => Buffer.from(body) });
+  const scripted = steps => {
+    const calls = [];
+    return { calls, fetchImpl: async url => {
+      calls.push(url);
+      const step = steps.shift();
+      if (step instanceof Error) throw step;
+      return response(step, 'payload');
+    } };
+  };
+  const waits = [];
+  const sleep = async ms => { waits.push(ms); };
+  let server = scripted([new Error('ECONNRESET'), 503, 200]);
+  assert.deepEqual(await download('u', { ...server, sleep }), Buffer.from('payload'));
+  assert.deepEqual([server.calls.length, waits], [3, [1000, 2000]]);
+  server = scripted([429, 502, 500]);
+  await assert.rejects(download('u', { ...server, sleep }), /GET u: HTTP 500 after 3 attempts/u);
+  server = scripted([404]);
+  await assert.rejects(download('u', { ...server, sleep }), /GET u: HTTP 404$/u);
+  assert.equal(server.calls.length, 1);
 });

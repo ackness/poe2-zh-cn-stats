@@ -101,7 +101,8 @@ export function loadConfig(file, repo = ROOT) {
   const origin = source.origin;
   require(origin?.repository === REPOSITORY && typeof origin.tag === 'string' && HEX40.test(origin.revision ?? ''),
     'The source origin needs this repository, its tag and the full revision');
-  require(published === undefined || (/^locale\/[0-9.]+-[1-9][0-9]*$/u.test(published.tag ?? '')
+  require(published === undefined || (typeof published.tag === 'string'
+    && published.tag.startsWith(`locale/${target.game_patch}-`) && /^[1-9][0-9]*$/u.test(published.tag.slice(`locale/${target.game_patch}-`.length))
     && published.asset === assetName(target.game_patch) && isPin(published)), 'Invalid published package pin');
   const relative = path.relative(repo, file);
   return { file, raw, config, display: relative.startsWith('..') ? file : relative.split(path.sep).join('/') };
@@ -288,10 +289,23 @@ export function releaseUrl(repository, tag, asset, base = process.env.POBR_RELEA
   return `${base.replace(/\/+$/u, '')}/${repository}/releases/download/${encodeURI(tag)}/${encodeURIComponent(asset)}`;
 }
 
-async function download(url) {
-  const response = await fetch(url, { headers: { 'user-agent': 'poe2-zh-cn-stats-release' } });
-  require(response.ok, `GET ${url}: HTTP ${response.status}`);
-  return Buffer.from(await response.arrayBuffer());
+// GET with retries on network errors, 429 and 5xx; other HTTP errors are answers.
+export async function download(url, { fetchImpl = fetch, attempts = 3, backoff = 1000, sleep } = {}) {
+  sleep ??= ms => new Promise(resolve => setTimeout(resolve, ms));
+  for (let attempt = 1; ; attempt++) {
+    let failure;
+    try {
+      const response = await fetchImpl(url, { headers: { 'user-agent': 'poe2-zh-cn-stats-release' } });
+      if (response.ok) return Buffer.from(await response.arrayBuffer());
+      require(response.status === 429 || response.status >= 500, `GET ${url}: HTTP ${response.status}`);
+      failure = `HTTP ${response.status}`;
+    } catch (error) {
+      if (error.message.startsWith(`GET ${url}: HTTP`)) throw error;
+      failure = error.message;
+    }
+    require(attempt < attempts, `GET ${url}: ${failure} after ${attempt} attempts`);
+    await sleep(backoff * 2 ** (attempt - 1));
+  }
 }
 
 // The declared published Release must serve exactly the rebuilt zip.

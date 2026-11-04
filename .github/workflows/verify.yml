@@ -31,17 +31,18 @@ jobs:
         run: |
           for config in release/*.json; do
             patch=$(basename "$config" .json)
-            mise run release:build -- --config "$config" --fetch --check --check-release
-            mise run release:build -- --config "$config" --out ".cache/release/again-$patch"
-            cmp ".cache/release/poe2-international-$patch/pobr-locale-$patch.zip" ".cache/release/again-$patch/pobr-locale-$patch.zip"
-            cmp ".cache/release/poe2-international-$patch/receipt.json" ".cache/release/again-$patch/receipt.json"
+            first=".cache/release/ci-$patch-1" second=".cache/release/ci-$patch-2"
+            mise run release:build -- --config "$config" --out "$first" --fetch --check --check-release
+            mise run release:build -- --config "$config" --out "$second"
+            cmp "$first/pobr-locale-$patch.zip" "$second/pobr-locale-$patch.zip"
+            cmp "$first/receipt.json" "$second/receipt.json"
           done
       - uses: actions/upload-artifact@v4.6.2
         if: always()
         with:
           name: locale-release-receipt
           path: |
-            .cache/release/poe2-international-*/receipt.json
-            .cache/release/poe2-international-*/manifest.json
-            .cache/release/poe2-international-*/SHA256SUMS
+            .cache/release/ci-*-1/receipt.json
+            .cache/release/ci-*-1/manifest.json
+            .cache/release/ci-*-1/SHA256SUMS
           if-no-files-found: ignore

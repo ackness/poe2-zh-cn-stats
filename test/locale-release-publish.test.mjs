@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { copyFileSync, existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { build, pin, sha256 } from '../src/locale-release.mjs';
 import {
@@ -17,10 +17,11 @@ function setup(t) {
 }
 
 // Git runs for real (tags are pushed to the fixture's bare origin); gh is simulated.
-function runner(repo, { auth = true, released = null, create = true } = {}) {
+// releases: {tag: {draft, assets: {name: Buffer}}}. create: 'ok', 'fail', or 'killed'
+// (interrupted mid-upload: a draft with only the first asset is left behind).
+function runner(repo, { auth = true, gh = true, releases = {}, create = 'ok' } = {}) {
   const calls = [];
-  const state = { released };
-  const done = (status, stderr = '') => ({ status, stdout: Buffer.alloc(0), stderr: Buffer.from(stderr) });
+  const done = (status, stdout = '', stderr = '') => ({ status, stdout: Buffer.from(stdout), stderr: Buffer.from(stderr) });
   const run = (command, options = {}) => {
     calls.push(command);
     if (command[0] === 'git') {
@@ -28,26 +29,49 @@ function runner(repo, { auth = true, released = null, create = true } = {}) {
         gitIn(repo, ...command.slice(1));
         return done(0);
       } catch (error) {
-        return done(1, error.message);
+        return done(1, '', error.message);
       }
     }
-    const verb = command.slice(1, 3).join(' ');
-    if (verb === 'auth status') return auth ? done(0) : done(1, 'You are not logged into any GitHub hosts');
-    if (verb === 'release view') return state.released ? done(0) : done(1, 'release not found');
+    if (!gh) throw new Error('spawnSync gh ENOENT');
+    const verb = command.slice(1, 3).join(' '), tag = command[3], release = releases[tag];
+    const option = name => command[command.indexOf(name) + 1];
+    if (verb === 'auth status') return auth ? done(0) : done(1, '', 'You are not logged into any GitHub hosts');
+    if (verb === 'release view') {
+      if (!release) return done(1, '', 'release not found');
+      return done(0, JSON.stringify({ tagName: tag, isDraft: release.draft, assets: Object.entries(release.assets)
+        .map(([name, raw]) => ({ name, size: raw.length, digest: `sha256:${sha256(raw)}`, state: 'uploaded' })) }));
+    }
     if (verb === 'release download') {
-      const directory = command[command.indexOf('--dir') + 1];
-      for (const file of state.released) copyFileSync(file, path.join(directory, path.basename(file)));
+      if (!release) return done(1, '', 'release not found');
+      if (command.includes('--pattern')) {
+        const raw = release.assets[option('--pattern')];
+        return raw ? done(0, raw) : done(1, '', 'no assets match the file pattern');
+      }
+      for (const [name, raw] of Object.entries(release.assets)) write(repo, path.relative(repo, path.join(option('--dir'), name)), raw);
       return done(0);
     }
     if (verb === 'release create') {
-      if (!create) return done(1, 'HTTP 502');
-      state.released = command.slice(command.indexOf('--notes-file') + 2);
+      if (create === 'fail') return done(1, '', 'HTTP 502');
+      const files = command.slice(command.indexOf('--notes-file') + 2);
+      const assets = Object.fromEntries(files.map(file => [path.basename(file), readFileSync(file)]));
+      if (create === 'killed') {
+        const [first] = Object.keys(assets);
+        releases[tag] = { draft: true, assets: { [first]: assets[first] } };
+        return done(1, '', 'signal: killed');
+      }
+      releases[tag] = { draft: false, assets };
+      return done(0);
+    }
+    if (verb === 'release edit' && command.includes('--draft=false')) {
+      release.draft = false;
       return done(0);
     }
     throw new Error(`unexpected command ${command}`);
   };
-  return { run, calls, state };
+  return { run, calls, releases };
 }
+
+const verbs = gh => gh.calls.map(c => c.slice(0, 3).join(' '));
 
 function publish(repo, argv, gh) {
   const lines = [];
@@ -127,7 +151,7 @@ test('dry run (the default): stages and prints the plan, runs nothing', t => {
     const gh = runner(repo);
     const { status, output } = publish(repo, argv, gh);
     assert.equal(status, 0);
-    assert.deepEqual(gh.calls, []);
+    assert.deepEqual(verbs(gh), ['gh auth status']);
     assert.match(output, new RegExp(`tag: locale/9\\.9-1 -> ${commit}`, 'u'));
     assert.match(output, /git push origin refs\/tags\/locale\/9\.9-1/u);
     assert.match(output, /dry run: nothing was tagged, pushed or released/u);
@@ -145,31 +169,90 @@ test('--yes tags, pushes and creates the Release; rerunning only verifies it', t
   const { status, output } = publish(repo, ['--yes'], gh);
   assert.equal(status, 0);
   assert.match(output, /published https:\/\/github\.com\/ackness\/poe2-zh-cn-stats\/releases\/tag\/locale\/9\.9-1/u);
-  assert.deepEqual(gh.calls.map(c => c.slice(0, 3).join(' ')), ['gh auth status', 'git tag --annotate', 'git push origin', 'gh release create']);
+  assert.deepEqual(verbs(gh), ['gh auth status', 'git tag --annotate', 'git push origin', 'gh release create']);
   assert.equal(gitIn(origin, 'rev-parse', 'locale/9.9-1^{commit}'), commit);
   assert.match(gitIn(origin, 'tag', '-l', '--format=%(contents)', 'locale/9.9-1'), /pobr-locale-9\.9\.zip/u);
-  assert.deepEqual(gh.state.released.map(f => path.basename(f)), ['SHA256SUMS', 'pobr-locale-9.9.zip', 'receipt.json']);
-  // The Release keeps its own copies; restaging replaces the staged files.
-  const copies = gh.state.released.map(file => {
-    const copy = path.join(repo, '.cache/released', path.basename(file));
-    write(repo, path.relative(repo, copy), readFileSync(file));
-    return copy;
-  });
-  const again = runner(repo, { released: copies });
+  const { releases } = gh;
+  assert.deepEqual(Object.keys(releases['locale/9.9-1'].assets), ['SHA256SUMS', 'pobr-locale-9.9.zip', 'receipt.json']);
+  const again = runner(repo, { releases });
   const rerun = publish(repo, ['--yes'], again);
   assert.equal(rerun.status, 0);
   assert.match(rerun.output, /already published: locale\/9\.9-1 names HEAD/u);
-  assert.ok(!again.calls.some(c => c[0] === 'git' || c[2] === 'create'));
+  assert.deepEqual(verbs(again), ['gh auth status', 'gh release view', 'gh release download']);
+  // A dry run still shows plan problems before reporting the existing Release.
+  write(repo, 'scratch.txt', 'x');
+  const dirty = publish(repo, [], runner(repo, { releases }));
+  assert.equal(dirty.status, 1);
+  assert.match(dirty.output, /already published: locale\/9\.9-1[^]*problems:\n {2}- the working tree is not clean/u);
+  rmSync(path.join(repo, 'scratch.txt'));
   // Other bytes under the same tag are an error, never overwritten.
-  write(repo, path.relative(repo, copies[1]), Buffer.from('tampered'));
-  assert.throws(() => publish(repo, ['--yes'], again), /already released with other assets/u);
+  releases['locale/9.9-1'].assets['pobr-locale-9.9.zip'] = Buffer.from('tampered');
+  assert.throws(() => publish(repo, ['--yes'], runner(repo, { releases })), /already released with other assets/u);
+});
+
+test('an interrupted upload leaves a draft: finish a complete one, refuse an incomplete one', t => {
+  const { repo } = setup(t);
+  const releases = {};
+  assert.throws(() => publish(repo, ['--yes'], runner(repo, { releases, create: 'killed' })), /step failed: gh release create/u);
+  assert.equal(releases['locale/9.9-1'].draft, true);
+  // Incomplete draft: never "already published"; the remedy keeps the tag.
+  const dry = publish(repo, [], runner(repo, { releases }));
+  assert.equal(dry.status, 1);
+  assert.match(dry.output, /commands: none until the problems below are resolved/u);
+  assert.match(dry.output, /locale\/9\.9-1 is a draft Release whose assets are incomplete or differ from the staged ones \(pobr-locale-9\.9\.zip,receipt\.json\); delete the draft with `gh release delete locale\/9\.9-1 --repo ackness\/poe2-zh-cn-stats --yes` \(keeps the tag\) and rerun/u);
+  const refused = runner(repo, { releases });
+  assert.equal(publish(repo, ['--yes'], refused).status, 1);
+  assert.deepEqual(verbs(refused), ['gh auth status', 'gh release view']);
+  delete releases['locale/9.9-1'];
+  const recreate = runner(repo, { releases });
+  assert.equal(publish(repo, ['--yes'], recreate).status, 0);
+  assert.deepEqual(verbs(recreate), ['gh auth status', 'gh release view', 'gh release create']);
+  // A draft that holds exactly the staged assets is published as it is.
+  releases['locale/9.9-1'].draft = true;
+  const plan = publish(repo, [], runner(repo, { releases }));
+  assert.match(plan.output, /gh release edit locale\/9\.9-1 --repo ackness\/poe2-zh-cn-stats --draft=false/u);
+  const finish = runner(repo, { releases });
+  assert.equal(publish(repo, ['--yes'], finish).status, 0);
+  assert.deepEqual(verbs(finish), ['gh auth status', 'gh release view', 'gh release edit']);
+  assert.equal(releases['locale/9.9-1'].draft, false);
+});
+
+test('the same bytes never get a second number from a later commit', t => {
+  const { repo } = setup(t);
+  const releases = {};
+  assert.equal(publish(repo, ['--yes'], runner(repo, { releases })).status, 0);
+  write(repo, 'docs.md', 'unrelated\n');
+  commitAll(repo, 'unrelated');
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  const result = publish(repo, [], runner(repo, { releases }));
+  assert.equal(result.status, 1);
+  assert.match(result.output, /tag: locale\/9\.9-2[^]*these exact bytes are already published as locale\/9\.9-1; pin that Release instead/u);
+  // Other bytes, or a previous tag without a Release, get the next number.
+  releases['locale/9.9-1'].assets.SHA256SUMS = Buffer.from(`${'0'.repeat(64)}  pobr-locale-9.9.zip\n`);
+  assert.equal(publish(repo, [], runner(repo, { releases })).status, 0);
+  delete releases['locale/9.9-1'];
+  assert.equal(publish(repo, [], runner(repo, { releases })).status, 0);
+});
+
+test('a dry run without gh reports it instead of failing', t => {
+  const { repo } = setup(t);
+  const releases = {};
+  assert.equal(publish(repo, ['--yes'], runner(repo, { releases })).status, 0);
+  for (const args of [[], ['--yes']]) {
+    const fn = () => publish(repo, args, runner(repo, { gh: false }));
+    if (args.length) assert.throws(fn, /gh is not available/u);
+    else {
+      const { status, output } = fn();
+      assert.equal(status, 1);
+      assert.match(output, /publish refused:\n {2}- gh is not available: spawnSync gh ENOENT/u);
+    }
+  }
 });
 
 test('--yes refuses before building: gh missing or logged out, dirty tree', t => {
   const { repo, origin } = setup(t);
   assert.throws(() => publish(repo, ['--yes'], runner(repo, { auth: false })), /refusing to publish:\n {2}- gh is not authenticated/u);
-  const missing = { run: () => { throw new Error('spawnSync gh ENOENT'); } };
-  assert.throws(() => publish(repo, ['--yes'], missing), /gh is not available/u);
+  assert.throws(() => publish(repo, ['--yes'], runner(repo, { gh: false })), /gh is not available/u);
   write(repo, 'docs.md', 'untracked\n');
   assert.throws(() => publish(repo, ['--yes'], runner(repo)), /working tree is not clean \(1 paths, e\.g\. docs\.md\)/u);
   assert.ok(!existsSync(path.join(repo, '.cache/release')));
@@ -178,19 +261,19 @@ test('--yes refuses before building: gh missing or logged out, dirty tree', t =>
 
 test('a failed step resumes with the same tag; an unpushed local tag resumes from the push', t => {
   const { repo, origin, commit } = setup(t);
-  assert.throws(() => publish(repo, ['--yes'], runner(repo, { create: false })),
+  assert.throws(() => publish(repo, ['--yes'], runner(repo, { create: 'fail' })),
     /step failed: gh release create locale\/9\.9-1[^]*rerun release:publish to resume/u);
   assert.equal(gitIn(origin, 'rev-parse', 'locale/9.9-1^{commit}'), commit);
   const gh = runner(repo);
   assert.equal(publish(repo, ['--yes'], gh).status, 0);
-  assert.deepEqual(gh.calls.map(c => c.slice(0, 3).join(' ')), ['gh auth status', 'gh release view', 'gh release create']);
+  assert.deepEqual(verbs(gh), ['gh auth status', 'gh release view', 'gh release create']);
   // A tag made locally but never pushed.
   const fresh = setup(t);
   gitIn(fresh.repo, 'tag', 'locale/9.9-1', fresh.commit);
   const resumed = runner(fresh.repo);
   const { output } = publish(fresh.repo, ['--yes'], resumed);
   assert.match(output, /\(tagged locally; resuming from the push\)/u);
-  assert.deepEqual(resumed.calls.map(c => c.slice(0, 3).join(' ')), ['gh auth status', 'git push origin', 'gh release create']);
+  assert.deepEqual(verbs(resumed), ['gh auth status', 'git push origin', 'gh release create']);
 });
 
 test('the package must be built from HEAD and not already published under another tag', t => {
