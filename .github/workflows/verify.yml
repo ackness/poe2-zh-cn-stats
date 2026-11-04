@@ -15,3 +15,33 @@ jobs:
           version: '2026.10.23'
       - run: mise run setup
       - run: mise run check
+  release:
+    name: release:build reproduces the locale package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5
+        with:
+          version: '2026.10.23'
+      # --fetch fetches each source's origin commit (Git only). --check fails unless
+      # the checkout is clean, the frozen source tree equals that origin commit's
+      # and the zip equals the config's published pin; --check-release downloads
+      # that Release and compares it byte for byte. A second build must match.
+      - name: Rebuild every declared patch's language package from its pinned source
+        run: |
+          for config in release/*.json; do
+            patch=$(basename "$config" .json)
+            mise run release:build -- --config "$config" --fetch --check --check-release
+            mise run release:build -- --config "$config" --out ".cache/release/again-$patch"
+            cmp ".cache/release/poe2-international-$patch/pobr-locale-$patch.zip" ".cache/release/again-$patch/pobr-locale-$patch.zip"
+            cmp ".cache/release/poe2-international-$patch/receipt.json" ".cache/release/again-$patch/receipt.json"
+          done
+      - uses: actions/upload-artifact@v4.6.2
+        if: always()
+        with:
+          name: locale-release-receipt
+          path: |
+            .cache/release/poe2-international-*/receipt.json
+            .cache/release/poe2-international-*/manifest.json
+            .cache/release/poe2-international-*/SHA256SUMS
+          if-no-files-found: ignore
