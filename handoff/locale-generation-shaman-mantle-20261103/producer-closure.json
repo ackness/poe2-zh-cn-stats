@@ -1,0 +1,19 @@
+{
+  "schema": "poe2-locale-producer-closure/v1",
+  "source_revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+  "entrypoint": "src/locale-producer.mjs",
+  "files": {
+    "src/locale-producer.mjs": {
+      "bytes": 12815,
+      "sha256": "dd1d29ad491ffa0ee139d6a81d216a3cd15f0dffee7c949a9e477ae8e78a5216"
+    },
+    "src/legacy-translation-merge.mjs": {
+      "bytes": 6804,
+      "sha256": "00d22200a86c129108910e83353f53ea97e38663f772625f0f5948d3e0916ce6"
+    },
+    "src/strict-json.mjs": {
+      "bytes": 2621,
+      "sha256": "679d91bb84e0bfa88c1e3cb25bfe11f27a1e0c17e85f11b58130a63b2aec6cdb"
+    }
+  }
+}
