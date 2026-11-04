@@ -1,0 +1,103 @@
+{
+  "schema": "poe2-curated-alias-review/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "adoption": "not-adopted",
+  "scope": "Four exact Shaman Mantle line aliases copied verbatim from the retained block; no new translation, numeric or client-authenticity claim; no generic multiline splitting.",
+  "inputs": {
+    "curated": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+      "path": "data/snapshots/20261104T031003350Z/generated/curated.json",
+      "bytes": 7717,
+      "sha256": "e9f297ea594a15ac02c44cfe467eabc70cf9c911493c47340afe372f485e29b6"
+    },
+    "templates": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+      "path": "data/snapshots/20261104T031003350Z/generated/templates.json",
+      "bytes": 4810831,
+      "sha256": "d65f05f2287d7376e382477fecd8c7f26b1c11a48d2009dc1d87f850cb484461"
+    },
+    "snapshot_manifest": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+      "path": "data/snapshots/20261104T031003350Z/manifest.json",
+      "bytes": 25700,
+      "sha256": "de65c7bffff74a77898afa07bbbe68848b92af7ec960704596be9774f920fb46"
+    },
+    "source_curated": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+      "path": "curated.json",
+      "bytes": 7717,
+      "sha256": "e9f297ea594a15ac02c44cfe467eabc70cf9c911493c47340afe372f485e29b6"
+    },
+    "retained": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+      "path": "handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json",
+      "bytes": 3875636,
+      "sha256": "1d51e0a2e58bb0fe46dfde331bd004140250eeed70d4e16f683b180c06eba301"
+    }
+  },
+  "review": {
+    "by": "Codex; independent gpt-6-astra xhigh review",
+    "method": "Exact ordered line correspondence to the pinned existing bilingual block and exact four-pair delta; regression tests and mutation deletion check passed."
+  },
+  "original_block": {
+    "src": "无法使用生命药剂\n非传奇生命药剂的效果持续生效\n生命药剂的回复效果无法瞬间完成\n你的生命药剂回复效果仅对你自己生效",
+    "en": "Cannot use Life Flasks\nNon-Unique Life Flasks apply their Effects constantly\nRecovery from Life Flasks cannot be Instant\nRecovery from your Life Flasks cannot be applied to anything other than you"
+  },
+  "aliases": [
+    {
+      "src": "你的生命药剂回复效果仅对你自己生效",
+      "en": "Recovery from your Life Flasks cannot be applied to anything other than you",
+      "kind": "curated",
+      "provenance": {
+        "id": "curated.shaman-mantle.self-only-life-flask-recovery",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 4 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016"
+      }
+    },
+    {
+      "src": "无法使用生命药剂",
+      "en": "Cannot use Life Flasks",
+      "kind": "curated",
+      "provenance": {
+        "id": "curated.shaman-mantle.cannot-use-life-flasks",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 1 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016"
+      }
+    },
+    {
+      "src": "生命药剂的回复效果无法瞬间完成",
+      "en": "Recovery from Life Flasks cannot be Instant",
+      "kind": "curated",
+      "provenance": {
+        "id": "curated.shaman-mantle.non-instant-life-flask-recovery",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 3 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016"
+      }
+    },
+    {
+      "src": "非传奇生命药剂的效果持续生效",
+      "en": "Non-Unique Life Flasks apply their Effects constantly",
+      "kind": "curated",
+      "provenance": {
+        "id": "curated.shaman-mantle.constant-life-flask-effects",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 2 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016"
+      }
+    }
+  ],
+  "output": {
+    "pairs": 28042,
+    "bytes": 3876139,
+    "sha256": "5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95"
+  },
+  "removed_count": 0
+}
