@@ -209,9 +209,9 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 ## 维护剩余缺口
 
 原生名称／描述使用[补译与区服工作表](translation-workbench.md)：
-[`native-translation-worklist.json`](../native-translation-worklist.json) 可直接查看官方缺译、待办和 agent 草稿；
+[`reports/native-translation-worklist.json`](../reports/native-translation-worklist.json) 可直接查看官方缺译、待办和 agent 草稿；
 [`native-translations.json`](../native-translations.json) 是可编辑的补译输入，官方补译优先，版本变化要求复核。
-[`native-regional-candidates.json`](../native-regional-candidates.json) 独立列出区服或版本差异待确认项。
+[`reports/native-regional-candidates.json`](../reports/native-regional-candidates.json) 独立列出区服或版本差异待确认项。
 国服与国际服按独立身份保存，语言不代替区服证据。下面的 `translations.json` 继续只维护交易 ID。
 
 ### 持续补译表

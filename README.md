@@ -1,6 +1,6 @@
-# PoE2 简中词条与语言数据
+# PoE2 中文语言数据（简中／繁中）
 
-为 PoE2 工具提供可追溯的英文／中文词条、名称和显示文本。本库负责采集交易词条、配对客户端语言、维护人工补译，并生成 PoBR 使用的固定语言文件。
+为 PoBR 及其他 PoE2 工具提供可追溯的英文／中文词条、名称和显示文本，覆盖简体与繁体中文。仓库名沿用最初的 `zh-cn-stats`。本库负责采集交易词条、配对客户端语言、维护人工补译，并生成 PoBR 使用的固定语言文件。
 
 每份输出保留来源、版本身份和校验摘要；缺译和冲突有独立记录，供维护者核对。
 
@@ -89,8 +89,7 @@ data/snapshots/<id>/generated/ 词典、模板、覆盖、缺口和冲突报告
 translations.json             交易补译工作表
 curated.json / overrides.json 人工模板与精确修正
 native-translations.json      原生文本补译输入
-native-translation-worklist.json  原生文本待办与草稿
-native-regional-candidates.json  区服／版本差异待核对项
+reports/                      已提交的可读待办快照（原生文本待办、区服／版本差异），由 `workbench` 命令输出生成，不是输入
 src/                          采集、配对、生成与验证代码
 test/                         离线回归用例
 docs/                         数据契约和维护指南

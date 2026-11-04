@@ -1,8 +1,8 @@
 # 原件补译与区服工作表
 
 `native-translations.json` 保存人工或 agent 的补译，原始官方 catalog 保持不可变。
-`native-translation-worklist.json` 是已提交的可读待办快照；它记录输入 catalog 的摘要，
-不是当前游戏的完整语言包。`native-regional-candidates.json` 单列目标表中缺少的来源条目，
+`reports/native-translation-worklist.json` 是已提交的可读待办快照；它记录输入 catalog 的摘要，
+不是当前游戏的完整语言包。`reports/native-regional-candidates.json` 单列目标表中缺少的来源条目，
 这些条目可能属于区服或版本差异，不能仅凭简体中文路径认定国服专属。
 
 交易 stat 的补译仍使用原 `translations.json`。本入口处理原件名称、技能说明等有明确
@@ -36,7 +36,7 @@ mise exec -- node src/cli.mjs workbench-list --file .cache/workbench/new/workben
 输出包括完整 `workbench.json`、按状态列 ID 的 `queues.json`、简要 `report.md`、
 可补译的 `worklist.json`、单列来源差异的 `regional-candidates.json`，以及输入 edits 副本、
 紧凑 `supplements.json`、请求和最后写入的 manifest。目录必须在本库 `.cache` 且尚不存在；命令不联网、不覆盖旧目录，
-不改 CURRENT。可将新 worklist 和 regional-candidates 作为根目录两份可读快照提交，
+不改 CURRENT。可将新的 `worklist.json` 与 `regional-candidates.json` 分别提交为 `reports/native-translation-worklist.json` 与 `reports/native-regional-candidates.json` 两份可读快照，
 完整证据留 cache 或固定数据分支。快照保留输入身份，不能冒充生产采用。
 
 机器之间通过 Git 同步数据和证据，线程消息只传提交、路径及摘要。读取器不设置固定的
