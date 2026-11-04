@@ -1,0 +1,341 @@
+[
+  {
+    "kind": "official-supplemental-difference",
+    "id": "crafted.stat_1484026495",
+    "english": "+# maximum stacks of Puppet Master",
+    "retained": "+# 傀儡大师层数上限",
+    "candidates": [
+      "+# 奇术大师层数上限"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "crafted.stat_2106365538",
+    "english": "#% increased Evasion Rating",
+    "retained": "闪避值提高 #%",
+    "candidates": [
+      "该装备的闪避值提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "crafted.stat_2840930496",
+    "english": "#% Surpassing Chance to gain a Puppet Master stack whenever you use a Command Skill",
+    "retained": "使用命令技能时，有 #% 的溢出几率获得一层傀儡大师",
+    "candidates": [
+      "使用号令技能时，有 #% 的溢出几率获得一层奇术大师"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "crafted.stat_3377888098",
+    "english": "#% increased Skill Effect Duration",
+    "retained": "技能效果持续时间延长 #%",
+    "candidates": [
+      "技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "desecrated.stat_1416406066",
+    "english": "#% increased Spirit",
+    "retained": "精魂提高 #%",
+    "candidates": [
+      "该装备精魂提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "desecrated.stat_1484026495",
+    "english": "+# maximum stacks of Puppet Master",
+    "retained": "+# 傀儡大师层数上限",
+    "candidates": [
+      "+# 奇术大师层数上限"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "desecrated.stat_2106365538",
+    "english": "#% increased Evasion Rating",
+    "retained": "闪避值提高 #%",
+    "candidates": [
+      "该装备的闪避值提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "desecrated.stat_2594634307",
+    "english": "Mark Skills have #% increased Skill Effect Duration",
+    "retained": "印记技能的技能效果持续时间延长 #%",
+    "candidates": [
+      "印记技能的技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "desecrated.stat_2840930496",
+    "english": "#% Surpassing Chance to gain a Puppet Master stack whenever you use a Command Skill",
+    "retained": "使用命令技能时，有 #% 的溢出几率获得一层傀儡大师",
+    "candidates": [
+      "使用号令技能时，有 #% 的溢出几率获得一层奇术大师"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "desecrated.stat_3377888098",
+    "english": "#% increased Skill Effect Duration",
+    "retained": "技能效果持续时间延长 #%",
+    "candidates": [
+      "技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "desecrated.stat_3523867985",
+    "english": "#% increased Armour, Evasion and Energy Shield",
+    "retained": "护甲、闪避和能量护盾提高 #%",
+    "candidates": [
+      "护甲、闪避和能量护盾提高 #%",
+      "护甲，闪避与能量护盾提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "enchant.stat_2106365538",
+    "english": "#% increased Evasion Rating",
+    "retained": "闪避值提高 #%",
+    "candidates": [
+      "该装备的闪避值提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "enchant.stat_3377888098",
+    "english": "#% increased Skill Effect Duration",
+    "retained": "技能效果持续时间延长 #%",
+    "candidates": [
+      "技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_1416406066",
+    "english": "#% increased Spirit",
+    "retained": "精魂提高 #%",
+    "candidates": [
+      "该装备精魂提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_1484026495",
+    "english": "+# maximum stacks of Puppet Master",
+    "retained": "+# 傀儡大师层数上限",
+    "candidates": [
+      "+# 奇术大师层数上限"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_2065500219",
+    "english": "Monsters have #% increased Effectiveness",
+    "retained": "怪物的效能提高 #%",
+    "candidates": [
+      "怪物的强度提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_2106365538",
+    "english": "#% increased Evasion Rating",
+    "retained": "闪避值提高 #%",
+    "candidates": [
+      "该装备的闪避值提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_2594634307",
+    "english": "Mark Skills have #% increased Skill Effect Duration",
+    "retained": "印记技能的技能效果持续时间延长 #%",
+    "candidates": [
+      "印记技能的技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_2840930496",
+    "english": "#% Surpassing Chance to gain a Puppet Master stack whenever you use a Command Skill",
+    "retained": "使用命令技能时，有 #% 的溢出几率获得一层傀儡大师",
+    "candidates": [
+      "使用号令技能时，有 #% 的溢出几率获得一层奇术大师"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_3377888098",
+    "english": "#% increased Skill Effect Duration",
+    "retained": "技能效果持续时间延长 #%",
+    "candidates": [
+      "技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_3523867985",
+    "english": "#% increased Armour, Evasion and Energy Shield",
+    "retained": "护甲、闪避和能量护盾提高 #%",
+    "candidates": [
+      "护甲、闪避和能量护盾提高 #%",
+      "护甲，闪避与能量护盾提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "explicit.stat_664606484",
+    "english": "Abyssal Monsters have #% increased Effectiveness for each closed Pit, up to 100%",
+    "retained": "每关闭一个巨坑，深渊怪物的效能提高 #%，最高可达 100%",
+    "candidates": [
+      "每关闭一个巨坑，深渊怪物的强度提高 #%，最高可达 100%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "fractured.stat_1416406066",
+    "english": "#% increased Spirit",
+    "retained": "精魂提高 #%",
+    "candidates": [
+      "该装备精魂提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "fractured.stat_1484026495",
+    "english": "+# maximum stacks of Puppet Master",
+    "retained": "+# 傀儡大师层数上限",
+    "candidates": [
+      "+# 奇术大师层数上限"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "fractured.stat_2106365538",
+    "english": "#% increased Evasion Rating",
+    "retained": "闪避值提高 #%",
+    "candidates": [
+      "该装备的闪避值提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "fractured.stat_2594634307",
+    "english": "Mark Skills have #% increased Skill Effect Duration",
+    "retained": "印记技能的技能效果持续时间延长 #%",
+    "candidates": [
+      "印记技能的技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "fractured.stat_2840930496",
+    "english": "#% Surpassing Chance to gain a Puppet Master stack whenever you use a Command Skill",
+    "retained": "使用命令技能时，有 #% 的溢出几率获得一层傀儡大师",
+    "candidates": [
+      "使用号令技能时，有 #% 的溢出几率获得一层奇术大师"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "fractured.stat_3377888098",
+    "english": "#% increased Skill Effect Duration",
+    "retained": "技能效果持续时间延长 #%",
+    "candidates": [
+      "技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "fractured.stat_3523867985",
+    "english": "#% increased Armour, Evasion and Energy Shield",
+    "retained": "护甲、闪避和能量护盾提高 #%",
+    "candidates": [
+      "护甲、闪避和能量护盾提高 #%",
+      "护甲，闪避与能量护盾提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "rune.stat_1416406066",
+    "english": "#% increased Spirit",
+    "retained": "精魂提高 #%",
+    "candidates": [
+      "该装备精魂提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "rune.stat_2652394701",
+    "english": "Companions in your Presence gain # Rage on hit",
+    "retained": "你在场范围内伙伴击中时获得 # 点怒火",
+    "candidates": [
+      "在场伙伴击中时获得 # 点怒火"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "rune.stat_2681952497",
+    "english": "Plants have a #% chance to immediately Overgrow when they enter your Presence for the first time",
+    "retained": "植物首次进入在场范围时，有 #% 的几率立即蔓生",
+    "candidates": [
+      "植物首次进入在场范围时，有 #% 的几率立即过度生长"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "rune.stat_3377888098",
+    "english": "#% increased Skill Effect Duration",
+    "retained": "技能效果持续时间延长 #%",
+    "candidates": [
+      "技能效果持续时间提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "rune.stat_3523867985",
+    "english": "#% increased Armour, Evasion and Energy Shield",
+    "retained": "护甲、闪避和能量护盾提高 #%",
+    "candidates": [
+      "护甲、闪避和能量护盾提高 #%",
+      "护甲，闪避与能量护盾提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "sanctum.stat_1016362888",
+    "english": "#% increased Armour, Evasion and Energy Shield",
+    "retained": "护甲，闪避与能量护盾提高 #%",
+    "candidates": [
+      "护甲、闪避和能量护盾提高 #%",
+      "护甲，闪避与能量护盾提高 #%"
+    ]
+  },
+  {
+    "kind": "official-supplemental-difference",
+    "id": "sanctum.stat_3882471944",
+    "english": "#% increased Evasion Rating",
+    "retained": "闪避值提高 #%",
+    "candidates": [
+      "该装备的闪避值提高 #%"
+    ]
+  },
+  {
+    "kind": "supplemental-not-in-official-branches",
+    "id": "explicit.stat_1210760818",
+    "english": "Breaches in Map have #% increased Pack Size",
+    "official": [
+      "地图裂隙中的怪物群落规模提高 #%",
+      "裂隙的怪物密度提高 #%"
+    ],
+    "candidate": "地图内的裂隙怪物密度提高 #%"
+  }
+]
