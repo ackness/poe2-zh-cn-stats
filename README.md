@@ -89,7 +89,7 @@ data/snapshots/<id>/generated/ 词典、模板、覆盖、缺口和冲突报告
 translations.json             交易补译工作表
 curated.json / overrides.json 人工模板与精确修正
 native-translations.json      原生文本补译输入
-reports/                      已提交的可读待办快照（原生文本待办、区服／版本差异），由工作表生成，不是输入
+reports/                      已提交的可读待办快照（原生文本待办、区服／版本差异），由 `workbench` 命令输出生成，不是输入
 src/                          采集、配对、生成与验证代码
 test/                         离线回归用例
 docs/                         数据契约和维护指南
