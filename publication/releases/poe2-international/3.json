@@ -1,0 +1,187 @@
+{
+  "bindings": {
+    "display_source": {
+      "bytes": 15012947,
+      "expanded_bytes": 354534682,
+      "manifest": {
+        "bytes": 23236,
+        "sha256": "dc00160526a114c0fdfc6a9e11564bbce17749ebff4c671a97b6e40d38265425"
+      },
+      "path": "handoff/windows-fk-20261101/source-candidate.zip",
+      "repository": "ackness/repoe",
+      "revision": "273f7a6d1f214b3a38c0c1a9dd78f1127b6b196b",
+      "sha256": "49c3d06dcd718c8e049e7cf1c24deecb245caab4a9a054803cc94aacbd00ff27"
+    }
+  },
+  "components": {
+    "display_catalog": {
+      "input": {
+        "bytes": 17177228,
+        "expanded_bytes": 391883530,
+        "manifest": {
+          "bytes": 4744,
+          "sha256": "0ef819f9628ae6341ce4f940ede093cdfaf6921b4b647c13d38912c1456e6a4e"
+        },
+        "path": "handoff/windows-fk-20261101/catalog.zip",
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "e61f1332e22dcbd199c3265b61b4e597b7da7b37",
+        "sha256": "f4bbbd01c5aeea8f8a19b99c7cea67f38550949d5ef8c62e1245304013d129ef"
+      },
+      "sequence": 1
+    },
+    "display_library": {
+      "input": {
+        "files": {
+          "src/native-catalog-binding.mjs": {
+            "bytes": 9877,
+            "sha256": "49664e47f7bcfe324cdec13cdd97b36668b2956337a16f83ed0ba86fb58529a6"
+          },
+          "src/native-catalog-fk-binding.mjs": {
+            "bytes": 20103,
+            "sha256": "fd1678e34e6b02c2b9055c21e3548eab6d4fdbf3841eefa52d2e302bd0ec83cb"
+          },
+          "src/native-catalog.mjs": {
+            "bytes": 29931,
+            "sha256": "92ae5e732170648c66529df09dfb003e5e3e1b35a6384f171e91beef0923ca9a"
+          },
+          "src/native-localization.mjs": {
+            "bytes": 25024,
+            "sha256": "d89f3137e44d957e987e3e01619793228bf3fc5cb740376810b103a5b3c5136b"
+          },
+          "src/native-names.mjs": {
+            "bytes": 15624,
+            "sha256": "62f2060682577b0c617b62b399166e72fe5fda650d1de63e732c43b773863c42"
+          },
+          "src/strict-json.mjs": {
+            "bytes": 2621,
+            "sha256": "679d91bb84e0bfa88c1e3cb25bfe11f27a1e0c17e85f11b58130a63b2aec6cdb"
+          }
+        },
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "e61f1332e22dcbd199c3265b61b4e597b7da7b37"
+      },
+      "sequence": 1
+    },
+    "language": {
+      "input": {
+        "format": "locale-git-files",
+        "manifest": {
+          "bytes": 4088,
+          "sha256": "730222f0cb7a777534243f3b4aff480ae31b2756c8e4ece574b0c4f44f0693a3"
+        },
+        "path": "handoff/locale-shaman-mantle-20261103/manifest.json",
+        "publication": "published",
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "9aba3687e6366597bc69a0795c63a20090cb02f5"
+      },
+      "sequence": 2
+    },
+    "locale_generation": {
+      "input": {
+        "input_manifest": {
+          "path": "handoff/locale-generation-shaman-mantle-20261103/input-manifest.json",
+          "bytes": 7344,
+          "sha256": "cc33dc60aa6ae2689f12f00db30efd6e92fcc84deb077651d878da9ed97f04a8"
+        },
+        "producer": {
+          "entrypoint": "src/locale-producer.mjs",
+          "files": {
+            "src/legacy-translation-merge.mjs": {
+              "bytes": 6804,
+              "sha256": "00d22200a86c129108910e83353f53ea97e38663f772625f0f5948d3e0916ce6"
+            },
+            "src/locale-producer.mjs": {
+              "bytes": 12815,
+              "sha256": "dd1d29ad491ffa0ee139d6a81d216a3cd15f0dffee7c949a9e477ae8e78a5216"
+            },
+            "src/strict-json.mjs": {
+              "bytes": 2621,
+              "sha256": "679d91bb84e0bfa88c1e3cb25bfe11f27a1e0c17e85f11b58130a63b2aec6cdb"
+            }
+          }
+        },
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "9aba3687e6366597bc69a0795c63a20090cb02f5",
+        "schema": "pobr-locale-generation-lock/v1",
+        "target": {
+          "game": "poe2",
+          "game_patch": "0.5.5.5",
+          "realm": "international"
+        }
+      },
+      "sequence": 2
+    },
+    "reviewed_supplement": {
+      "input": {
+        "bytes": 1585,
+        "expanded_bytes": 2160,
+        "manifest": {
+          "bytes": 1219,
+          "sha256": "a55b9c56fb97af7a88c1f18749bed9d6936fe135b503e560acda2788ec1c3392"
+        },
+        "path": "handoff/reviewed-supplements-20261101/runtime.zip",
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "5d019466678522e1ff3535b27951ad8056498ff8",
+        "sha256": "989293a62f212f56c2f8e2b26aec6439709d55600f5cb8360d6c9ab5ccc968a8"
+      },
+      "sequence": 1
+    },
+    "support_display": {
+      "input": {
+        "asset": {
+          "bytes": 183816,
+          "sha256": "57602ecb59184e5ba239531b5f47faa6c0c9f836530b3f516a976ed2041e3b49"
+        },
+        "catalog_sha256": "de57e010c8bf93f18bf557c650d6cdc06d98bc3fbde58049227b31feda9deea6",
+        "manifest": {
+          "bytes": 1062,
+          "sha256": "88aef08b06b2b2987dd21db5c6ac276ce0a9411830b86a548729f5f2f10fe0d7"
+        },
+        "path": "handoff/support-display-20261101/manifest.json",
+        "publication": "published",
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "5046a18af9974e8914fa1ea1b2b0db9202b2908b",
+        "source_data_version": "0.5.5.4.2"
+      },
+      "sequence": 1
+    },
+    "workbench": {
+      "input": {
+        "bytes": 25586,
+        "file": "src/translation-workbench.mjs",
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "0e7778c4e7db217b79fcf33f9718315dcf223a60",
+        "sha256": "1709a661cfe0d7cf4b798e5c25aa746c5bb17cc6b404598f5a59ab34119b0cd3"
+      },
+      "sequence": 1
+    }
+  },
+  "evidence": {
+    "catalog_validation": {
+      "bytes": 3302,
+      "path": "handoff/windows-fk-20261101/validation.json",
+      "revision": "e61f1332e22dcbd199c3265b61b4e597b7da7b37",
+      "sha256": "9a9f7b1607277e398d7edd706bee2ad69f020b6b988348c78018f6d911242271"
+    }
+  },
+  "owner": "ackness/poe2-zh-cn-stats",
+  "previous": {
+    "revision": "dd8f99dbc48cfb2279a1bbd30d261b46acab4561",
+    "path": "publication/releases/poe2-international/2.json",
+    "bytes": 6550,
+    "sha256": "b9aea36f065be73c4d26e015581f2e7b6713bb9ac2d25b167ae170045df12f24"
+  },
+  "schema": "owned-data-publication/v2",
+  "scope": {
+    "complete": "declared-dependency-closure-only",
+    "freshness_certified": false,
+    "official_client_certified": false,
+    "translation_quality_certified": false
+  },
+  "sequence": 3,
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  }
+}
