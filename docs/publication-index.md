@@ -5,9 +5,16 @@
 `head` 的 revision/path/bytes/SHA-256 读取 descriptor。源码 HEAD、分支时间和 patch
 字符串都不是数据包排序规则。同 patch 新语言、reviewed 输入或工具也必须发布新序号。
 
-当前 sequence 2 的[发布声明](../publication/releases/poe2-international/2.json)
-迁移 RePoE 截断 fork 前历史后变化的 `bindings.display_source.revision`。
-原件、目录和语言产物字节均未改变，七个语言角色的序号保持 1；sequence 1 原声明继续保留。
+本地准备的 sequence 3 [发布声明](../publication/releases/poe2-international/3.json)
+为 Shaman Mantle 增加四条已审核的简中单行别名，保留原四行区块；
+`language` 和 `locale_generation` 角色序号增至 2，其他五个角色仍为 1。
+新选取层沿用固定生产输入及旧两条 literal，再显式追加四条 curated 别名，
+逐文件来源与生成收据见 `handoff/locale-shaman-mantle-20261103/evidence/`
+（由 `handoff/shaman-mantle-20261103` tag 保活）。本地登记不表示已远端发布或 PoBR 已采用。
+
+sequence 2 的[历史声明](../publication/releases/poe2-international/2.json)
+迁移 RePoE 截断 fork 前历史后变化的 `bindings.display_source.revision`；
+当时原件、目录和语言产物字节均未改变，七个语言角色的序号保持 1。
 RePoE 的旧 SHA 与新 SHA 关系见其[历史迁移说明](https://github.com/ackness/repoe/blob/master/RePoE/docs/history.md)。
 
 ## 产物身份与保活

@@ -1,0 +1,54 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import { buildTemplateExport } from '../src/template-export.mjs';
+import { mergeTranslations } from '../src/legacy-translation-merge.mjs';
+
+const aliases = [
+  { src: '无法使用生命药剂', en: 'Cannot use Life Flasks' },
+  { src: '非传奇生命药剂的效果持续生效', en: 'Non-Unique Life Flasks apply their Effects constantly' },
+  { src: '生命药剂的回复效果无法瞬间完成', en: 'Recovery from Life Flasks cannot be Instant' },
+  { src: '你的生命药剂回复效果仅对你自己生效', en: 'Recovery from your Life Flasks cannot be applied to anything other than you' },
+];
+const block = {
+  src: aliases.map(row => row.src).join('\n'),
+  en: aliases.map(row => row.en).join('\n'),
+};
+const source = 'https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016';
+const curated = JSON.parse(await readFile(new URL('../curated.json', import.meta.url)));
+const retained = JSON.parse(await readFile(new URL('../handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json', import.meta.url)));
+const bundle = buildTemplateExport({ snapshot: '20261103T000000000Z', entries: [], curated });
+const pair = ({ src, en }) => ({ src, en });
+const key = row => JSON.stringify(pair(row));
+
+test('Shaman Mantle exports exactly four reviewed, verbatim single-line aliases with retained provenance', () => {
+  const rows = bundle.templates.filter(row => row.provenance.id.startsWith('curated.shaman-mantle.'));
+  assert.equal(rows.length, 4);
+  assert.deepEqual(new Set(rows.map(key)), new Set(aliases.map(key)));
+  assert.deepEqual(retained.filter(row => row.en === block.en), [block]);
+  for (const row of rows) {
+    assert.equal(row.kind, 'curated');
+    assert.equal(row.provenance.source_url, source);
+    assert.match(row.provenance.note, /Reviewed single-line alias/);
+    assert.ok(!/[\n{}]/u.test(row.src + row.en));
+  }
+});
+
+test('locale merge adds only the four aliases and preserves every retained pair and the original block', () => {
+  const before = JSON.stringify(retained);
+  const result = mergeTranslations(retained, bundle);
+  const retainedKeys = new Set(retained.map(key));
+  const added = result.pairs.filter(row => !retainedKeys.has(key(row)));
+  assert.deepEqual(new Set(added.map(key)), new Set(aliases.map(key)));
+  assert.equal(result.pairs.length, retained.length + 4);
+  assert.deepEqual(result.pairs.filter(row => retainedKeys.has(key(row))), retained);
+  assert.deepEqual(result.pairs.filter(row => row.en === block.en), [block]);
+  assert.equal(JSON.stringify(retained), before);
+});
+
+test('unreviewed multiline templates remain whole and gain no implicit single-line aliases', () => {
+  const unrelated = { src: '测试生命\n测试魔力', en: 'Test Life\nTest Mana' };
+  const result = mergeTranslations([block, unrelated], bundle);
+  assert.deepEqual(result.pairs.filter(row => row.en === unrelated.en), [unrelated]);
+  assert.ok(result.pairs.every(row => !['Test Life', 'Test Mana'].includes(row.en)));
+});

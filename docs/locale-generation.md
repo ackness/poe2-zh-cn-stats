@@ -74,3 +74,39 @@ producer. Compose them through their existing independently pinned native
 projection or retained-publication contracts, with catalog and reviewed bundle
 checks where required. The original SC client patch and realm remain unknown;
 no new client authenticity, quality or gameplay claim follows from byte equality.
+
+## Reviewed single-line aliases over the retained production inputs
+
+Shaman Mantle's four flask aliases are explicit `curated.json` records copied
+verbatim from the retained four-line block. Rebuild and verify a new trade
+snapshot first; preserve both the old snapshot and the new snapshot's curated
+input and complete template export. No producer splits multi-line templates.
+
+For this bounded addition, reproduce the historical `retained-selected` output
+from its pinned inputs before creating a new composition. Keep the ten community
+files, historical template bundle, 140-pair delta and both historical metadata
+files at their original pins. In a **new** selected-literal input, preserve the
+two original selected rows and their provenance, then append only the four
+reviewed aliases from the freshly generated template export. Keep the original
+28,036-pair baseline pin; compute a new final output pin and preserve the old
+selection receipt under a separate historical provenance field. This is an
+explicit composition, not a new native selection or translation invention.
+
+The new input manifest keeps profile `retained-selected` and pins the new
+selected-literal file and expected output. The producer checks all intermediate
+pins and reports 27,896 legacy + 140 native + 6 selected = 28,042 final pairs.
+The historical `_meta.json` and translation audit retain their historical
+meaning and bytes; the fresh generation receipt and composition evidence record
+the four new aliases. Save per-file production provenance, and prove that every
+other locale file is byte-identical and the stat pair delta is exactly those
+four additions, with no removals and the original block intact.
+
+Keep research and candidate directories under `.cache`. Copy verified files
+into new immutable `handoff/` paths only for delivery, retaining all original
+evidence files. Publish a new descriptor with both `language` and
+`locale_generation` role sequences incremented; their output pins must agree.
+The other five roles and display bindings remain pinned to their own production
+snapshots. Commit the descriptor before registering its exact pin in a separate
+index commit. Local commits, tags and a valid registry do not establish remote
+availability or PoBR adoption; those are separate coordinator steps in the
+[publication workflow](publication-index.md).
