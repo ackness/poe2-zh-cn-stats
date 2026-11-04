@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Reproducible, source-attributed English and Simplified Chinese PoE2 modifier data",
+  "description": "Source-attributed PoE2 language data for PoBR: trade modifier dictionary, Simplified and Traditional Chinese names, display texts and locale publications",
   "engines": { "node": ">=22" },
   "scripts": {
     "refresh": "node src/cli.mjs refresh",
