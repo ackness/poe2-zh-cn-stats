@@ -16,7 +16,12 @@ const block = {
   en: aliases.map(row => row.en).join('\n'),
 };
 const source = 'https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016';
-const curated = JSON.parse(await readFile(new URL('../../curation/curated.json', import.meta.url)));
+// Only the four Shaman Mantle rows of curation/curated.json, pinned by SHA-256 of their JSON: other
+// curated rows change over time and are not what this publication added.
+const SHAMAN_MANTLE_ROWS_SHA256 = 'aa20861ea43088e1039b4c16e14ea125de40760efadcb50697f34b1cb1cee757';
+const live = JSON.parse(await readFile(new URL('../../curation/curated.json', import.meta.url)));
+const shamanMantle = live.templates.filter(row => row.id.startsWith('curated.shaman-mantle.'));
+const curated = { schema_version: live.schema_version, templates: shamanMantle, words: [] };
 // The retained 0.5.5.4.2 stat_lines.json (tag handoff/locale-retained-20261101) is no longer in the
 // tree. It is exactly the Shaman Mantle publication's stat_lines.json without the four aliases, which
 // its evidence pins by SHA-256 (evidence/production-snapshots.json).
@@ -30,7 +35,8 @@ const bundle = buildTemplateExport({ snapshot: '20261103T000000000Z', entries: [
 const pair = ({ src, en }) => ({ src, en });
 const key = row => JSON.stringify(pair(row));
 
-test('the retained stat lines are the pinned 0.5.5.4.2 bytes', () => {
+test('the retained stat lines are the pinned 0.5.5.4.2 bytes, and the curated rows are the pinned four', () => {
+  assert.equal(createHash('sha256').update(JSON.stringify(shamanMantle)).digest('hex'), SHAMAN_MANTLE_ROWS_SHA256);
   assert.ok(evidence.includes(`"sha256": "${RETAINED_SHA256}"`));
   assert.equal(createHash('sha256').update(retainedRaw).digest('hex'), RETAINED_SHA256);
   assert.equal(published.length, retained.length + 4);
@@ -49,17 +55,13 @@ test('Shaman Mantle exports exactly four reviewed, verbatim single-line aliases 
   }
 });
 
-// curated.json rows changed after the Shaman Mantle publication; the merge adds them too. curated.bonded
-// moved from 纽带：{0} to Tencent's official prefix (the retained bytes keep the old pair).
-const changedSince = [{ src: '羁绊： {0}', en: 'Bonded: {0}' }];
-
 test('locale merge adds only the four aliases and preserves every retained pair and the original block', () => {
   const before = JSON.stringify(retained);
   const result = mergeTranslations(retained, bundle);
   const retainedKeys = new Set(retained.map(key));
   const added = result.pairs.filter(row => !retainedKeys.has(key(row)));
-  assert.deepEqual(new Set(added.map(key)), new Set([...aliases, ...changedSince].map(key)));
-  assert.equal(result.pairs.length, retained.length + 4 + changedSince.length);
+  assert.deepEqual(new Set(added.map(key)), new Set(aliases.map(key)));
+  assert.equal(result.pairs.length, retained.length + 4);
   assert.deepEqual(result.pairs.filter(row => retainedKeys.has(key(row))), retained);
   assert.deepEqual(result.pairs.filter(row => row.en === block.en), [block]);
   assert.equal(JSON.stringify(retained), before);
