@@ -180,3 +180,8 @@ test('createSupplementLines reads pinned inputs and writes stat_lines.json, _met
   assert.deepEqual(fs.readFileSync(path.join(`${out}-empty`, 'stat_lines.json')), fs.readFileSync(request.base.file));
   assert.equal(fs.existsSync(path.join(`${out}-empty`, '_meta.json')), false);
 });
+
+test('the committed curation/display-supplements.json is valid', () => {
+  const doc = JSON.parse(fs.readFileSync(new URL('../../curation/display-supplements.json', import.meta.url)));
+  assert.doesNotThrow(() => validateSupplements(doc));
+});
