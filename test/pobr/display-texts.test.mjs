@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-texts.mjs';
+import { entryId } from '../../src/pobr/display-supplements.mjs';
 
 const row = (id, english, localized, extra = {}) => ({
   table: 'BaseItemTypes', field: 'Name', id, english, localized,
@@ -305,6 +306,9 @@ test('a pinned reviewed supplement projects exact-context text and keeps the off
   assert.deepEqual(sidecar.entries, { Flask: '药剂', Sword: null });
   assert.deepEqual(sidecar.scopes['BaseItemTypes.Name'],
     { flask: ['Flask', '药剂'], sword: ['Sword', null] });
+  // The supplemented value is marked as ours in the literal and in its scope; official values are not listed.
+  assert.deepEqual(sidecar.origins, { entries: { Flask: 'agent' }, scopes: { 'BaseItemTypes.Name': { flask: 'agent' } } });
+  assert.deepEqual(Object.keys(sidecar), ['schema', 'game_patch', 'realm', 'locale', 'catalog_sha256', 'entries', 'scopes', 'origins']);
   assert.equal(sidecar.catalog_sha256, input.manifest.files['catalog.json'].sha256);
   // Only the complete English context of each row reaches the library lookup.
   const scope = { game_patch: 'test', realm: 'international', locale: 'zh-CN' };
@@ -466,4 +470,68 @@ test('a request projection replaces the default file, which is then neither read
   await assert.rejects(createDisplayTexts({ ...other.request, projection: { ...projection, extra: true } }, other.out),
     /Invalid runtime projection/);
   assert.equal(fs.existsSync(other.out), false);
+});
+
+const BASED_ON = { game_patch: 'test', game_package: { repository: 'ackness/repoe', tag: 'game/test-1', sha256: 'c'.repeat(64) },
+  stat_descriptions_sha256: 'd'.repeat(64) };
+const monster = (english, ids, extra = {}) => {
+  const identity = { game: 'poe2', realm: 'international', locale: 'zh-TW', kind: 'monster-name',
+    table: 'MonsterVarieties', field: 'Name', english, ...extra.identity };
+  return { entry_id: entryId(identity), identity, ids, based_on: BASED_ON, text: extra.text ?? '骷髏', origin: 'agent',
+    basis: 'own', author: 'claude-haiku-4-5', note: '音译', status: extra.status ?? 'reviewed',
+    review: (extra.status ?? 'reviewed') === 'draft' ? null : { by: 'claude-opus-5-5', note: 'checked' } };
+};
+const NAMES = { scopes: ['BaseItemTypes.Name', 'MonsterVarieties.Name'], literals: 'all-catalog-conflict-participants' };
+const projectNames = (records, entries, projection = NAMES) => projectDisplayTexts(
+  { game_patch: 'test', realm: 'international', locale: 'zh-TW', records }, query => {
+    const match = records.find(r => r.table === query.table && r.id === query.id);
+    return match.localized === null ? { status: 'fallback', text: query.english }
+      : { status: 'translated', text: match.localized, origin: match.origin };
+  }, 'a'.repeat(64), projection, { schema: 'poe2-display-supplements/v1', entries, corrections: [] });
+
+test('without supplements the sidecar has no origins block, so existing members keep their bytes', () => {
+  const { sidecar } = project([row('a', 'Same', '甲')]);
+  assert.equal(Object.hasOwn(sidecar, 'origins'), false);
+  // An empty names document adds nothing either, even with the scope declared.
+  const empty = projectNames([row('a', 'Same', '甲')], []);
+  assert.deepEqual(empty.sidecar, sidecar);
+  assert.deepEqual(empty.names, []);
+});
+
+test('reviewed monster names fill MonsterVarieties.Name with origin; a catalog row and other states win', () => {
+  const records = [row('Metadata/Monsters/Official', 'Official Beast', '官方野獸', { table: 'MonsterVarieties' })];
+  const entries = [
+    monster('Skeleton', ['Metadata/Monsters/Skeleton', 'Metadata/Monsters/Skeleton2']),
+    monster('Official Beast', ['Metadata/Monsters/Official'], { text: '我們的野獸' }),
+    monster('Draft', ['Metadata/Monsters/Draft'], { status: 'draft' }),
+    monster('Elsewhere', ['Metadata/Monsters/Elsewhere'], { identity: { locale: 'zh-CN' } }),
+  ];
+  const { sidecar, names } = projectNames(records, entries);
+  assert.deepEqual(sidecar.scopes['MonsterVarieties.Name'], {
+    'Metadata/Monsters/Official': ['Official Beast', '官方野獸'],
+    'Metadata/Monsters/Skeleton': ['Skeleton', '骷髏'], 'Metadata/Monsters/Skeleton2': ['Skeleton', '骷髏'] });
+  assert.deepEqual(sidecar.origins, { entries: {}, scopes: { 'MonsterVarieties.Name': {
+    'Metadata/Monsters/Skeleton': 'agent', 'Metadata/Monsters/Skeleton2': 'agent' } } });
+  // Names never become literal entries (an English name can be shared by unrelated things).
+  assert.equal(Object.hasOwn(sidecar.entries, 'Skeleton'), false);
+  assert.deepEqual(names.map(name => name.lifecycle), ['supplemented', 'official', 'draft', 'other-target']);
+  assert.throws(() => projectNames([], [entries[0], monster('Skeleton Two', ['Metadata/Monsters/Skeleton'])]), /Two reviewed monster names/);
+  assert.throws(() => projectNames([], [entries[0]], { ...NAMES, scopes: ['BaseItemTypes.Name'] }), /MonsterVarieties\.Name in projection\.scopes/);
+  assert.throws(() => projectNames([], [{ ...entries[0], entry_id: 'f'.repeat(64) }]), /entry_id/);
+});
+
+test('createDisplayTexts reads names only from a pinned file and records the decisions', async t => {
+  const input = fixture(t, 3, 6);
+  const doc = JSON.stringify({ schema: 'poe2-display-supplements/v1', corrections: [],
+    entries: [monster('Skeleton', ['Metadata/Monsters/Skeleton'], { identity: { locale: 'zh-CN' }, text: '骷髅' })] });
+  input.request.names = { file: path.join(input.root, 'names.json'), ...input.write('names.json', doc) };
+  input.request.projection = NAMES;
+  const receipt = await createDisplayTexts(input.request, input.out);
+  const sidecar = JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json')));
+  assert.deepEqual(sidecar.scopes['MonsterVarieties.Name'], { 'Metadata/Monsters/Skeleton': ['Skeleton', '骷髅'] });
+  assert.deepEqual(sidecar.origins.scopes, { 'MonsterVarieties.Name': { 'Metadata/Monsters/Skeleton': 'agent' } });
+  assert.equal(receipt.names[0].lifecycle, 'supplemented');
+  assert.equal(typeof receipt.inputs[path.join(input.root, 'names.json')], 'object');
+  input.request.names.sha256 = '0'.repeat(64);
+  await assert.rejects(createDisplayTexts(input.request, input.out + '-bad'), /SHA256 mismatch/);
 });

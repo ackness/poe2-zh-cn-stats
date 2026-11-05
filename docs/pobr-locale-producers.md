@@ -1,6 +1,6 @@
 # PoBR 语言文件生产者
 
-PoBR 只消费本仓库发布的语言包，自己不生成语言数据。下面三个入口把本仓库的配对结果投影成
+PoBR 只消费本仓库发布的语言包，自己不生成语言数据。下面四个入口把本仓库的配对结果投影成
 PoBR 读取的运行时文件格式。
 
 | 输出（PoBR 路径） | 入口 | mise task |
@@ -8,8 +8,9 @@ PoBR 读取的运行时文件格式。
 | `i18n/zh-CN/display_texts.json` | `src/pobr/display-texts.mjs` | `mise run pobr:display-texts` |
 | `i18n/zh-TW/{base_items,skills,mods}.json` | `src/pobr/name-sidecars.mjs` | `mise run pobr:names` |
 | `i18n/zh-CN/stat_lines.json` | `src/pobr/stat-lines.mjs` | `mise run pobr:stat-lines` |
+| `i18n/zh-CN/stat_lines.json`（补译与修正）、`_meta.json` | `src/pobr/supplement-lines.mjs` | `mise run pobr:supplement-lines` |
 
-三个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
+四个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
 产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、所执行实现的 SHA-256
 和逐条取舍，`adoption` 固定为 `not-adopted`。生成本身不修改任何已发布目录；产物要进入语言包，
 按 [RELEASING.md](../RELEASING.md#新补丁) 放进新的源目录并发布。
@@ -50,6 +51,12 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   （见[语言包配置参考](release-config.md#重新生成配方releaseregeneratepatchjson)）。
   唯一支持的 literal 策略是 `all-catalog-conflict-participants`：选择 scope 不会
   把未解决或冲突的记录移出 literal 歧义检查。
+- `names: {file, bytes, sha256}` 可选，指向固定的
+  [`curation/display-supplements.json`](../curation/display-supplements.json)（见
+  [显示补译与来源标记](translation-workbench.md#显示补译与来源标记)）。其中与请求同 realm、locale 的
+  `reviewed` 怪物名（`kind: "monster-name"`）写入 `scopes["MonsterVarieties.Name"][变种 ID] = [英文, 译文]`；
+  这时投影必须声明 `MonsterVarieties.Name`。catalog 自身已有同一 ID 的行时 catalog 优先，补译只记在
+  receipt 的 `names` 里（`lifecycle: "official"`）。同一 ID 有两条已审核名称时报错。怪物名不写入 `entries`。
 
 输出有两种视图：
 
@@ -72,6 +79,19 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   冲突的记录写 null，不取第一行。被拒绝的 v2 组即使英文字段为 null，它的每个候选
   英文与别名也写入 null 阻断。含数值占位符、hash 槽或未知语法的记录不进入 literal
   视图，需要专门的渲染器。
+- `origins` 只在有非官方值时出现，否则整个字段省略（没有补译的请求输出字节不变）：
+  `origins.entries[literal]` 与 `origins.scopes["Table.Field"][stableKey]` 的值是 `agent` 或 `human`，标出
+  由本项目补译而非官方提供的值。官方值不列出；缺少条目即表示官方。同一 literal 只要有一条官方记录给出
+  同一译文，就不算补译；全部来自补译时，有 agent 参与记 `agent`，否则 `human`。schema 仍是
+  `pobr-native-display-texts/v1`：旧读者忽略这个字段和未知 scope。
+
+  ```json
+  {"schema": "pobr-native-display-texts/v1", "…": "…",
+   "entries": {"Flask": "药剂"},
+   "scopes": {"MonsterVarieties.Name": {"Metadata/Monsters/Skeleton": ["Skeleton", "骷髅"]}},
+   "origins": {"entries": {"Flask": "agent"},
+               "scopes": {"MonsterVarieties.Name": {"Metadata/Monsters/Skeleton": "agent"}}}}
+  ```
 
 `receipt.json` 保留每条库查询的决定和全部跨表冲突，以及实际使用的 `library`。
 `runtime_scopes` 是排序后的 scope；`projection` 记录投影来源：`{source: "request"}`
@@ -114,6 +134,47 @@ mise run pobr:stat-lines -- --selection <receipt.json> --selection-sha256 <sha> 
 `poe2-native-localization-candidate/v1`，`--legacy` 是上一份 `stat_lines.json`。
 只追加按实际 CSD 分支选取、且英文和中文都无歧义的整行译文；已有模板保持不变。
 receipt 的 `implementation` 固定本入口和 `native-selected-translations.mjs` 两个文件。
+
+## 补译与修正：`supplement-lines`
+
+```sh
+mise run pobr:supplement-lines -- --request /absolute/request.json --out .cache/fresh-supplement-lines
+```
+
+请求 schema 为 `pobr-supplement-lines-request/v1`：
+
+| 字段 | 含义 |
+| --- | --- |
+| `target` | `{game: "poe2", game_patch, realm, locale}` |
+| `base` | `{file, bytes, sha256}`：作为底的 `stat_lines.json`，例如上一份已发布语言包的成员 |
+| `meta` | 可选 `{file, bytes, sha256}`：作为底的 `_meta.json`；给出时也写 `_meta.json` |
+| `game_package` | `{file, repository, tag, asset, bytes, sha256}`：RePoE 游戏 Release 资产 `pobr-game-<patch>.zip`，读其中的 `data/<patch>/overlay/stat_descriptions.json` |
+| `edits` | `{file, bytes, sha256}`：[`curation/display-supplements.json`](../curation/display-supplements.json) |
+
+处理顺序：
+
+1. `corrections`：只应用 `reviewed` 且 locale 相同的修正组。每行 `{from, to}` 的 `from` 必须是底里完全相同的
+   `{src, en}`，它被替换成 `to` 并加上该组的 `origin`。底里已经是 `to` 时记 `already-in-base`；`from` 的英文
+   还在但译文已变，记 `superseded`（底优先）；英文已不在，记 `retired`。
+2. `entries`：只看 `kind: "stat-line"`。英文必须是游戏包里的当前模板且 stat ID 与 `identity.stats` 相同，
+   否则 `retired`；草稿与已拒绝的记录不出货；底里已有同一 `en` 的行时底优先（`official`，并记
+   `supplement_differs`）；其余 `reviewed` 记录追加为 `{src, en, origin}`（`supplemented`）。`based_on` 与固定
+   的游戏包不同时只标 `needs_review`。
+3. 输出按 `(src, en)` 排序，序列化方式与底相同（两空格缩进、末尾换行）。没有可应用记录时输出与底逐字节相同。
+
+本入口新增或改动的每一行都带 `origin`，其余行保持原字节、不带 `origin`：
+
+```json
+{"src": "羁绊： 你受到的增益消减速度减慢 10%", "en": "Bonded: Buffs on you expire 10% slower", "origin": "agent"}
+```
+
+PoBR 的 `StatLineTemplate` 没有拒绝未知字段，旧版本会忽略 `origin`。
+
+给出 `meta` 时，`_meta.json` 是底的内容后加一个 `supplements` 块：`schema`、`edits` 与
+`base_stat_lines` 的 pin、`game_package`（含 `stat_descriptions_sha256`）、`producer`，以及 `stat_lines` 计数
+（每个修正组改了几行、追加几行、按 origin 统计带标记的行）。块里只有数据 pin，不放实现摘要，所以以后
+改代码不会改变已发布成员的重新生成结果。`receipt.json`（`pobr-supplement-lines-receipt/v1`）记录请求、
+输入、游戏包、实现摘要（`supplement-lines.mjs`、`display-supplements.mjs`）、计数，以及每行修正和每条记录的决定。
 
 ## 重放
 

@@ -186,6 +186,71 @@ mise exec -- node src/cli.mjs workbench-export --config request.json --out .cach
 edits SHA 和全部七个 producer 模块 SHA。导出忽略 `previous`，因为历史条目永不生效；
 完整 workbench 同时生成的 `supplements.json` 应逐字节相同。两种命令均不复制重型证据。
 
+## 显示补译与来源标记
+
+原件目录覆盖不到的两类显示文本，以及对已发布词条行的修正，放在
+[`curation/display-supplements.json`](../curation/display-supplements.json)
+（`poe2-display-supplements/v1`，校验在 `src/pobr/display-supplements.mjs`）：
+
+- PoBR 词条模板（`kind: "stat-line"`）：游戏 `stat_descriptions` 里有、交易目录和 `stat_lines.json` 都没有的
+  英文模板；
+- 没有原件表的名称（`kind: "monster-name"`）：召唤生物、幽魂、同伴的 `MonsterVarieties.Name`；
+- `corrections`：对作为底的 `stat_lines.json` 的逐行修正，例如历史词典留下的英文前缀或字面反斜杠。
+
+规则：官方文本永远优先，本项目的文本只是补充；每条都写 `origin`（`agent` 或 `human`），即使逐字照抄或
+拼接官方措辞，“这样配对”也是本项目做的，所以不会写 `official`。官方文本出现后补译不再出货，但记录保留、
+不改标记；上游删除英文后记录变为 `retired`，同样保留。只有 `reviewed` 的记录进入语言包。
+
+`entries` 的每条记录：
+
+```text
+entry_id: identity 的规范 JSON（键排序、紧凑、不转义非 ASCII）的 SHA-256
+identity: stat-line 为 {game: "poe2", realm, locale, kind, english, stats}（stats 为该英文模板的 stat ID，排序去重）
+          monster-name 为 {game: "poe2", realm, locale, kind, table: "MonsterVarieties", field: "Name", english}
+ids: stat-line 为 null；monster-name 为该名称适用的 MonsterVarieties ID 列表
+based_on: {game_patch, game_package: {repository, tag, sha256}, stat_descriptions_sha256}
+text: 译文；未审核时可为 null
+origin: agent | human        basis: 见下表        author: 实际作者（模型 ID 或 GitHub 账号）
+note: 依据与仍存疑之处（中文）
+status: draft | reviewed | rejected          review: draft 为 null；其余为 {by, note}
+confidence: 可选，high | medium | low（译者自评，仅供参考）
+```
+
+`basis` 说明措辞来源，不作为门槛：`official-same-id-branch`、`official-same-text`、`official-composed`、
+`official-terms`、`poe1-official`、`community`、`own`。
+
+`corrections` 的每组：`correction_id`（小写 slug）、`locale`、`member: "stat_lines.json"`、
+`rows: [{from: {src, en}, to: {src, en}}]`（`from` 必须与底中某行完全相同）、`origin`、`basis`
+（`official-terms`、`official-same-text` 或只改排版字符的 `format-repair`）、`author`、`note`、`evidence`（依据列表）、
+`status`、`review`。被修正的行在输出里带 `origin`，因为它已不是原来的字节。
+
+形式检查（`reviewed` 的 stat-line 译文与修正后的行）：占位符记号与英文完全相同（`{0}`、`{0:+d}` 同样拼写）、
+占位符外的字面数字相同、行数相同（换行用真正的 `\n`）、没有字面反斜杠或首尾空白、没有其他花括号或 `#`。
+怪物名必须是不含换行、占位符的中文。
+
+审核：`reviewed` 必须写 `review.by` 与 `review.note`。Opus 模型的审核可以把记录标为 `reviewed`，这时
+`review.by` 写模型 ID（例如 `claude-opus-5-5`），`review.note` 写核对了什么；不需要再由维护者签署。
+草稿由翻译模型产出、一律 `draft`；人重写了译文就把 `origin` 改为 `human`。
+
+各生产者如何处理这些记录：
+
+| 事件 | stat-line（`pobr:supplement-lines`） | monster-name（`pobr:display-texts` 的 `names`） | 修正 |
+| --- | --- | --- | --- |
+| 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 有同一 ID：catalog 优先，记 `official` | 底已是 `to`：`already-in-base` |
+| 官方文本再次消失 | 补译重新出货 | 补译重新出货 | 再次应用 |
+| 英文或上下文变化 | `retired`；新英文是新 `entry_id` | 新 identity；旧记录 `retired` | 英文还在但译文变了：`superseded`（底优先） |
+| 游戏移除该英文 | `retired` | — | `retired` |
+| `based_on` 与固定的游戏包不同 | 仍按英文与 stat ID 判断，并标 `needs_review` | — | — |
+
+语言包里的标记见 [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)：
+`stat_lines.json` 的补译与修正行带 `origin`，`display_texts.json` 有可选的 `origins`，`_meta.json` 有
+`supplements` 块。没有 `origin` 的行或条目是官方或历史词典的文本。zh-TW 在 PoBR 里由简中经 OpenCC
+转换得到，转换后的补译仍是补译；本仓库不产出 zh-TW 补译行。
+
+交易 ID 的缺口仍在 `curation/translations.json`（见
+[交易词典维护](trade-dictionary.md#持续补译表)），它用同一套 `origin`／`status`／`review` 字段，字段名带
+`manual_` 前缀。
+
 ## 国服专属内容
 
 区服和语言是两个独立维度。相同 ID／英文的 `china/zh-CN`、`international/zh-CN` 和

@@ -141,11 +141,22 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
   `supplement_module` 必须等于它在固定提交里的字节。`projection`（`{scopes, literals}`，只有这两个字段）
   必填，作为请求的 `projection` 传入：任务不读 `src/pobr/display-projection.json`，所以给默认投影加
   scope 不会改变已发布成员的重新生成结果；要发布新 scope，就在新配置的配方里写新的 `projection`。
-  `regeneration.json` 的任务摘要记录生产者回执里的 `projection`。
+  `regeneration.json` 的任务摘要记录生产者回执里的 `projection`。可选 `names`（本仓库某个提交里的
+  `curation/display-supplements.json`，带 `bytes`、`sha256`）作为请求的 `names` 传入，为
+  `MonsterVarieties.Name` 提供已审核的怪物名补译；这时 `projection.scopes` 必须含该 scope。
+- `supplement-lines`：`src/pobr/supplement-lines.mjs`（见
+  [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)）。`base` 是作为底的
+  `stat_lines.json`，`edits` 是 `curation/display-supplements.json`，可选 `meta` 是作为底的 `_meta.json`，
+  三者都是本仓库某个提交里的文件，带 `bytes`、`sha256`；`game_package` 是游戏 Release 资产
+  `{repository, tag, asset, bytes, sha256}`（`--fetch` 下载）。`members` 依次为
+  `i18n/<locale>/stat_lines.json`，固定了 `meta` 时再加 `i18n/<locale>/_meta.json`。
 
 任务可选：
 
 - `passthrough`：输出等于任务某个输入时必须声明（会自动检测），值写原因。
+- `replaced_by`（仅 `locale-producer`）：生产者也会写、但由本配方另一个任务产出的成员，值写那个任务的
+  `id`，例如由 `supplement-lines` 接管的 `stat_lines.json` 与 `_meta.json`。该成员必须在那个任务的
+  `members` 里，不能同时列在本任务的 `members` 里。
 - `composed_evidence`：生成成员里由固定证据层组合进来、但其选取过程还不能重放的部分，每层写
   `input`、`category`、`reason`、`exit`。
 
