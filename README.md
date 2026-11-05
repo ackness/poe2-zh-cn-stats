@@ -83,8 +83,12 @@ data/snapshots/<id>/generated/ 词典、模板、覆盖、缺口和冲突报告
 curation/                     人工维护的输入：交易补译工作表 translations.json、人工模板 curated.json、
                               精确修正 overrides.json、原生文本补译 native-translations.json、采集页面 trade-sources.json
 reports/                      已提交的可读待办快照（原生文本待办、区服／版本差异），由 `workbench` 命令输出生成，不是输入
-src/                          采集、配对、生成与验证代码
-test/                         离线回归用例
+src/cli.mjs                   交易词典与原生文本命令入口（npm run refresh／build／check／report）
+src/trade/                    交易词典：采集、配对、生成与验证
+src/release/                  语言包 release:build／release:publish／release:regenerate
+src/pobr/                     PoBR 语言文件生产者（pobr:*）与固定历史简中词典生成
+src/*.mjs（其余 7 个）         原生目录库，路径与字节固定：release/regenerate/0.5.5.5.json 固定的 catalog（e61f1332）在 producer 里记录了 src/<名> 及哈希，模块又按自身位置读取 src/，所以留在 src/ 根下、不改字节
+test/<领域>/                  按 src/ 领域分组的离线回归用例（test/native/ 对应 src/ 下的原生目录库）
 docs/                         数据契约和维护指南
 sources/                      语言来源台账（自 PoBR 迁入）与说明
 inputs/                       release/<patch>.json 固定的源发布与保留的辅助宝石说明（只读，字节与原 tag 相同）
