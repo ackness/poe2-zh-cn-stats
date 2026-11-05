@@ -212,7 +212,7 @@ mise run release:regenerate -- --fetch   # 每个 release/regenerate/<patch>.jso
 
 ## 下一个语言包：`release/0.5.5.5-2.json`
 
-v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化，带 `hold`，暂不发布：
+v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化：
 
 - 每张表固定一种键，与 PoBR 的查法一致：`base_items`、`skills` 用稳定 ID；`mods`、
   `passive_names`、`words`、`rare_words`、`classes` 用英文。已发布包里繁中 `mods.json`
@@ -235,20 +235,20 @@ v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化，带 `hold`�
   （`288d8b9d…`）等于简中 `_meta.json` 的。发布后 PoBR 用 `data:bump` 改为从这个 Release 取，
   不再读 `handoff/` tag。
 
-**为什么 hold**：发布前 PoBR 侧要先满足两点，并且在**同一个**把锁 bump 到这个包的 PoBR PR 里完成：
+**发布前提（已满足，`hold` 已去掉）**：PoBR 侧的两点：
 
 1. `pipeline/runtime/build_data.py` 改为从语言包自己的 `manifest.json` 取
-   `data/<patch>/i18n/*` 的清单和 pin。现在它要求这部分等于**游戏包**（RePoE）快照清单
+   `data/<patch>/i18n/*` 的清单和 pin。原来它要求这部分等于**游戏包**（RePoE）快照清单
    `data/<patch>/manifest.json` 列的那份，`game/0.5.5.5-1` 固定的是 `locale/0.5.5.5-1` 的
    13 个哈希，所以语言包单独改任何字节、加任何成员（`index.json`、`_meta.json`）都会被拒。
-   （PoBR 正在做。）语言索引因此放在回执的 `package.index`，不进 zip。
+   （PoBR 已按 owner 组装运行 manifest。）语言索引因此放在回执的 `package.index`，不进 zip。
 2. 假定繁中 `mods.json` 以 mod ID 为键的地方改成英文词缀名：
    `crates/pobr-gamedata/tests/mods/load_mods.rs` 的 `traditional_chinese_mod_names_available`
    （查 `Strength1`）、`GameData::mod_names` 的文档（`crates/pobr-gamedata/src/lib.rs`，
    写着 `id -> localized name`），以及 `pobr-i18n` 的 crate 文档（`src/lib.rs`）和
-   `NameKind::Affix` 的注释（`src/pack.rs`）。
+   `NameKind::Affix` 的注释（`src/pack.rs`）。改动随 PoBR 把锁 bump 到这个包的 PR 一起合并。
 
-两点都完成后去掉 `hold`，按上面的步骤发布为 `locale/0.5.5.5-2`。
+
 
 ## 新补丁
 
