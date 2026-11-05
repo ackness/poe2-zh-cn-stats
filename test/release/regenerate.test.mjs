@@ -201,6 +201,9 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
   const names = { revision: 'f'.repeat(40), path: 'n.json', bytes: 1, sha256: '0'.repeat(64) };
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names }] }), /display: game_package needs repository/u);
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: GAME }] }), /display: pin package_texts/u);
+  // They must be this package's own official texts, not any pinned file.
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: GAME,
+    package_texts: { stat_lines: names, passive_names: names } }] }), /display: package_texts\.passive_names is not this package's i18n\/zh-CN\/passive_names\.json/u);
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, asset: '../x.zip' } }] }),
     /asset pobr-game-9\.9\.zip/u);
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, tag: '' } }] }),

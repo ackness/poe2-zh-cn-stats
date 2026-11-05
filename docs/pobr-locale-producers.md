@@ -74,10 +74,12 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   同一 ID 出现两个不同英文时视为不确定。
 - `package_texts: {stat_lines, passive_names}`（各为 `{file, bytes, sha256}`）：同一语言包里的官方文本，
   `stat_lines` 用作底的 `stat_lines.json`（只取不带 `origin` 的行），`passive_names` 用 `passive_names.json`。
-  给出 `names` 时必填；catalog 查询返回我们的补译（reviewed supplement）时也必填。**补译不得遮住官方文本**：
-  某英文在 `package_texts`、catalog 的官方值或已采用的官方怪物名里已有官方译文时，这条补译不出货，
-  catalog 行回到未翻译（`null`，decision 记 `skipped: "official-elsewhere"`），怪物名记 `official-elsewhere`
-  （`official`、`source`）。receipt 的 `official_elsewhere` 记录跳过条数 `skipped` 和每一行 `rows`
+  有已审核的怪物名要决定时，或 catalog 查询返回我们的补译（reviewed supplement）时必填（重新生成配方给出
+  `names` 就必须固定它，并核对它就是本包的文件：`passive_names` 等于源目录成员，`stat_lines` 等于
+  `supplement-lines` 任务的底，没有该任务时等于源目录成员）。**补译不得遮住官方文本**：catalog 补译的英文在
+  `package_texts` 或 catalog 的官方值里已有官方译文时，catalog 行回到未翻译（`null`，decision 记
+  `skipped: "official-elsewhere"`）；怪物名的英文在这些地方或已采用的官方怪物名里已有官方译文时记
+  `official-elsewhere`（`official`、`source`），都不出货。receipt 的 `official_elsewhere` 记录跳过条数 `skipped` 和每一行 `rows`
   （`kind`、`identity`、`english`、`origin`、我们的 `text`、`official`、`source`）。例：-3 的 `display_texts.json`
   里 `Bulwark` 为 `null`，而 `stat_lines.json` 有官方 `壁垒`，补译不能填它。
 
