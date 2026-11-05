@@ -8,6 +8,7 @@ import { createSupplementLines } from '../../src/pobr/supplement-lines.mjs';
 import { storedZip } from '../../src/release/stored-zip.mjs';
 import { loadRecipe, problems, recipeFiles, regenerate } from '../../src/release/regenerate.mjs';
 import { strictJson } from '../../src/strict-json.mjs';
+import { chinaPackage } from '../pobr/official-fixture.mjs';
 import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
 const table = (column, values) => ({ entries: values.map(([id, en, zh]) => ({ id, columns: { [column]: [{ en, zh }] } })) });
@@ -36,7 +37,9 @@ const EDITS = bytes({ schema: 'poe2-display-supplements/v1', entries: [], correc
   member: 'stat_lines.json', rows: [{ from: { src: '生命', en: 'Life' }, to: { src: '生命值', en: 'Life' } }], origin: 'agent',
   basis: 'official-terms', author: 'claude-opus-5-5', note: 'synthetic', evidence: ['synthetic'], status: 'reviewed', review: REVIEW }] });
 
-async function setup(t, { edit, supplement } = {}) {
+const CHINA = chinaPackage();
+
+async function setup(t, { edit, supplement, official } = {}) {
   const made = fixture('locale-regenerate');
   t.after(() => rmSync(made.root, { recursive: true, force: true }));
   const { repo, root } = made;
@@ -69,16 +72,18 @@ async function setup(t, { edit, supplement } = {}) {
     const revision = commitAll(repo, 'supplement inputs');
     const local = name => ({ file: path.join(repo, name), ...pin(readFileSync(path.join(repo, name))) });
     write(root, 'game.zip', GAME_ZIP);
+    write(root, CHINA.spec.asset, CHINA.zip);
     const out = path.join(ROOT, '.cache', `${path.basename(root)}-supplement`);
     t.after(() => rmSync(out, { recursive: true, force: true }));
-    createSupplementLines({ schema: 'pobr-supplement-lines-request/v1', target: { ...TARGET, locale: 'zh-CN' },
+    await createSupplementLines({ schema: 'pobr-supplement-lines-request/v1', target: { ...TARGET, locale: 'zh-CN' },
       base: local('base/stat_lines.json'), meta: local('base/_meta.json'), edits: local('curation/display-supplements.json'),
-      game_package: { file: path.join(root, 'game.zip'), ...GAME } }, out);
+      game_package: { file: path.join(root, 'game.zip'), ...GAME },
+      ...(official ? { official: [{ file: path.join(root, CHINA.spec.asset), ...CHINA.spec }] } : {}) }, out);
     for (const name of ['stat_lines.json', '_meta.json']) files[`i18n/zh-CN/${name}`] = readFileSync(path.join(out, name));
     const git = name => ({ revision, path: name, ...pin(readFileSync(path.join(repo, name))) });
     supplementJob = { id: 'zh-cn-supplement-lines', kind: 'supplement-lines', locale: 'zh-CN', base: git('base/stat_lines.json'),
       meta: git('base/_meta.json'), game_package: GAME, edits: git('curation/display-supplements.json'),
-      members: ['i18n/zh-CN/stat_lines.json', 'i18n/zh-CN/_meta.json'] };
+      members: ['i18n/zh-CN/stat_lines.json', 'i18n/zh-CN/_meta.json'], ...(official ? { official: [CHINA.spec] } : {}) };
   }
   gitIn(repo, 'rm', '-rq', 'inputs');
   for (const [name, raw] of Object.entries(files)) write(repo, `inputs/locale-test/${name}`, raw);
@@ -109,6 +114,7 @@ async function setup(t, { edit, supplement } = {}) {
   const fetcher = async address => {
     served.push(address);
     if (address === releaseUrl(GAME.repository, GAME.tag, GAME.asset)) return GAME_ZIP;
+    if (address === releaseUrl(CHINA.spec.repository, CHINA.spec.tag, CHINA.spec.asset)) return CHINA.zip;
     const file = DICTIONARY_FILES.find(name => url(name) === address);
     assert.ok(file, `unexpected download ${address}`);
     return bytes(DICTIONARY[file]);
@@ -252,4 +258,48 @@ test('regenerate: a supplement-lines job owns stat_lines.json and _meta.json ove
   await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, game_package: { ...job.game_package, sha256: '0'.repeat(64) } }] }),
     /game_package/u);
   await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, edits: { ...job.edits, bytes: 1 } }] }), /edits.*differs from its pin/u);
+});
+
+test('regenerate: a supplement-lines job reads its official sources from pinned RePoE input Releases', async t => {
+  const { repo, recipe, recipeFile, fetcher, served } = await setup(t, { supplement: true, official: true });
+  const done = await regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+  assert.deepEqual(problems(done), []);
+  const { result } = done;
+  assert.ok(served.includes(releaseUrl(CHINA.spec.repository, CHINA.spec.tag, CHINA.spec.asset)));
+  assert.deepEqual(pin(CHINA.zip), { bytes: result.inputs['zh-cn-supplement-lines:official[0]'].bytes,
+    sha256: result.inputs['zh-cn-supplement-lines:official[0]'].sha256 });
+  // The synthetic game package has no templates, so the China lines are all skipped.
+  assert.equal(result.jobs[1].summary.official.skipped_not_game_template, 4);
+  const meta = strictJson(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/_meta.json')));
+  assert.equal(meta.official.sources[0].tag, CHINA.spec.tag);
+  const attempt = async value => {
+    write(repo, 'release/regenerate/9.9.json', bytes(value));
+    return regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+  };
+  const [producer, job] = recipe.jobs;
+  await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, official: [] }] }), /official lists RePoE input packages/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, official: [{ ...CHINA.spec, url: 'https://x.test' }] }] }),
+    /fields are repository, tag, asset, bytes, sha256, member, manifest_sha256/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, official: [{ ...CHINA.spec, member: 'x' }] }] }), /member/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, official: [{ ...CHINA.spec, sha256: '0'.repeat(64) }] }] }),
+    /official\[0\]/u);
+  // With an official layer the base is no longer the package's official text: package_texts.stat_lines
+  // must be the publication's own member.
+  const display = { id: 'display', kind: 'display-texts', locale: 'zh-CN', catalog: job.base, supplement: job.base,
+    supplement_module: { revision: job.base.revision, path: 'src/translation-workbench.mjs' },
+    projection: { scopes: ['Characters.Name'], literals: 'all-catalog-conflict-participants' },
+    names: job.edits, game_package: GAME, members: ['i18n/zh-CN/display_texts.json'] };
+  const passive = { revision: job.base.revision, path: 'inputs/locale-test/i18n/zh-CN/passive_names.json',
+    ...pin(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/passive_names.json'))) };
+  write(repo, 'release/regenerate/9.9.json', bytes({ ...recipe, jobs: [producer, job, { ...display, package_texts: { stat_lines: job.base, passive_names: passive } }] }));
+  assert.throws(() => loadRecipe(path.join(repo, 'release/regenerate/9.9.json'), repo),
+    /package_texts\.stat_lines is not this package's i18n\/zh-CN\/stat_lines\.json$/u);
+  const own = { ...passive, path: 'inputs/locale-test/i18n/zh-CN/stat_lines.json',
+    ...pin(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/stat_lines.json'))) };
+  write(repo, 'release/regenerate/9.9.json', bytes({ ...recipe, jobs: [producer, job, { ...display, package_texts: { stat_lines: own, passive_names: passive } }] }));
+  assert.doesNotThrow(() => loadRecipe(path.join(repo, 'release/regenerate/9.9.json'), repo));
+  // Without an official layer the supplement-lines base is still accepted (the older recipe shape).
+  const { official: _, ...plainJob } = job;
+  write(repo, 'release/regenerate/9.9.json', bytes({ ...recipe, jobs: [producer, plainJob, { ...display, package_texts: { stat_lines: job.base, passive_names: passive } }] }));
+  assert.doesNotThrow(() => loadRecipe(path.join(repo, 'release/regenerate/9.9.json'), repo));
 });

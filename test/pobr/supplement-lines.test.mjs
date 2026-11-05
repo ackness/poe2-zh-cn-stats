@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { entryId, statTemplates, templateProblem, validateSupplements } from '../../src/pobr/display-supplements.mjs';
 import { createSupplementLines, supplementLines } from '../../src/pobr/supplement-lines.mjs';
 import { storedZip } from '../../src/release/stored-zip.mjs';
+import { officialLayer } from '../../src/pobr/official-lines.mjs';
+import { chinaPackage } from './official-fixture.mjs';
 
 const TARGET = { game: 'poe2', game_patch: '9.9', realm: 'international', locale: 'zh-CN' };
 const GAME = { sha256: 'c'.repeat(64), stat_descriptions_sha256: 'd'.repeat(64) };
@@ -120,6 +122,34 @@ test('a correction of the English gives way to a base row for that English; an e
   assert.throws(() => run([], [rename], result.lines.concat({ src: '甲', en: 'A', origin: 'agent' })), /without origin/);
 });
 
+test('over an official layer: an entry it supplies is official, a correction of its English is superseded-by-official', () => {
+  const life = '{0}% increased maximum Life';
+  const official = { texts: new Map([[life, new Set(['最大生命提高 {0}%'])], ['Sacrifice {0}%\nFully made', new Set(['献祭 {0}%\\完全献祭'])]]),
+    stats: new Map([[life, new Set(['life'])], ['Sacrifice {0}%\nFully made', new Set(['x'])]]), incomplete: new Set() };
+  const layer = officialLayer(structuredClone(BASE), [official], TEMPLATES);
+  // The China text revises the base row; the official layer adds no origin.
+  assert.deepEqual(layer.lines.filter(row => row.en === life), [{ src: '最大生命提高 {0}%', en: life }]);
+  const ours = correction('life-terms', [{ from: { src: '最大生命提高 {0}%', en: life }, to: { src: '生命上限提高 {0}%', en: life } }]);
+  // A format-only repair of official text still applies over it (the China client has the stray backslash too).
+  const slash = correction('literal-backslash-line-break', [{ from: BASE[3], to: { src: '献祭 {0}%\n完全献祭', en: BASE[3].en } }],
+    { basis: 'official-typo-format-fix' });
+  // A composite the CSD does not have as English (ClientStrings prefix + CSD remainder) still applies.
+  const bonded = correction('bonded-prefix-official', [{ from: BASE[0], to: { src: '羁绊： 生命提高 10%', en: BASE[0].en } }]);
+  const entryLife = entry(life, ['life'], '最大生命提高 {0}%');
+  const result = supplementLines(layer.lines, doc([entryLife], [ours, slash, bonded]), TEMPLATES, TARGET, GAME, layer.english);
+  assert.deepEqual(result.corrections.map(row => [row.correction_id, row.decision]),
+    [['life-terms', 'superseded-by-official'], ['literal-backslash-line-break', 'applied'], ['bonded-prefix-official', 'applied']]);
+  assert.deepEqual(result.lines.filter(row => row.en === life), [{ src: '最大生命提高 {0}%', en: life }]);
+  // The supplement equal to official text is kept in curation and never shipped.
+  assert.deepEqual(result.entries.map(row => [row.lifecycle, row.supplement_differs]), [['official', false]]);
+  assert.deepEqual(result.counts.with_origin, { agent: 2 });
+  // Without the official set the same correction applies (the historical base alone does not supersede it).
+  assert.equal(supplementLines(layer.lines, doc([], [ours]), TEMPLATES, TARGET, GAME).corrections[0].decision, 'applied');
+  // A correction whose corrected pair official text already has is already-in-base, not superseded.
+  const same = correction('same', [{ from: { src: '旧', en: life }, to: { src: '最大生命提高 {0}%', en: life } }]);
+  assert.equal(supplementLines(layer.lines, doc([], [same]), TEMPLATES, TARGET, GAME, layer.english).corrections[0].decision, 'already-in-base');
+});
+
 test('an empty document reproduces the base exactly', () => {
   const sorted = BASE.slice().sort((a, b) => a.src < b.src ? -1 : a.src > b.src ? 1 : a.en < b.en ? -1 : 1);
   assert.deepEqual(run([], [], sorted).lines, sorted);
@@ -183,7 +213,7 @@ test('createSupplementLines reads pinned inputs and writes stat_lines.json, _met
       [{ from: BASE[0], to: { src: '羁绊： 生命提高 10%', en: BASE[0].en } }])]), null, 2) + '\n'),
   };
   const out = path.join(root, 'out');
-  const receipt = createSupplementLines(request, out);
+  const receipt = await createSupplementLines(request, out);
   assert.deepEqual(fs.readdirSync(out).sort(), ['_meta.json', 'receipt.json', 'stat_lines.json']);
   const lines = JSON.parse(fs.readFileSync(path.join(out, 'stat_lines.json')));
   assert.equal(lines.length, 5);
@@ -197,15 +227,69 @@ test('createSupplementLines reads pinned inputs and writes stat_lines.json, _met
   assert.equal(JSON.stringify(meta.supplements).includes('implementation'), false);
   assert.equal(receipt.entries[0].needs_review, 'based_on differs from the pinned game package');
   assert.equal(receipt.adoption, 'not-adopted');
-  assert.throws(() => createSupplementLines(request, out), /fresh repository cache candidate/);
-  assert.throws(() => createSupplementLines({ ...request, edits: { ...request.edits, sha256: '0'.repeat(64) } }, `${out}-pin`), /differs from its pin/);
-  assert.throws(() => createSupplementLines({ ...request, game_package: { ...request.game_package, asset: 'x.zip' } }, `${out}-asset`), /asset/);
+  await assert.rejects(createSupplementLines(request, out), /fresh repository cache candidate/);
+  await assert.rejects(createSupplementLines({ ...request, edits: { ...request.edits, sha256: '0'.repeat(64) } }, `${out}-pin`), /differs from its pin/);
+  await assert.rejects(createSupplementLines({ ...request, game_package: { ...request.game_package, asset: 'x.zip' } }, `${out}-asset`), /asset/);
   // Without meta and supplements the base bytes come out unchanged.
   const empty = { ...request, meta: undefined, edits: write('empty.json', JSON.stringify(doc())) };
   delete empty.meta;
-  createSupplementLines(empty, `${out}-empty`);
+  await createSupplementLines(empty, `${out}-empty`);
   assert.deepEqual(fs.readFileSync(path.join(`${out}-empty`, 'stat_lines.json')), fs.readFileSync(request.base.file));
   assert.equal(fs.existsSync(path.join(`${out}-empty`, '_meta.json')), false);
+});
+
+test('createSupplementLines applies a pinned official source first and records it in _meta.json and the receipt', async t => {
+  const { root, write } = files(t);
+  const template = 'Same {0} template';
+  const descriptions = { scopes: { stat_descriptions: { descriptors: {
+    scope_one: { member_stats: ['scope_one', 'scope_two'], branches: [{ template }] },
+    adds: { member_stats: ['first', 'second'], branches: [{ template: 'Adds {0:d} to {1:d} damage every 2 seconds' }] } } } } };
+  const base = [{ src: '第一种 {0} 模板', en: template }, { src: '其他', en: 'Other line' }];
+  const zip = storedZip({ 'data/9.9/overlay/stat_descriptions.json': Buffer.from(JSON.stringify(descriptions)) });
+  const china = chinaPackage();
+  const ours = correction('same-template', [{ from: base[0], to: { src: '第一 {0} 模板', en: template } }]);
+  const request = {
+    schema: 'pobr-supplement-lines-request/v1', target: TARGET,
+    base: write('stat_lines.json', JSON.stringify(base, null, 2) + '\n'),
+    meta: write('_meta.json', JSON.stringify({ source: 'x' }, null, 2) + '\n'),
+    game_package: { ...write('pobr-game-9.9.zip', zip), repository: 'ackness/repoe', tag: 'game/9.9-1', asset: 'pobr-game-9.9.zip' },
+    edits: write('display-supplements.json', JSON.stringify(doc([], [ours]))),
+    official: [{ ...write(china.spec.asset, china.zip), ...china.spec }],
+  };
+  const out = path.join(root, 'out');
+  const receipt = await createSupplementLines(request, out);
+  const lines = JSON.parse(fs.readFileSync(path.join(out, 'stat_lines.json')));
+  assert.deepEqual(lines, [
+    { src: '其他', en: 'Other line' },
+    { src: '每 2 秒附加 {1:d} 至 {0:d} 伤害', en: 'Adds {0:d} to {1:d} damage every 2 seconds' },
+    { src: '第一种 {0} 模板', en: template },
+    { src: '第二种 {0} 模板', en: template },
+  ]);
+  const meta = JSON.parse(fs.readFileSync(path.join(out, '_meta.json')));
+  assert.deepEqual(Object.keys(meta), ['source', 'official', 'supplements']);
+  assert.deepEqual(meta.official.counts, { official_english: 4, confirmed: 0, revised: 1, revised_partial: 1, kept_pairing_incomplete: 0,
+    added: 1, skipped_not_game_template: 2, skipped_other_stats: 0, skipped_unresolved_markup: 0, kept_historical: 1 });
+  const [source] = meta.official.sources;
+  assert.deepEqual([source.realm, source.tag, source.asset, source.sha256, source.member, source.manifest_sha256],
+    ['china', china.spec.tag, china.spec.asset, china.spec.sha256, china.spec.member, china.spec.manifest_sha256]);
+  assert.equal(source.source_identity.acquisition.status, 'unreviewed-acquisition-draft');
+  assert.deepEqual(meta.supplements.stat_lines.superseded_by_official, [{ correction_id: 'same-template', rows: 1 }]);
+  assert.deepEqual(meta.supplements.stat_lines.corrected, []);
+  assert.equal(receipt.corrections[0].decision, 'superseded-by-official');
+  assert.deepEqual(receipt.official.decisions.map(row => [row.english, row.decision]), [
+    ['Adds {0:d} to {1:d} damage every 2 seconds', 'added'], ['Local {0:+d} Resistance', 'skipped-not-game-template'],
+    ['Same {0} template', 'revised-partial'], ['{0:+d}% to Fire Resistance', 'skipped-not-game-template']]);
+  assert.ok(receipt.implementation['src/pobr/official-lines.mjs']);
+  // The pins and the shape of the official input are checked before anything is written.
+  await assert.rejects(createSupplementLines({ ...request, official: [{ ...request.official[0], sha256: '0'.repeat(64) }] }, `${out}-pin`),
+    /official\[0\]: .* differs from its pin/u);
+  await assert.rejects(createSupplementLines({ ...request, meta: undefined }, `${out}-meta`), /request\.official needs the base meta/u);
+  await assert.rejects(createSupplementLines({ ...request, target: { ...TARGET, locale: 'zh-TW' } }, `${out}-tw`),
+    /no official stat-line source for zh-TW/u);
+  await assert.rejects(createSupplementLines({ ...request, official: [{ ...request.official[0], member: '../x/' }] }, `${out}-member`),
+    /member \(a directory ending in \/\)/u);
+  await assert.rejects(createSupplementLines({ ...request, official: [] }, `${out}-empty`), /lists the official sources/u);
+  assert.equal(fs.existsSync(`${out}-pin`), false);
 });
 
 test('the committed curation/display-supplements.json is valid', () => {
