@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { NAME_SCOPE, validateSupplements } from './display-supplements.mjs';
 
 const requireValue = (value, message) => { if (!value) throw new Error(message); };
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -44,13 +45,27 @@ const localLibrary = () => ({ root: REPO_ROOT, files: Object.fromEntries(FK_LIBR
 const strip = text => text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu,
   (_, key, label) => label ?? key).trim();
 
-export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection()) {
+// The origin of a shown value: the reviewed-supplement lookup returns official | agent | human;
+// the plain catalog lookup returns none, which is official.
+const originOf = result => result.status === 'translated' ? result.origin ?? 'official' : null;
+
+// names: an optional validated poe2-display-supplements/v1 document; its reviewed monster-name
+// entries fill the MonsterVarieties.Name scope for ids the catalog does not have.
+export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection(), names = null) {
   validateProjection(projection);
   const runtimeScopes = new Set(projection.scopes);
   const scopes = new Map(), identities = new Set(), literalRows = new Map(), decisions = [];
-  const add = (english, localized, identity) => {
+  // Non-official values only; `origins` is written when it is not empty, so a projection without
+  // supplements keeps its exact bytes.
+  const originScopes = new Map();
+  const markScope = (scope, id, origin) => {
+    if (!origin || origin === 'official') return;
+    if (!originScopes.has(scope)) originScopes.set(scope, new Map());
+    originScopes.get(scope).set(id, origin);
+  };
+  const add = (english, localized, identity, origin = null) => {
     if (!literalRows.has(english)) literalRows.set(english, []);
-    literalRows.get(english).push({ localized, identity });
+    literalRows.get(english).push({ localized, identity, origin });
   };
   for (const row of catalog.records) {
     // Exact scope, identity, current English and the field's complete English context:
@@ -61,6 +76,7 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
       context: row.context?.english ?? null };
     const result = lookup(query);
     const localized = result.status === 'translated' ? result.text : null;
+    const origin = originOf(result);
     const identity = [row.table, row.field, row.id];
     decisions.push({ identity, ...result });
     const scope = `${row.table}.${row.field}`;
@@ -70,6 +86,7 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     if (runtimeScopes.has(scope)) {
       if (!scopes.has(scope)) scopes.set(scope, new Map());
       scopes.get(scope).set(String(row.id), [row.english, localized]);
+      markScope(scope, String(row.id), origin);
     }
     // A rejected v2 group can have no single English value. Every candidate
     // still owns its literal and display alias, blocking other IDs and old
@@ -85,26 +102,59 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     // use the shared CSD renderer, never substitute captured display numbers here.
     if (!row.templates.english?.syntax_valid || row.templates.english.placeholders.length
       || row.templates.english.hash_slots) continue;
-    add(row.english, localized, identity);
+    add(row.english, localized, identity, origin);
     // The ordinary Web display removes reference markup. Preserve the raw key
     // too, and consider collisions introduced by stripping rather than choosing
     // a row, a table, or the last translation.
     const english = strip(row.english);
-    if (english && english !== row.english) add(english, localized === null ? null : strip(localized), identity);
+    if (english && english !== row.english) add(english, localized === null ? null : strip(localized), identity, origin);
   }
-  const conflicts = [], entries = new Map();
+  const conflicts = [], entries = new Map(), originEntries = new Map();
   for (const [english, rows] of literalRows) {
     const values = new Set(rows.map(row => row.localized));
     const text = values.size === 1 && !values.has(null) ? rows[0].localized : null;
     entries.set(english, text);
-    if (rows.length > 1 && text === null) conflicts.push({ english, rows });
+    if (rows.length > 1 && text === null) conflicts.push({ english, rows: rows.map(({ origin, ...row }) => row) });
+    // A literal is ours only when no official row supplies the same text.
+    const origins = new Set(rows.map(row => row.origin));
+    if (text !== null && !origins.has('official')) originEntries.set(english, origins.has('agent') ? 'agent' : 'human');
   }
-  return {
-    sidecar: { schema: 'pobr-native-display-texts/v1', game_patch: catalog.game_patch,
-      realm: catalog.realm, locale: catalog.locale, catalog_sha256: catalogSha256,
-      entries: sorted(entries), scopes: sorted([...scopes].map(([key, rows]) => [key, sorted(rows)])) },
-    decisions, conflicts,
-  };
+  const nameDecisions = names ? projectNames(names, catalog, runtimeScopes, identities, scopes, markScope) : null;
+  const sidecar = { schema: 'pobr-native-display-texts/v1', game_patch: catalog.game_patch,
+    realm: catalog.realm, locale: catalog.locale, catalog_sha256: catalogSha256,
+    entries: sorted(entries), scopes: sorted([...scopes].map(([key, rows]) => [key, sorted(rows)])) };
+  if (originEntries.size || originScopes.size) {
+    sidecar.origins = { entries: sorted(originEntries),
+      scopes: sorted([...originScopes].map(([key, rows]) => [key, sorted(rows)])) };
+  }
+  return { sidecar, decisions, conflicts, ...(nameDecisions ? { names: nameDecisions } : {}) };
+}
+
+// Reviewed monster-name entries for this catalog's realm and locale. A catalog row with the same
+// MonsterVarieties id always wins (official decode); the entry is kept in curation, not shipped.
+function projectNames(names, catalog, runtimeScopes, identities, scopes, markScope) {
+  validateSupplements(names);
+  const decisions = [], named = new Set();
+  for (const entry of names.entries) {
+    const { identity } = entry;
+    if (identity.kind !== 'monster-name') continue;
+    const decision = { entry_id: entry.entry_id, english: identity.english, ids: entry.ids, origin: entry.origin };
+    decisions.push(decision);
+    if (identity.realm !== catalog.realm || identity.locale !== catalog.locale) { decision.lifecycle = 'other-target'; continue; }
+    if (entry.status !== 'reviewed') { decision.lifecycle = entry.status; continue; }
+    requireValue(runtimeScopes.has(NAME_SCOPE), `Reviewed monster names need ${NAME_SCOPE} in projection.scopes`);
+    decision.ids = entry.ids.map(id => {
+      if (identities.has(JSON.stringify([NAME_SCOPE, id]))) return { id, lifecycle: 'official' };
+      requireValue(!named.has(id), `Two reviewed monster names for ${id}`);
+      named.add(id);
+      if (!scopes.has(NAME_SCOPE)) scopes.set(NAME_SCOPE, new Map());
+      scopes.get(NAME_SCOPE).set(id, [identity.english, entry.text]);
+      markScope(NAME_SCOPE, id, entry.origin);
+      return { id, lifecycle: 'supplemented' };
+    });
+    decision.lifecycle = decision.ids.every(row => row.lifecycle === 'official') ? 'official' : 'supplemented';
+  }
+  return decisions;
 }
 
 function readPinned(file, pin, reads) {
@@ -220,7 +270,14 @@ export async function createDisplayTexts(request, out) {
     projectionSource = { source: 'file', file: PROJECTION_FILE, bytes: raw.length, sha256: digest(raw) };
   }
   validateProjection(projection);
-  const projected = projectDisplayTexts(catalog, lookup, manifest.files['catalog.json'].sha256, projection);
+  // Optional pinned curation/display-supplements.json for names with no catalog table.
+  let names = null;
+  if (request.names !== undefined) {
+    requireValue(request.names && typeof request.names.file === 'string' && Number.isSafeInteger(request.names.bytes),
+      'Invalid names pin: {file, bytes, sha256}');
+    names = strictJson(readPinned(request.names.file, request.names, reads));
+  }
+  const projected = projectDisplayTexts(catalog, lookup, manifest.files['catalog.json'].sha256, projection, names);
   for (const [file, pin] of [...reads]) readPinned(file, pin, reads);
   const output = path.resolve(out), cache = path.join(REPO_ROOT, '.cache');
   requireValue(output.startsWith(cache + path.sep) && !fs.existsSync(output), 'Output must be a fresh repository cache candidate');
@@ -238,6 +295,7 @@ export async function createDisplayTexts(request, out) {
       runtime: { bytes: reviewed.runtimeBytes.length, sha256: reviewed.runtimeSha256 },
       catalog_sha256: manifest.files['catalog.json'].sha256, sources: reviewed.sources,
       records: reviewed.records } } : {}),
+    ...(projected.names ? { names: projected.names } : {}),
     scope: 'Only declared runtime scopes retain browser per-ID indexes. Every source record still participates in exact library decisions and applicable literal collision checks, including unresolved records and markup aliases. Null blocks stale compatibility text. Other scoped metadata stays in the translation library. No cross-locale conversion, placeholder rendering, calculation, source approval or CURRENT adoption.' };
   fs.writeFileSync(path.join(output, 'receipt.json'), serialize(receipt), { flag: 'wx' });
   return receipt;

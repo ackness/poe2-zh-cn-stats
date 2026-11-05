@@ -9,7 +9,8 @@
 | --- | --- |
 | 发布新补丁的语言包、换文件、补辅助宝石说明 | [RELEASING.md](../RELEASING.md) |
 | 查配置、重新生成配方和回执的字段 | [语言包配置参考](release-config.md) |
-| 生成 PoBR 的显示文本、繁中名称、词条译文 | [PoBR 语言文件生产者](pobr-locale-producers.md) |
+| 生成 PoBR 的显示文本、繁中名称、词条译文及补译 | [PoBR 语言文件生产者](pobr-locale-producers.md) |
+| 补交易目录以外的词条与怪物名、修正已发布词条行 | [显示补译与来源标记](translation-workbench.md#显示补译与来源标记) |
 | 生成或重放简中词典文件 | [简中词典生成](locale-generation.md) |
 | 查语言来源的接受记录 | [语言来源台账](../sources/README.md) |
 
