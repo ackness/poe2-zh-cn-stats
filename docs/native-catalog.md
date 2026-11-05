@@ -2,15 +2,19 @@
 
 `src/native-catalog.mjs` 在现有 RePoE 物理表读取器上导出
 `poe2-native-catalog/v1`。输入为 `poe2-native-catalog-request/v1`，
-其 `language`、`localized`、`english` 与 README 的 native-name request 相同。
+其 `language`、`localized`、`english` 与下文[原件名称](#原件名称native-names)的请求相同。
 可选 `tables` 明确限定本次已获取的表；省略时必须提供全部九表。
 `english[].tables` 必须恰好拥有所选范围，各表一个 owner。
 这允许真实简中来源先提供 Words / Ascendancy 的小范围候选，不能把其余表算作已覆盖。
 
 ```sh
-node src/native-catalog.mjs --config /absolute/catalog-request.json --out .cache/catalog/fresh
-node --test test/native-catalog.test.mjs test/native-names.test.mjs test/native-localization.test.mjs
+mise exec -- node src/native-catalog.mjs --config /absolute/catalog-request.json --out .cache/catalog/fresh
+mise exec -- node --test test/native/
 ```
+
+`src/` 下的原生目录库（`native-catalog`、`native-names`、`strict-json`、`native-catalog-binding`、
+`native-catalog-fk-binding`、`native-localization`，以及 `translation-workbench`）字节和路径冻结，
+原因见 [AGENTS.md](../AGENTS.md#layout)。
 
 导出仅写本 checkout 下全新的 `.cache` 目录。`manifest.json` 固定
 `catalog.json` 和 `request.json` 的字节数及 SHA-256；固定 consumer commit 和
@@ -147,5 +151,27 @@ const lookup = createCatalogLookup(catalog, {
 当前固定 SC 产物有 58588 字段／18 列，lookup 状态为 25097 translated／33491 fallback；
 这是该固定目录的结果，不是全游戏汉化率。观察客户端 patch／realm 仍为 null，
 目标 `0.5.5.5/international` 绑定不认证整个观察客户端或国服数值。
-当前固定 catalog、六模块库和原 validation 收据；内容验证仍由完整 v3 guard 负责。PoBR 已导入该目录并生成精简显示资产，
-原大 sidecar 留作构建／离线校验输入，不进入玩家运行包。
+内容验证由完整 v3 guard 负责。PoBR 使用的是由该目录投影出的 `display_texts.json`（见
+[PoBR 语言文件生产者](pobr-locale-producers.md#显示文本display_textsjson)）；原大 sidecar 只作构建和离线校验输入，
+不进入玩家运行包。
+
+## 原件名称（native-names）
+
+`src/native-names.mjs` 离线配对同游戏、补丁、服别与 schema 的英文事实和显式语言事实，输出
+`poe2-native-names/v1`，不修改交易快照或 `CURRENT`：
+
+```sh
+mise exec -- node src/native-names.mjs --config /absolute/name-request.json --out .cache/names/fresh
+```
+
+请求 schema 为 `poe2-native-name-request/v1`：`language` 是 `Traditional Chinese` 或
+`Simplified Chinese`；`localized: {manifest, sha256}` 指定 RePoE `repoe-localized-tables/v1`；`english` 是
+`{manifest, sha256, tables}` 数组，支持 `repoe-native-facts/v4` 或 `repoe-native-tables/v1`，每张表只有一个
+owner。九张表为 BaseItemTypes、ActiveSkills、Mods、Words、Characters、Ascendancy、PassiveSkills、ItemClasses、
+AlternateQualityTypes。每个 manifest 和实际读取的 payload 先核对外部摘要，解析后再检查输入未变。
+
+`names.json` 按表、字段及原件身份保留英文、译文、两侧物理行和来源 manifest。八张表按精确 `Id` 配对；
+Words 的 `Text` 有重名，按同补丁内唯一的 `HASH32` 加精确 `Text`、`Wordlist` 对应，不把物理行当稳定 ID。
+空值、缺行、未译和同英文多译分别列入 `excluded`／`conflicts`；只有英文文本的消费方不能在冲突中任选译文。
+这个入口不抓取资源、不猜译、不做繁简转换，也不认证数值适用性。繁中名称交给 PoBR 时经过
+`pobr:names`（见 [PoBR 语言文件生产者](pobr-locale-producers.md#繁中名称zh-tw-三个-id-文件)）。
