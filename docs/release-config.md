@@ -92,7 +92,9 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
   （`.cache/release/inputs/<sha256>`；`release:publish` 只读缓存）。
 
 与真实游戏包的交易目录比较：`regenerate` 每次构建都做；`retained` 只在 `--check` 且声明了
-`dictionary`／`catalog` 时做。0.5.5.5 用 `retained`：以记录的输入重算时 `entries`、`untranslated`
+`dictionary`／`catalog` 时做。
+
+示例（0.5.5.5）：0.5.5.5 用 `retained`：以记录的输入重算时 `entries`、`untranslated`
 逐字节相同，只有 `_meta` 不同（保留文件记的是当年的 `data_version` 与命令），所以保留已固定的字节。
 
 构建把两个文件写到输出目录并列入 `SHA256SUMS`，回执的 `support_display` 记 `mode`、
@@ -150,7 +152,7 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
 成员加冻结成员打出的 zip。任何成员不同，或配置已有 `published` 而 zip 与它不同，都以 1 退出。
 `display-texts` 任务要解开约 390 MB 的 catalog，峰值内存约 4 GB。
 
-0.5.5.5 的配方：13 个成员中 10 个重新生成且逐字节相同（简中 9 个来自 `locale-producer`，其中
+示例（0.5.5.5）：0.5.5.5 的配方有 13 个成员，其中 10 个重新生成且逐字节相同（简中 9 个来自 `locale-producer`，其中
 `_meta.json` 是 passthrough；`display_texts.json` 来自 `display-texts`），繁中 3 个冻结，冻结原因与
 退出条件写在配方里。
 

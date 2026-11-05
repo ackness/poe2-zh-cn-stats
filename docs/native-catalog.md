@@ -13,8 +13,8 @@ mise exec -- node --test test/native/
 ```
 
 `src/` 下的原生目录库（`native-catalog`、`native-names`、`strict-json`、`native-catalog-binding`、
-`native-catalog-fk-binding`、`native-localization`，以及 `translation-workbench`）字节和路径都被
-`release/regenerate/0.5.5.5.json` 固定的 catalog 记录为 producer 闭包，修改它们会让 CI 的重新生成失败。
+`native-catalog-fk-binding`、`native-localization`，以及 `translation-workbench`）字节和路径冻结，
+原因见 [AGENTS.md](../AGENTS.md#layout)。
 
 导出仅写本 checkout 下全新的 `.cache` 目录。`manifest.json` 固定
 `catalog.json` 和 `request.json` 的字节数及 SHA-256；固定 consumer commit 和

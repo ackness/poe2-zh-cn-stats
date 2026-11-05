@@ -1,4 +1,4 @@
-# PoE2 Chinese language data (Simplified / Traditional)
+# PoE2 language data (English / Simplified Chinese / Traditional Chinese)
 
 **English** | [简体中文](README.zh-CN.md)
 
@@ -76,9 +76,15 @@ mise exec -- npm run build     # after editing curation/: rebuild offline from t
 mise run report                # show the coverage report
 ```
 
-Manual inputs live in [`curation/`](curation/): the trade worklist `translations.json`, reviewed templates
-`curated.json`, explicit overrides `overrides.json`, native supplements `native-translations.json` and the
-PoE2DB page list `trade-sources.json`.
+What to edit, by purpose:
+
+| To change | Edit |
+| --- | --- |
+| A missing translation for an existing trade ID + English branch | [`curation/translations.json`](curation/translations.json): `manual_chinese`, `manual_note`, `manual_source_url` |
+| Explicitly override an existing trade translation | [`curation/overrides.json`](curation/overrides.json), with reason and source |
+| Non-trade templates, multi-slot templates, rare-name words | [`curation/curated.json`](curation/curated.json) |
+| Native name or description supplements | [`curation/native-translations.json`](curation/native-translations.json), reviewed through the [workbench flow](docs/translation-workbench.md) (Chinese) |
+| Additional pages to fetch | [`curation/trade-sources.json`](curation/trade-sources.json) |
 
 ## Layout
 
@@ -92,15 +98,15 @@ src/cli.mjs                     command entry for the trade dictionary and nativ
 src/trade/                      trade dictionary
 src/release/                    release:build, release:publish, release:regenerate
 src/pobr/                       PoBR locale producers and the historical zh-CN dictionary producer
-src/*.mjs (the other seven)     native catalog library; paths and bytes are fixed because the catalog that
-                                release/regenerate/0.5.5.5.json pins (e61f1332) records src/<name> and its
-                                hash, and the modules locate src/ from their own path
+src/*.mjs (the other seven)     native catalog library; paths and bytes are frozen (see AGENTS.md)
 test/<domain>/                  offline tests grouped like src/ (test/native/ covers the native library)
 docs/                           contracts and guides (Chinese)
 sources/                        locale provenance ledger
+.cache/                         local candidates and temporary files, not committed
 ```
 
-What is editable, frozen or generated is listed in [AGENTS.md](AGENTS.md#layout).
+What is editable, frozen or generated, and why the seven native modules stay frozen at `src/`, is in
+[AGENTS.md](AGENTS.md#layout).
 
 ## Publishing the language package
 

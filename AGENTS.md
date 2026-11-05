@@ -16,7 +16,7 @@ document.
   GGG's trade API. International-client Simplified Chinese text never proves China-realm values.
 - **No new features.** The structure may stay ready for more languages, but do not add functionality
   beyond this purpose: no further languages, runtime services, calculation rules or PoBR wiring.
-  Removing dead code is fine; removing a path that a pin, a Release or another repository still uses is not.
+  Removing dead code is fine; removing a path that a pin, a Release or another repository (e.g. `ackness/pobr`) still uses is not.
 
 ## Ownership boundaries
 
@@ -69,14 +69,16 @@ Why the frozen parts stay as they are:
 
 - Never move or delete a `locale/*` tag or a `handoff/*` tag. PoBR's lock, this repository's configs and
   its recipes read them by tag and commit.
-- These handoff tags are the only refs that keep pinned commits alive (the commits are not on `main`):
+- Example (0.5.5.5): these handoff tags are the only refs that keep pinned commits alive (the commits
+  are not on `main`):
   `handoff/shaman-mantle-20261103` (`9aba3687`: the 0.5.5.5 source origin, the recipe's generation
   manifest and producer commit), `handoff/windows-sc-20261101` (`e61f1332`: the recipe's native catalog),
   `handoff/reviewed-supplements-20261101` (`5d019466`: the recipe's reviewed supplement) and
   `handoff/rollback-0.5.5.4.2-20261101` (`93d9e164`). The other `handoff/*` tags point at `main` commits
   and are still cited, e.g. `handoff/support-display-20261101` by `release/0.5.5.5-2.json`.
 - Only maintainers publish (`mise run release:publish -- --yes`). A `locale/*` tag that an interrupted
-  publish left without a Release is finished by rerunning that command; deleting it is the owner's call.
+  publish left without a Release is never deleted or moved: rerun `mise run release:publish -- --yes` on the
+  same commit to finish the interrupted publish.
 
 ## Commands
 
@@ -91,7 +93,7 @@ mise run report                                  # saved trade coverage report
 mise exec -- npm run refresh                     # fetch the trade catalogs and PoE2DB pages (network)
 mise exec -- npm run build                       # offline rebuild after editing curation/
 mise run release:build -- --fetch --check        # build a language package and check it
-mise run release:build -- --check-release        # also compare with its Release and check the tag pins (network)
+mise run release:build -- --check-release        # also compare with its Release and check the tag pins (needs network: GitHub)
 mise run release:regenerate -- --fetch           # rebuild members from pinned inputs (~40 s, ~4 GB)
 mise run release:publish                         # dry run of a publish
 mise run pobr:display-texts -- --request FILE --out .cache/NEW
@@ -127,10 +129,12 @@ CI runs all of this anyway; run locally what your change can break.
 - Branch from `main`. Commit subjects follow `type(scope): imperative lowercase` (`feat`, `fix`,
   `refactor`, `chore`, `docs`, `test`; scopes such as `release`, `trade`, `pobr`, `native`); the body
   says why. Code and comments are in English; documents are in Chinese, except `README.md` (English, with
-  `README.zh-CN.md`), `AGENTS.md` and `CONTRIBUTING.md`.
+  `README.zh-CN.md`), `AGENTS.md` and `CONTRIBUTING.md`. `README.md` (English, the default) and
+  `README.zh-CN.md` must stay in sync: change both in the same PR.
 - Merge with a merge commit, never squash or rebase: `source.origin.revision` can be a commit on the PR
   branch, and only a merge commit keeps it in `main`'s history. A new `inputs/` directory, its config
   and its recipe go in one PR (see [RELEASING.md](RELEASING.md#新补丁)).
 - Never edit a config that has `published` or anything under `inputs/`; add a new config and directory.
+  The one allowed edit is the post-publish PR that writes the `published` block (next item).
 - After every publish, a follow-up PR writes `published` into the config. Until it merges, CI's
   `--check-release` fails on purpose.

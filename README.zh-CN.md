@@ -89,14 +89,14 @@ src/cli.mjs                   交易词典与原生文本命令入口
 src/trade/                    交易词典：采集、配对、生成与验证
 src/release/                  release:build／release:publish／release:regenerate
 src/pobr/                     PoBR 语言文件生产者与历史简中词典生成
-src/*.mjs（其余 7 个）         原生目录库，路径与字节固定：release/regenerate/0.5.5.5.json 固定的 catalog（e61f1332）在 producer 里记录了 src/<名> 及哈希，模块又按自身位置读取 src/，所以留在 src/ 根下、不改字节
+src/*.mjs（其余 7 个）         原生目录库，路径与字节冻结（见 AGENTS.md）
 test/<领域>/                  按 src/ 领域分组的离线测试（test/native/ 对应原生目录库）
 docs/                         数据契约和维护指南
 sources/                      语言来源台账
 .cache/                       本地候选与临时文件，不提交
 ```
 
-哪些可编辑、哪些冻结或生成，见 [AGENTS.md](AGENTS.md#layout)。
+哪些可编辑、哪些冻结或生成，以及 7 个原生模块为何冻结在 `src/`，见 [AGENTS.md](AGENTS.md#layout)。
 
 ## 语言包发布
 

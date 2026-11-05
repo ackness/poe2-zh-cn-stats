@@ -6,7 +6,9 @@
 也不决定来源是否被接受。依赖只有 `src/pobr/legacy-translation-merge.mjs`、`src/strict-json.mjs` 和
 Node 内置模块。
 
-## 0.5.5.5 的固定生成
+## 示例（0.5.5.5）：固定生成
+
+以下是 0.5.5.5 的具体做法，其他补丁的清单与计数不同。
 
 `release/regenerate/0.5.5.5.json` 的 `zh-cn-dictionary` 任务固定了 0.5.5.5 用的生成清单
 （`9aba3687` 的 `handoff/locale-generation-shaman-mantle-20261103/input-manifest.json`），CI 每次都用它重新
@@ -45,7 +47,7 @@ mise exec -- node src/pobr/locale-producer.mjs \
   `_meta.json`。这是对另一份固定来源可复用的生成方式，不代表结果已被任何补丁接受。
 - `retained-selected`：另需四个固定证据输入。它用另行固定的旧元数据核对生成的计数和身份，核对 140 条原生
   配对增量的输入与中间 pin，再叠加选中的字面译文层并核对最终 pin。原元数据和原有的三个选取块原样保留，
-  不重标为当前生成。0.5.5.5 的清单用这个 profile：27896 条历史配对、140 条原生配对和 6 条选中字面译文
+  不重标为当前生成。示例（0.5.5.5）：0.5.5.5 的清单用这个 profile：27896 条历史配对、140 条原生配对和 6 条选中字面译文
   （两条原有的，加四条来自 `curation/curated.json` 的 Shaman Mantle 别名），共 28042 条。
 
 输出的 9 个 `i18n/zh-CN/*.json` 和 `generated/translation-audit.json` 的 pin 写在 `receipt.json` 的 `files`；
