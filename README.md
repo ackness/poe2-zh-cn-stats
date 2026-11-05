@@ -97,7 +97,7 @@ inputs/                       release/<patch>.json 固定的源发布与保留�
 
 消费方固定发布声明中的完整 commit、文件路径、字节数与 SHA-256，验证后再读取。源码 `main` 的新提交不自动更新已发布语言数据。PoBR 在唯一的 `pipeline/data.lock.json` 中记录采用的发布与产物；产品运行时使用已打包文件。
 
-PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件生产入口](docs/pobr-locale-producers.md)生成。固定历史简中词典的再生见[离线生成契约](docs/locale-generation.md)，已有字节的重放见[保留语言发布](docs/retained-locale-publication.md)。
+PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件生产入口](docs/pobr-locale-producers.md)生成。固定历史简中词典的再生见[离线生成契约](docs/locale-generation.md)。
 
 ### 语言包 GitHub Release
 
