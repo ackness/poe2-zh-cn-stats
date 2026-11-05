@@ -63,7 +63,7 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   scope 里该 ID 的英文等于当前英文时采用译文。PoBR 实现新的精确 ID 调用方时再增加
   scope；其余字段留在本库，不增大玩家下载。
   示例（0.5.5.5）：`PassiveSkills.Name` 有 9731 个 ID，8424 个有译文、1307 个为 null；
-  `display_texts.json` 因此从 1649082 字节增至 2215826 字节（gzip -9 从 459008 增至 553548）。
+  `display_texts.json` 因此从 1649082 字节增至 2215826 字节（gzip 后约增加 94 KB）。
   其中只有 1567 个 ID 的英文在 `entries` 里为 null 或不在 `entries` 中（260 个有译文）；
   只保留这些 ID 只增加 gzip 约 9.7 KB，但增量不大，所以默认投影保留完整 scope，PoBR
   可以对每个天赋节点只查 scope。
