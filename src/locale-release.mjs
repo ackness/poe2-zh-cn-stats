@@ -86,13 +86,15 @@ function comparePatches(a, b) {
   return 0;
 }
 
-// The highest release/<patch>[-<n>].json: patches compared numerically, then <n> (none first).
+// The highest release/<patch>[-<n>].json that is not on hold: patches compared numerically, then
+// <n> (none first). A held config is built and checked only when named with --config.
 export function defaultConfig(repo = ROOT) {
   const names = readdirSync(path.join(repo, 'release')).filter(name => name.endsWith('.json')).map(name => name.slice(0, -5));
   const invalid = names.filter(name => !CONFIG_NAME.test(name));
   require(!invalid.length, `Release declarations must be named <game patch>[-<n>]: ${invalid}`);
-  require(names.length, 'No release declaration under release/; pass --config');
-  return path.join(repo, 'release', `${names.sort(comparePatches).at(-1)}.json`);
+  const active = names.filter(name => strictJson(readFileSync(path.join(repo, 'release', `${name}.json`))).hold === undefined);
+  require(active.length, 'No release declaration (not on hold) under release/; pass --config');
+  return path.join(repo, 'release', `${active.sort(comparePatches).at(-1)}.json`);
 }
 
 // The <n> a release/<patch>-<n>.json declares, or null.
@@ -138,7 +140,7 @@ export function loadConfig(file, repo = ROOT) {
     require(base.config.schema === CONFIG_SCHEMA && base.underRelease, 'The base must be a v1 config under release/');
     require(JSON.stringify(base.config.target) === JSON.stringify(target), 'The base targets another game patch or realm');
     validateTransforms(config.transforms);
-    require(config.expect === undefined || isPin(config.expect.package), 'expect must pin the package {bytes, sha256}');
+    require(isPin(config.expect?.package), 'A v2 config pins its intended package in expect.package {bytes, sha256}');
     return { ...loaded, base };
   }
   const { source } = config;

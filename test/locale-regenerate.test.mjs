@@ -134,6 +134,11 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
   const meta = { ...pin(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/_meta.json'))), category: 'unpinned-input', reason: 'r', exit: 'e' };
   await assert.rejects(attempt({ ...recipe, jobs: [{ ...job, members: ZH_CN.slice(1) }], frozen: { ...recipe.frozen, 'i18n/zh-CN/_meta.json': meta } }),
     /the producer also writes i18n\/zh-CN\/_meta\.json/u);
+  const layer = { input: 'templates.json', category: 'unknown', reason: 'r', exit: 'e' };
+  await assert.rejects(attempt({ ...recipe, jobs: [{ ...job, composed_evidence: { 'i18n/zh-CN/stat_lines.json': [layer] } }] }),
+    /stat_lines\.json layer templates\.json names an undeclared category/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [{ ...job, composed_evidence: { 'i18n/zh-CN/stat_lines.json': [{ ...layer, category: undefined }] } }] }),
+    /maps a member to \[\{input, category, reason, exit\}\]/u);
   await assert.rejects(attempt({ ...recipe, jobs: [{ ...job, passthrough: { 'i18n/zh-CN/mods.json': 'carried' } }] }),
     /mods\.json is declared passthrough but equals no input/u);
   await assert.rejects(attempt({ ...recipe, jobs: [{ ...job, manifest: { ...job.manifest, sha256: '0'.repeat(64) } }] }),

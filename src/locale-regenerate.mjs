@@ -54,8 +54,8 @@ function validateJob(job, members) {
   `${job.id}: passthrough maps a member of the job to a reason`);
   require(job.composed_evidence === undefined || (object(job.composed_evidence) && Object.entries(job.composed_evidence)
     .every(([member, layers]) => job.members.includes(member) && Array.isArray(layers) && layers.length
-      && layers.every(layer => typeof layer.input === 'string' && layer.reason && layer.exit))),
-  `${job.id}: composed_evidence maps a member to [{input, reason, exit}]`);
+      && layers.every(layer => typeof layer.input === 'string' && typeof layer.category === 'string' && layer.reason && layer.exit))),
+  `${job.id}: composed_evidence maps a member to [{input, category, reason, exit}]`);
   if (job.kind === 'locale-producer') {
     gitRef(job.manifest, `${job.id} manifest`);
     require(isPin(job.manifest) && HEX40.test(job.producer_commit ?? ''), `${job.id}: pin the manifest and name the producer commit`);
@@ -85,6 +85,11 @@ export function loadRecipe(file, repo = ROOT) {
     ids.add(job.id);
   }
   require(object(recipe.categories) && object(recipe.frozen ?? {}), 'categories and frozen are objects');
+  for (const job of recipe.jobs) for (const [member, layers] of Object.entries(job.composed_evidence ?? {})) {
+    for (const layer of layers) {
+      require(Object.hasOwn(recipe.categories, layer.category), `${job.id}: ${member} layer ${layer.input} names an undeclared category`);
+    }
+  }
   for (const [member, entry] of Object.entries(recipe.frozen ?? {})) {
     require(!members.has(member), `${member} is both regenerated and frozen`);
     members.add(member);

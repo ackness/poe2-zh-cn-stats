@@ -32,8 +32,9 @@ const TRANSFORMS = [
     records: 'evidence/zh-TW-receipt.json', table: 'mods.json', conflicts: 'most-common-then-first-row' },
   { id: 'zh-tw-meta', kind: 'json', member: 'i18n/zh-TW/_meta.json', value: { fallback: ['zh-CN'] } },
 ];
+const UNKNOWN = { package: { bytes: 1, sha256: '0'.repeat(64) } };
 const v2 = extra => ({ schema: 'poe2-locale-release-config/v2', target: TARGET, base: { config: 'release/9.9.json' },
-  transforms: TRANSFORMS, ...extra });
+  transforms: TRANSFORMS, expect: UNKNOWN, ...extra });
 
 // The fixture's checkout with BASE_FILES as release/9.9.json's publication and release/9.9-2.json on top.
 function v2Fixture(t, extra = {}) {
@@ -106,10 +107,7 @@ test('v2 build: the base package with its transforms applied; check pins the exp
   assert.equal(receipt.package.members['data/9.9/i18n/zh-CN/mods.json'], 'inputs/locale-test/i18n/zh-CN/mods.json');
   assert.deepEqual(receipt.package.index.languages['zh-TW'].tables['mods.json'],
     { entries: 3, fallback_keys_covered: 2, fallback_entries: 3 });
-  assert.deepEqual(check(repo, built), []);
-  write(repo, 'release/9.9-2.json', bytes(v2({ expect: { package: { bytes: 1, sha256: '0'.repeat(64) } } })));
-  commitAll(repo, 'wrong expectation');
-  assert.deepEqual(check(repo, build({ repo })), [`the package differs from the expected ${'0'.repeat(64)}`]);
+  assert.deepEqual(check(repo, built), [`the package differs from the expected ${'0'.repeat(64)}`]);
   write(repo, 'release/9.9-2.json', bytes(v2({ expect: { package: pin(built.zip) } })));
   commitAll(repo, 'expectation');
   assert.deepEqual(check(repo, build({ repo })), []);
@@ -124,6 +122,7 @@ test('v2 config: refuses unknown fields, bad transforms and a published tag for 
     assert.throws(() => loadConfig(file, repo), pattern);
   };
   refuse(v2({ extra: 1 }), /unknown fields/u);
+  refuse(v2({ expect: undefined }), /pins its intended package in expect\.package/u);
   refuse(v2({ base: { config: 'release/9.9-2.json' } }), /base must be a v1 config/u);
   refuse(v2({ transforms: [] }), /at least one transform/u);
   refuse(v2({ transforms: [TRANSFORMS[0], { ...TRANSFORMS[1], member: TRANSFORMS[0].member }] }), /repeated member/u);
@@ -136,5 +135,11 @@ test('v2 config: refuses unknown fields, bad transforms and a published tag for 
   assert.throws(() => build({ repo }), /already exists; a json transform only adds a member/u);
   write(repo, 'release/9.9-x.json', bytes(v2()));
   assert.throws(() => defaultConfig(repo), /named <game patch>\[-<n>\]/u);
+  rmSync(path.join(repo, 'release/9.9-x.json'));
+  // A held config is never the default.
+  write(repo, 'release/9.9-2.json', bytes(v2({ hold: 'waiting for PoBR' })));
+  assert.equal(defaultConfig(repo), path.join(repo, 'release/9.9.json'));
+  write(repo, 'release/9.9.json', bytes({ ...strictJson(readFileSync(path.join(repo, 'release/9.9.json'))), hold: 'also waiting' }));
+  assert.throws(() => defaultConfig(repo), /not on hold/u);
   assert.equal(strictJson(readFileSync(path.join(repo, 'release/9.9.json'))).schema, 'poe2-locale-release-config/v1');
 });
