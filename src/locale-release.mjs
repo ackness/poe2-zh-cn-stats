@@ -6,7 +6,10 @@
 // plus every i18n/* member as data/<patch>/i18n/*) and receipt.json (producer commit, every
 // source pin, the transforms, the package pins and a language index). The zip is a function of
 // the pinned source bytes, the transforms and the target only, so any later clean commit with
-// the same inputs reproduces it byte for byte. release:regenerate (src/locale-regenerate.mjs)
+// the same inputs reproduces it byte for byte. A config may also declare a support display
+// (`support_display`, src/support-display.mjs): support-display.zh-CN.json and
+// supportDescriptions.zh-CN.json are written beside the zip, listed in SHA256SUMS and pinned in the
+// receipt, and never change the zip. release:regenerate (src/locale-regenerate.mjs)
 // separately rebuilds a v1 source's members from their producers' pinned inputs.
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
@@ -17,6 +20,9 @@ import { parseArgs } from 'node:util';
 import { strictJson } from './strict-json.mjs';
 import { readZip, storedZip } from './stored-zip.mjs';
 import { applyTransforms, localeIndex, validateTransforms } from './locale-package.mjs';
+import {
+  DISPLAY_ASSET, MANIFEST_ASSET, displayOrigin, displayProblems, fetchDisplayInputs, supportDisplay, validateSupportDisplay,
+} from './support-display.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const REPOSITORY = 'ackness/poe2-zh-cn-stats';
@@ -27,7 +33,8 @@ export const SOURCE_SCHEMA = 'poe2-retained-locale-publication/v1';
 export const PART_SCHEMA = 'pobr-build-data-part/v1';
 const MARKER = '.release-build';
 // Pinned in the receipt; the commit identifies them too, the pins make a receipt self-describing.
-export const CODE = ['src/locale-release.mjs', 'src/locale-package.mjs', 'src/stored-zip.mjs', 'src/strict-json.mjs', 'mise.lock'];
+export const CODE = ['src/locale-release.mjs', 'src/locale-package.mjs', 'src/support-display.mjs', 'src/support-description-projection.mjs',
+  'src/stored-zip.mjs', 'src/strict-json.mjs', 'mise.lock'];
 // Untracked files here could change the build, so they make the producer dirty.
 export const PRODUCER_PATHS = ['src', 'release', 'inputs', 'package.json', 'package-lock.json', 'mise.toml', 'mise.lock'];
 const HEX40 = /^[0-9a-f]{40}$/u;
@@ -53,14 +60,14 @@ export function sha256sums(digests) {
   return Object.keys(digests).sort().map(name => `${digests[name]}  ${name}\n`).join('');
 }
 
-function safeRelative(name) {
+export function safeRelative(name) {
   require(typeof name === 'string' && name && !name.includes('\\') && !name.includes(':')
     && !name.split('/').some(part => part === '' || part === '.' || part === '..'), `Unsafe path: ${JSON.stringify(name)}`);
   return name;
 }
 
 // A regular file inside the repository, never through a symlink.
-function readRegular(repo, relative) {
+export function readRegular(repo, relative) {
   let at = repo;
   for (const part of safeRelative(relative).split('/')) {
     at = path.join(at, part);
@@ -70,7 +77,7 @@ function readRegular(repo, relative) {
   return readFileSync(at);
 }
 
-function isPin(value) {
+export function isPin(value) {
   return value && Number.isSafeInteger(value.bytes) && value.bytes >= 0 && HEX64.test(value.sha256 ?? '');
 }
 
@@ -130,8 +137,14 @@ export function loadConfig(file, repo = ROOT) {
   require(config.hold === undefined || (typeof config.hold === 'string' && config.hold.trim()), 'hold must be a reason');
   const relative = path.relative(repo, file);
   const loaded = { file, raw, config, underRelease, display: relative.startsWith('..') ? file : relative.split(path.sep).join('/') };
+  // The support display is the config's own; a v2 config does not inherit its base's.
+  if (config.support_display !== undefined) {
+    validateSupportDisplay(config.support_display, target);
+    // A regenerated `_meta.regen_command` names the config, so it must not depend on the machine.
+    require(config.support_display.mode !== 'regenerate' || underRelease, 'A regenerated support display needs a config under release/');
+  }
   if (config.schema === CONFIG_SCHEMA_V2) {
-    const keys = ['schema', 'target', 'base', 'transforms', 'expect', 'hold', 'published'];
+    const keys = ['schema', 'target', 'base', 'transforms', 'expect', 'hold', 'published', 'support_display'];
     require(Object.keys(config).every(key => keys.includes(key)), `${file}: unknown fields (v2 allows ${keys})`);
     require(typeof config.base?.config === 'string' && Object.keys(config.base).join() === 'config', 'base must name {config}');
     const baseFile = path.join(repo, safeRelative(config.base.config));
@@ -143,6 +156,8 @@ export function loadConfig(file, repo = ROOT) {
     require(isPin(config.expect?.package), 'A v2 config pins its intended package in expect.package {bytes, sha256}');
     return { ...loaded, base };
   }
+  const keys = ['schema', 'target', 'source', 'hold', 'published', 'support_display'];
+  require(Object.keys(config).every(key => keys.includes(key)), `${file}: unknown fields (v1 allows ${keys})`);
   const { source } = config;
   safeRelative(source?.manifest?.path);
   require(source.manifest.path.endsWith('/manifest.json') && isPin(source.manifest), 'Invalid source manifest pin');
@@ -193,7 +208,7 @@ export function producerIdentity(repo, loaded) {
 
 // --- source --------------------------------------------------------------------------------------
 
-function listFiles(directory, prefix = '') {
+export function listFiles(directory, prefix = '') {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
     const name = prefix + entry.name;
     if (entry.isDirectory()) return listFiles(path.join(directory, entry.name), `${name}/`);
@@ -315,7 +330,7 @@ export function packageOf(repo, loaded) {
   };
 }
 
-export function build({ repo = ROOT, config: configFile, out } = {}) {
+export function build({ repo = ROOT, config: configFile, out, cache } = {}) {
   repo = path.resolve(repo);
   const loaded = loadConfig(configFile ?? defaultConfig(repo), repo);
   const { config } = loaded, { target } = config;
@@ -324,6 +339,8 @@ export function build({ repo = ROOT, config: configFile, out } = {}) {
   const { zip, manifestRaw, expanded } = packageArchive(target, partSource, members);
   const asset = assetName(target.game_patch);
   const prefix = `data/${target.game_patch}/`;
+  // Release assets beside the zip, never members of it.
+  const display = supportDisplay(repo, loaded, members, { cache });
   const receipt = {
     schema: RECEIPT_SCHEMA,
     target,
@@ -338,6 +355,7 @@ export function build({ repo = ROOT, config: configFile, out } = {}) {
       // Not a package member: PoBR rejects data/<patch>/i18n/* files the game snapshot does not list.
       index: localeIndex(new Map([...members].map(([name, raw]) => [name.slice(prefix.length), raw]))),
     },
+    ...(display ? { support_display: display.receipt } : {}),
   };
   const receiptRaw = encoded(receipt);
   if (existsSync(out)) {
@@ -349,8 +367,14 @@ export function build({ repo = ROOT, config: configFile, out } = {}) {
   writeFileSync(path.join(out, asset), zip);
   writeFileSync(path.join(out, 'receipt.json'), receiptRaw);
   writeFileSync(path.join(out, 'manifest.json'), manifestRaw);
-  writeFileSync(path.join(out, 'SHA256SUMS'), sha256sums({ [asset]: sha256(zip), 'receipt.json': sha256(receiptRaw) }));
-  return { out, loaded, receipt, receiptRaw, zip, asset };
+  const digests = { [asset]: sha256(zip), 'receipt.json': sha256(receiptRaw) };
+  if (display) {
+    writeFileSync(path.join(out, MANIFEST_ASSET), display.manifestRaw);
+    writeFileSync(path.join(out, DISPLAY_ASSET), display.assetRaw);
+    Object.assign(digests, { [MANIFEST_ASSET]: sha256(display.manifestRaw), [DISPLAY_ASSET]: sha256(display.assetRaw) });
+  }
+  writeFileSync(path.join(out, 'SHA256SUMS'), sha256sums(digests));
+  return { out, loaded, receipt, receiptRaw, zip, asset, display };
 }
 
 // --- checks --------------------------------------------------------------------------------------
@@ -363,11 +387,12 @@ export function fetchOrigin(repo, origin) {
 }
 
 // Offline reproducibility claims of a clean build; returns the list of failures.
-export function check(repo, built) {
+export function check(repo, built, { cache } = {}) {
   const { config } = built.loaded, { receipt } = built;
   const problems = [];
   if (receipt.producer.dirty) problems.push(`the checkout is dirty: ${receipt.producer.dirty_paths.slice(0, 5)}`);
   problems.push(...sourceProblems(repo, built.loaded.base ?? built.loaded));
+  problems.push(...displayProblems(repo, built.loaded, { cache }));
   if (config.expect && !samePin(receipt.package, config.expect.package)) {
     problems.push(`the package differs from the expected ${config.expect.package.sha256}`);
   }
@@ -421,6 +446,20 @@ export async function checkRelease(built, fetcher = download) {
     `${published.tag} SHA256SUMS does not list ${published.asset} ${published.sha256}`);
   const zip = await fetcher(releaseUrl(REPOSITORY, published.tag, published.asset));
   require(zip.equals(built.zip), `${published.tag} ${published.asset} differs from the rebuilt package`);
+  // A declared support display must be the Release's, as SHA256SUMS lists it; an undeclared one must not be listed.
+  for (const [name, raw] of built.display ? [[MANIFEST_ASSET, built.display.manifestRaw], [DISPLAY_ASSET, built.display.assetRaw]] : []) {
+    require(sums.split('\n').includes(`${sha256(raw)}  ${name}`), `${published.tag} SHA256SUMS does not list the rebuilt ${name} ${sha256(raw)}`);
+  }
+  const listed = [MANIFEST_ASSET, DISPLAY_ASSET].filter(name => sums.split('\n').some(line => line.endsWith(`  ${name}`)));
+  require(built.display || !listed.length, `${published.tag} SHA256SUMS lists ${listed}, but the config declares no support display`);
+}
+
+function displayReport(shown) {
+  return [
+    `support display (${shown.mode}, ${shown.locale}): ${shown.counts.entries} entries, ${shown.counts.untranslated} untranslated, `
+      + `generated for ${shown.generation_data_version}, trade catalog ${shown.catalog_sha256}`,
+    ...[shown.manifest, shown.asset].map(file => `  ${file.asset}: ${file.bytes} bytes sha256 ${file.sha256}`),
+  ];
 }
 
 export function report(built) {
@@ -439,6 +478,7 @@ export function report(built) {
     `producer: ${producer.repository}@${producer.commit}${producer.dirty ? ` DIRTY (${producer.dirty_paths.length} paths)` : ''}`,
     `${pkg.asset}: ${pkg.bytes} bytes sha256 ${pkg.sha256}`,
     `  ${Object.keys(pkg.members).length} members + manifest.json (${pkg.manifest.sha256}), ${pkg.expanded_bytes} expanded bytes`,
+    ...(receipt.support_display ? displayReport(receipt.support_display) : []),
     `receipt.json: ${built.receiptRaw.length} bytes sha256 ${sha256(built.receiptRaw)}`,
     `output: ${built.out}`,
   ].join('\n');
@@ -451,21 +491,33 @@ export async function main(argv = process.argv.slice(2)) {
   } });
   if (values.help) {
     console.log('usage: release:build [--config release/<patch>[-<n>].json] [--out .cache/DIR] [--fetch] [--check] [--check-release]\n'
-      + '  --fetch          fetch the source origin commit from origin when missing (Git only)\n'
+      + '  --fetch          fetch the source (and retained support display) origin commits from origin when missing,\n'
+      + '                   and download the support display\'s pinned inputs into .cache/release/inputs\n'
       + '  --check          exit 1 unless the build is clean, the source equals its origin tag tree and\n'
-      + '                   the zip equals the config\'s expected and published pins (when declared)\n'
+      + '                   the zip equals the config\'s expected and published pins (when declared); a retained\n'
+      + '                   support display must equal its origin tree and regenerate from its declared inputs\n'
       + '  --check-release  download the config\'s published Release (when declared) and compare it byte for byte');
     return;
   }
+  if (values.fetch) {
+    // Before the build: a regenerated support display needs its downloads.
+    const loaded = loadConfig(values.config ?? defaultConfig(ROOT));
+    fetchOrigin(ROOT, (loaded.base ?? loaded).config.source.origin);
+    const origin = displayOrigin(loaded.config.support_display);
+    if (origin) fetchOrigin(ROOT, origin);
+    await fetchDisplayInputs(ROOT, loaded.config.support_display);
+  }
   const built = build({ config: values.config, out: values.out });
   console.log(report(built));
-  if (values.fetch) fetchOrigin(ROOT, (built.loaded.base ?? built.loaded).config.source.origin);
   if (values.check) {
     const problems = check(ROOT, built);
     require(!problems.length, `check failed:\n${problems.map(p => `  - ${p}`).join('\n')}`);
     const { expect, published } = built.loaded.config;
+    const shown = built.loaded.config.support_display;
     console.log('check: clean build; source equals its origin tree' + (expect ? '; zip equals the expected pin' : '')
-      + (published ? '; zip equals the published pin' : ''));
+      + (published ? '; zip equals the published pin' : '')
+      + (shown?.mode === 'retained' ? '; the support display equals its origin tree' : '')
+      + (shown?.mode === 'retained' && shown.dictionary ? ' and its entries regenerate from its declared inputs' : ''));
   }
   if (values['check-release']) {
     const { published } = built.loaded.config;

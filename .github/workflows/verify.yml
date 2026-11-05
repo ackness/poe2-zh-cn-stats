@@ -26,7 +26,9 @@ jobs:
       # --fetch fetches each source's origin commit (Git only). --check fails unless
       # the checkout is clean, the frozen source tree equals that origin commit's
       # and the zip equals the config's expected and published pins; --check-release downloads
-      # that Release and compares it byte for byte. A second build must match.
+      # that Release and compares it byte for byte. A declared support display is checked too:
+      # --fetch downloads its pinned inputs, --check compares a retained one with its origin tree
+      # and its declared inputs. A second build must match.
       - name: Rebuild every declared patch's language package from its pinned source
         run: |
           for config in release/*.json; do
@@ -45,6 +47,7 @@ jobs:
             .cache/release/ci-*-a/receipt.json
             .cache/release/ci-*-a/manifest.json
             .cache/release/ci-*-a/SHA256SUMS
+            .cache/release/ci-*-a/support-display.zh-CN.json
           if-no-files-found: ignore
   regenerate:
     name: release:regenerate rebuilds the published members from pinned inputs

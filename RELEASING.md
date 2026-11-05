@@ -1,7 +1,9 @@
 # 发布 PoBR 语言包
 
 PoBR 的语言包是本仓库的 GitHub Release `locale/<patch>-<n>`，附件为
-`pobr-locale-<patch>.zip`、`receipt.json` 和 `SHA256SUMS`。三仓库各自负责什么见
+`pobr-locale-<patch>.zip`、`receipt.json` 和 `SHA256SUMS`；配置声明了 `support_display` 时
+再加简中辅助宝石说明的两个附件 `support-display.zh-CN.json`（清单）和
+`supportDescriptions.zh-CN.json`（见[辅助宝石说明](#辅助宝石说明support-display)）。三仓库各自负责什么见
 [PoBR 数据架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md)。
 
 ```sh
@@ -29,6 +31,8 @@ mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>
 - `published`：发布之后补上的 Release 附件 pin（`tag`、`asset`、`bytes`、`sha256`）。
 - `hold`（可选）：一句原因；有它时 `release:publish` 拒绝发布，也不作默认配置，
   点名构建和核对照常。
+- `support_display`（可选，v1／v2 都可写）：随这个 Release 发布的辅助宝石说明，见下文
+  [辅助宝石说明](#辅助宝石说明support-display)。它不进 zip，不影响包的字节。
 
 `poe2-locale-release-config/v2` 不指向源目录，而是在一个 v1 配置的包上做声明过的改动：
 
@@ -56,9 +60,88 @@ zip。zip 只取决于源字节和目标；`receipt.json` 记录生产提交，�
 输出在 `.cache/release/<game>-<realm>-<配置名>/`（如 `poe2-international-0.5.5.5`）。
 
 - `--check`：检出干净、源目录（v2 为基础配置的源目录）在 HEAD 的 tree 与 `origin.revision`
-  上原路径的 tree 相同、zip 等于 `expect.package` 和 `published`（有的话）。
-- `--fetch`：本地没有 `origin.revision` 时从 origin 取（只走 Git）。
-- `--check-release`：下载 `published` 的 Release，要求与重建结果逐字节相同。
+  上原路径的 tree 相同、zip 等于 `expect.package` 和 `published`（有的话）；保留的辅助宝石说明
+  目录同样要等于它的 origin tree，声明了 `dictionary`／`catalog` 时还要能由它们重新算出相同的
+  `entries` 和 `untranslated`。
+- `--fetch`：本地没有 `origin.revision`（含辅助宝石说明的）时从 origin 取（只走 Git），并把
+  辅助宝石说明固定的下载（词典、游戏包）下到 `.cache/release/inputs/<sha256>`；之后离线可重跑。
+- `--check-release`：下载 `published` 的 Release，要求与重建结果逐字节相同；有辅助宝石说明时
+  它的 `SHA256SUMS` 还必须列出重建出的两个文件。
+
+## 辅助宝石说明（support display）
+
+PoBR Web 在辅助宝石上显示的简中说明不是语言包成员，而是语言 Release 的两个额外附件：
+
+- `supportDescriptions.zh-CN.json`：`{_meta, entries, untranslated}`，按辅助宝石 `skill_id`
+  记英文原文和简中译文，没有译文的 ID 在 `untranslated`。
+- `support-display.zh-CN.json`：清单（`poe2-support-display-publication/v1`），写 `target`
+  （`game`、`version`、`realm`）、`locale`、`catalog_sha256`、`files`（固定上一个文件）、
+  `provenance`（`kind`、`generation_data_version`、`source`、`source_commit`、`source_file`、
+  `source_sha256`），可选 `applicability`。
+
+**它绑定的是交易目录**：`catalog_sha256` 是游戏包（RePoE Release `game/<patch>-<n>` 的
+`pobr-game-<patch>.zip`）成员 `data/<patch>/overlay/trade_catalog.json` 的 SHA-256。PoBR 的
+`data:bump`（`pipeline/imports/data_bump.py`、`display_assets.py`）只在 Release 的 `SHA256SUMS`
+同时列出这两个附件时采用它们，并核对：清单的目标、语言和 `catalog_sha256` 等于新游戏包的；
+文件的字节等于清单的 pin；`_meta.data_version` 等于 `provenance.generation_data_version`，
+`_meta.catalog_sha256` 等于清单的，`_meta` 的 `source`／`source_commit`／`source_file`／
+`source_sha256` 等于 `provenance`；回执写了 `support_display` 时其 pin 必须是这两个文件。
+PoBR 的 Web 测试还要求 `_meta.source_commit` 等于语言包 `i18n/zh-CN/_meta.json` 的
+`source_commit`。换游戏 patch 时如果语言 Release 不带辅助宝石说明，`data:bump` 拒绝。
+`release:build` 做同样的检查（加上最后一条），不符就拒绝构建；清单里 `files` 的条目必须正好是
+`{bytes, sha256}`（PoBR 整个比较）。
+
+`catalog_sha256` 什么时候核对：每次构建都要求它等于清单和 `_meta` 里的值（这只是与配置一致）。
+与真实游戏包的交易目录比较：`regenerate` 每次构建都做（目录就是输入）；`retained` 只在
+`--check` 且配置声明了 `dictionary`／`catalog` 时做（需要先 `--fetch`）。没有声明它们的 `retained`
+配置，`catalog_sha256` 只和配置本身核对，与游戏包是否一致要等 PoBR `data:bump` 时才检查。
+
+所以辅助宝石说明**在游戏 Release 之后生成**：先有 RePoE 的 `game/<patch>-<n>`，才知道交易目录的
+SHA-256。**游戏包重新发布（`game/<patch>-<n+1>`）只要改变了交易目录，就要发布新的
+`locale/<patch>-<n+1>`**，带上为新目录生成的辅助宝石说明（zip 可以不变：同样的 zip 配上不同的
+辅助宝石说明算新内容，`release:publish` 不会因“zip 已发布过”而拒绝）；目录没变则旧的语言
+Release 继续可用。
+
+**已发布的 zip 要配新的辅助宝石说明时，新建配置 `release/<patch>-<n+1>.json`，不改已发布的配置**
+（带 `published` 的配置一律不改）：v2 配置就写相同的 `base`、`transforms` 和 `expect`，v1 配置写相同的
+`source`，再加上新的 `support_display`。zip 不变，`release:publish` 把它发布为 `locale/<patch>-<n+1>`。
+直接改已发布配置的 `support_display` 时，`release:publish` 拒绝：`the zip is already published as …;
+a new display needs release/<patch>-<n+1>.json`。判断“已发布”时比较 zip 和辅助宝石说明：前一个 Release
+已有同样的 zip，并且暂存的辅助宝石说明为空或与它的相同，就算重复；只有新的或改动过的辅助宝石说明
+才算新内容。
+
+配置写法（两种 `mode`，都固定两个输出文件和 `catalog_sha256`）：
+
+- `retained`：仓库里的保留目录（`manifest.json`、`supportDescriptions.zh-CN.json`，可有
+  `README.md`，别的文件不允许），字节从原提交原样恢复。`manifest` 是 `{path, bytes, sha256}`，
+  `asset` 是 `{bytes, sha256}`（文件在清单旁边），`origin` 同 `source.origin`（`repository`、
+  `tag`、完整 `revision`，目录被移动过时 `path` 写原清单路径）。可选 `dictionary` 和
+  `catalog`（写法同下）记录它的生成输入，`--check` 用它们核对 `entries`／`untranslated`
+  （`_meta` 是历史记录，不比较）。
+- `regenerate`：`src/support-description-projection.mjs` 的 `supportDescriptions` 跑两个固定
+  下载：`dictionary` 是 GemEffects 词典（`source` 为 `https://github.com/<owner>/<repo>`、完整
+  `source_commit`、`source_file`、指向该提交的 `raw.githubusercontent.com` `url`、`bytes`、
+  `sha256`），`catalog` 是游戏 Release 的包（`repository: ackness/repoe`、`tag: game/<patch>-<n>`、
+  `asset: pobr-game-<patch>.zip`、`bytes`、`sha256`、`member: data/<patch>/overlay/trade_catalog.json`；
+  成员的 SHA-256 必须等于 `catalog_sha256`，包内 `manifest.json` 列了它时 pin 也要一致）。
+  `_meta`（`source`…`source_sha256`、`data_version` 为目标 patch、`catalog_sha256`、
+  `regen_command`）和清单（`provenance.kind: generated-asset`，另记 `provenance.catalog`；
+  `applicability` 取自配置）按固定格式写出。`manifest`／`asset` 是期望的 `{bytes, sha256}`，
+  不符时报错信息里给出实际的 pin。`_meta.regen_command` 写配置路径，所以配置必须在 `release/`
+  下（否则字节会随机器而变，构建拒绝）。构建前先 `release:build -- --fetch` 下载输入
+  （`release:publish` 只读缓存）。
+
+构建把两个文件写到输出目录、列进 `SHA256SUMS`，回执的 `support_display` 记 `mode`、
+`catalog_sha256`、`generation_data_version`、`manifest`／`asset`（`{asset, bytes, sha256}`）、
+条数和来源；`release:publish` 把它们一起暂存、上传，并写进 Release 说明。v2 配置不继承基础配置的
+`support_display`。`release:publish` 只构建、不跑 `--check`（origin tree、声明输入的核对）：发布前先
+在同一提交上跑 `release:build -- --fetch --check`（CI 也会跑）。
+
+用 0.5.5.5 保留资产的记录输入（词典 `288d8b9d…` 的 `dictionary/tables/GemEffects.json`、
+`game/0.5.5.5-1` 的交易目录 `de57e010…`）以 `regenerate` 重算，`entries` 和 `untranslated`
+与保留文件逐字节相同；整个文件不同，只因为 `_meta` 不同：保留文件记的是它当年的生成
+（`data_version: 0.5.5.4.2`、PoBR 的旧命令 `regen_command`），重算写的是 `0.5.5.5` 和本库的命令。
+所以 0.5.5.5 用 `retained`，PoBR 已固定的字节不变。
 
 CI（`.github/workflows/verify.yml`）对每个 `release/*.json` 跑
 `--fetch --check --check-release`，再构建一次并比较 zip 和回执；另一个 job 对每个
@@ -144,6 +227,13 @@ v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化，带 `hold`�
   `name_zh_cn`／`name_zh_tw` 是 PoBR Web 读表后自己拼的字段，要在 PoBR 里改。
 - 包：6925862 字节，SHA-256 `bdfb38f4…`（`expect.package`）；13 个成员，只有繁中
   `mods.json` 与 `locale/0.5.5.5-1` 不同，包内 `manifest.json` 多出 `source.transforms`。
+- 辅助宝石说明（`support_display`，`retained`）：`inputs/support-display-0.5.5.5/`，从
+  `handoff/support-display-20261101`（`5046a18a…`）原样恢复，tree 未变；PoBR 现在固定的就是这份
+  （`supportDescriptions.zh-CN.json` 183816 字节，`57602ecb…`；清单 1062 字节，`88aef08b…`）。
+  交易目录 `de57e010…` 在 `game/0.5.5.5-1` 和即将发布的 `game/0.5.5.5-2` 里相同；配置以
+  `game/0.5.5.5-1` 和词典 `288d8b9d…` 作为 `--check` 的核对输入。`_meta.source_commit`
+  （`288d8b9d…`）等于简中 `_meta.json` 的。发布后 PoBR 用 `data:bump` 改为从这个 Release 取，
+  不再读 `handoff/` tag。
 
 **为什么 hold**：发布前 PoBR 侧要先满足两点，并且在**同一个**把锁 bump 到这个包的 PoBR PR 里完成：
 
@@ -166,6 +256,8 @@ v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化，带 `hold`�
 2. 新建 `release/<new patch>.json`：`source.manifest` 指向新清单，`source.origin.revision`
    填添加该目录的 `main` 提交，`tag` 填能找到该提交的名字（目前只作记录，不校验），
    不写 `published`。它自动成为默认配置；旧配置继续可构建、继续由 CI 核对。
+   等 RePoE 发布了新 patch 的 `game/<patch>-<n>`，再写 `support_display`（通常是 `regenerate`，
+   `catalog` 指向该游戏 Release）：PoBR 换 patch 时必须同时采用新的辅助宝石说明。
 3. `mise run release:build -- --check`，检查回执里的成员和来源。
 4. 合并后在 `main` 的该提交上 `mise run release:publish`，确认 dry run 的计划，再
    `-- --yes`。
@@ -185,6 +277,11 @@ v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化，带 `hold`�
 | `the package differs from the published …` | 配置的 `published` 与新包不符：有意的新内容就去掉 `published` 再发布 |
 | `was not built from this checkout; rerun without --reuse` | 去掉 `--reuse` 重新构建 |
 | `origin … is not present locally (pass --fetch)` | 加 `--fetch` |
+| `… is not cached under .cache/release/inputs (run release:build with --fetch)` | 先 `release:build -- --fetch` 下载辅助宝石说明的输入 |
+| `Pin mismatch: …` | 辅助宝石说明的文件与配置的 pin 不符；有意的新内容就按信息里的实际值改配置 |
+| `the zip is already published as …; a new display needs release/<patch>-<n+1>.json` | 别改已发布的配置，按上面新建 `release/<patch>-<n+1>.json` |
+| `Catalog mismatch: …` | 辅助宝石说明绑定的交易目录与配置或游戏包不符；为新目录重新生成并发布新的 `locale/<patch>-<n>` |
+| `Provenance mismatch: …` | `_meta` 与清单 `provenance`（或简中 `_meta.json` 的 `source_commit`）不一致 |
 
 **中途失败后重跑 `-- --yes` 即可继续**，同一提交不会得到第二个序号：
 

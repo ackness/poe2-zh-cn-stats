@@ -30,7 +30,7 @@ description = "Verify a saved native localization candidate against the same pin
 run = "node src/cli.mjs native-check"
 
 [tasks."release:build"]
-description = "Package release/<patch>.json's pinned language publication as pobr-locale-<patch>.zip + receipt.json under .cache/release/ (--config, --check, --fetch, --check-release)"
+description = "Package release/<patch>.json's pinned language publication as pobr-locale-<patch>.zip + receipt.json (and its declared support display) under .cache/release/ (--config, --check, --fetch, --check-release)"
 run = "node src/locale-release.mjs"
 
 [tasks."release:regenerate"]
