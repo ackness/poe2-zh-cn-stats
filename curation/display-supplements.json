@@ -3046,7 +3046,7 @@
       }
     },
     {
-      "correction_id": "bonded-modifiers-official-terms",
+      "correction_id": "bonded-modifiers-and-idols-official-terms",
       "locale": "zh-CN",
       "member": "stat_lines.json",
       "rows": [
@@ -3064,7 +3064,7 @@
       "origin": "agent",
       "basis": "official-terms",
       "author": "claude-opus-5-5",
-      "note": "历史词典行把“Bonded modifiers”译为“纽带词缀”、“Idols”译为“魔偶”。改用腾讯官方术语“羁绊词缀”与“雕像”，句式不变。",
+      "note": "本修正同时改两个术语：历史词典行把“Bonded modifiers”译为“纽带词缀”、“Idols”译为“魔偶”，改用腾讯官方术语“羁绊词缀”与“雕像”，句式不变。",
       "evidence": [
         "Tencent trade2 stats https://poe.game.qq.com/api/trade2/data/stats, data/snapshots/20261104T031003350Z/raw/trade-cn.json.gz (source sha256 db26a1aa3e74fe110983b17478fca81661869d9c79c0ad4491fc7d5967204f34): rune.stat_726496846 \"Idols socketed in this item gain the benefits of their Bonded modifiers\" = \"镶嵌在该物品上的雕像获得其自身的羁绊词缀的强化效果\"; rune.stat_1073847159 uses 雕像 for Idol.",
         "Base: inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json (sha256 5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95): other Idol rows use 雕像 (e.g. \"{0:+d} to Spirit per Idol socketed in your Equipment\" = \"你的装备中每镶嵌一个雕像，{0:+d} 点精魂\"); display_texts.json names Idol bases …雕像 (Bear Idol 巨熊雕像). The bare \"Idol\" and the \" Idol\" suffix in display_texts.json entries are 魔偶, but no Idol augment base or official stat uses it."
