@@ -1,0 +1,259 @@
+{
+  "schema": "poe2-locale-file-production-snapshots/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "adoption": "not-adopted",
+  "note": "Historical metadata, translation audit, display projection and independent zh-TW provenance retain their original scope. Only stat_lines is newly composed; old acceptance evidence does not imply adoption of the four aliases.",
+  "files": {
+    "evidence/locale-decision.json": {
+      "output": {
+        "bytes": 28528,
+        "sha256": "878b6f49df4460e49aeee960bdbd85e62d81ff64c5a75b1675b32c864c71fef7"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/evidence/locale-decision.json",
+        "bytes": 28528,
+        "sha256": "878b6f49df4460e49aeee960bdbd85e62d81ff64c5a75b1675b32c864c71fef7"
+      }
+    },
+    "evidence/native-140-pairs.json": {
+      "output": {
+        "bytes": 20049,
+        "sha256": "6dd206dd75f651e4fde326228815882243b0af0a74645e46565a729308056306"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/evidence/native-140-pairs.json",
+        "bytes": 20049,
+        "sha256": "6dd206dd75f651e4fde326228815882243b0af0a74645e46565a729308056306"
+      }
+    },
+    "evidence/zh-CN-original-meta.json": {
+      "output": {
+        "bytes": 901,
+        "sha256": "14e0ff55f8dcfab5e91868dc2db56e65fc75551a64c59579d6a75469c98bb68f"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/evidence/zh-CN-original-meta.json",
+        "bytes": 901,
+        "sha256": "14e0ff55f8dcfab5e91868dc2db56e65fc75551a64c59579d6a75469c98bb68f"
+      }
+    },
+    "evidence/zh-CN-original-stat-lines.json": {
+      "output": {
+        "bytes": 3857237,
+        "sha256": "28da2be7c44a4d872a94ad653d0002ff798f02de7a2b503d020d318cd170275e"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/evidence/zh-CN-original-stat-lines.json",
+        "bytes": 3857237,
+        "sha256": "28da2be7c44a4d872a94ad653d0002ff798f02de7a2b503d020d318cd170275e"
+      }
+    },
+    "evidence/zh-TW-receipt.json": {
+      "output": {
+        "bytes": 7699503,
+        "sha256": "50a90defb34a9af67f424367f696179bf9d10d0e0079920aff74cc8a3820b7cb"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/evidence/zh-TW-receipt.json",
+        "bytes": 7699503,
+        "sha256": "50a90defb34a9af67f424367f696179bf9d10d0e0079920aff74cc8a3820b7cb"
+      }
+    },
+    "i18n/zh-CN/_meta.json": {
+      "output": {
+        "bytes": 2312,
+        "sha256": "06b03f89d5641d818341d25fce77513216f17eb44e97f3a39dbb54b5f58c6c53"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/_meta.json",
+        "bytes": 2312,
+        "sha256": "06b03f89d5641d818341d25fce77513216f17eb44e97f3a39dbb54b5f58c6c53"
+      }
+    },
+    "i18n/zh-CN/base_items.json": {
+      "output": {
+        "bytes": 370795,
+        "sha256": "910c5ebb7af9efe976f01414dfae4bda22132c23c5138eb0cbadaeb5e86e4d53"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/base_items.json",
+        "bytes": 370795,
+        "sha256": "910c5ebb7af9efe976f01414dfae4bda22132c23c5138eb0cbadaeb5e86e4d53"
+      }
+    },
+    "i18n/zh-CN/classes.json": {
+      "output": {
+        "bytes": 1128,
+        "sha256": "6944676a4fd017fde321ee2758992ee4b18a835ce59ed45e6c9708b01a275bed"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/classes.json",
+        "bytes": 1128,
+        "sha256": "6944676a4fd017fde321ee2758992ee4b18a835ce59ed45e6c9708b01a275bed"
+      }
+    },
+    "i18n/zh-CN/display_texts.json": {
+      "output": {
+        "bytes": 1649082,
+        "sha256": "381d827ab1345bf746ed0da349414b5806037043e0a60540fa10f94af868f45f"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/display_texts.json",
+        "bytes": 1649082,
+        "sha256": "381d827ab1345bf746ed0da349414b5806037043e0a60540fa10f94af868f45f"
+      }
+    },
+    "i18n/zh-CN/mods.json": {
+      "output": {
+        "bytes": 93053,
+        "sha256": "8d62bf95d9a54650fff127815580e169f7e83983235a56dc3ed295c9d1a1a76d"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/mods.json",
+        "bytes": 93053,
+        "sha256": "8d62bf95d9a54650fff127815580e169f7e83983235a56dc3ed295c9d1a1a76d"
+      }
+    },
+    "i18n/zh-CN/passive_names.json": {
+      "output": {
+        "bytes": 134582,
+        "sha256": "6becc784be1f24e4b3dbc4ed8a16335c2602b1c90b4e3f73a5c23e5879af26dd"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/passive_names.json",
+        "bytes": 134582,
+        "sha256": "6becc784be1f24e4b3dbc4ed8a16335c2602b1c90b4e3f73a5c23e5879af26dd"
+      }
+    },
+    "i18n/zh-CN/rare_words.json": {
+      "output": {
+        "bytes": 124951,
+        "sha256": "ab23836d0f2034914bf799777134cf51482708425c909f7bf713400c67105915"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/rare_words.json",
+        "bytes": 124951,
+        "sha256": "ab23836d0f2034914bf799777134cf51482708425c909f7bf713400c67105915"
+      }
+    },
+    "i18n/zh-CN/skills.json": {
+      "output": {
+        "bytes": 33008,
+        "sha256": "16eb4a451e3472c0b06fd36f21c6f308b2ebca24287d5c240a1345491c91eb77"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/skills.json",
+        "bytes": 33008,
+        "sha256": "16eb4a451e3472c0b06fd36f21c6f308b2ebca24287d5c240a1345491c91eb77"
+      }
+    },
+    "i18n/zh-CN/stat_lines.json": {
+      "output": {
+        "bytes": 3876139,
+        "sha256": "5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95"
+      },
+      "production": {
+        "producer_revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+        "input_manifest": {
+          "path": "handoff/locale-generation-shaman-mantle-20261103/input-manifest.json",
+          "bytes": 7344,
+          "sha256": "cc33dc60aa6ae2689f12f00db30efd6e92fcc84deb077651d878da9ed97f04a8"
+        },
+        "receipt": {
+          "path": "evidence/shaman-mantle-generation-receipt.json",
+          "bytes": 7564,
+          "sha256": "9b47d8a506896b62c2c75b59ebc9e4ae3093be95776c9565a757769e5f96667b"
+        }
+      },
+      "historical": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json",
+        "bytes": 3875636,
+        "sha256": "1d51e0a2e58bb0fe46dfde331bd004140250eeed70d4e16f683b180c06eba301"
+      }
+    },
+    "i18n/zh-CN/words.json": {
+      "output": {
+        "bytes": 132463,
+        "sha256": "7ba0c43e90c3909c725f8a563ab169ccfcbcf3b53c05a2748d17d7508cce58cc"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/words.json",
+        "bytes": 132463,
+        "sha256": "7ba0c43e90c3909c725f8a563ab169ccfcbcf3b53c05a2748d17d7508cce58cc"
+      }
+    },
+    "i18n/zh-TW/base_items.json": {
+      "output": {
+        "bytes": 375343,
+        "sha256": "67c3db66b47c39e4148eaa365eec8a0050b6eee2a84032fd579d70f5395025aa"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-TW/base_items.json",
+        "bytes": 375343,
+        "sha256": "67c3db66b47c39e4148eaa365eec8a0050b6eee2a84032fd579d70f5395025aa"
+      }
+    },
+    "i18n/zh-TW/mods.json": {
+      "output": {
+        "bytes": 333567,
+        "sha256": "c0212690817a81753a26e078c59c58e71b51c51857084a964dc297ce4237b944"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-TW/mods.json",
+        "bytes": 333567,
+        "sha256": "c0212690817a81753a26e078c59c58e71b51c51857084a964dc297ce4237b944"
+      }
+    },
+    "i18n/zh-TW/skills.json": {
+      "output": {
+        "bytes": 34080,
+        "sha256": "af64e24e26657e9b5bfa11fb186e145c8ff5fbbabf7a80af6b47e681bd0d02bb"
+      },
+      "retained_from": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-TW/skills.json",
+        "bytes": 34080,
+        "sha256": "af64e24e26657e9b5bfa11fb186e145c8ff5fbbabf7a80af6b47e681bd0d02bb"
+      }
+    }
+  }
+}

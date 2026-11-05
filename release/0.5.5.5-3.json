@@ -1,0 +1,55 @@
+{
+  "schema": "poe2-locale-release-config/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "source": {
+    "manifest": {
+      "path": "inputs/locale-0.5.5.5-3/manifest.json",
+      "bytes": 4715,
+      "sha256": "4c8570ce8b912a3f51273346d74f4c1bba564a6a8b7b06734c1fd0fc043f07ee"
+    },
+    "origin": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "tag": "main",
+      "revision": "27213865c84f134bbb05cafede5f7ce598f7237b"
+    }
+  },
+  "support_display": {
+    "mode": "retained",
+    "catalog_sha256": "de57e010c8bf93f18bf557c650d6cdc06d98bc3fbde58049227b31feda9deea6",
+    "manifest": {
+      "path": "inputs/support-display-0.5.5.5/manifest.json",
+      "bytes": 1062,
+      "sha256": "88aef08b06b2b2987dd21db5c6ac276ce0a9411830b86a548729f5f2f10fe0d7"
+    },
+    "asset": {
+      "bytes": 183816,
+      "sha256": "57602ecb59184e5ba239531b5f47faa6c0c9f836530b3f516a976ed2041e3b49"
+    },
+    "origin": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "tag": "handoff/support-display-20261101",
+      "revision": "5046a18af9974e8914fa1ea1b2b0db9202b2908b",
+      "path": "handoff/support-display-20261101/manifest.json"
+    },
+    "dictionary": {
+      "source": "https://github.com/vagrant-soul/poe2-en-cn-dict",
+      "source_commit": "288d8b9d999c5ea5664149e408847156dbd83ff4",
+      "source_file": "tables/GemEffects.json",
+      "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/GemEffects.json",
+      "bytes": 323634,
+      "sha256": "1a5b039482e09193b41b1d30e68066906a174c834ffe4974d5784203494322f7"
+    },
+    "catalog": {
+      "repository": "ackness/repoe",
+      "tag": "game/0.5.5.5-1",
+      "asset": "pobr-game-0.5.5.5.zip",
+      "bytes": 4452510,
+      "sha256": "3edc9b1eb3e813781ef63dcc7db5be29cfd6a15ef29b92773eaa7fb45082df4d",
+      "member": "data/0.5.5.5/overlay/trade_catalog.json"
+    }
+  }
+}

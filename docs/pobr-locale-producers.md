@@ -43,17 +43,30 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   `producer` 必须等于六个官方模块摘要加该模块摘要。官方闭包与 catalog
   manifest 的 `producer` 不包含 workbench 模块。库拒绝未审核、跨范围、过期或
   来源不符的记录时，本入口不写任何输出。空补译表是合法输入，结果与只用官方目录相同。
-- `projection: {scopes, literals}` 可选；省略时读取并固定
+- `projection: {scopes, literals}` 可选，只允许这两个字段；省略时读取并固定
   [`src/pobr/display-projection.json`](../src/pobr/display-projection.json)。
+  这个文件只是新候选的默认值：重新生成配方在 `display-texts` 任务里固定自己的
+  `projection` 并随请求传入，所以改这个文件不会改变已发布成员的重新生成结果
+  （见[语言包配置参考](release-config.md#重新生成配方releaseregeneratepatchjson)）。
   唯一支持的 literal 策略是 `all-catalog-conflict-participants`：选择 scope 不会
   把未解决或冲突的记录移出 literal 歧义检查。
 
 输出有两种视图：
 
 - `scopes["Table.Field"][stableKey] = [currentEnglish, translatedOrNull]` 只含投影
-  声明的 scope，目前是 PoBR `web/src/lib/nativeDisplayNames.ts` 读取的
-  `BaseItemTypes.Name`、`Characters.Name`、`Ascendancy.Name`。PoBR 实现新的精确
-  ID 调用方时再增加 scope；其余字段留在本库，不增大玩家下载。
+  声明的 scope。默认投影有四个：PoBR `web/src/lib/nativeDisplayNames.ts` 读取的
+  `BaseItemTypes.Name`、`Characters.Name`、`Ascendancy.Name`，以及
+  `PassiveSkills.Name`（键是 PassiveSkills 的 `Id`，即 PoBR 天赋树节点的 `id`，
+  例如 `mana_regeneration5`）。同一英文天赋名在客户端有多个译法时（例如
+  "Mana Regeneration" 在 `mana10` 是“魔力再生”，在 `energy_shield_recovery10` 是“魔力回复”），
+  `entries` 里这个英文是 null，按 ID 查 scope 才能拿到各自的译文。PoBR 应当只在
+  scope 里该 ID 的英文等于当前英文时采用译文。PoBR 实现新的精确 ID 调用方时再增加
+  scope；其余字段留在本库，不增大玩家下载。
+  示例（0.5.5.5）：`PassiveSkills.Name` 有 9731 个 ID，8424 个有译文、1307 个为 null；
+  `display_texts.json` 因此从 1649082 字节增至 2215826 字节（gzip 后约增加 94 KB）。
+  其中只有 1567 个 ID 的英文在 `entries` 里为 null 或不在 `entries` 中（260 个有译文）；
+  只保留这些 ID 只增加 gzip 约 9.7 KB，但增量不大，所以默认投影保留完整 scope，PoBR
+  可以对每个天赋节点只查 scope。
 - `entries[currentLiteral] = translatedOrNull` 供 PoBR 的 `translateLines` 使用。
   所有表中同一英文的记录必须一致，去掉引用标记后的别名也参与同一检查。未解决或
   冲突的记录写 null，不取第一行。被拒绝的 v2 组即使英文字段为 null，它的每个候选
@@ -61,6 +74,9 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   视图，需要专门的渲染器。
 
 `receipt.json` 保留每条库查询的决定和全部跨表冲突，以及实际使用的 `library`。
+`runtime_scopes` 是排序后的 scope；`projection` 记录投影来源：`{source: "request"}`
+（请求原样记在回执的 `request` 里），或 `{source: "file", file, bytes, sha256}`（默认文件，
+其字节同时记在 `inputs`），再加实际使用的 `scopes`、`literals`。
 本入口不读客户端数据，不推断 patch／realm，不做简繁转换，也不改写数值。
 
 ## 繁中名称：zh-TW 三个 ID 文件

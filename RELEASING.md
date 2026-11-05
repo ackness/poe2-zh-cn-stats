@@ -60,9 +60,16 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 1. 按[新补丁](#新补丁)第 1 步生成新文件。
 2. 新建源目录 `inputs/locale-<patch>-<n>/`：未改动的文件按原字节复制，改动的文件换成新字节，证据放
-   `evidence/`，写新的 `manifest.json`。已有的 `inputs/` 目录不改。
-3. 新建 `release/<patch>-<n>.json`（`<n>` 是要发布的序号），之后同新补丁第 3–10 步。只改一两张表时也可以
-   写 v2 配置，在已发布配置的包上声明 transform，并在 `expect.package` 写新的 zip pin。
+   `evidence/`，写新的 `manifest.json`。已有的 `inputs/` 目录不改。要替换的是 v2 配置发布的包时，复制的是
+   那个包的成员（transform 之后的字节），并把它的 Release `receipt.json` 放进 `evidence/` 记录 transform。
+3. 新建 `release/<patch>-<n>.json`（`<n>` 是要发布的序号），之后同新补丁第 3–10 步；配方从被替换包的配方
+   复制，改动的成员用新的任务参数（例如 `display-texts` 的 `projection`）重新生成。改动正好是一种已有的
+   transform（按英文重写一张表、新增一个 JSON 成员）时，也可以写 v2 配置，在已发布配置的包上声明 transform，
+   并在 `expect.package` 写新的 zip pin；transform 不能换入新生成的字节，配方也只复现 v1 配置。
+
+示例（0.5.5.5）：`locale/0.5.5.5-3` 给 `display_texts.json` 加 `PassiveSkills.Name` scope。它是 v1 配置
+`release/0.5.5.5-3.json`，源目录 `inputs/locale-0.5.5.5-3/` 复制 `locale/0.5.5.5-2` 的 12 个其他成员（包括按英文为键
+的繁中 `mods.json`），辅助宝石说明与 -2 相同；`release/regenerate/0.5.5.5-3.json` 重新生成全部简中成员。
 
 ## 新的辅助宝石说明
 

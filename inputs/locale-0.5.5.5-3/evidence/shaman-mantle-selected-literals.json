@@ -1,0 +1,213 @@
+{
+  "schema": "poe2-selected-literal-layer/v1",
+  "scope": "Explicit composition of two retained native literal pairs and four reviewed curated aliases. Historical source receipt and exclusions apply only to the retained two; no fresh native selection is claimed.",
+  "retained_selection": {
+    "repository": "ackness/poe2-zh-cn-stats",
+    "revision": "629be2d902a886dd1ad0961b5ac704c1909ce4f9",
+    "path": "handoff/locale-generation-20261101/selected-literals.json",
+    "bytes": 3010,
+    "sha256": "2dccedae8e74d05aa17620fb28c933369a740b7116d132312560c7dfd73296a0",
+    "source_receipt": {
+      "sha256": "f140212c41570d990e287d2f0c5d6a0e8dd8db28296144a3ed5db8b1e162a53b",
+      "bytes": 4799513
+    },
+    "excluded_counts": {
+      "client-string-requires-separate-language-binding": 52,
+      "context-free-translation-would-be-ambiguous": 450,
+      "existing-template-preserved": 2359,
+      "literal-translation-conflict": 2,
+      "multiline-alignment-unproven": 9,
+      "no-library-pair-for-selected-branch": 35
+    },
+    "scope": "Selected, unambiguous literal effect text only. Existing templates and untranslatable effects remain intact; no name translation or CN numeric equivalence claim."
+  },
+  "curated_review": {
+    "path": "handoff/locale-generation-shaman-mantle-20261103/curated-alias-review.json",
+    "bytes": 5494,
+    "sha256": "e589ed5360c2725e59f4ff409aed50c7600262e0e9170c1eee8a2622df59a07c",
+    "inputs": {
+      "curated": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+        "path": "data/snapshots/20261104T031003350Z/generated/curated.json",
+        "bytes": 7717,
+        "sha256": "e9f297ea594a15ac02c44cfe467eabc70cf9c911493c47340afe372f485e29b6"
+      },
+      "templates": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+        "path": "data/snapshots/20261104T031003350Z/generated/templates.json",
+        "bytes": 4810831,
+        "sha256": "d65f05f2287d7376e382477fecd8c7f26b1c11a48d2009dc1d87f850cb484461"
+      },
+      "snapshot_manifest": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+        "path": "data/snapshots/20261104T031003350Z/manifest.json",
+        "bytes": 25700,
+        "sha256": "de65c7bffff74a77898afa07bbbe68848b92af7ec960704596be9774f920fb46"
+      },
+      "source_curated": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+        "path": "curated.json",
+        "bytes": 7717,
+        "sha256": "e9f297ea594a15ac02c44cfe467eabc70cf9c911493c47340afe372f485e29b6"
+      },
+      "retained": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "revision": "a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json",
+        "bytes": 3875636,
+        "sha256": "1d51e0a2e58bb0fe46dfde331bd004140250eeed70d4e16f683b180c06eba301"
+      }
+    }
+  },
+  "baseline": {
+    "bytes": 3875309,
+    "sha256": "76d4af1898a92963e205534f5020c8bf48477c3c844d59e263c53f1bc5e8fb83",
+    "pairs": 28036
+  },
+  "output": {
+    "bytes": 3876139,
+    "sha256": "5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95"
+  },
+  "added": [
+    {
+      "en": "Gain a Vivid Wisp for every 10 metres you move, up to a maximum of 3",
+      "src": "每移动 10 米，获得一个活性鬼灵，上限为 3 个",
+      "provenance": [
+        {
+          "id": "AscendancyHuntress2Notable1",
+          "packet": "node",
+          "source_row": 6667,
+          "reference": {
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "record": 20965,
+            "branch": 1
+          },
+          "values": [
+            10,
+            3
+          ],
+          "formatted_values": [
+            "10",
+            "3"
+          ],
+          "equivalent_english_descriptors": [],
+          "chinese_reference": {
+            "branch": 1,
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "group": 8,
+            "record": 20965
+          },
+          "stat_ids": [
+            "vivid_stag_metres_travled_per_wisp_gain",
+            "vivid_stag_maximum_stag_wisps_allowed"
+          ],
+          "line": 0
+        }
+      ]
+    },
+    {
+      "en": "Expend all Vivid Wisps to trigger Vivid Stampede when you Attack",
+      "src": "攻击时，消耗所有的活性鬼灵以触发雄鹿践踏",
+      "provenance": [
+        {
+          "id": "AscendancyHuntress2Notable1",
+          "packet": "node",
+          "source_row": 6667,
+          "reference": {
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "record": 20965,
+            "branch": 1
+          },
+          "values": [
+            10,
+            3
+          ],
+          "formatted_values": [
+            "10",
+            "3"
+          ],
+          "equivalent_english_descriptors": [],
+          "chinese_reference": {
+            "branch": 1,
+            "file": "Data/StatDescriptions/stat_descriptions.csd",
+            "group": 8,
+            "record": 20965
+          },
+          "stat_ids": [
+            "vivid_stag_metres_travled_per_wisp_gain",
+            "vivid_stag_maximum_stag_wisps_allowed"
+          ],
+          "line": 1
+        }
+      ]
+    },
+    {
+      "src": "你的生命药剂回复效果仅对你自己生效",
+      "en": "Recovery from your Life Flasks cannot be applied to anything other than you",
+      "provenance": {
+        "id": "curated.shaman-mantle.self-only-life-flask-recovery",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 4 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016",
+        "templates": {
+          "repository": "ackness/poe2-zh-cn-stats",
+          "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+          "path": "data/snapshots/20261104T031003350Z/generated/templates.json",
+          "bytes": 4810831,
+          "sha256": "d65f05f2287d7376e382477fecd8c7f26b1c11a48d2009dc1d87f850cb484461"
+        }
+      }
+    },
+    {
+      "src": "无法使用生命药剂",
+      "en": "Cannot use Life Flasks",
+      "provenance": {
+        "id": "curated.shaman-mantle.cannot-use-life-flasks",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 1 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016",
+        "templates": {
+          "repository": "ackness/poe2-zh-cn-stats",
+          "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+          "path": "data/snapshots/20261104T031003350Z/generated/templates.json",
+          "bytes": 4810831,
+          "sha256": "d65f05f2287d7376e382477fecd8c7f26b1c11a48d2009dc1d87f850cb484461"
+        }
+      }
+    },
+    {
+      "src": "生命药剂的回复效果无法瞬间完成",
+      "en": "Recovery from Life Flasks cannot be Instant",
+      "provenance": {
+        "id": "curated.shaman-mantle.non-instant-life-flask-recovery",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 3 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016",
+        "templates": {
+          "repository": "ackness/poe2-zh-cn-stats",
+          "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+          "path": "data/snapshots/20261104T031003350Z/generated/templates.json",
+          "bytes": 4810831,
+          "sha256": "d65f05f2287d7376e382477fecd8c7f26b1c11a48d2009dc1d87f850cb484461"
+        }
+      }
+    },
+    {
+      "src": "非传奇生命药剂的效果持续生效",
+      "en": "Non-Unique Life Flasks apply their Effects constantly",
+      "provenance": {
+        "id": "curated.shaman-mantle.constant-life-flask-effects",
+        "note": "Reviewed single-line alias for Shaman Mantle, copied verbatim from line 2 of the linked retained four-line block. The original block remains intact; this review does not authorize splitting other multi-line templates.",
+        "source_url": "https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016",
+        "templates": {
+          "repository": "ackness/poe2-zh-cn-stats",
+          "revision": "5c25a6ac5dec7004ee47a61cca9b4a0ff5f12880",
+          "path": "data/snapshots/20261104T031003350Z/generated/templates.json",
+          "bytes": 4810831,
+          "sha256": "d65f05f2287d7376e382477fecd8c7f26b1c11a48d2009dc1d87f850cb484461"
+        }
+      }
+    }
+  ]
+}
