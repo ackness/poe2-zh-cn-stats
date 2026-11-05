@@ -195,7 +195,7 @@ edits SHA 和全部七个 producer 模块 SHA。导出忽略 `previous`，因为
 - PoBR 词条模板（`kind: "stat-line"`）：游戏 `stat_descriptions` 里有、交易目录和 `stat_lines.json` 都没有的
   英文模板；
 - 没有原件表的名称（`kind: "monster-name"`）：召唤生物、幽魂、同伴的 `MonsterVarieties.Name`；
-- `corrections`：对作为底的 `stat_lines.json` 的逐行修正，例如历史词典留下的英文前缀或字面反斜杠。
+- `corrections`：对作为底的 `stat_lines.json` 的逐行修正，例如 RePoE 硬编码留在 src 里的英文前缀，或官方文本里本该是换行的字面反斜杠。
 
 规则：官方文本永远优先，本项目的文本只是补充；每条都写 `origin`（`agent` 或 `human`），即使逐字照抄或
 拼接官方措辞，“这样配对”也是本项目做的，所以不会写 `official`。官方文本出现后补译不再出货，但记录保留、
@@ -221,7 +221,7 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 
 `corrections` 的每组：`correction_id`（小写 slug）、`locale`、`member: "stat_lines.json"`、
 `rows: [{from: {src, en}, to: {src, en}}]`（`from` 必须与底中某行完全相同）、`origin`、`basis`
-（`official-terms`、`official-same-text` 或只改排版字符的 `format-repair`）、`author`、`note`、`evidence`（依据列表）、
+（`official-terms`、`official-same-text`，或只把官方文本里的字面反斜杠改为换行的 `official-typo-format-fix`：把每个 `\` 读作换行后 `from` 与 `to` 必须逐字节相同，措辞不变）、`author`、`note`、`evidence`（依据列表）、
 `status`、`review`。被修正的行在输出里带 `origin`，因为它已不是原来的字节。
 
 形式检查（`reviewed` 的 stat-line 译文与修正后的行）：占位符记号与英文完全相同（`{0}`、`{0:+d}` 同样拼写）、
@@ -247,7 +247,7 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 
 语言包里的标记见 [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)：
 `stat_lines.json` 的补译与修正行带 `origin`，`display_texts.json` 有可选的 `origins`，`_meta.json` 有
-`supplements` 块。没有 `origin` 的行或条目是官方或历史词典的文本。zh-TW 在 PoBR 里由简中经 OpenCC
+`supplements` 块。没有 `origin` 的行或条目不是本仓库补的：底的来源见各成员的证据（例如 vagrant-soul/poe2-en-cn-dict 是 WeGame 国服客户端的解包，其行除非另有证据都按国服客户端文本看待）。zh-TW 在 PoBR 里由简中经 OpenCC
 转换得到，转换后的补译仍是补译；本仓库不产出 zh-TW 补译行。
 
 交易 ID 的缺口仍在 `curation/translations.json`（见
