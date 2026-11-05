@@ -200,6 +200,9 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
   // Monster names are decided against the game English, so names need the game Release package pinned too.
   const names = { revision: 'f'.repeat(40), path: 'n.json', bytes: 1, sha256: '0'.repeat(64) };
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names }] }), /display: game_package needs repository/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: GAME }] }), /display: pin package_texts/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, asset: '../x.zip' } }] }),
+    /asset pobr-game-9\.9\.zip/u);
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, tag: '' } }] }),
     /display: game_package needs repository/u);
   write(repo, 'release/regenerate/9.9.json', bytes(recipe));
