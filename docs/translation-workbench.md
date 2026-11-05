@@ -238,6 +238,7 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 | --- | --- | --- | --- |
 | 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 有该 ID，或官方名文件（`official_names`）的英文等于游戏包目标英文：官方优先，补译记 `superseded`（补译英文已过时则 `retired`） | 底已是 `to`：`already-in-base`；改英文的修正遇到底已有 `to.en`：`superseded` |
 | 我们的修正已提供该英文 | `covered-by-correction`，不另加一行 | — | — |
+| 同一语言包别处已有该英文的官方译文 | 底已有同一英文：`official` | `stat_lines`、`passive_names`、catalog 官方值或其他 ID 的官方名有该英文：`official-elsewhere`，不出货 | — |
 | 官方文本再次消失 | 补译重新出货 | 补译重新出货 | 再次应用 |
 | 官方名针对旧英文 | — | 不采用官方名（`english-differs`）；补译英文等于目标英文时出货 | — |
 | 英文或上下文变化 | `retired`；新英文是新 `entry_id` | 补译英文不等于目标英文：`retired`；新英文是新 identity | 英文还在但译文变了：`superseded`（底优先） |
