@@ -7,14 +7,15 @@
   },
   "source": {
     "manifest": {
-      "path": "handoff/locale-shaman-mantle-20261103/manifest.json",
+      "path": "inputs/locale-0.5.5.5/manifest.json",
       "bytes": 4088,
       "sha256": "730222f0cb7a777534243f3b4aff480ae31b2756c8e4ece574b0c4f44f0693a3"
     },
     "origin": {
       "repository": "ackness/poe2-zh-cn-stats",
       "tag": "handoff/shaman-mantle-20261103",
-      "revision": "9aba3687e6366597bc69a0795c63a20090cb02f5"
+      "revision": "9aba3687e6366597bc69a0795c63a20090cb02f5",
+      "path": "handoff/locale-shaman-mantle-20261103/manifest.json"
     }
   },
   "published": {

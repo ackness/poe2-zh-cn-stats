@@ -21,8 +21,8 @@ const curated = JSON.parse(await readFile(new URL('../curated.json', import.meta
 // tree. It is exactly the Shaman Mantle publication's stat_lines.json without the four aliases, which
 // its evidence pins by SHA-256 (evidence/production-snapshots.json).
 const RETAINED_SHA256 = '1d51e0a2e58bb0fe46dfde331bd004140250eeed70d4e16f683b180c06eba301';
-const evidence = await readFile(new URL('../handoff/locale-shaman-mantle-20261103/evidence/production-snapshots.json', import.meta.url), 'utf8');
-const published = JSON.parse(await readFile(new URL('../handoff/locale-shaman-mantle-20261103/i18n/zh-CN/stat_lines.json', import.meta.url)));
+const evidence = await readFile(new URL('../inputs/locale-0.5.5.5/evidence/production-snapshots.json', import.meta.url), 'utf8');
+const published = JSON.parse(await readFile(new URL('../inputs/locale-0.5.5.5/i18n/zh-CN/stat_lines.json', import.meta.url)));
 const aliasKeys = new Set(aliases.map(row => JSON.stringify({ src: row.src, en: row.en })));
 const retained = published.filter(row => !aliasKeys.has(JSON.stringify({ src: row.src, en: row.en })));
 const retainedRaw = `${JSON.stringify(retained, null, 2)}\n`;

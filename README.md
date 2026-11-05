@@ -87,7 +87,7 @@ src/                          采集、配对、生成与验证代码
 test/                         离线回归用例
 docs/                         数据契约和维护指南
 sources/                      语言来源台账（自 PoBR 迁入）与说明
-handoff/                      release/<patch>.json 固定的源发布（只读，字节与原 tag 相同）
+inputs/                       release/<patch>.json 固定的源发布（只读，字节与原 tag 相同）
 .cache/                       本地候选与临时文件，不提交
 ```
 

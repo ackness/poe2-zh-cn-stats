@@ -20,7 +20,9 @@ mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>
   `--config` 时用最高 patch。
 - `source.manifest`：仓库内源发布清单（`poe2-retained-locale-publication/v1`）的路径、
   字节数和 SHA-256。
-- `source.origin`：该目录最初所在的提交（`revision`，完整 40 位）和名字（`tag`）。
+- `source.origin`：该目录最初所在的提交（`revision`，完整 40 位）和名字（`tag`）；目录在
+  那之后被移动过时，`path` 写该提交里清单的原路径（tree 必须不变）。包内 `manifest.json`
+  记录的是这个原路径，所以移动目录不改变包的字节。
 - `published`：发布之后补上的 Release 附件 pin（`tag`、`asset`、`bytes`、`sha256`）。
 
 构建只读源目录：清单之外只允许 `README.md`，每个文件按清单核对字节；`i18n/*` 原样
@@ -28,8 +30,8 @@ mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>
 zip。zip 只取决于源字节和目标；`receipt.json` 记录生产提交，每次都不同。
 输出在 `.cache/release/<game>-<realm>-<patch>/`。
 
-- `--check`：检出干净、源目录在 HEAD 的 tree 与 `origin.revision` 的相同、zip 等于
-  `published`（有的话）。
+- `--check`：检出干净、源目录在 HEAD 的 tree 与 `origin.revision` 上原路径的 tree 相同、
+  zip 等于 `published`（有的话）。
 - `--fetch`：本地没有 `origin.revision` 时从 origin 取（只走 Git）。
 - `--check-release`：下载 `published` 的 Release，要求与重建结果逐字节相同。
 
@@ -38,19 +40,22 @@ CI（`.github/workflows/verify.yml`）对每个 `release/*.json` 跑
 
 ## 冻结的内容与替换
 
-源目录是冻结输入：构建不重新生成任何语言文件，也不能修改已被配置固定的目录（会让
-`--check` 和已发布的字节对不上）。0.5.5.5 的源是 `handoff/locale-shaman-mantle-20261103/`
-（来源 tag `handoff/shaman-mantle-20261103`）：保留的历史简中词典和 140 条原生配对、
-四条 Shaman Mantle 别名、繁中名称 sidecar 和显示文本，证据在 `evidence/`。
+源目录是冻结输入，统一放在 `inputs/` 下：构建不重新生成任何语言文件，也不能修改已被
+配置固定的目录（会让 `--check` 和已发布的字节对不上）。0.5.5.5 的源是
+`inputs/locale-0.5.5.5/`（原在 `handoff/locale-shaman-mantle-20261103/`，来源 tag
+`handoff/shaman-mantle-20261103`，tree 未变，配置用 `source.origin.path` 记原路径）：保留的
+历史简中词典和 140 条原生配对、四条 Shaman Mantle 别名、繁中名称 sidecar 和显示文本，
+证据在 `evidence/`。目录里冻结的 README 和证据仍写着旧的 `handoff/` 路径，那是固定字节，
+不改。
 
 替换某个文件：
 
 1. 用生产入口生成新文件——[PoBR 语言文件生产者](docs/pobr-locale-producers.md)
    （`pobr:display-texts`、`pobr:names`、`pobr:stat-lines`）或
    [离线简中生成](docs/locale-generation.md)，输出在 `.cache/`。
-2. 新建一个源目录（放在 `handoff/<name>/` 下：`release:build` 的 dirty 检查覆盖
-   `handoff/`，放到别处要同步改 `src/locale-release.mjs` 的 `PRODUCER_PATHS`），
-   未改动的文件按原字节复制，写 `manifest.json` 固定每个文件，证据放 `evidence/`。
+2. 新建一个源目录 `inputs/locale-<patch>[-<n>]/`（`release:build` 的 dirty 检查覆盖
+   `inputs/`，见 `src/locale-release.mjs` 的 `PRODUCER_PATHS`），未改动的文件按原字节
+   复制，写 `manifest.json` 固定每个文件，证据放 `evidence/`。
 3. 经 PR 合并到 `main`，再让配置指向它：同一 patch 就改 `release/<patch>.json` 的
    `source` 并去掉 `published`（每个 patch 只有一个配置，发布得到下一个 `<n>`），
    新 patch 见下节。
