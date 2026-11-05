@@ -5,67 +5,22 @@ import path from 'node:path';
 import { strictJson } from '../src/strict-json.mjs';
 import { readZip, storedZip } from '../src/stored-zip.mjs';
 import { ROOT, build, check, checkRelease, loadConfig, pin, releaseUrl, sha256 } from '../src/locale-release.mjs';
-import { releaseBody, samePayload, stage } from '../src/locale-release-publish.mjs';
+import { releaseBody, coveredBy, stage } from '../src/locale-release-publish.mjs';
 import { DISPLAY_ASSET, MANIFEST_ASSET, displayInputs, fetchDisplayInputs, regenCommand } from '../src/support-display.mjs';
-import { bytes, commitAll, config, fixture, gitIn, write } from './locale-release-fixture.mjs';
+import { bytes, commitAll, fixture, write } from './locale-release-fixture.mjs';
+import {
+  CATALOG, CATALOG_SHA, DICTIONARY, DISPLAY_DIR, ENTRIES, GAME_ZIP, MEMBER, UNTRANSLATED, addRetainedDisplay, catalog, dictionary,
+  releaseConfig, retained, retainedSpec, sourceFields, writeConfig,
+} from './support-display-fixture.mjs';
 
-const DISPLAY_DIR = 'inputs/support-display-test';
-const COMMIT = 'd'.repeat(40); // the fixture's i18n/zh-CN/_meta.json source_commit
-const SOURCE = 'https://github.com/example/dict';
-const CATALOG = bytes({ _meta: {}, gems: [
-  { skill_id: 'SupportB', description: 'Supports nothing.', is_support: true },
-  { skill_id: 'SupportA', description: 'Supports Attacks.', is_support: true },
-  { skill_id: 'Active', description: 'Supports Attacks.', is_support: false },
-] });
-const CATALOG_SHA = sha256(CATALOG);
-const MEMBER = 'data/9.9/overlay/trade_catalog.json';
-const GAME_ZIP = storedZip(new Map([[MEMBER, CATALOG], ['manifest.json', bytes({ files: { [MEMBER]: pin(CATALOG) } })]]));
-const DICTIONARY = bytes({ table: 'GemEffects', entries: [{ columns: { SupportText: [{ en: 'Supports [Attack|Attacks].', zh: '辅助[Attack|攻击]。' }] } }] });
-const ENTRIES = { SupportA: { en: 'Supports Attacks.', zh_cn: '辅助攻击。' } };
-const UNTRANSLATED = ['SupportB'];
-const dictionary = (raw = DICTIONARY) => ({ source: SOURCE, source_commit: COMMIT, source_file: 'tables/GemEffects.json',
-  url: `https://raw.githubusercontent.com/example/dict/${COMMIT}/dictionary/tables/GemEffects.json`, ...pin(raw) });
-const catalog = (zip = GAME_ZIP) => ({ repository: 'ackness/repoe', tag: 'game/9.9-1', asset: 'pobr-game-9.9.zip', ...pin(zip), member: MEMBER });
-const sourceFields = { source: SOURCE, source_commit: COMMIT, source_file: 'tables/GemEffects.json', source_sha256: sha256(DICTIONARY) };
-
-// A retained publication generated for 9.8 whose catalog equals 9.9's.
-function retained({ meta = {}, manifest = {}, entries = ENTRIES } = {}) {
-  const assetRaw = bytes({ _meta: { ...sourceFields, data_version: '9.8', catalog_sha256: CATALOG_SHA, regen_command: 'old', ...meta },
-    entries, untranslated: UNTRANSLATED });
-  const manifestRaw = bytes({ schema: 'poe2-support-display-publication/v1', target: { game: 'poe2', version: '9.9', realm: 'international' },
-    locale: 'zh-CN', catalog_sha256: CATALOG_SHA, files: { [DISPLAY_ASSET]: pin(assetRaw) },
-    provenance: { kind: 'retained-generated-asset', generation_data_version: '9.8', ...sourceFields }, ...manifest });
-  return { assetRaw, manifestRaw };
-}
-
-const retainedSpec = (files, revision, extra = {}) => ({ mode: 'retained', catalog_sha256: CATALOG_SHA,
-  manifest: { path: `${DISPLAY_DIR}/manifest.json`, ...pin(files.manifestRaw) }, asset: pin(files.assetRaw),
-  origin: { repository: 'ackness/poe2-zh-cn-stats', tag: 'handoff/display-test', revision }, ...extra });
-
-// release/9.9.json declaring `display`; the locale source's origin is the fixture's first commit.
-function releaseConfig(repo, manifestRaw, extra) {
-  const declared = config(manifestRaw, extra);
-  const revision = gitIn(repo, 'rev-list', '--max-parents=0', 'HEAD');
-  return bytes({ ...declared, source: { ...declared.source, origin: { ...declared.source.origin, revision } } });
-}
-function writeConfig(repo, manifestRaw, display) {
-  write(repo, 'release/9.9.json', releaseConfig(repo, manifestRaw, display ? { support_display: display } : {}));
-}
 
 // The fixture checkout with a committed retained display and a config that declares it.
 function retainedFixture(t, { files = retained(), extra = {} } = {}) {
   const context = fixture('support-display');
   t.after(() => rmSync(context.root, { recursive: true, force: true }));
-  const { repo, manifestRaw } = context;
+  const { repo } = context;
   const plain = build({ repo, out: path.join(repo, '.cache/plain') });
-  write(repo, `${DISPLAY_DIR}/manifest.json`, files.manifestRaw);
-  write(repo, `${DISPLAY_DIR}/${DISPLAY_ASSET}`, files.assetRaw);
-  write(repo, `${DISPLAY_DIR}/README.md`, 'retained\n');
-  const origin = commitAll(repo, 'retained display');
-  const spec = retainedSpec(files, origin, extra);
-  writeConfig(repo, manifestRaw, spec);
-  commitAll(repo, 'declare the display');
-  return { ...context, plain, files, spec, origin };
+  return { ...context, plain, ...addRetainedDisplay(context, { files, extra }) };
 }
 
 const served = entries => async url => {
@@ -111,6 +66,8 @@ test('retained: pin, catalog and provenance mismatches are refused', t => {
   refuses({ ...spec, mode: 'copied' }, /mode must be one of/u, 'mode');
   refuses({ ...spec, extra: 1 }, /unknown fields/u, 'unknown field');
   refuses({ ...spec, dictionary: dictionary() }, /declare dictionary and catalog together/u, 'half the inputs');
+  write(repo, 'release/9.9.json', bytes({ ...strictJson(releaseConfig(repo, manifestRaw, { support_display: spec })), display: spec }));
+  assert.throws(() => build({ repo }), /unknown fields \(v1 allows schema,target,source,hold,published,support_display\)/u, 'v1 top-level field');
   // Inconsistent files, each with matching pins.
   const variant = (changed, pattern, label) => {
     write(repo, `${DISPLAY_DIR}/manifest.json`, changed.manifestRaw);
@@ -123,6 +80,9 @@ test('retained: pin, catalog and provenance mismatches are refused', t => {
   variant(retained({ meta: { source_commit: 'c'.repeat(40) }, manifest: { provenance: { kind: 'x', generation_data_version: '9.8',
     ...sourceFields, source_commit: 'c'.repeat(40) } } }), /i18n\/zh-CN\/_meta\.json source_commit d{40}/u, 'locale commit');
   variant(retained({ manifest: { target: { game: 'poe2', version: '9.8', realm: 'international' } } }), /expected poe2-support-display/u, 'target');
+  const base = retained();
+  variant({ ...base, manifestRaw: retained({ manifest: { files: { [DISPLAY_ASSET]: { ...pin(base.assetRaw), note: 'x' } } } }).manifestRaw },
+    /files must pin exactly supportDescriptions\.zh-CN\.json as \{bytes, sha256\}/u, 'manifest pin with extra keys');
   const stale = retained();
   variant({ ...stale, manifestRaw: retained({ manifest: { files: { [DISPLAY_ASSET]: { bytes: 1, sha256: '0'.repeat(64) } } } }).manifestRaw },
     /files must pin exactly/u, 'manifest pins another asset');
@@ -201,6 +161,9 @@ test('regenerate: the projection of the pinned downloads, written deterministica
   refuses({ ...spec, catalog: { ...catalog(), tag: 'game/9.8-1' } }, /needs ackness\/repoe's Release game\/9\.9-<n>/u);
   refuses({ ...spec, dictionary: { ...dictionary(), url: 'https://example.test/GemEffects.json' } }, /url must be https:\/\/raw\.githubusercontent\.com/u);
   refuses({ ...spec, origin: { repository: 'ackness/poe2-zh-cn-stats', tag: 't', revision: 'a'.repeat(40) } }, /unknown fields/u);
+  // regen_command names the config: a config outside release/ would make `_meta` machine-dependent.
+  write(repo, '.cache/elsewhere/9.9.json', releaseConfig(repo, manifestRaw, { support_display: spec }));
+  assert.throws(() => loadConfig(path.join(repo, '.cache/elsewhere/9.9.json'), repo), /A regenerated support display needs a config under release\//u);
 });
 
 test('publish: stages both display files, lists them in SHA256SUMS and the notes', t => {
@@ -219,10 +182,13 @@ test('publish: stages both display files, lists them in SHA256SUMS and the notes
   assert.match(body, /also moves PoBR's support display to this Release/u);
   // The same zip with another display is new content; the same zip and display are not.
   const sums = Object.fromEntries(Object.entries(staged.assets).map(([name, value]) => [name, value.sha256]));
-  assert.equal(samePayload({ ...sums, 'receipt.json': '0'.repeat(64) }, staged.assets), true);
-  assert.equal(samePayload({ ...sums, [DISPLAY_ASSET]: '0'.repeat(64) }, staged.assets), false);
-  assert.equal(samePayload({ 'pobr-locale-9.9.zip': sums['pobr-locale-9.9.zip'] }, staged.assets), false);
-  assert.equal(samePayload(null, staged.assets), false);
+  assert.equal(coveredBy({ ...sums, 'receipt.json': '0'.repeat(64) }, staged.assets), true);
+  assert.equal(coveredBy({ ...sums, [DISPLAY_ASSET]: '0'.repeat(64) }, staged.assets), false);
+  assert.equal(coveredBy({ 'pobr-locale-9.9.zip': sums['pobr-locale-9.9.zip'] }, staged.assets), false);
+  assert.equal(coveredBy(null, staged.assets), false);
+  // The same zip without a display is covered by a Release that also carries one.
+  const { [DISPLAY_ASSET]: _asset, [MANIFEST_ASSET]: _manifest, ...plain } = staged.assets;
+  assert.equal(coveredBy(sums, plain), true);
   // A display file that no longer matches the receipt is not staged.
   write(repo, path.relative(repo, path.join(built.out, DISPLAY_ASSET)), Buffer.from('{}\n'));
   assert.throws(() => stage(built.out, path.join(repo, '.cache/stage')), /supportDescriptions\.zh-CN\.json differs from its pin in receipt\.json/u);
@@ -239,7 +205,12 @@ test('check-release: the published SHA256SUMS must list the rebuilt display', as
   const zipLine = `${sha256(built.zip)}  pobr-locale-9.9.zip\n`;
   await assert.rejects(checkRelease(built, served([[url('SHA256SUMS'), Buffer.from(zipLine)], [url('pobr-locale-9.9.zip'), built.zip]])),
     /SHA256SUMS does not list the rebuilt support-display\.zh-CN\.json/u);
-  await checkRelease(built, served([[url('SHA256SUMS'), readFileSync(path.join(built.out, 'SHA256SUMS'))], [url('pobr-locale-9.9.zip'), built.zip]]));
+  const listing = readFileSync(path.join(built.out, 'SHA256SUMS'));
+  await checkRelease(built, served([[url('SHA256SUMS'), listing], [url('pobr-locale-9.9.zip'), built.zip]]));
+  // A Release that carries a display the config does not declare.
+  write(repo, 'release/9.9.json', releaseConfig(repo, manifestRaw, { published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...pin(plain.zip) } }));
+  await assert.rejects(checkRelease(build({ repo }), served([[url('SHA256SUMS'), listing], [url('pobr-locale-9.9.zip'), built.zip]])),
+    /SHA256SUMS lists support-display\.zh-CN\.json,supportDescriptions\.zh-CN\.json, but the config declares no support display/u);
 });
 
 test('the committed 0.5.5.5-2 config ships the retained display of handoff/support-display-20261101', t => {

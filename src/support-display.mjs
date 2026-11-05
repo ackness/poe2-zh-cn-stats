@@ -210,8 +210,10 @@ export function verifyDisplay(manifestRaw, assetRaw, spec, target, members) {
     && manifest.locale === LOCALE, `${MANIFEST_ASSET}: expected ${DISPLAY_SCHEMA} for ${JSON.stringify(manifestTarget(target))} ${LOCALE}`);
   require(manifest.catalog_sha256 === spec.catalog_sha256, `Catalog mismatch: the manifest binds trade catalog ${manifest.catalog_sha256}, `
     + `support_display.catalog_sha256 is ${spec.catalog_sha256}`);
-  require(object(manifest.files) && Object.keys(manifest.files).join() === DISPLAY_ASSET && samePin(manifest.files[DISPLAY_ASSET], pin(assetRaw)),
-    `${MANIFEST_ASSET}: files must pin exactly ${DISPLAY_ASSET} (${show(pin(assetRaw))})`);
+  // PoBR compares the whole entry with the lock's pin: exactly {bytes, sha256}.
+  const entry = object(manifest.files) ? manifest.files[DISPLAY_ASSET] : undefined;
+  require(Object.keys(manifest.files ?? {}).join() === DISPLAY_ASSET && object(entry) && Object.keys(entry).sort().join() === 'bytes,sha256'
+    && samePin(entry, pin(assetRaw)), `${MANIFEST_ASSET}: files must pin exactly ${DISPLAY_ASSET} as {bytes, sha256} (${show(pin(assetRaw))})`);
   const { provenance } = manifest;
   require(object(provenance) && typeof provenance.kind === 'string' && typeof provenance.generation_data_version === 'string'
     && SOURCE_FIELDS.every(key => typeof provenance[key] === 'string'), `${MANIFEST_ASSET}: provenance needs kind, generation_data_version and ${SOURCE_FIELDS}`);

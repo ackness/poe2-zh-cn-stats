@@ -138,7 +138,11 @@ export function loadConfig(file, repo = ROOT) {
   const relative = path.relative(repo, file);
   const loaded = { file, raw, config, underRelease, display: relative.startsWith('..') ? file : relative.split(path.sep).join('/') };
   // The support display is the config's own; a v2 config does not inherit its base's.
-  if (config.support_display !== undefined) validateSupportDisplay(config.support_display, target);
+  if (config.support_display !== undefined) {
+    validateSupportDisplay(config.support_display, target);
+    // A regenerated `_meta.regen_command` names the config, so it must not depend on the machine.
+    require(config.support_display.mode !== 'regenerate' || underRelease, 'A regenerated support display needs a config under release/');
+  }
   if (config.schema === CONFIG_SCHEMA_V2) {
     const keys = ['schema', 'target', 'base', 'transforms', 'expect', 'hold', 'published', 'support_display'];
     require(Object.keys(config).every(key => keys.includes(key)), `${file}: unknown fields (v2 allows ${keys})`);
@@ -152,6 +156,8 @@ export function loadConfig(file, repo = ROOT) {
     require(isPin(config.expect?.package), 'A v2 config pins its intended package in expect.package {bytes, sha256}');
     return { ...loaded, base };
   }
+  const keys = ['schema', 'target', 'source', 'hold', 'published', 'support_display'];
+  require(Object.keys(config).every(key => keys.includes(key)), `${file}: unknown fields (v1 allows ${keys})`);
   const { source } = config;
   safeRelative(source?.manifest?.path);
   require(source.manifest.path.endsWith('/manifest.json') && isPin(source.manifest), 'Invalid source manifest pin');
@@ -440,10 +446,12 @@ export async function checkRelease(built, fetcher = download) {
     `${published.tag} SHA256SUMS does not list ${published.asset} ${published.sha256}`);
   const zip = await fetcher(releaseUrl(REPOSITORY, published.tag, published.asset));
   require(zip.equals(built.zip), `${published.tag} ${published.asset} differs from the rebuilt package`);
-  // A declared support display must be the Release's, as SHA256SUMS lists it.
+  // A declared support display must be the Release's, as SHA256SUMS lists it; an undeclared one must not be listed.
   for (const [name, raw] of built.display ? [[MANIFEST_ASSET, built.display.manifestRaw], [DISPLAY_ASSET, built.display.assetRaw]] : []) {
     require(sums.split('\n').includes(`${sha256(raw)}  ${name}`), `${published.tag} SHA256SUMS does not list the rebuilt ${name} ${sha256(raw)}`);
   }
+  const listed = [MANIFEST_ASSET, DISPLAY_ASSET].filter(name => sums.split('\n').some(line => line.endsWith(`  ${name}`)));
+  require(built.display || !listed.length, `${published.tag} SHA256SUMS lists ${listed}, but the config declares no support display`);
 }
 
 function displayReport(shown) {

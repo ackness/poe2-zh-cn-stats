@@ -88,13 +88,27 @@ PoBR Web 在辅助宝石上显示的简中说明不是语言包成员，而是�
 `source_sha256` 等于 `provenance`；回执写了 `support_display` 时其 pin 必须是这两个文件。
 PoBR 的 Web 测试还要求 `_meta.source_commit` 等于语言包 `i18n/zh-CN/_meta.json` 的
 `source_commit`。换游戏 patch 时如果语言 Release 不带辅助宝石说明，`data:bump` 拒绝。
-`release:build` 做同样的检查（加上最后一条），不符就拒绝构建。
+`release:build` 做同样的检查（加上最后一条），不符就拒绝构建；清单里 `files` 的条目必须正好是
+`{bytes, sha256}`（PoBR 整个比较）。
+
+`catalog_sha256` 什么时候核对：每次构建都要求它等于清单和 `_meta` 里的值（这只是与配置一致）。
+与真实游戏包的交易目录比较：`regenerate` 每次构建都做（目录就是输入）；`retained` 只在
+`--check` 且配置声明了 `dictionary`／`catalog` 时做（需要先 `--fetch`）。没有声明它们的 `retained`
+配置，`catalog_sha256` 只和配置本身核对，与游戏包是否一致要等 PoBR `data:bump` 时才检查。
 
 所以辅助宝石说明**在游戏 Release 之后生成**：先有 RePoE 的 `game/<patch>-<n>`，才知道交易目录的
 SHA-256。**游戏包重新发布（`game/<patch>-<n+1>`）只要改变了交易目录，就要发布新的
 `locale/<patch>-<n+1>`**，带上为新目录生成的辅助宝石说明（zip 可以不变：同样的 zip 配上不同的
 辅助宝石说明算新内容，`release:publish` 不会因“zip 已发布过”而拒绝）；目录没变则旧的语言
 Release 继续可用。
+
+**已发布的 zip 要配新的辅助宝石说明时，新建配置 `release/<patch>-<n+1>.json`，不改已发布的配置**
+（带 `published` 的配置一律不改）：v2 配置就写相同的 `base`、`transforms` 和 `expect`，v1 配置写相同的
+`source`，再加上新的 `support_display`。zip 不变，`release:publish` 把它发布为 `locale/<patch>-<n+1>`。
+直接改已发布配置的 `support_display` 时，`release:publish` 拒绝：`the zip is already published as …;
+a new display needs release/<patch>-<n+1>.json`。判断“已发布”时比较 zip 和辅助宝石说明：前一个 Release
+已有同样的 zip，并且暂存的辅助宝石说明为空或与它的相同，就算重复；只有新的或改动过的辅助宝石说明
+才算新内容。
 
 配置写法（两种 `mode`，都固定两个输出文件和 `catalog_sha256`）：
 
@@ -113,13 +127,15 @@ Release 继续可用。
   `_meta`（`source`…`source_sha256`、`data_version` 为目标 patch、`catalog_sha256`、
   `regen_command`）和清单（`provenance.kind: generated-asset`，另记 `provenance.catalog`；
   `applicability` 取自配置）按固定格式写出。`manifest`／`asset` 是期望的 `{bytes, sha256}`，
-  不符时报错信息里给出实际的 pin。构建前先 `release:build -- --fetch` 下载输入（`release:publish`
-  只读缓存）。
+  不符时报错信息里给出实际的 pin。`_meta.regen_command` 写配置路径，所以配置必须在 `release/`
+  下（否则字节会随机器而变，构建拒绝）。构建前先 `release:build -- --fetch` 下载输入
+  （`release:publish` 只读缓存）。
 
 构建把两个文件写到输出目录、列进 `SHA256SUMS`，回执的 `support_display` 记 `mode`、
 `catalog_sha256`、`generation_data_version`、`manifest`／`asset`（`{asset, bytes, sha256}`）、
 条数和来源；`release:publish` 把它们一起暂存、上传，并写进 Release 说明。v2 配置不继承基础配置的
-`support_display`。
+`support_display`。`release:publish` 只构建、不跑 `--check`（origin tree、声明输入的核对）：发布前先
+在同一提交上跑 `release:build -- --fetch --check`（CI 也会跑）。
 
 用 0.5.5.5 保留资产的记录输入（词典 `288d8b9d…` 的 `dictionary/tables/GemEffects.json`、
 `game/0.5.5.5-1` 的交易目录 `de57e010…`）以 `regenerate` 重算，`entries` 和 `untranslated`
@@ -263,6 +279,7 @@ v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化，带 `hold`�
 | `origin … is not present locally (pass --fetch)` | 加 `--fetch` |
 | `… is not cached under .cache/release/inputs (run release:build with --fetch)` | 先 `release:build -- --fetch` 下载辅助宝石说明的输入 |
 | `Pin mismatch: …` | 辅助宝石说明的文件与配置的 pin 不符；有意的新内容就按信息里的实际值改配置 |
+| `the zip is already published as …; a new display needs release/<patch>-<n+1>.json` | 别改已发布的配置，按上面新建 `release/<patch>-<n+1>.json` |
 | `Catalog mismatch: …` | 辅助宝石说明绑定的交易目录与配置或游戏包不符；为新目录重新生成并发布新的 `locale/<patch>-<n>` |
 | `Provenance mismatch: …` | `_meta` 与清单 `provenance`（或简中 `_meta.json` 的 `source_commit`）不一致 |
 

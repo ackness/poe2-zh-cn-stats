@@ -298,12 +298,12 @@ function built(repo, configFile, reuse) {
   return build({ repo, config: configFile, out }).out;
 }
 
-// Whether a Release's SHA256SUMS lists exactly the staged content assets (all but receipt.json).
-export function samePayload(sums, assets) {
+// Whether a Release's SHA256SUMS already lists every staged content asset (all but receipt.json and
+// SHA256SUMS) with the same digest: the same zip, with no display or the same display.
+export function coveredBy(sums, assets) {
   if (!sums) return false;
-  const content = names => names.filter(name => name !== 'receipt.json' && name !== 'SHA256SUMS').sort();
-  const [published, staged] = [content(Object.keys(sums)), content(Object.keys(assets))];
-  return published.join() === staged.join() && staged.every(name => sums[name] === assets[name].sha256);
+  return Object.keys(assets).filter(name => name !== 'receipt.json' && name !== 'SHA256SUMS')
+    .every(name => sums[name] === assets[name].sha256);
 }
 
 const bullets = items => items.map(item => `  - ${item}\n`).join('');
@@ -345,7 +345,11 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
   if (config.published && !samePin(staged.assets[staged.asset], config.published)) {
     problems.push(`the package differs from the published ${config.published.tag} the config declares; update or drop "published"`);
   } else if (config.published && action === 'new') {
-    problems.push(`these exact bytes are already published as ${config.published.tag}; nothing new to publish`);
+    // The config already names its Release; a display it does not carry needs a new config.
+    const sums = staged.receipt.support_display && !ghIssue ? releaseSums(run, config.published.tag) : null;
+    problems.push(staged.receipt.support_display && !coveredBy(sums, staged.assets)
+      ? `the zip is already published as ${config.published.tag}; a new display needs release/${patch}-${sequence}.json`
+      : `these exact bytes are already published as ${config.published.tag}; nothing new to publish`);
   }
   const tag = tagName(patch, sequence ?? '<n>');
   const { directory } = staged;
@@ -368,10 +372,10 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
       done = `already published: ${tag} names HEAD and its Release assets equal the staged ones`;
     }
   } else if (action === 'new' && sequence > 1 && !ghIssue) {
-    // The same bytes never get a second number, whichever commit built them. A new support
-    // display (e.g. for a game re-release with another trade catalog) is new content.
+    // The same bytes never get a second number, whichever commit built them. Only a new or
+    // changed support display (e.g. for a game re-release with another trade catalog) is new content.
     const previous = tagName(patch, sequence - 1);
-    if (samePayload(releaseSums(run, previous), staged.assets)) {
+    if (coveredBy(releaseSums(run, previous), staged.assets)) {
       problems.push(`these exact bytes are already published as ${previous}; pin that Release instead`);
     }
   }

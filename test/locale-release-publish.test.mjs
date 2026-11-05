@@ -7,6 +7,7 @@ import {
   commands, main, nextSequence, plan, preflight, remoteTags, sequences, stage, tagName,
 } from '../src/locale-release-publish.mjs';
 import { bytes, commitAll, config, fixture, gitIn, write } from './locale-release-fixture.mjs';
+import { addRetainedDisplay, retained } from './support-display-fixture.mjs';
 
 const STAGE = 'publish/poe2-international-9.9';
 
@@ -317,4 +318,50 @@ test('a config on hold or named for another sequence is not published', t => {
   // The held config is not the default: the plain config of the same patch publishes as locale/9.9-1.
   const plain = publish(repo, [], runner(repo));
   assert.equal(plain.status, 0, plain.output);
+});
+
+test('a Release with a support display: published, verified on rerun, and a duplicate only without new display bytes', t => {
+  const context = setup(t), { repo } = context;
+  addRetainedDisplay(context);
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  const display = ['support-display.zh-CN.json', 'supportDescriptions.zh-CN.json'];
+  // An interrupted upload: the draft lacks the display files, so it is not finished as it is.
+  const releases = {};
+  assert.throws(() => publish(repo, ['--yes'], runner(repo, { releases, create: 'killed' })), /step failed: gh release create/u);
+  const dry = publish(repo, [], runner(repo, { releases }));
+  assert.equal(dry.status, 1);
+  assert.match(dry.output, /draft Release whose assets are incomplete or differ from the staged ones \(pobr-locale-9\.9\.zip,receipt\.json,support-display\.zh-CN\.json,supportDescriptions\.zh-CN\.json\)/u);
+  delete releases['locale/9.9-1'];
+  assert.equal(publish(repo, ['--yes'], runner(repo, { releases })).status, 0);
+  assert.deepEqual(Object.keys(releases['locale/9.9-1'].assets).sort(), ['SHA256SUMS', 'pobr-locale-9.9.zip', 'receipt.json', ...display].sort());
+  assert.match(releases['locale/9.9-1'].assets.SHA256SUMS.toString(), /  supportDescriptions\.zh-CN\.json\n/u);
+  // The remote tag's Release is compared asset by asset, the display files included.
+  const rerun = publish(repo, ['--yes'], runner(repo, { releases }));
+  assert.match(rerun.output, /already published: locale\/9\.9-1 names HEAD and its Release assets equal the staged ones/u);
+  releases['locale/9.9-1'].assets['supportDescriptions.zh-CN.json'] = Buffer.from('{}\n');
+  assert.throws(() => publish(repo, ['--yes'], runner(repo, { releases })), /already released with other assets/u);
+  releases['locale/9.9-1'].assets['supportDescriptions.zh-CN.json'] = readFileSync(path.join(repo, 'inputs/support-display-test/supportDescriptions.zh-CN.json'));
+  // A later commit with the same zip and display is a duplicate.
+  write(repo, 'docs.md', 'unrelated\n');
+  commitAll(repo, 'unrelated');
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  const duplicate = publish(repo, [], runner(repo, { releases }));
+  assert.equal(duplicate.status, 1);
+  assert.match(duplicate.output, /these exact bytes are already published as locale\/9\.9-1; pin that Release instead/u);
+  // The same zip with another display is new content for locale/9.9-2 ...
+  const zip = pin(releases['locale/9.9-1'].assets['pobr-locale-9.9.zip']);
+  const other = retained({ entries: { SupportA: { en: 'Supports Attacks.', zh_cn: '辅助攻击！' } } });
+  rmSync(path.join(repo, 'inputs/support-display-test'), { recursive: true });
+  addRetainedDisplay(context, { files: other });
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  const fresh = publish(repo, [], runner(repo, { releases }));
+  assert.equal(fresh.status, 0, fresh.output);
+  assert.match(fresh.output, /tag: locale\/9\.9-2/u);
+  // ... but not by editing a config that already declares its Release.
+  rmSync(path.join(repo, 'inputs/support-display-test'), { recursive: true });
+  addRetainedDisplay(context, { files: other, published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...zip } });
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  const edited = publish(repo, [], runner(repo, { releases }));
+  assert.equal(edited.status, 1);
+  assert.match(edited.output, /the zip is already published as locale\/9\.9-1; a new display needs release\/9\.9-2\.json/u);
 });
