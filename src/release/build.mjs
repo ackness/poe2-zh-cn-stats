@@ -485,7 +485,7 @@ export function unpinnedTags(repo, tags) {
     const [, patch, sequence] = /^locale\/(.+)-([1-9][0-9]*)$/u.exec(tag) ?? [];
     const expected = patch ? `release/${patch}-${sequence}.json${sequence === '1' ? ` or release/${patch}.json` : ''}` : 'a release config';
     return [`${tag} is published, but no release config pins it: write "published" into ${expected} `
-      + '(or delete the tag if its publish stopped before creating the Release)'];
+      + '(or, if its publish stopped before creating the Release, finish it with release:publish -- --yes)'];
   }));
 }
 
