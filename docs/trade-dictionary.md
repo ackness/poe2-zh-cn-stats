@@ -213,7 +213,7 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 [`reports/native-translation-worklist.json`](../reports/native-translation-worklist.json) 可直接查看官方缺译、待办和 agent 草稿；
 [`curation/native-translations.json`](../curation/native-translations.json) 是可编辑的补译输入，官方补译优先，版本变化要求复核。
 [`reports/native-regional-candidates.json`](../reports/native-regional-candidates.json) 独立列出区服或版本差异待确认项。
-国服与国际服按独立身份保存，语言不代替区服证据。下面的 `translations.json` 继续只维护交易 ID。
+国服与国际服按独立身份保存，语言不代替区服证据。下面的 `curation/translations.json` 继续只维护交易 ID。
 
 ### 持续补译表
 
@@ -256,7 +256,7 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 - 修改或移除某条人工译文后需重新构建。重复行、非中文译文、缺少备注、占位符数量不符会阻止生成，不切换当前快照。相同 ID 的不同英文分支、`|` 后的不同枚举值分别维护。
 - 提交时同时提交根工作表、`data/CURRENT` 和新快照；不能只提交人工修改而让生成数据保持旧版本。Git 快照保留每次完成更新时的状态与内容。
 
-`unresolved.json` 仍然只列当前未解决项；`translations.json` 则记录持续工作流。`coverage.json` 的 `translation_worklist` 汇总各状态及人工差异数量，它统计的是工作表中的条目，不是整个词典中所有自动翻译。
+`unresolved.json` 仍然只列当前未解决项；`curation/translations.json` 则记录持续工作流。`coverage.json` 的 `translation_worklist` 汇总各状态及人工差异数量，它统计的是工作表中的条目，不是整个词典中所有自动翻译。
 
 ### 扩展来源与固定修正
 
