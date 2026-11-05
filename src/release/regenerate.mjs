@@ -17,6 +17,7 @@ import { parseArgs } from 'node:util';
 import { strictJson } from '../strict-json.mjs';
 import { readZip } from './stored-zip.mjs';
 import { produceLocale } from '../pobr/locale-producer.mjs';
+import { validateProjection } from '../pobr/display-texts.mjs';
 import {
   REPOSITORY, ROOT, assetName, download, encoded, fetchOrigin, loadConfig, log, originManifestPath, packageArchive, packageMembers,
   pin, producerIdentity, publicationSource, readSource, require, samePin, sha256,
@@ -63,6 +64,11 @@ function validateJob(job, members) {
   } else if (job.kind === 'display-texts') {
     for (const key of ['catalog', 'supplement']) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
     gitRef(job.supplement_module, `${job.id} supplement_module`);
+    // The projection is pinned in the recipe, never read from src/pobr/display-projection.json:
+    // a new default scope there must not change a member that a published package already holds.
+    try { validateProjection(job.projection); } catch {
+      throw new Error(`${job.id}: pin the projection {scopes, literals} that produced the member`);
+    }
     require(typeof job.locale === 'string' && job.members.length === 1 && job.members[0] === `i18n/${job.locale}/display_texts.json`,
       `${job.id}: one member, i18n/<locale>/display_texts.json`);
   } else throw new Error(`${job.id}: unknown job kind ${job.kind}`);
@@ -188,8 +194,8 @@ async function localeProducer(job, inputs, work) {
 }
 
 // src/pobr/display-texts.mjs over a pinned catalog archive and reviewed supplement archive, with this
-// checkout's library modules (a v3 catalog's producer closure must equal them) and the reviewed
-// module, which must equal its file at the pinned revision.
+// checkout's library modules (a v3 catalog's producer closure must equal them), the reviewed
+// module, which must equal its file at the pinned revision, and the job's pinned projection.
 async function displayTexts(job, inputs, work, repo) {
   require(path.resolve(repo) === ROOT, `${job.id}: display texts are produced by this checkout's modules`);
   const { createDisplayTexts } = await import('../pobr/display-texts.mjs');
@@ -207,12 +213,14 @@ async function displayTexts(job, inputs, work, repo) {
     catalog: { manifest: path.join(catalog, 'manifest.json'), ...catalogPin },
     supplement: { manifest: path.join(supplement, 'manifest.json'), ...supplementPin,
       module: { file: job.supplement_module.path, ...pin(moduleRaw), revision: job.supplement_module.revision } },
+    projection: job.projection,
   };
   const receipt = await createDisplayTexts(request, path.join(work, 'out'));
   const raw = readFileSync(path.join(work, 'out', 'display_texts.json'));
   require(samePin(pin(raw), receipt.files['display_texts.json']), `${job.id}: display_texts.json differs from its receipt`);
   return { outputs: new Map([[job.members[0], raw]]), inputs: new Map(),
-    summary: { decisions: receipt.decisions.length, conflicts: receipt.conflicts.length, supplement_records: receipt.supplement?.records } };
+    summary: { decisions: receipt.decisions.length, conflicts: receipt.conflicts.length, supplement_records: receipt.supplement?.records,
+      projection: receipt.projection } };
 }
 
 const JOBS = { 'locale-producer': localeProducer, 'display-texts': displayTexts };

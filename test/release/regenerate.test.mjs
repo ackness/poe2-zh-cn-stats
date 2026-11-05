@@ -146,6 +146,16 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
   await assert.rejects(attempt({ ...recipe, jobs: [{ ...job, manifest: { ...job.manifest, revision: 'e'.repeat(40) } }] }),
     /Cannot fetch origin revision e{40}/u);
   await assert.rejects(regenerate({ repo, recipe: recipeFile, fetcher }), /e{40}:generation\/input-manifest\.json is not present locally \(pass --fetch\)/u);
+  // A display-texts job pins its projection; src/pobr/display-projection.json is only the default for new candidates.
+  const zip = { revision: 'f'.repeat(40), path: 'x.zip', bytes: 1, sha256: '0'.repeat(64) };
+  const projection = { scopes: ['Characters.Name'], literals: 'all-catalog-conflict-participants' };
+  const display = { id: 'display', kind: 'display-texts', locale: 'zh-CN', catalog: zip, supplement: zip,
+    supplement_module: { revision: 'f'.repeat(40), path: 'src/translation-workbench.mjs' }, projection,
+    members: ['i18n/zh-CN/display_texts.json'] };
+  for (const bad of [undefined, { ...projection, extra: 1 }, { ...projection, scopes: ['Characters.Name', 'Characters.Name'] }]) {
+    await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, projection: bad }] }), /display: pin the projection \{scopes, literals\}/u);
+  }
+  await assert.rejects(attempt({ ...recipe, jobs: [job, display] }), /extra: i18n\/zh-CN\/display_texts\.json/u);
   write(repo, 'release/regenerate/9.9.json', bytes(recipe));
   mkdirSync(path.join(repo, 'release/regenerate/other'), { recursive: true });
   write(repo, 'release/regenerate/9.8.json', bytes(recipe));
