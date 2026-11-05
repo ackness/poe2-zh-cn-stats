@@ -210,7 +210,7 @@ identity: stat-line 为 {game: "poe2", realm, locale, kind, english, stats}（st
 ids: stat-line 为 null；monster-name 为该名称适用的 MonsterVarieties ID 列表
 based_on: {game_patch, game_package: {repository, tag, sha256}, stat_descriptions_sha256}
 text: 译文；未审核时可为 null
-origin: agent | human        basis: 见下表        author: 实际作者（模型 ID 或 GitHub 账号）
+origin: agent | human        basis: 见下表        author: 实际作者（模型 ID、GitHub 账号或确定性生成器的标识）
 note: 依据与仍存疑之处（中文）
 status: draft | reviewed | rejected          review: draft 为 null；其余为 {by, note}
 confidence: 可选，high | medium | low（译者自评，仅供参考）
@@ -236,11 +236,13 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 
 | 事件 | stat-line（`pobr:supplement-lines`） | monster-name（`pobr:display-texts` 的 `names`） | 修正 |
 | --- | --- | --- | --- |
-| 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 或 RePoE 官方名文件（`official_names`）有同一 ID：官方优先，补译记 `superseded` | 底已是 `to`：`already-in-base` |
+| 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 有该 ID，或官方名文件（`official_names`）的英文等于游戏包目标英文：官方优先，补译记 `superseded`（补译英文已过时则 `retired`） | 底已是 `to`：`already-in-base`；改英文的修正遇到底已有 `to.en`：`superseded` |
+| 我们的修正已提供该英文 | `covered-by-correction`，不另加一行 | — | — |
 | 官方文本再次消失 | 补译重新出货 | 补译重新出货 | 再次应用 |
-| 英文或上下文变化 | `retired`；新英文是新 `entry_id` | 新 identity；旧记录 `retired` | 英文还在但译文变了：`superseded`（底优先） |
-| 游戏移除该英文 | `retired` | — | `retired` |
-| `based_on` 与固定的游戏包不同 | 仍按英文与 stat ID 判断，并标 `needs_review` | — | — |
+| 官方名针对旧英文 | — | 不采用官方名（`english-differs`）；补译英文等于目标英文时出货 | — |
+| 英文或上下文变化 | `retired`；新英文是新 `entry_id` | 补译英文不等于目标英文：`retired`；新英文是新 identity | 英文还在但译文变了：`superseded`（底优先） |
+| 游戏移除该英文 | `retired` | 游戏包里没有该 ID：`retired` | `retired` |
+| `based_on` 与固定的游戏包不同 | 仍按英文与 stat ID 判断，并标 `needs_review` | 仍按目标英文判断，并标 `needs_review` | — |
 
 语言包里的标记见 [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)：
 `stat_lines.json` 的补译与修正行带 `origin`，`display_texts.json` 有可选的 `origins`，`_meta.json` 有

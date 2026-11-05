@@ -43,6 +43,13 @@ function gitRef(value, label) {
   return value;
 }
 
+// A game Release asset {repository, tag, asset, bytes, sha256}, downloaded with --fetch.
+function validateGamePackage(job) {
+  const game = job.game_package;
+  require(object(game) && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/u.test(game.repository ?? '') && typeof game.tag === 'string' && game.tag
+    && typeof game.asset === 'string' && game.asset && isPin(game), `${job.id}: game_package needs repository, tag, asset, bytes and sha256`);
+}
+
 function validateJob(job, members) {
   require(object(job) && /^[a-z0-9][a-z0-9-]*$/u.test(job.id ?? ''), `Invalid job id: ${job?.id}`);
   require(Array.isArray(job.members) && job.members.length, `${job.id}: no members`);
@@ -66,12 +73,10 @@ function validateJob(job, members) {
       .every(([member, owner]) => !job.members.includes(member) && typeof owner === 'string' && owner !== job.id)),
     `${job.id}: replaced_by maps a member it does not list to the job that produces it`);
   } else if (job.kind === 'supplement-lines') {
+    validateGamePackage(job);
     // src/pobr/supplement-lines.mjs: a base stat_lines.json (and optional _meta.json) as Git pins, the
     // game Release package, and curation/display-supplements.json as a Git pin.
     for (const key of ['base', 'edits', ...(job.meta ? ['meta'] : [])]) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
-    const game = job.game_package;
-    require(object(game) && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/u.test(game.repository ?? '') && typeof game.tag === 'string' && game.tag
-      && typeof game.asset === 'string' && game.asset && isPin(game), `${job.id}: game_package needs repository, tag, asset, bytes and sha256`);
     require(typeof job.locale === 'string' && JSON.stringify(job.members) === JSON.stringify([`i18n/${job.locale}/stat_lines.json`,
       ...(job.meta ? [`i18n/${job.locale}/_meta.json`] : [])]),
     `${job.id}: members are i18n/<locale>/stat_lines.json, then i18n/<locale>/_meta.json when meta is pinned`);
@@ -82,6 +87,8 @@ function validateJob(job, members) {
     if (job.official_names !== undefined) require(isPin(job.official_names) && (typeof job.official_names.url === 'string'
       ? job.official_names.url.startsWith('https://') : gitRef(job.official_names, `${job.id} official_names`)),
     `${job.id}: pin official_names as {revision, path, bytes, sha256} or {url, bytes, sha256}`);
+    // Monster names are decided against the target English of the game Release package.
+    if (job.names !== undefined || job.official_names !== undefined) validateGamePackage(job);
     gitRef(job.supplement_module, `${job.id} supplement_module`);
     // The projection is pinned in the recipe, never read from src/pobr/display-projection.json:
     // a new default scope there must not change a member that a published package already holds.
@@ -247,6 +254,12 @@ async function displayTexts(job, inputs, work, repo) {
     const raw = spec.url ? await inputs.url(spec.url, spec, label) : inputs.git(spec, spec, label);
     writeFileSync(path.join(work, 'official-names.json'), raw);
     request.official_names = { file: path.join(work, 'official-names.json'), ...pin(raw) };
+  }
+  if (job.names || job.official_names) {
+    const { repository, tag, asset } = job.game_package;
+    const zip = await inputs.url(releaseUrl(repository, tag, asset), job.game_package, `${job.id}:game_package`);
+    writeFileSync(path.join(work, asset), zip);
+    request.game_package = { file: path.join(work, asset), ...pin(zip), repository, tag, asset };
   }
   const receipt = await createDisplayTexts(request, path.join(work, 'out'));
   const raw = readFileSync(path.join(work, 'out', 'display_texts.json'));

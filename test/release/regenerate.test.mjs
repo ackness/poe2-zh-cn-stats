@@ -197,6 +197,11 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
     /display: pin the names file/u);
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, official_names: { url: 'http://x.test/n.json', bytes: 1, sha256: '0'.repeat(64) } }] }),
     /display: pin official_names/u);
+  // Monster names are decided against the game English, so names need the game Release package pinned too.
+  const names = { revision: 'f'.repeat(40), path: 'n.json', bytes: 1, sha256: '0'.repeat(64) };
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names }] }), /display: game_package needs repository/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, tag: '' } }] }),
+    /display: game_package needs repository/u);
   write(repo, 'release/regenerate/9.9.json', bytes(recipe));
   mkdirSync(path.join(repo, 'release/regenerate/other'), { recursive: true });
   write(repo, 'release/regenerate/9.8.json', bytes(recipe));

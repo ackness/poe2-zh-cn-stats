@@ -98,6 +98,26 @@ test('reviewed entries append {src, en, origin} only for current templates the b
     { identity: { ...fire.identity }, entry_id: fire.entry_id })], []), /duplicate entry_id/);
 });
 
+test('a correction of the English gives way to a base row for that English; an entry our correction covers is not shipped', () => {
+  const life = '{0}% increased maximum Life';
+  const rename = correction('life-template', [{ from: { src: '纽带：{0}', en: 'Bonded: {0}' }, to: { src: '羁绊： {0}', en: 'Bonded {0}' } }]);
+  // The base has no row for the new English: the correction applies.
+  assert.equal(run([], [rename]).corrections[0].decision, 'applied');
+  // The base already has the corrected English: superseded, never a second row for that English.
+  const base = [...BASE, { src: '羁绊 {0}', en: 'Bonded {0}' }];
+  const result = run([], [rename], base);
+  assert.equal(result.corrections[0].decision, 'superseded');
+  assert.equal(result.lines.filter(row => row.en === 'Bonded {0}').length, 1);
+  assert.equal(result.lines.some(row => row.origin), false);
+  // An entry for English one of our corrections supplies is covered by it, not shipped beside it.
+  const templates = new Map([...TEMPLATES, ['Bonded {0}', ['bonded']]]);
+  const covered = supplementLines(structuredClone(BASE), doc([entry('Bonded {0}', ['bonded'], '羁绊：{0}')], [rename]), templates, TARGET, GAME);
+  assert.deepEqual(covered.entries.map(row => [row.lifecycle, row.supplement_differs, row.correction]),
+    [['covered-by-correction', true, ['羁绊： {0}']]]);
+  assert.equal(covered.lines.filter(row => row.en === 'Bonded {0}').length, 1);
+  assert.equal(run([entry(life, ['life'], '最大生命提高 {0}%')], []).entries[0].lifecycle, 'official');
+});
+
 test('an empty document reproduces the base exactly', () => {
   const sorted = BASE.slice().sort((a, b) => a.src < b.src ? -1 : a.src > b.src ? 1 : a.en < b.en ? -1 : 1);
   assert.deepEqual(run([], [], sorted).lines, sorted);
