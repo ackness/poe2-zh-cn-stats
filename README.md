@@ -1,116 +1,122 @@
-# PoE2 中文语言数据（简中／繁中）
+# PoE2 Chinese language data (Simplified / Traditional)
 
-为 PoBR 及其他 PoE2 工具提供可追溯的英文／中文词条、名称和显示文本，覆盖简体与繁体中文。仓库名沿用最初的 `zh-cn-stats`。本库负责采集交易词条、配对客户端语言、维护人工补译，并生成 PoBR 使用的固定语言文件。
+**English** | [简体中文](README.zh-CN.md)
 
-每份输出保留来源、版本身份和校验摘要；缺译和冲突有独立记录，供维护者核对。
+Source-attributed English, Simplified Chinese and Traditional Chinese modifier text, names and display
+text for PoBR and other Path of Exile 2 tools. This repository collects the trade catalogs, pairs client
+languages, keeps reviewed manual translations and publishes the language files PoBR uses as the GitHub
+Release `locale/<patch>-<n>`. The repository name keeps its original `zh-cn-stats`.
 
-## 从哪里开始
+Every output records its sources, version identity and checksums; missing translations and conflicts are
+recorded separately for maintainers to review.
 
-| 你的目的 | 入口 |
+**Language scope:** English (`en`), Simplified Chinese (`zh-CN`) and Traditional Chinese (`zh-TW`) only.
+Simplified Chinese is the focus and needs its own handling: its official text belongs to Tencent's China
+realm, so zh-CN data is built from Tencent's trade catalog, pinned client language tables and reviewed
+manual translations, with realm recorded separately from language. English and Traditional Chinese come
+from the international client and GGG's trade catalog. Simplified Chinese text in the international
+client does not prove that China-realm values are the same.
+
+## Where to start
+
+| You want to | Start here |
 | --- | --- |
-| 发布或更新 PoBR 语言包 | [RELEASING.md](RELEASING.md)（`locale/<patch>-<n>` GitHub Release） |
-| 在自己的工具里使用交易词条翻译 | [交易词典格式与读取示例](docs/trade-dictionary.md#其他仓库如何接入) |
-| 采集交易目录、补一条译文、修正模板 | [交易词典维护指南](docs/trade-dictionary.md) |
-| 配对原生名称、技能说明或 stat 描述 | [原件显示目录](docs/native-catalog.md)／[原生描述接入口](docs/native-localization.md) |
-| 审核原生文本补译和区服差异 | [补译工作表](docs/translation-workbench.md) |
+| Publish or update PoBR's language package | [RELEASING.md](RELEASING.md) (Chinese) |
+| Use the trade modifier translations in your own tool | [Reading the trade dictionary](docs/trade-dictionary.md#其他仓库如何接入) (Chinese) |
+| Refresh the trade catalogs, add a translation, fix a template | [Trade dictionary guide](docs/trade-dictionary.md) (Chinese) |
+| Pair native names, skill descriptions or stat descriptions | [Native display catalog](docs/native-catalog.md) / [native descriptions](docs/native-localization.md) (Chinese) |
+| Review native-text supplements and realm differences | [Translation workbench](docs/translation-workbench.md) (Chinese) |
+| Change code or open a pull request | [AGENTS.md](AGENTS.md) (layout, commands, validation, conventions), [CONTRIBUTING.md](CONTRIBUTING.md) |
 
-## 与 RePoE、PoBR 的关系
+All documents are listed in the [docs index](docs/README.md).
 
-三个仓库的分工和共同约定只在 [PoBR 数据架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md)里维护一份；当前跨仓缺口见[数据现状](https://github.com/ackness/pobr/blob/master/docs/data-status.md)。
+## Relation to RePoE and PoBR
 
-## 提供哪些数据
+RePoE decodes the client and publishes the game package `game/<patch>-<n>`. This repository owns the
+translations, templates and manual curation and publishes the language package `locale/<patch>-<n>`.
+PoBR pins both Releases (repository, tag, asset and SHA-256) in its `pipeline/data.lock.json` with
+`mise run data:bump` and ships only the packaged files. The split and shared conventions are maintained
+once, in [PoBR's data architecture](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md);
+open cross-repository gaps are in [PoBR's data status](https://github.com/ackness/pobr/blob/master/docs/data-status.md).
 
-| 数据 | 来源与产物 | 使用边界 |
+## What it provides
+
+| Data | Sources and outputs | Limits |
 | --- | --- | --- |
-| 交易词条 | GGG／腾讯交易目录、分裂词缀译文复用、PoE2DB 补缺；`dictionary.json`、`pairs.json` | 主键为完整交易 ID **加英文分支** |
-| 编号模板 | 交易词典的保守转换及 `curation/curated.json`；`templates.json` | 自动转换只接受零／单数值槽，多参数由人工审核 |
-| 原生描述与名称 | 固定 RePoE 客户端事实、CSD 描述和显式语言表 | 保留 stat ID、表身份、条件和分支，按精确上下文查询 |
-| PoBR 运行时文件 | 名称、显示目录、选中的描述及固定历史词典 | 发布后由 PoBR 按 commit、路径与 SHA-256 导入 |
-| 人工补译 | 独立工作表及审核记录 | 草稿不进入已审核输出，来源变化后需要复核 |
+| Trade modifiers | GGG and Tencent trade catalogs, fractured-modifier reuse, PoE2DB gap filling; `dictionary.json`, `pairs.json` under `data/snapshots/<id>/generated/` | Keyed by the full trade ID **plus the English branch** |
+| Numbered templates | Conservative conversion of the trade dictionary plus `curation/curated.json`; `templates.json` | Automatic conversion only for zero or one numeric slot; multi-slot templates are reviewed by hand |
+| Native descriptions and names | Pinned RePoE client facts, CSD descriptions and explicit language tables | Keeps stat IDs, table identities, conditions and branches; queried by exact context |
+| PoBR language package | Names, display texts, selected descriptions, the pinned historical zh-CN dictionary and the zh-CN support-gem display | Published as `locale/<patch>-<n>`; PoBR pins its assets by SHA-256 |
+| Manual translations | Worklists and review records under `curation/` | Drafts never reach reviewed output; a source change requires review again |
 
-交易 ID、游戏 stat ID 和显示文本各有用途，不能互相代替。语言与区服分别记录：国际服的简中内容不能证明国服数值相同。交易覆盖率也不代表完整汉化或计算机制覆盖率。
+Trade IDs, game stat IDs and display text serve different purposes and do not substitute for each other.
+Trade coverage is not full localization or calculation coverage. The historical compatibility dictionary
+keeps its community source and Traditional Chinese keeps its own; the repository as a whole is neither
+purely official text nor a complete client language library.
 
-历史兼容词典保留其社区来源；繁中保留独立来源。各数据域分别记录 provenance，不能把整个仓库描述为纯官方文本或完整客户端语言库。
+## Local development
 
-## 本地开发
-
-先安装 [mise](https://mise.jdx.dev/)，在本仓库根目录执行：
+Install [mise](https://mise.jdx.dev/), then from the repository root:
 
 ```sh
 mise trust
 mise install --locked
 mise run setup
 mise run check
-mise run report
 ```
 
-`mise.lock` 固定 Node 版本，`setup` 按 `package-lock.json` 安装依赖，并禁用依赖包的生命周期脚本。首次安装需要联网；安装后，`check` 运行测试并离线核对当前交易快照的来源摘要和可重现生成结果，`report` 读取已保存的覆盖报告。
-
-### 常见维护操作
-
-下列原生 npm 命令通过 `mise exec --` 执行；已激活 mise 时可直接运行。
+`mise.lock` pins Node; `setup` installs the dependencies from `package-lock.json` without lifecycle scripts
+and needs the network once. `check` runs the tests and verifies offline that the current trade snapshot's
+sources match their checksums and regenerate byte for byte. Every command runs through mise: `mise run <task>`
+for a task, `mise exec -- <command>` otherwise.
 
 ```sh
-# 联网重新采集交易目录与配置中的 PoE2DB 页面，验证后激活新快照
-mise exec -- npm run refresh
-
-# 仅采集官方交易目录；本次快照不沿用旧 PoE2DB 页面
-mise exec -- npm run refresh -- --trade-only
-
-# 编辑人工输入后，使用保存的原始响应离线重建并验证
-mise exec -- npm run build
-mise run check
+mise exec -- npm run refresh   # fetch the trade catalogs and configured PoE2DB pages, verify, activate
+mise exec -- npm run build     # after editing curation/: rebuild offline from the saved responses
+mise run report                # show the coverage report
 ```
 
-| 要改的内容 | 编辑位置 |
-| --- | --- |
-| 已有交易 ID＋英文分支缺译 | [`curation/translations.json`](curation/translations.json) 的 `manual_chinese`、`manual_note`、`manual_source_url` |
-| 明确覆盖既有交易译文 | [`curation/overrides.json`](curation/overrides.json)，附理由与来源 |
-| 非交易模板、多参数模板、稀有名组成词 | [`curation/curated.json`](curation/curated.json) |
-| 原生名称／描述补译 | [`curation/native-translations.json`](curation/native-translations.json)，按[工作表流程](docs/translation-workbench.md)审核 |
-| 补充采集页面 | [`curation/trade-sources.json`](curation/trade-sources.json) |
+Manual inputs live in [`curation/`](curation/): the trade worklist `translations.json`, reviewed templates
+`curated.json`, explicit overrides `overrides.json`, native supplements `native-translations.json` and the
+PoE2DB page list `trade-sources.json`.
 
-交易生成器为已发布快照创建新候选，完整验证后才切换 `data/CURRENT`；失败保留旧快照。恢复中断、工作表状态、占位符和配对优先级见[详细指南](docs/trade-dictionary.md)。
-
-## 目录与版本入口
+## Layout
 
 ```text
-release/<patch>[-<n>].json    PoBR 语言包 GitHub Release 的构建声明
-release/regenerate/<patch>.json 从固定输入重新生成该包各成员的声明（release:regenerate）
-data/CURRENT                  当前交易快照的目录名
-data/snapshots/<id>/raw/      压缩保存的原始交易响应与页面证据
-data/snapshots/<id>/generated/ 词典、模板、覆盖、缺口和冲突报告
-curation/                     人工维护的输入：交易补译工作表 translations.json、人工模板 curated.json、
-                              精确修正 overrides.json、原生文本补译 native-translations.json、采集页面 trade-sources.json
-reports/                      已提交的可读待办快照（原生文本待办、区服／版本差异），由 `workbench` 命令输出生成，不是输入
-src/cli.mjs                   交易词典与原生文本命令入口（npm run refresh／build／check／report）
-src/trade/                    交易词典：采集、配对、生成与验证
-src/release/                  语言包 release:build／release:publish／release:regenerate
-src/pobr/                     PoBR 语言文件生产者（pobr:*）与固定历史简中词典生成
-src/*.mjs（其余 7 个）         原生目录库，路径与字节固定：release/regenerate/0.5.5.5.json 固定的 catalog（e61f1332）在 producer 里记录了 src/<名> 及哈希，模块又按自身位置读取 src/，所以留在 src/ 根下、不改字节
-test/<领域>/                  按 src/ 领域分组的离线回归用例（test/native/ 对应 src/ 下的原生目录库）
-docs/                         数据契约和维护指南
-sources/                      语言来源台账（自 PoBR 迁入）与说明
-inputs/                       release/<patch>.json 固定的源发布与保留的辅助宝石说明（只读，字节与原 tag 相同）
-.cache/                       本地候选与临时文件，不提交
+curation/                       hand-maintained inputs
+data/CURRENT, data/snapshots/   trade dictionary snapshots (raw responses and generated files)
+reports/                        committed workbench queues, generated
+release/                        language package configs and regeneration recipes
+inputs/                         source bytes the configs pin (read-only)
+src/cli.mjs                     command entry for the trade dictionary and native text
+src/trade/                      trade dictionary
+src/release/                    release:build, release:publish, release:regenerate
+src/pobr/                       PoBR locale producers and the historical zh-CN dictionary producer
+src/*.mjs (the other seven)     native catalog library; paths and bytes are fixed because the catalog that
+                                release/regenerate/0.5.5.5.json pins (e61f1332) records src/<name> and its
+                                hash, and the modules locate src/ from their own path
+test/<domain>/                  offline tests grouped like src/ (test/native/ covers the native library)
+docs/                           contracts and guides (Chinese)
+sources/                        locale provenance ledger
 ```
 
-**PoBR 语言包看 GitHub Release `locale/<patch>-<n>`，交易词典快照看 `data/CURRENT`。** 两者承担不同职责。旧的 `handoff/*` 交付位于各自 tag 所指的提交，不在当前树里；已被引用的 tag 一直保留。
+What is editable, frozen or generated is listed in [AGENTS.md](AGENTS.md#layout).
 
-## 消费与发布
+## Publishing the language package
 
-消费方固定发布声明中的完整 commit、文件路径、字节数与 SHA-256，验证后再读取。源码 `main` 的新提交不自动更新已发布语言数据。PoBR 在唯一的 `pipeline/data.lock.json` 中记录采用的发布与产物；产品运行时使用已打包文件。
+`release:build` packages only the source bytes a config pins; `release:regenerate` separately rebuilds the
+members from pinned inputs and compares them byte for byte; `release:publish` creates the Release, which
+PoBR then adopts with `data:bump`. CI rebuilds every published package and compares it with its Release on
+every push. The steps are in [RELEASING.md](RELEASING.md). `locale/*` and `handoff/*` tags are never
+deleted or moved.
 
-PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件生产入口](docs/pobr-locale-producers.md)生成。固定历史简中词典的再生见[离线生成契约](docs/locale-generation.md)。
+## Sources and rights
 
-### 语言包 GitHub Release
+The trade sources are [GGG](https://www.pathofexile.com/api/trade2/data/stats),
+[Tencent](https://poe.game.qq.com/api/trade2/data/stats) and the configured [PoE2DB](https://poe2db.tw/)
+pages. The official trade endpoints do not report a client patch, so trade snapshots record
+`game_patch: null`. Scope, access limits and failure behaviour are described in
+[sources and access](docs/trade-dictionary.md#来源与访问边界) (Chinese).
 
-PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布（`release:build` → `release:publish` → PoBR `data:bump`），构建只打包 `release/<patch>.json` 固定的源字节、不重新生成；`release:regenerate` 另行从固定输入重新生成各成员并逐字节比较，CI 每次都跑。配置声明了 `support_display` 时，同一个 Release 还附带简中辅助宝石说明 `support-display.zh-CN.json` 和 `supportDescriptions.zh-CN.json`（在 zip 之外，列入 `SHA256SUMS`），它绑定游戏包的交易目录 SHA-256，PoBR 的 `data:bump` 随语言包一起采用。步骤、新补丁和排障见 [RELEASING.md](RELEASING.md)。
-
-已被 PoBR 锁引用的 `handoff/*` tag 必须持续可取，不能删除或移动。
-
-## 来源与权利
-
-交易来源为 [GGG](https://www.pathofexile.com/api/trade2/data/stats)、[腾讯](https://poe.game.qq.com/api/trade2/data/stats)和配置中的 [PoE2DB](https://poe2db.tw/) 页面。官方交易端点没有提供客户端补丁号，交易快照因此保留 `game_patch: null`。采集范围、访问限制和失败行为见[来源与访问边界](docs/trade-dictionary.md#来源与访问边界)。
-
-游戏文本、原始响应及网页内容的权利归各自来源方。仓库公开不为这些内容授予新的许可；本项目与 GGG、腾讯和 PoE2DB 无隶属关系。
+Game text, raw responses and web content belong to their respective owners. Publishing this repository
+grants no new licence to them; the project is not affiliated with GGG, Tencent or PoE2DB.
