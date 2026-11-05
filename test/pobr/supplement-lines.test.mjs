@@ -148,6 +148,15 @@ test('over an official layer: an entry it supplies is official, a correction of 
   // A correction whose corrected pair official text already has is already-in-base, not superseded.
   const same = correction('same', [{ from: { src: '旧', en: life }, to: { src: '最大生命提高 {0}%', en: life } }]);
   assert.equal(supplementLines(layer.lines, doc([], [same]), TEMPLATES, TARGET, GAME, layer.english).corrections[0].decision, 'already-in-base');
+  // A revised-partial English whose official rows hold both sides of a correction: nothing is
+  // applied and no official row is replaced by ours (this used to throw "already has the corrected pair").
+  const both = { ...official, texts: new Map([[life, new Set(['生命上限提高 {0}%', '最大生命提高 {0}%'])]]), stats: new Map([[life, new Set(['life'])]]) };
+  const partial = officialLayer(structuredClone(BASE), [both], TEMPLATES);
+  assert.equal(partial.decisions.find(row => row.english === life).decision, 'revised-partial');
+  const over = supplementLines(partial.lines, doc([], [ours]), TEMPLATES, TARGET, GAME, partial.english);
+  assert.equal(over.corrections[0].decision, 'already-in-base');
+  assert.deepEqual(over.lines.filter(row => row.en === life), [{ src: '最大生命提高 {0}%', en: life }, { src: '生命上限提高 {0}%', en: life }]
+    .sort((a, b) => a.src < b.src ? -1 : 1));
 });
 
 test('an empty document reproduces the base exactly', () => {

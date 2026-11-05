@@ -80,6 +80,8 @@ test('readOfficialSource reads the member through the frozen reader and refuses 
   assert.deepEqual([...read.texts.stats.get('Same {0} template')].sort(), ['scope_one', 'scope_two']);
   // The English of every default branch the reader excluded.
   assert.ok(read.texts.incomplete.has('{0} value') && read.texts.incomplete.has('Same'));
+  // A record excluded as a whole (here missing-simplified-chinese-group) names no branch: all its default English count.
+  assert.ok(read.texts.incomplete.has('Not translated'));
   assert.equal(read.source.realm, 'china');
   assert.equal(read.source.member, MEMBER);
   assert.deepEqual(read.source.package_target, { game: 'poe2', game_patch: '9.9', realm: 'china' });

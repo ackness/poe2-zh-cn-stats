@@ -209,7 +209,7 @@ mise run pobr:supplement-lines -- --request /absolute/request.json --out .cache/
    | --- | --- |
    | `confirmed` | 该英文的官方译文集合等于底的集合 |
    | `revised`（共享某个译文时 `revised-partial`） | 集合不同：官方行替换底里该英文的所有行（旧的别译，如 轮箭雨，被丢弃） |
-   | `kept-pairing-incomplete` | 集合不同，但冻结读取器排除了该英文的某个分支（官方集合可能缺一个别译）：保留底 |
+   | `kept-pairing-incomplete` | 集合不同，但冻结读取器排除了该英文的某个分支，或排除了含它的整条记录（`nonunique-implicit-default`、`missing-simplified-chinese-group`，记录的默认组每个分支都算），官方集合可能缺一个别译：保留底 |
    | `added` | 底没有该英文，它是游戏包的当前模板，且官方配对的 stat ID 都在模板的 stat ID 里 |
    | `skipped-not-game-template`、`skipped-other-stats` | 底没有该英文，游戏包没有该模板（或 stat ID 不同）：不加 |
    | `skipped-unresolved-markup` | `plain()` 之后英文或译文还留有 `[`／`]`（未知的标记形式）：不出货，保留底 |
@@ -226,7 +226,9 @@ mise run pobr:supplement-lines -- --request /absolute/request.json --out .cache/
    我们的修正留在 curation 里，不出货（例：`bonded-modifiers-and-idols-official-terms` 想把 纽带/魔偶 改成
    羁绊/雕像，国服原文就是 从符文和魔偶上获得纽带词缀效果）。唯一例外是 basis `official-typo-format-fix`：
    它只把官方文本里多余的 `\` 改成换行、措辞逐字节不变，国服原文本身也有这个 `\`，所以仍然应用。CSD 里没有的
-   英文（例如 `Bonded: …` 前缀行，是 ClientStrings 的 羁绊 加 CSD 余下部分的组合）不受影响。
+   英文（例如 `Bonded: …` 前缀行，是 ClientStrings 的 羁绊 加 CSD 余下部分的组合）不受影响。当前官方层提供该英文、
+   且底里已经有 `to` 这一对时（例如 `revised-partial` 的官方行同时含 `from` 和 `to`），记 `already-in-base`：
+   什么都不改，官方行永远不会被我们的行替换。
 2. `entries`：只看 `kind: "stat-line"`。英文必须是游戏包里的当前模板且 stat ID 与 `identity.stats` 相同，
    否则 `retired`；草稿与已拒绝的记录不出货；底里已有同一 `en` 的行时底优先（`official`，并记
    `supplement_differs`）；英文只由我们修正过的行提供时记 `covered-by-correction`（记 `supplement_differs`

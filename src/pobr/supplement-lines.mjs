@@ -67,6 +67,10 @@ export function supplementLines(base, supplements, templates, target, game, offi
         && correction.basis !== FORMAT_REPAIR) {
         // The current official text decides this English; our edit of it is kept in curation, never shipped.
         decision = 'superseded-by-official';
+      } else if (official && (official.has(from.en) || official.has(to.en)) && rows.has(pairKey(to))) {
+        // The current official text already has the corrected pair (a revised-partial English can hold
+        // both `from` and `to`): nothing to apply, and official rows are never replaced by ours.
+        decision = 'already-in-base';
       } else if (rows.has(pairKey(from)) && to.en !== from.en
         && [...rows.values()].some(row => row.en === to.en && pairKey(row) !== pairKey(from))) {
         // A correction of the English key gives way to a row the base already has for that English,
