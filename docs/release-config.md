@@ -138,7 +138,10 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
   里的路径。
 - `display-texts`：`src/pobr/display-texts.mjs` 跑固定的 `catalog` 与审核补译 `supplement`（都是本仓库
   某个提交里的 zip）。库模块用本 checkout 的，v3 catalog 的 producer 闭包必须等于它们；
-  `supplement_module` 必须等于它在固定提交里的字节。
+  `supplement_module` 必须等于它在固定提交里的字节。`projection`（`{scopes, literals}`，只有这两个字段）
+  必填，作为请求的 `projection` 传入：任务不读 `src/pobr/display-projection.json`，所以给默认投影加
+  scope 不会改变已发布成员的重新生成结果；要发布新 scope，就在新配置的配方里写新的 `projection`。
+  `regeneration.json` 的任务摘要记录生产者回执里的 `projection`。
 
 任务可选：
 
@@ -153,8 +156,10 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
 `display-texts` 任务要解开约 390 MB 的 catalog，峰值内存约 4 GB。
 
 示例（0.5.5.5）：0.5.5.5 的配方有 13 个成员，其中 10 个重新生成且逐字节相同（简中 9 个来自 `locale-producer`，其中
-`_meta.json` 是 passthrough；`display_texts.json` 来自 `display-texts`），繁中 3 个冻结，冻结原因与
-退出条件写在配方里。
+`_meta.json` 是 passthrough；`display_texts.json` 来自 `display-texts`，`projection` 固定发布时的三个
+scope），繁中 3 个冻结，冻结原因与退出条件写在配方里。`release/regenerate/0.5.5.5-3.json` 复现
+`release/0.5.5.5-3.json`：任务与 0.5.5.5 相同，只是 `projection` 多了 `PassiveSkills.Name`；繁中
+`mods.json` 冻结为 `locale/0.5.5.5-2` 里按英文为键的字节。
 
 ## 冻结的输入
 
