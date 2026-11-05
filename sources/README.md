@@ -11,7 +11,7 @@ The production pipeline these records describe — trade/community dictionary
 curation, native-text pairing and selection, the v3 display projection and the
 reviewed-translation workbench — is implemented in this repository (see
 [docs](../docs/), especially
-[retained-locale-publication](../docs/retained-locale-publication.md),
+[RELEASING](../RELEASING.md),
 [locale-generation](../docs/locale-generation.md),
 [pobr-locale-producers](../docs/pobr-locale-producers.md) and
 [translation-workbench](../docs/translation-workbench.md)). Acceptance entries
@@ -28,8 +28,9 @@ change in `0fb6f913cc3fac980f9d84e855b26103860d6b96`). The
 entry is copied verbatim; item pins, decision text and frozen limits are
 unchanged. PoBR's companion narrative remains
 `pipeline/imports/client-source-draft.md` in that repository; the locale
-paragraph's substance is carried by this entry and
-[retained-locale-publication](../docs/retained-locale-publication.md).
+paragraph's substance is carried by this entry and the former
+[retained-locale-publication](https://github.com/ackness/poe2-zh-cn-stats/blob/b831e31ed2b6325c1aeefedb2918905486e75d6a/docs/retained-locale-publication.md)
+note (removed with its replay tool; `release:build` now packages retained publications).
 
 Per the shared [data
 architecture](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md),

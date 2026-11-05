@@ -1,11 +1,11 @@
 # 原件补译与区服工作表
 
-`native-translations.json` 保存人工或 agent 的补译，原始官方 catalog 保持不可变。
+`curation/native-translations.json` 保存人工或 agent 的补译，原始官方 catalog 保持不可变。
 `reports/native-translation-worklist.json` 是已提交的可读待办快照；它记录输入 catalog 的摘要，
 不是当前游戏的完整语言包。`reports/native-regional-candidates.json` 单列目标表中缺少的来源条目，
 这些条目可能属于区服或版本差异，不能仅凭简体中文路径认定国服专属。
 
-交易 stat 的补译仍使用原 `translations.json`。本入口处理原件名称、技能说明等有明确
+交易 stat 的补译仍使用 `curation/translations.json`。本入口处理原件名称、技能说明等有明确
 table/field/ID 的文本，不把交易 ID 当成原生 ID，也不生成游戏数值或词缀关系。
 
 ## 查看和更新
@@ -18,7 +18,7 @@ table/field/ID 的文本，不把交易 ID 当成原生 ID，也不生成游戏�
   "catalogs": [
     {"manifest": "/path/to/catalog/manifest.json", "sha256": "完整的 manifest SHA256"}
   ],
-  "edits": "/path/to/repository/native-translations.json",
+  "edits": "/path/to/repository/curation/native-translations.json",
   "previous": "/path/to/previous/workbench.json"
 }
 ```
@@ -75,7 +75,7 @@ renderer，工作表只允许已明确支持的参数格式，保留引用 key�
 ## Agent 补译
 
 从 worklist 复制精确 `entry_id`、`identity`、`english`、`context`，以 `current` 作为 `based_on`，
-填入 `native-translations.json.entries`。记录形状如下：
+填入 `curation/native-translations.json` 的 `entries`。记录形状如下：
 
 ```text
 entry_id: 工作表给出的完整摘要，不能改词句后沿用

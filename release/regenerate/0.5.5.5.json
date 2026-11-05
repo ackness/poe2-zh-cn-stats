@@ -77,8 +77,8 @@
       "bytes": 375343,
       "sha256": "67c3db66b47c39e4148eaa365eec8a0050b6eee2a84032fd579d70f5395025aa",
       "category": "unpinned-input",
-      "reason": "pobr:names (src/pobr-name-sidecars.mjs) produced it from names.json (poe2-native-names/v1, sha256 0b2ff2e2…), which was never committed; names.json pairs RePoE's English facts (manifest 56e71e00…, pinned in repoe handoff/ordinary-uniques-20261103) with the Traditional Chinese client tables (repoe-localized-tables/v1, manifest 94dcfdc5…), which exist only as hashes in repoe sources/sources.lock.json. The pairing is recorded row by row in evidence/zh-TW-receipt.json.",
-      "exit": "RePoE publishes the Traditional Chinese localized-tables package (manifest 94dcfdc5…); then a pobr:names job replays native-names.mjs and pobr-name-sidecars.mjs with the PoBR 0.5.5.4.2 zh-TW legacy files and must reproduce these bytes."
+      "reason": "pobr:names (src/pobr/name-sidecars.mjs) produced it from names.json (poe2-native-names/v1, sha256 0b2ff2e2…), which was never committed; names.json pairs RePoE's English facts (manifest 56e71e00…, pinned in repoe handoff/ordinary-uniques-20261103) with the Traditional Chinese client tables (repoe-localized-tables/v1, manifest 94dcfdc5…), which exist only as hashes in repoe sources/sources.lock.json. The pairing is recorded row by row in evidence/zh-TW-receipt.json.",
+      "exit": "RePoE publishes the Traditional Chinese localized-tables package (manifest 94dcfdc5…); then a pobr:names job replays src/native-names.mjs and src/pobr/name-sidecars.mjs with the PoBR 0.5.5.4.2 zh-TW legacy files and must reproduce these bytes."
     },
     "i18n/zh-TW/mods.json": {
       "bytes": 333567,

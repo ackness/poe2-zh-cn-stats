@@ -43,7 +43,7 @@ npm run report
 
 已发布快照不可原地写入。`build` 对当前或指定的 `data/snapshots/<ID>` 创建新候选，保留原始采集时间并记录 `rebuilt_from`，全部校验成功后切换 `CURRENT`；失败时旧快照不变。对 `.cache` 候选的构建不会自动激活。
 
-成功激活还会同步根目录的 `translations.json` 补译工作表。新缺口自动加入，已补全和已退出上游目录的条目保留状态与人工内容。快照内保存同一张表，便于追溯；检测到发布期间有人编辑工作表时，不覆盖这些编辑，按报错重新构建。
+成功激活还会同步 `curation/translations.json` 补译工作表。新缺口自动加入，已补全和已退出上游目录的条目保留状态与人工内容。快照内保存同一张表，便于追溯；检测到发布期间有人编辑工作表时，不覆盖这些编辑，按报错重新构建。
 
 `check` 重新核对原始响应的 SHA-256 和字节数，并离线再生成所有产物进行逐字节比较。它不会联网，不会修改数据。GitHub Actions 也只运行离线测试与校验，不定期抓取网站、不自动发布。
 
@@ -62,12 +62,13 @@ node src/cli.mjs activate --snapshot .cache/candidate-<时间戳>
 ## 数据结构
 
 ```text
-sources.json                         官方入口及有限的 PoE2DB 页面清单
-overrides.json                       自己维护的、有来源的精确修正
-translations.json                    可编辑的持续补译表，含待办及已解决历史
-curated.json                         人工维护的编号模板与稀有物品名补丁
-src/                                 采集、配对、补缺、生成、校验代码
-test/                                行为回归测试
+curation/trade-sources.json          官方入口及有限的 PoE2DB 页面清单
+curation/overrides.json              自己维护的、有来源的精确修正
+curation/translations.json           可编辑的持续补译表，含待办及已解决历史
+curation/curated.json                人工维护的编号模板与稀有物品名补丁
+src/cli.mjs                          命令入口（refresh／build／check／report／activate）
+src/trade/                           采集、配对、补缺、生成、校验代码
+test/trade/                          行为回归测试
 data/CURRENT                         当前快照目录名
 data/snapshots/<时间戳>/
   manifest.json                      URL、采集时间、响应摘要、校验和、失败记录
@@ -168,17 +169,17 @@ curated_sha256: 人工模板输入的 SHA-256
 - `kind: "trade"` 表示从主交易词表转换，并不保证译文来自官方；完整 ID、人工补缺或 PoE2DB 证据均保留在 `provenance` 中。空格不同的可匹配模板不会合并丢失。
 - `kind: "curated"` 是人工审核的完整编号模板，可保留多参数、字符串和嵌套捕获。`words` 仅为稀有物品名组成词的缺省补丁，消费方采用 `rareWords[english] ??= chinese`，不覆盖其他名词来源。
 
-根目录的 **[`curated.json`](../curated.json)** 目前有 15 条人工模板和 1 条稀有名补丁（`Maelstrom → 漩涡`），每条保留原词句、编号及不可变来源链接。包括天赋点单复数、武器组技能点、珠宝插槽效果、Bonded 前缀、附赠技能、范围珠宝和连接条件，以及 Shaman Mantle 药剂区块的四条逐行别名。四条别名逐字沿用固定历史区块的译文，原区块继续保留；不自动拆分其他多行模板。它们不需要伪造交易 ID。
+**[`curation/curated.json`](../curation/curated.json)** 目前有 15 条人工模板和 1 条稀有名补丁（`Maelstrom → 漩涡`），每条保留原词句、编号及不可变来源链接。包括天赋点单复数、武器组技能点、珠宝插槽效果、Bonded 前缀、附赠技能、范围珠宝和连接条件，以及 Shaman Mantle 药剂区块的四条逐行别名。四条别名逐字沿用固定历史区块的译文，原区块继续保留；不自动拆分其他多行模板。它们不需要伪造交易 ID。
 
 日常维护分工：
 
 | 文件 | 用途 |
 |---|---|
-| `translations.json` | 为现有交易 ID＋英文分支补译；可靠来源补齐后自动让位 |
-| `overrides.json` | 对现有交易词条明确指定高优先级修正 |
-| `curated.json` | 维护交易目录之外的文本、已审核多参数或字符串模板，以及稀有名组成词补丁 |
+| `curation/translations.json` | 为现有交易 ID＋英文分支补译；可靠来源补齐后自动让位 |
+| `curation/overrides.json` | 对现有交易词条明确指定高优先级修正 |
+| `curation/curated.json` | 维护交易目录之外的文本、已审核多参数或字符串模板，以及稀有名组成词补丁 |
 
-修改 `curated.json` 后运行 `npm run build`、`npm run check`；生成、校验和激活均包含编号模板导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
+修改 `curation/curated.json` 后运行 `npm run build`、`npm run check`；生成、校验和激活均包含编号模板导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
 
 消费方接入这份导出时的建议：
 
@@ -199,8 +200,8 @@ curated_sha256: 人工模板输入的 SHA-256
 1. **官方直接配对 `trade`**：完整 ID（包括 `|` 后的枚举值）相同；两边均只有一个不同文本；中文含汉字；占位符数量一致。相同重复行可去重，不同分支不得按数组顺序拼接。`pseudo` 综合统计不作为实际游戏词条进入主表。
 2. **普通词缀复用 `explicit-reuse`**：只对腾讯没有该完整分裂 ID 的情况使用；必须找到相同 stat 后缀的 `explicit.*`，英文完全一致，普通词缀本身已直接配对。有现存冲突的分裂中文时不覆盖它。记录保留 `fractured.*`，证据指向真实的 `explicit.*` 来源。复用译文不能改变交易过滤条件。
 3. **PoE2DB 补缺 `poe2db`**：从中英文页面内嵌的 JSON 修饰词池、或具有底层 Stats 信息的详情卡片提取。不得执行远程 JavaScript。依据非本地化结构、词缀族、等级、类型、标签、数值区间、关键字及作用域配对；不能用显示名称、页面顺序或语言相关缓存哈希作稳定 ID。只替换明确标记的数值片段，保留字面条件、符号、百分号及参数顺序。
-4. **人工补缺 `manual-fallback`**：从根 `translations.json` 读取，仅在以上来源仍未解决时使用。后续可靠来源补齐后自动让位，不删除人工记录。
-5. **精确人工修正 `manual`**：从 `overrides.json` 读取，经维护者核实后可显式覆盖所有其他结果；保留理由和来源，覆盖旧值会出现在冲突报告中。
+4. **人工补缺 `manual-fallback`**：从 `curation/translations.json` 读取，仅在以上来源仍未解决时使用。后续可靠来源补齐后自动让位，不删除人工记录。
+5. **精确人工修正 `manual`**：从 `curation/overrides.json` 读取，经维护者核实后可显式覆盖所有其他结果；保留理由和来源，覆盖旧值会出现在冲突报告中。
 
 PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯一且参数数量相同的情况下补入。它不会覆盖已解决的官方译文；若官方有多个中文分支，补充候选还必须属于这些分支。不同来源的措辞冲突保留在报告中，不凭多数投票抹平。
 
@@ -210,13 +211,13 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 原生名称／描述使用[补译与区服工作表](translation-workbench.md)：
 [`reports/native-translation-worklist.json`](../reports/native-translation-worklist.json) 可直接查看官方缺译、待办和 agent 草稿；
-[`native-translations.json`](../native-translations.json) 是可编辑的补译输入，官方补译优先，版本变化要求复核。
+[`curation/native-translations.json`](../curation/native-translations.json) 是可编辑的补译输入，官方补译优先，版本变化要求复核。
 [`reports/native-regional-candidates.json`](../reports/native-regional-candidates.json) 独立列出区服或版本差异待确认项。
 国服与国际服按独立身份保存，语言不代替区服证据。下面的 `translations.json` 继续只维护交易 ID。
 
 ### 持续补译表
 
-根目录的 **[`translations.json`](../translations.json)** 是日常维护入口。首次生成已将当前全部 265 条缺口放入表中，后续数量以 `npm run report` 为准。它不是每次清空的临时报表；已解决项会保留下来，便于核对人工内容与新来源的差异。
+**[`curation/translations.json`](../curation/translations.json)** 是日常维护入口。首次生成已将当前全部 265 条缺口放入表中，后续数量以 `npm run report` 为准。它不是每次清空的临时报表；已解决项会保留下来，便于核对人工内容与新来源的差异。
 
 只编辑这三个字段，不要改 `id`／`english` 来迁移译文：
 
@@ -243,7 +244,7 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 | `pending` | 仍然缺少可采用的译文 |
 | `manual` | 正在使用人工补缺，主表 method 为 `manual-fallback` |
 | `automatic` | 当前 GGG／腾讯配对、分裂复用或 PoE2DB 已提供译文 |
-| `override` | 使用 `overrides.json` 中明确指定的修正 |
+| `override` | 使用 `curation/overrides.json` 中明确指定的修正 |
 | `retired` | 当前英文目录不再包含这个完整 ID＋英文组合，旧人工内容仅存档、不应用 |
 
 更新行为：
@@ -261,8 +262,8 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 先查看 `unresolved.json`、`conflicts.json` 与 `source-issues.json`，避免把交易类别缺失、重复分支和真正没有译文混为一谈。
 
-- **增加补充页面**：编辑 `sources.json` 的 `poe2db.pages`。每个 slug 对应 `/us/<slug>` 和 `/cn/<slug>`；使用已确认存在的公开页面。然后运行 `npm run refresh`，已有工作表自动对照这些新候选。
-- **明确覆盖官方或补充来源**：这与普通缺口补译不同。在根 `overrides.json` 添加如下格式，再运行 `npm run build` 和 `npm run check`。示例只说明格式，不会自动加入数据。
+- **增加补充页面**：编辑 `curation/trade-sources.json` 的 `poe2db.pages`。每个 slug 对应 `/us/<slug>` 和 `/cn/<slug>`；使用已确认存在的公开页面。然后运行 `npm run refresh`，已有工作表自动对照这些新候选。
+- **明确覆盖官方或补充来源**：这与普通缺口补译不同。在 `curation/overrides.json` 添加如下格式，再运行 `npm run build` 和 `npm run check`。示例只说明格式，不会自动加入数据。
 
 ```json
 [

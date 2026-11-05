@@ -23,7 +23,7 @@
 | 数据 | 来源与产物 | 使用边界 |
 | --- | --- | --- |
 | 交易词条 | GGG／腾讯交易目录、分裂词缀译文复用、PoE2DB 补缺；`dictionary.json`、`pairs.json` | 主键为完整交易 ID **加英文分支** |
-| 编号模板 | 交易词典的保守转换及 `curated.json`；`templates.json` | 自动转换只接受零／单数值槽，多参数由人工审核 |
+| 编号模板 | 交易词典的保守转换及 `curation/curated.json`；`templates.json` | 自动转换只接受零／单数值槽，多参数由人工审核 |
 | 原生描述与名称 | 固定 RePoE 客户端事实、CSD 描述和显式语言表 | 保留 stat ID、表身份、条件和分支，按精确上下文查询 |
 | PoBR 运行时文件 | 名称、显示目录、选中的描述及固定历史词典 | 发布后由 PoBR 按 commit、路径与 SHA-256 导入 |
 | 人工补译 | 独立工作表及审核记录 | 草稿不进入已审核输出，来源变化后需要复核 |
@@ -64,11 +64,11 @@ mise run check
 
 | 要改的内容 | 编辑位置 |
 | --- | --- |
-| 已有交易 ID＋英文分支缺译 | [`translations.json`](translations.json) 的 `manual_chinese`、`manual_note`、`manual_source_url` |
-| 明确覆盖既有交易译文 | [`overrides.json`](overrides.json)，附理由与来源 |
-| 非交易模板、多参数模板、稀有名组成词 | [`curated.json`](curated.json) |
-| 原生名称／描述补译 | [`native-translations.json`](native-translations.json)，按[工作表流程](docs/translation-workbench.md)审核 |
-| 补充采集页面 | [`sources.json`](sources.json) |
+| 已有交易 ID＋英文分支缺译 | [`curation/translations.json`](curation/translations.json) 的 `manual_chinese`、`manual_note`、`manual_source_url` |
+| 明确覆盖既有交易译文 | [`curation/overrides.json`](curation/overrides.json)，附理由与来源 |
+| 非交易模板、多参数模板、稀有名组成词 | [`curation/curated.json`](curation/curated.json) |
+| 原生名称／描述补译 | [`curation/native-translations.json`](curation/native-translations.json)，按[工作表流程](docs/translation-workbench.md)审核 |
+| 补充采集页面 | [`curation/trade-sources.json`](curation/trade-sources.json) |
 
 交易生成器为已发布快照创建新候选，完整验证后才切换 `data/CURRENT`；失败保留旧快照。恢复中断、工作表状态、占位符和配对优先级见[详细指南](docs/trade-dictionary.md)。
 
@@ -80,12 +80,15 @@ release/regenerate/<patch>.json 从固定输入重新生成该包各成员的声
 data/CURRENT                  当前交易快照的目录名
 data/snapshots/<id>/raw/      压缩保存的原始交易响应与页面证据
 data/snapshots/<id>/generated/ 词典、模板、覆盖、缺口和冲突报告
-translations.json             交易补译工作表
-curated.json / overrides.json 人工模板与精确修正
-native-translations.json      原生文本补译输入
+curation/                     人工维护的输入：交易补译工作表 translations.json、人工模板 curated.json、
+                              精确修正 overrides.json、原生文本补译 native-translations.json、采集页面 trade-sources.json
 reports/                      已提交的可读待办快照（原生文本待办、区服／版本差异），由 `workbench` 命令输出生成，不是输入
-src/                          采集、配对、生成与验证代码
-test/                         离线回归用例
+src/cli.mjs                   交易词典与原生文本命令入口（npm run refresh／build／check／report）
+src/trade/                    交易词典：采集、配对、生成与验证
+src/release/                  语言包 release:build／release:publish／release:regenerate
+src/pobr/                     PoBR 语言文件生产者（pobr:*）与固定历史简中词典生成
+src/*.mjs（其余 7 个）         原生目录库，路径与字节固定：release/regenerate/0.5.5.5.json 固定的 catalog（e61f1332）在 producer 里记录了 src/<名> 及哈希，模块又按自身位置读取 src/，所以留在 src/ 根下、不改字节
+test/<领域>/                  按 src/ 领域分组的离线回归用例（test/native/ 对应 src/ 下的原生目录库）
 docs/                         数据契约和维护指南
 sources/                      语言来源台账（自 PoBR 迁入）与说明
 inputs/                       release/<patch>.json 固定的源发布与保留的辅助宝石说明（只读，字节与原 tag 相同）
@@ -98,7 +101,7 @@ inputs/                       release/<patch>.json 固定的源发布与保留�
 
 消费方固定发布声明中的完整 commit、文件路径、字节数与 SHA-256，验证后再读取。源码 `main` 的新提交不自动更新已发布语言数据。PoBR 在唯一的 `pipeline/data.lock.json` 中记录采用的发布与产物；产品运行时使用已打包文件。
 
-PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件生产入口](docs/pobr-locale-producers.md)生成。固定历史简中词典的再生见[离线生成契约](docs/locale-generation.md)，已有字节的重放见[保留语言发布](docs/retained-locale-publication.md)。
+PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件生产入口](docs/pobr-locale-producers.md)生成。固定历史简中词典的再生见[离线生成契约](docs/locale-generation.md)。
 
 ### 语言包 GitHub Release
 

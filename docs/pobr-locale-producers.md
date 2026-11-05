@@ -7,9 +7,9 @@ PoBR 只消费本库发布的固定语言文件，不再生成语言数据。下
 
 | 输出（PoBR 路径） | 入口 | mise task |
 |---|---|---|
-| `i18n/zh-CN/display_texts.json` | `src/pobr-display-texts.mjs` | `mise run pobr:display-texts` |
-| `i18n/zh-TW/{base_items,skills,mods}.json` | `src/pobr-name-sidecars.mjs` | `mise run pobr:names` |
-| `i18n/zh-CN/stat_lines.json` | `src/pobr-stat-lines.mjs` | `mise run pobr:stat-lines` |
+| `i18n/zh-CN/display_texts.json` | `src/pobr/display-texts.mjs` | `mise run pobr:display-texts` |
+| `i18n/zh-TW/{base_items,skills,mods}.json` | `src/pobr/name-sidecars.mjs` | `mise run pobr:names` |
+| `i18n/zh-CN/stat_lines.json` | `src/pobr/stat-lines.mjs` | `mise run pobr:stat-lines` |
 
 三个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
 产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、所执行实现的 SHA-256
@@ -48,7 +48,7 @@ mise run pobr:display-texts --request /absolute/request.json --out .cache/fresh-
   manifest 的 `producer` 不包含 workbench 模块。库拒绝未审核、跨范围、过期或
   来源不符的记录时，本入口不写任何输出。空补译表是合法输入，结果与只用官方目录相同。
 - `projection: {scopes, literals}` 可选；省略时读取并固定
-  [`src/pobr-display-projection.json`](../src/pobr-display-projection.json)。
+  [`src/pobr/display-projection.json`](../src/pobr/display-projection.json)。
   唯一支持的 literal 策略是 `all-catalog-conflict-participants`：选择 scope 不会
   把未解决或冲突的记录移出 literal 歧义检查。
 
@@ -92,7 +92,7 @@ mise run pobr:stat-lines --selection <receipt.json> --selection-sha256 <sha> \
   --legacy <stat_lines.json> --legacy-sha256 <sha> --out .cache/fresh-stat-lines
 ```
 
-这是 `src/native-selected-translations.mjs` 的命令行入口。`--selection` 是 RePoE
+这是 `src/pobr/native-selected-translations.mjs` 的命令行入口。`--selection` 是 RePoE
 `tools/pobr-data-adapter --ordinary-facts` 写出的 `pobr-ordinary-facts-receipt/v1`
 （`adapter.output_schema` 为符文 `runes/v1` 或天赋树 `passive_tree/v1`，与 repoe adapter 的 `src/schema_id.rs` 一致；
 旧收据里的 Rust 类型路径 `pobr_data::catalog::item_overlay::RunesDef`、

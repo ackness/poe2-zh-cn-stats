@@ -31,24 +31,24 @@ run = "node src/cli.mjs native-check"
 
 [tasks."release:build"]
 description = "Package release/<patch>.json's pinned language publication as pobr-locale-<patch>.zip + receipt.json (and its declared support display) under .cache/release/ (--config, --check, --fetch, --check-release)"
-run = "node src/locale-release.mjs"
+run = "node src/release/build.mjs"
 
 [tasks."release:regenerate"]
 description = "Rebuild every member of release/regenerate/<patch>.json's config from pinned producer inputs and compare it byte for byte (--recipe, --fetch, --out, --keep-work)"
-run = "node src/locale-regenerate.mjs"
+run = "node src/release/regenerate.mjs"
 
 [tasks."release:publish"]
 description = "Stage the release:build package as the locale/<patch>-<n> GitHub Release and print the plan; --yes tags, pushes and creates the Release (--config, --dry-run, --reuse)"
-run = "node src/locale-release-publish.mjs"
+run = "node src/release/publish.mjs"
 
 [tasks."pobr:display-texts"]
 description = "Project a pinned native catalog into PoBR's display_texts.json; --request FILE --out .cache/FRESH"
-run = "node src/pobr-display-texts.mjs"
+run = "node src/pobr/display-texts.mjs"
 
 [tasks."pobr:names"]
 description = "Adapt pinned native names into PoBR's three zh-TW ID-keyed sidecars; --request FILE --out .cache/FRESH"
-run = "node src/pobr-name-sidecars.mjs"
+run = "node src/pobr/name-sidecars.mjs"
 
 [tasks."pobr:stat-lines"]
 description = "Append selected native effect translations to PoBR's stat_lines.json; pinned --selection/--native/--legacy, --out .cache/FRESH"
-run = "node src/pobr-stat-lines.mjs"
+run = "node src/pobr/stat-lines.mjs"
