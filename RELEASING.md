@@ -55,7 +55,49 @@ zip。zip 只取决于源字节和目标；`receipt.json` 记录生产提交，�
 - `--check-release`：下载 `published` 的 Release，要求与重建结果逐字节相同。
 
 CI（`.github/workflows/verify.yml`）对每个 `release/*.json` 跑
-`--fetch --check --check-release`，再构建一次并比较 zip 和回执。
+`--fetch --check --check-release`，再构建一次并比较 zip 和回执；另一个 job 对每个
+`release/regenerate/*.json` 跑 `release:regenerate -- --fetch`（见下节）。
+
+## 从固定输入重新生成
+
+`release:build` 只打包冻结的源字节；`release:regenerate` 证明这些字节能由本库的生产者从
+固定输入重新算出来：
+
+```sh
+mise run release:regenerate -- --fetch   # 每个 release/regenerate/<patch>.json；--recipe 指定一个
+```
+
+`release/regenerate/<patch>.json`（`poe2-locale-regeneration/v1`）声明它复现的 v1 配置
+（`reproduces`，文件名相同）、生产任务（`jobs`）和暂时无法重新生成的成员（`frozen`）。
+源目录的每个 `i18n/*` 成员必须正好被一个任务或一条冻结记录覆盖。
+
+- `locale-producer`：`src/locale-producer.mjs` 跑固定的生成清单（`manifest` 是本库某个
+  提交里的文件，带字节数和 SHA-256）。清单的每个输入按它自己的来源取：URL（本库的
+  `raw.githubusercontent.com` 地址改从 Git 读），或 `producer-commit`（任务的
+  `producer_commit`）里的路径。
+- `display-texts`：`src/pobr-display-texts.mjs` 跑固定的 catalog 与审核补译 zip（都是本库某个
+  提交里的文件）。库模块用本 checkout 的，v3 catalog 的 producer 闭包必须等于它们；
+  `supplement_module` 必须等于它在固定提交里的字节。
+- `passthrough`：输出等于任务的某个输入时必须声明（会自动检测），例如 `retained-selected`
+  原样写出固定的 `_meta.json`。`composed_evidence` 列出生成成员里由固定证据层组合进来、
+  但其选择过程还不能重放的部分，各带原因和退出条件。
+- `frozen`：成员的字节数、SHA-256、类别（`categories` 里声明）、原因和退出条件。冻结条数是
+  进度指标，只减不增。
+
+`--fetch` 拉取本地缺的 Git 提交（`--depth=1`），并把 URL 输入下载到
+`.cache/regenerate/inputs/<sha256>`；之后离线可重跑。输出在
+`.cache/regenerate/<game>-<realm>-<patch>/`：`regeneration.json`（每个成员的类别
+`generated-identical`／`passthrough-identical`／`frozen`／`*-different`、所用输入、任务摘要）
+和由重新生成的成员加冻结成员打出的 zip。任何成员不同，或 zip 不等于配置的 `published`，
+都以 1 退出。显示文本任务要解开约 390 MB 的 catalog，峰值内存约 4 GB，整次约 40 秒。
+
+0.5.5.5（`release/regenerate/0.5.5.5.json`）：13 个成员中 10 个重新生成且逐字节相同（简中
+9 个来自 `locale-producer` 的 Shaman Mantle 清单，`_meta.json` 是 passthrough；
+`display_texts.json` 来自 `display-texts`），zip 等于 `locale/0.5.5.5-1` 的 `bd7ba6ce…`。
+冻结 3 个：繁中 `base_items.json`、`mods.json`、`skills.json`，它们的 `names.json`
+（`0b2ff2e2…`）从未提交，所需的繁中客户端表（`repoe-localized-tables/v1`，`94dcfdc5…`）
+只在 RePoE `sources/sources.lock.json` 里留有哈希。`stat_lines.json` 里 140 条原生配对和
+两条 Vivid Wisp 原文是固定证据层，它们的选取收据也只有哈希。退出条件写在 recipe 里。
 
 ## 冻结的内容与替换
 

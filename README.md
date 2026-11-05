@@ -75,7 +75,8 @@ mise run check
 ## 目录与版本入口
 
 ```text
-release/<patch>.json          PoBR 语言包 GitHub Release 的构建声明
+release/<patch>[-<n>].json    PoBR 语言包 GitHub Release 的构建声明
+release/regenerate/<patch>.json 从固定输入重新生成该包各成员的声明（release:regenerate）
 data/CURRENT                  当前交易快照的目录名
 data/snapshots/<id>/raw/      压缩保存的原始交易响应与页面证据
 data/snapshots/<id>/generated/ 词典、模板、覆盖、缺口和冲突报告
@@ -101,7 +102,7 @@ PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件�
 
 ### 语言包 GitHub Release
 
-PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布（`release:build` → `release:publish` → PoBR `data:bump`），构建只打包 `release/<patch>.json` 固定的源字节、不重新生成。步骤、新补丁和排障见 [RELEASING.md](RELEASING.md)。
+PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布（`release:build` → `release:publish` → PoBR `data:bump`），构建只打包 `release/<patch>.json` 固定的源字节、不重新生成；`release:regenerate` 另行从固定输入重新生成各成员并逐字节比较，CI 每次都跑。步骤、新补丁和排障见 [RELEASING.md](RELEASING.md)。
 
 已被 PoBR 锁引用的 `handoff/*` tag 必须持续可取，不能删除或移动。
 

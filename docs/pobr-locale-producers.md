@@ -118,3 +118,7 @@ receipt 的 `implementation` 固定本入口和 `native-selected-translations.mj
   未进入 Git。
 - `stat_lines.json` 未重放：当时的选取收据只存在于已清理的 PoBR 缓存。命令行入口由
   合成测试覆盖，配对核心沿用本库已有的 `native-selected-translations.mjs` 及其测试。
+
+显示文本和简中词典的重放现在由 `release:regenerate`（`release/regenerate/0.5.5.5.json`）在 CI
+里每次执行，见 [RELEASING.md](../RELEASING.md#从固定输入重新生成)；繁中名称和
+`stat_lines.json` 的两层原生选取仍按上面的原因冻结。

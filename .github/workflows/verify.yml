@@ -46,3 +46,26 @@ jobs:
             .cache/release/ci-*-1/manifest.json
             .cache/release/ci-*-1/SHA256SUMS
           if-no-files-found: ignore
+  regenerate:
+    name: release:regenerate rebuilds the published members from pinned inputs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5
+        with:
+          version: '2026.10.23'
+      # --fetch fetches each pinned producer revision (Git) and downloads the pinned URL inputs.
+      # Every regenerated member must equal its frozen source member byte for byte, and the
+      # package assembled from regenerated plus declared-frozen members must equal the
+      # published zip's SHA-256; the step fails otherwise.
+      - name: Regenerate every recipe's package from its producers' pinned inputs
+        run: |
+          for recipe in release/regenerate/*.json; do
+            mise run release:regenerate -- --recipe "$recipe" --fetch
+          done
+      - uses: actions/upload-artifact@v4.6.2
+        if: always()
+        with:
+          name: locale-regeneration-receipt
+          path: .cache/regenerate/*/regeneration.json
+          if-no-files-found: ignore
