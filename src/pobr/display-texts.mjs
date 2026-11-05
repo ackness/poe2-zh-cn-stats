@@ -20,8 +20,22 @@ const REVIEWED_MODULE = 'src/translation-workbench.mjs';
 const REPO_ROOT = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 // PoBR's exact-ID readers live in its web/src/lib/nativeDisplayNames.ts. Other
 // fields can supply literal text, but do not need a second per-ID browser index.
+// The file is the default for new candidates; a regeneration recipe pins its own
+// projection in the request, so editing the file never changes a published member.
+const PROJECTION_FILE = 'src/pobr/display-projection.json';
 const PROJECTION_PATH = fileURLToPath(new URL('./display-projection.json', import.meta.url));
 const defaultProjection = () => JSON.parse(fs.readFileSync(PROJECTION_PATH, 'utf8'));
+
+// {scopes: ["<Table>.<Field>", ...], literals: "all-catalog-conflict-participants"}, nothing else.
+export function validateProjection(projection) {
+  requireValue(projection !== null && typeof projection === 'object' && !Array.isArray(projection)
+    && JSON.stringify(Object.keys(projection).sort()) === '["literals","scopes"]'
+    && projection.literals === 'all-catalog-conflict-participants'
+    && Array.isArray(projection.scopes) && new Set(projection.scopes).size === projection.scopes.length
+    && projection.scopes.every(scope => typeof scope === 'string' && /^[A-Za-z][A-Za-z0-9_]*\.[A-Za-z][A-Za-z0-9_]*$/u.test(scope)),
+  'Invalid runtime projection');
+  return projection;
+}
 // Without an explicit closure, a v3 catalog runs this checkout's six modules,
 // whose hashes still have to equal the manifest's producer closure. v1/v2
 // manifests record no producer to compare, so they must name their library.
@@ -31,10 +45,7 @@ const strip = text => text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu,
   (_, key, label) => label ?? key).trim();
 
 export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection()) {
-  requireValue(projection.literals === 'all-catalog-conflict-participants'
-    && Array.isArray(projection.scopes) && new Set(projection.scopes).size === projection.scopes.length
-    && projection.scopes.every(scope => typeof scope === 'string' && /^[A-Za-z][A-Za-z0-9_]*\.[A-Za-z][A-Za-z0-9_]*$/u.test(scope)),
-  'Invalid runtime projection');
+  validateProjection(projection);
   const runtimeScopes = new Set(projection.scopes);
   const scopes = new Map(), identities = new Set(), literalRows = new Map(), decisions = [];
   const add = (english, localized, identity) => {
@@ -199,12 +210,16 @@ export async function createDisplayTexts(request, out) {
     reviewed.records = runtime.records.length;
     reviewed.sources = runtime.sources;
   }
-  let projection = request.projection;
-  if (!projection) {
+  // The receipt names where the projection came from: the request (which the
+  // receipt embeds verbatim) or this checkout's default file, pinned by its bytes.
+  let projection = request.projection, projectionSource = { source: 'request' };
+  if (projection === undefined) {
     const raw = fs.readFileSync(PROJECTION_PATH);
     readPinned(PROJECTION_PATH, { bytes: raw.length, sha256: digest(raw) }, reads);
     projection = JSON.parse(raw);
+    projectionSource = { source: 'file', file: PROJECTION_FILE, bytes: raw.length, sha256: digest(raw) };
   }
+  validateProjection(projection);
   const projected = projectDisplayTexts(catalog, lookup, manifest.files['catalog.json'].sha256, projection);
   for (const [file, pin] of [...reads]) readPinned(file, pin, reads);
   const output = path.resolve(out), cache = path.join(REPO_ROOT, '.cache');
@@ -218,6 +233,7 @@ export async function createDisplayTexts(request, out) {
     implementation_sha256: digest(fs.readFileSync(fileURLToPath(import.meta.url))),
     decisions: projected.decisions, conflicts: projected.conflicts,
     runtime_scopes: [...projection.scopes].sort(),
+    projection: { ...projectionSource, scopes: projection.scopes, literals: projection.literals },
     ...(reviewed ? { supplement: { manifest: reviewed.manifest, module: reviewed.module,
       runtime: { bytes: reviewed.runtimeBytes.length, sha256: reviewed.runtimeSha256 },
       catalog_sha256: manifest.files['catalog.json'].sha256, sources: reviewed.sources,
