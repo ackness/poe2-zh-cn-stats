@@ -16,5 +16,11 @@
       "tag": "handoff/shaman-mantle-20261103",
       "revision": "9aba3687e6366597bc69a0795c63a20090cb02f5"
     }
+  },
+  "published": {
+    "tag": "locale/0.5.5.5-1",
+    "asset": "pobr-locale-0.5.5.5.zip",
+    "bytes": 7165092,
+    "sha256": "bd7ba6ce955c9aa604a1a9721c7e28ca3a005a29c0d23f4e99af736cf540d5a7"
   }
 }
