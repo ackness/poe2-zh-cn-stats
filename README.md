@@ -8,7 +8,7 @@
 
 | 你的目的 | 入口 |
 | --- | --- |
-| 给 PoBR 接入或更新语言文件 | [语言包 GitHub Release](#语言包-github-release)（`locale/<patch>-<n>`） |
+| 发布或更新 PoBR 语言包 | [RELEASING.md](RELEASING.md)（`locale/<patch>-<n>` GitHub Release） |
 | 在自己的工具里使用交易词条翻译 | [交易词典格式与读取示例](docs/trade-dictionary.md#其他仓库如何接入) |
 | 采集交易目录、补一条译文、修正模板 | [交易词典维护指南](docs/trade-dictionary.md) |
 | 配对原生名称、技能说明或 stat 描述 | [原件显示目录](docs/native-catalog.md)／[原生描述接入口](docs/native-localization.md) |
@@ -16,13 +16,7 @@
 
 ## 与 RePoE、PoBR 的关系
 
-| 仓库 | 负责什么 |
-| --- | --- |
-| [RePoE](https://github.com/ackness/repoe) | 读取客户端资源，保留原始表、stat ID、描述分支、关系和来源；生成游戏数据包 |
-| **本库** | 将语言与原件身份配对，处理歧义和人工补译，生成词典及语言文件 |
-| [PoBR](https://github.com/ackness/pobr) | 固定并导入发布产物，实现计算规则、输入解释与界面显示 |
-
-原始数据遗漏在 RePoE 修复；配对或译文问题在本库修复；已交付文本没有显示出来时检查 PoBR 的调用方。共同约定见 [PoBR 数据架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md)，当前跨仓缺口见[数据现状](https://github.com/ackness/pobr/blob/master/docs/data-status.md)。
+三个仓库的分工和共同约定只在 [PoBR 数据架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md)里维护一份；当前跨仓缺口见[数据现状](https://github.com/ackness/pobr/blob/master/docs/data-status.md)。
 
 ## 提供哪些数据
 
@@ -107,21 +101,7 @@ PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件�
 
 ### 语言包 GitHub Release
 
-PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布，与 RePoE 的 `game/<patch>-<n>` 同一约定：
-
-```sh
-mise run release:build                  # 打包 release/<patch>.json 固定的语言发布（默认最高 patch）
-mise run release:publish                # 默认 dry run：构建、暂存资产并打印将执行的命令
-mise run release:publish -- --yes       # 打 tag、推送并创建 Release（--reuse 复用当前提交的构建）
-# 在 PoBR 中：
-mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>
-```
-
-- **输入**：`release/<patch>.json` 声明目标（game、game_patch、realm）、仓库内源发布清单（`poe2-retained-locale-publication/v1`）的路径与字节／SHA-256，以及该清单最初的 tag 与提交。源文件按原字节提交在 `handoff/` 下，构建不重新生成。
-- **输出**（`.cache/release/<game>-<realm>-<patch>/`）：`pobr-locale-<patch>.zip`（`manifest.json` 加上源发布全部 `i18n/*`，映射为 `data/<patch>/i18n/*`，字节不变）、`receipt.json`（`poe2-locale-release-receipt/v1`：生产提交、是否 dirty、配置与代码摘要、包括 evidence 在内的每个源文件及源清单的摘要、zip 与其清单的摘要）和 `SHA256SUMS`。
-- **可重现**：zip 只取决于源字节和目标，与提交无关；成员排序、时间固定为 1980-01-01、0644 普通文件、不压缩（STORED），与 Python `zipfile` 按 RePoE 约定写出的字节完全一致，不受 zlib 版本影响。`receipt.json` 记录生产提交，因此每次发布都有自己的回执。
-- **发布**：`<n>` 从 1 开始，取远端同 patch 最大序号加一；同一提交不会得到第二个序号。`--yes` 要求工作区干净、HEAD 位于 `origin/main`、`gh auth status` 通过；中途失败后重跑即可从未完成的步骤继续，已存在的 Release 只核对资产、不覆盖。
-- **CI**：`verify.yml` 的 release 任务对每个 `release/*.json` 构建两次并逐字节比较，`--check` 核对源目录与原 tag 提交的 tree 相同；发布后把 `published`（tag、asset、bytes、sha256）写入配置，CI 即下载该 Release 并要求与重建结果逐字节相同。
+PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布（`release:build` → `release:publish` → PoBR `data:bump`），构建只打包 `release/<patch>.json` 固定的源字节、不重新生成。步骤、新补丁和排障见 [RELEASING.md](RELEASING.md)。
 
 已被 PoBR 锁引用的 `handoff/*` tag 必须持续可取，不能删除或移动。
 
