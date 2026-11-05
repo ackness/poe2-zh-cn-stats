@@ -244,18 +244,25 @@ test('check-release: every locale/* tag on origin is pinned by exactly one relea
   tagged('locale/9.9-1');
   assert.deepEqual(remoteLocaleTags(repo), ['locale/9.9-1']);
   assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), ['locale/9.9-1 is published, but no release config pins it: '
-    + 'write "published" into release/9.9-1.json or release/9.9.json']);
+    + 'write "published" into release/9.9-1.json or release/9.9.json' + ' (or delete the tag if its publish stopped before creating the Release)']);
   write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published: published('locale/9.9-1') })));
   assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), []);
   // Published, but its config's post-publish PR has not landed.
   write(repo, 'release/9.9-2.json', bytes(config(manifestRaw)));
   tagged('locale/9.9-2');
   assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), ['locale/9.9-2 is published, but no release config pins it: '
-    + 'write "published" into release/9.9-2.json']);
+    + 'write "published" into release/9.9-2.json' + ' (or delete the tag if its publish stopped before creating the Release)']);
   write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { published: published('locale/9.9-2') })));
   write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { published: published('locale/9.9-1') })));
   assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)),
     ['locale/9.9-1 is pinned by several release configs: release/9.9-1.json, release/9.9.json']);
+  // A pin whose tag the remote lacks (a tagless mirror or stale fork) fails instead of passing on an empty list.
+  rmSync(path.join(repo, 'release/9.9-1.json'));
+  assert.deepEqual(unpinnedTags(repo, []), [
+    'locale/9.9-1 is pinned by release/9.9.json, but the remote has no such tag',
+    'locale/9.9-2 is pinned by release/9.9-2.json, but the remote has no such tag',
+  ]);
+  assert.throws(() => remoteLocaleTags(repo, 'no-such-remote'), /Cannot list no-such-remote's locale\/\* tags/u);
 });
 
 test('config: a published tag must name the config patch', t => {
