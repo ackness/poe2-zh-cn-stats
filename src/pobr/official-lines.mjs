@@ -57,7 +57,8 @@ const unresolved = text => /[[\]]/u.test(text);
 /**
  * One source's texts from the frozen reader's output: {texts: Map english -> Set chinese,
  * stats: Map english -> Set stat id, incomplete: Set english}. `incomplete` is every English of a
- * default branch the reader excluded (its pairing in that record is unknown).
+ * default branch the reader excluded, directly or with its whole record (its pairing in that record
+ * is unknown).
  */
 export function officialTexts(candidate, document) {
   const texts = new Map(), stats = new Map(), incomplete = new Set();
@@ -68,10 +69,24 @@ export function officialTexts(candidate, document) {
     for (const id of pair.stat_ids) stats.get(en).add(id);
   }
   for (const excluded of candidate.excluded) {
-    for (const ref of excluded.default_refs ?? []) {
-      const branch = document.files[ref.file]?.records[ref.record]?.groups[ref.group]?.branches[ref.branch];
-      require(typeof branch?.template_raw === 'string', `excluded reference ${JSON.stringify(ref)} is not a branch`);
-      incomplete.add(plain(branch.template_raw));
+    if (excluded.default_refs) {
+      for (const ref of excluded.default_refs) {
+        const branch = document.files[ref.file]?.records[ref.record]?.groups[ref.group]?.branches[ref.branch];
+        require(typeof branch?.template_raw === 'string', `excluded reference ${JSON.stringify(ref)} is not a branch`);
+        incomplete.add(plain(branch.template_raw));
+      }
+      continue;
+    }
+    // A record excluded as a whole (nonunique-implicit-default, missing-simplified-chinese-group)
+    // names no branch: every branch of its default groups is unpaired.
+    const record = document.files[excluded.file]?.records[excluded.record];
+    require(Array.isArray(record?.groups), `excluded record ${JSON.stringify([excluded.file, excluded.record])} is not a record`);
+    for (const group of record.groups) {
+      if (group.declared_language !== null) continue;
+      for (const branch of group.branches) {
+        require(typeof branch?.template_raw === 'string', `excluded record ${JSON.stringify([excluded.file, excluded.record])} has a branch without template_raw`);
+        incomplete.add(plain(branch.template_raw));
+      }
     }
   }
   return { texts, stats, incomplete };
