@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { extractPagePairs, PoE2DBDecodeError } from '../src/poe2db.mjs';
+import { extractPagePairs, PoE2DBDecodeError } from '../../src/trade/poe2db.mjs';
 
 const urls = { enUrl: 'https://poe2db.tw/us/example', cnUrl: 'https://poe2db.tw/cn/example' };
 const span = value => `<span class="mod-value">${value}</span>`;

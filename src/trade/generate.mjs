@@ -2,7 +2,7 @@ import { mkdir, readFile, writeFile, rename, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { buildDictionary } from './dictionary.mjs';
 import { extractPagePairs } from './poe2db.mjs';
-import { readSnapshot, sha256, activateSnapshot } from './sources.mjs';
+import { readSnapshot, sha256, activateSnapshot } from './snapshots.mjs';
 import { buildTemplateExport } from './template-export.mjs';
 
 const json = value => JSON.stringify(value, null, 2) + '\n';

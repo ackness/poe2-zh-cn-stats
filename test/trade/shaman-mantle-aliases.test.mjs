@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { buildTemplateExport } from '../src/template-export.mjs';
-import { mergeTranslations } from '../src/legacy-translation-merge.mjs';
+import { buildTemplateExport } from '../../src/trade/template-export.mjs';
+import { mergeTranslations } from '../../src/legacy-translation-merge.mjs';
 
 const aliases = [
   { src: '无法使用生命药剂', en: 'Cannot use Life Flasks' },
@@ -16,13 +16,13 @@ const block = {
   en: aliases.map(row => row.en).join('\n'),
 };
 const source = 'https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016';
-const curated = JSON.parse(await readFile(new URL('../curation/curated.json', import.meta.url)));
+const curated = JSON.parse(await readFile(new URL('../../curation/curated.json', import.meta.url)));
 // The retained 0.5.5.4.2 stat_lines.json (tag handoff/locale-retained-20261101) is no longer in the
 // tree. It is exactly the Shaman Mantle publication's stat_lines.json without the four aliases, which
 // its evidence pins by SHA-256 (evidence/production-snapshots.json).
 const RETAINED_SHA256 = '1d51e0a2e58bb0fe46dfde331bd004140250eeed70d4e16f683b180c06eba301';
-const evidence = await readFile(new URL('../inputs/locale-0.5.5.5/evidence/production-snapshots.json', import.meta.url), 'utf8');
-const published = JSON.parse(await readFile(new URL('../inputs/locale-0.5.5.5/i18n/zh-CN/stat_lines.json', import.meta.url)));
+const evidence = await readFile(new URL('../../inputs/locale-0.5.5.5/evidence/production-snapshots.json', import.meta.url), 'utf8');
+const published = JSON.parse(await readFile(new URL('../../inputs/locale-0.5.5.5/i18n/zh-CN/stat_lines.json', import.meta.url)));
 const aliasKeys = new Set(aliases.map(row => JSON.stringify({ src: row.src, en: row.en })));
 const retained = published.filter(row => !aliasKeys.has(JSON.stringify({ src: row.src, en: row.en })));
 const retainedRaw = `${JSON.stringify(retained, null, 2)}\n`;

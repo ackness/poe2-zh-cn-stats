@@ -66,8 +66,9 @@ curation/trade-sources.json          官方入口及有限的 PoE2DB 页面清�
 curation/overrides.json              自己维护的、有来源的精确修正
 curation/translations.json           可编辑的持续补译表，含待办及已解决历史
 curation/curated.json                人工维护的编号模板与稀有物品名补丁
-src/                                 采集、配对、补缺、生成、校验代码
-test/                                行为回归测试
+src/cli.mjs                          命令入口（refresh／build／check／report／activate）
+src/trade/                           采集、配对、补缺、生成、校验代码
+test/trade/                          行为回归测试
 data/CURRENT                         当前快照目录名
 data/snapshots/<时间戳>/
   manifest.json                      URL、采集时间、响应摘要、校验和、失败记录

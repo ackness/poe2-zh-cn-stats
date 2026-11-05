@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDictionary } from '../src/dictionary.mjs';
+import { buildDictionary } from '../../src/trade/dictionary.mjs';
 
 const life = { id: 'explicit.stat_1', text: '# to maximum Life' };
 const catalog = entries => ({ result: [{ id: 'explicit', label: 'Explicit', entries }] });

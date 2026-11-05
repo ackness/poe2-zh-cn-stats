@@ -4,8 +4,8 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { readSnapshot, sha256 } from '../src/sources.mjs';
-import { writeGenerated } from '../src/snapshot.mjs';
+import { readSnapshot, sha256 } from '../../src/trade/snapshots.mjs';
+import { writeGenerated } from '../../src/trade/generate.mjs';
 
 async function sourceFixture(t, cn) {
   const root = await mkdtemp(path.join(tmpdir(), 'poe2-stats-'));

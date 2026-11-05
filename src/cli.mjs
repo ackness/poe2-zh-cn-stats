@@ -2,7 +2,7 @@
 import { readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fetchSnapshot, currentSnapshot, cloneCandidate } from './sources.mjs';
+import { fetchSnapshot, currentSnapshot, cloneCandidate } from './trade/snapshots.mjs';
 import { checkNativeLocalizationCandidate, generateNativeLocalization, nativeBytes } from './native-localization.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -53,7 +53,7 @@ async function main() {
   }
   if (!['refresh', 'build', 'check', 'report', 'activate'].includes(command)) throw new Error(help);
   // Native compilation is stdlib-only; do not load the HTML parser for it.
-  const { generateFiles, writeGenerated, checkGenerated, activateGenerated, formatReport } = await import('./snapshot.mjs');
+  const { generateFiles, writeGenerated, checkGenerated, activateGenerated, formatReport } = await import('./trade/generate.mjs');
   let tradeOnly = false;
   let supplied;
   while (args.length) {

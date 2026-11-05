@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { pairTrade } from '../src/trade.mjs';
+import { pairTrade } from '../../src/trade/trade.mjs';
 
 function response(...rows) {
   const groups = new Map();

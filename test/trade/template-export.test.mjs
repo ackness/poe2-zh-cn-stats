@@ -4,9 +4,9 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { buildTemplateExport } from '../src/template-export.mjs';
-import { generateFiles, writeGenerated, checkGenerated, activateGenerated } from '../src/snapshot.mjs';
-import { sha256 } from '../src/sources.mjs';
+import { buildTemplateExport } from '../../src/trade/template-export.mjs';
+import { generateFiles, writeGenerated, checkGenerated, activateGenerated } from '../../src/trade/generate.mjs';
+import { sha256 } from '../../src/trade/snapshots.mjs';
 
 const snapshot = '20260101T000000000Z';
 const empty = () => ({ schema_version: 1, templates: [], words: [] });
