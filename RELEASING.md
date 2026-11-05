@@ -66,7 +66,8 @@ zip。zip 只取决于源字节和目标；`receipt.json` 记录生产提交，�
 - `--fetch`：本地没有 `origin.revision`（含辅助宝石说明的）时从 origin 取（只走 Git），并把
   辅助宝石说明固定的下载（词典、游戏包）下到 `.cache/release/inputs/<sha256>`；之后离线可重跑。
 - `--check-release`：下载 `published` 的 Release，要求与重建结果逐字节相同；有辅助宝石说明时
-  它的 `SHA256SUMS` 还必须列出重建出的两个文件。
+  它的 `SHA256SUMS` 还必须列出重建出的两个文件。另外要求 origin 上每个 `locale/*` tag 都正好由
+  一个 `release/*.json` 的 `published` 固定：已发布但配置还没写 `published` 时失败。
 
 ## 辅助宝石说明（support display）
 
@@ -261,8 +262,8 @@ v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化：
 3. `mise run release:build -- --check`，检查回执里的成员和来源。
 4. 合并后在 `main` 的该提交上 `mise run release:publish`，确认 dry run 的计划，再
    `-- --yes`。
-5. 另开一个 PR 把 `published` 写进配置（之后 CI 会下载该 Release 核对），然后在 PoBR
-   跑 `data:bump`。
+5. 另开一个 PR 把 `published` 写进配置（之后 CI 会下载该 Release 核对；这个 PR 合并之前，
+   CI 的 `--check-release` 因 tag 未被固定而失败），然后在 PoBR 跑 `data:bump`。
 
 ## 排障
 

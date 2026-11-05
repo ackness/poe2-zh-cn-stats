@@ -58,5 +58,11 @@
       "bytes": 6925862,
       "sha256": "bdfb38f4f8db84f0f16544756fab3fcfc7bf6fee17fd24592f603bc87331be37"
     }
+  },
+  "published": {
+    "tag": "locale/0.5.5.5-2",
+    "asset": "pobr-locale-0.5.5.5.zip",
+    "bytes": 6925862,
+    "sha256": "bdfb38f4f8db84f0f16544756fab3fcfc7bf6fee17fd24592f603bc87331be37"
   }
 }
