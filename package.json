@@ -10,9 +10,7 @@
     "build": "node src/cli.mjs build",
     "check": "node src/cli.mjs check",
     "report": "node src/cli.mjs report",
-    "test": "node --test",
-    "test:publication": "node --test test/publication-index.test.mjs",
-    "publication:check": "node src/publication-index.mjs check"
+    "test": "node --test"
   },
   "dependencies": { "cheerio": "1.1.2" }
 }

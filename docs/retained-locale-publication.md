@@ -1,6 +1,6 @@
 # 固定旧语言资产的交付契约
 
-`handoff/locale-retained-20261101` 由翻译库独立维护，固定承接 PoBR
+`handoff/locale-retained-20261101`（tag 同名，提交 `a4bd9b5b`）由翻译库独立维护，固定承接 PoBR
 `0.5.5.5/international` 已接受的过渡语言字节。它不是客户端版本证明，
 也不把旧词典重标为新补丁。`manifest.json` 固定每个文件的字节数和
 SHA-256；`evidence/locale-decision.json` 保存逐项来源、接受范围和未解决事项，
@@ -17,12 +17,13 @@ SHA-256；`evidence/locale-decision.json` 保存逐项来源、接受范围和�
 `989293a62f212f56c2f8e2b26aec6439709d55600f5cb8360d6c9ab5ccc968a8`；
 其中实际审核记录为 0，不包含两个未批准的 Freezing Pulse 草稿。
 
-消费方必须独立固定本目录所属的翻译库 Git commit 及 manifest SHA-256，
-在临时目录离线导出；例如：
+该目录已不在 `main` 的当前树里（Git 历史和 tag 保留）。消费方必须独立固定它所属的
+翻译库 Git commit 及 manifest SHA-256，从该提交取出后在临时目录离线导出；例如：
 
 ```sh
+git worktree add --detach /temporary/retained a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb
 node src/retained-locale-export.mjs \
-  --publication handoff/locale-retained-20261101 \
+  --publication /temporary/retained/handoff/locale-retained-20261101 \
   --manifest-sha256 f90362c7bca642267ce9906c2a060336a8d2c472c73053707909d497eb22a551 \
   --game poe2 --patch 0.5.5.5 --realm international --locale zh-CN \
   --catalog /temporary/catalog.json --reviewed-supplement /temporary/runtime.zip \

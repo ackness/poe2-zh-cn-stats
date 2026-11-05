@@ -8,7 +8,7 @@
 
 | 你的目的 | 入口 |
 | --- | --- |
-| 给 PoBR 接入或更新语言文件 | [发布索引](publication/index.json) → [接入契约](docs/publication-index.md) |
+| 给 PoBR 接入或更新语言文件 | [语言包 GitHub Release](#语言包-github-release)（`locale/<patch>-<n>`） |
 | 在自己的工具里使用交易词条翻译 | [交易词典格式与读取示例](docs/trade-dictionary.md#其他仓库如何接入) |
 | 采集交易目录、补一条译文、修正模板 | [交易词典维护指南](docs/trade-dictionary.md) |
 | 配对原生名称、技能说明或 stat 描述 | [原件显示目录](docs/native-catalog.md)／[原生描述接入口](docs/native-localization.md) |
@@ -81,8 +81,6 @@ mise run check
 ## 目录与版本入口
 
 ```text
-publication/index.json        完整语言发布的发现入口
-publication/releases/         按序号保存的发布声明
 release/<patch>.json          PoBR 语言包 GitHub Release 的构建声明
 data/CURRENT                  当前交易快照的目录名
 data/snapshots/<id>/raw/      压缩保存的原始交易响应与页面证据
@@ -95,11 +93,11 @@ src/                          采集、配对、生成与验证代码
 test/                         离线回归用例
 docs/                         数据契约和维护指南
 sources/                      语言来源台账（自 PoBR 迁入）与说明
-handoff/                      当前检出可见的交付文件
+handoff/                      release/<patch>.json 固定的源发布（只读，字节与原 tag 相同）
 .cache/                       本地候选与临时文件，不提交
 ```
 
-**完整语言发布看 `publication/index.json`，交易词典快照看 `data/CURRENT`。** 两者承担不同职责。大产物可能位于单独的 `handoff/*` tag 所指提交，不一定出现在默认分支的目录里。
+**PoBR 语言包看 GitHub Release `locale/<patch>-<n>`，交易词典快照看 `data/CURRENT`。** 两者承担不同职责。旧的 `handoff/*` 交付位于各自 tag 所指的提交，不在当前树里；已被引用的 tag 一直保留。
 
 ## 消费与发布
 
@@ -125,7 +123,7 @@ mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>
 - **发布**：`<n>` 从 1 开始，取远端同 patch 最大序号加一；同一提交不会得到第二个序号。`--yes` 要求工作区干净、HEAD 位于 `origin/main`、`gh auth status` 通过；中途失败后重跑即可从未完成的步骤继续，已存在的 Release 只核对资产、不覆盖。
 - **CI**：`verify.yml` 的 release 任务对每个 `release/*.json` 构建两次并逐字节比较，`--check` 核对源目录与原 tag 提交的 tree 相同；发布后把 `published`（tag、asset、bytes、sha256）写入配置，CI 即下载该 Release 并要求与重建结果逐字节相同。
 
-发布需要完成生成、完整校验、不可变产物交付及远端核验，再登记发布索引；PoBR 采用是后续独立步骤。`mise run publication:check` 只校验声明和既有证据，不重新采集客户端或执行整轮生产。已被引用的交付 tag 必须持续可取。
+已被 PoBR 锁引用的 `handoff/*` tag 必须持续可取，不能删除或移动。
 
 ## 来源与权利
 

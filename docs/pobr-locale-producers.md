@@ -13,9 +13,10 @@ PoBR 只消费本库发布的固定语言文件，不再生成语言数据。下
 
 三个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
 产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、所执行实现的 SHA-256
-和逐条取舍，`adoption` 固定为 `not-adopted`。交付给 PoBR 仍走既有流程：把产物
-放进新的 `handoff/<name>` 目录与 tag，在 `manifest.json` 固定字节数和 SHA-256，
-再由 PoBR 在 `pipeline/data.lock.json` 引用该 commit。生成本身不修改任何已发布目录。
+和逐条取舍，`adoption` 固定为 `not-adopted`。交付给 PoBR 时把审核过的产物放进新的源
+发布目录（`manifest.json` 固定字节数和 SHA-256），由 `release/<patch>.json` 指向它，再按
+[RELEASING.md](../RELEASING.md) 发布 `locale/<patch>-<n>` Release，PoBR 用 `data:bump` 采用。
+生成本身不修改任何已发布目录。
 
 ## 显示文本：`display_texts.json`
 
