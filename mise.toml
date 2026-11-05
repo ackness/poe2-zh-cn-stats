@@ -37,6 +37,14 @@ run = "npm run publication:check"
 description = "Run only the small synthetic publication registry regressions"
 run = "npm run test:publication"
 
+[tasks."release:build"]
+description = "Package release/<patch>.json's pinned language publication as pobr-locale-<patch>.zip + receipt.json under .cache/release/ (--config, --check, --fetch, --check-release)"
+run = "node src/locale-release.mjs"
+
+[tasks."release:publish"]
+description = "Stage the release:build package as the locale/<patch>-<n> GitHub Release and print the plan; --yes tags, pushes and creates the Release (--config, --dry-run, --reuse)"
+run = "node src/locale-release-publish.mjs"
+
 [tasks."pobr:display-texts"]
 description = "Project a pinned native catalog into PoBR's display_texts.json; --request FILE --out .cache/FRESH"
 run = "node src/pobr-display-texts.mjs"

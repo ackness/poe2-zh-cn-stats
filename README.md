@@ -83,6 +83,7 @@ mise run check
 ```text
 publication/index.json        完整语言发布的发现入口
 publication/releases/         按序号保存的发布声明
+release/<patch>.json          PoBR 语言包 GitHub Release 的构建声明
 data/CURRENT                  当前交易快照的目录名
 data/snapshots/<id>/raw/      压缩保存的原始交易响应与页面证据
 data/snapshots/<id>/generated/ 词典、模板、覆盖、缺口和冲突报告
@@ -105,6 +106,24 @@ handoff/                      当前检出可见的交付文件
 消费方固定发布声明中的完整 commit、文件路径、字节数与 SHA-256，验证后再读取。源码 `main` 的新提交不自动更新已发布语言数据。PoBR 在唯一的 `pipeline/data.lock.json` 中记录采用的发布与产物；产品运行时使用已打包文件。
 
 PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件生产入口](docs/pobr-locale-producers.md)生成。固定历史简中词典的再生见[离线生成契约](docs/locale-generation.md)，已有字节的重放见[保留语言发布](docs/retained-locale-publication.md)。
+
+### 语言包 GitHub Release
+
+PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布，与 RePoE 的 `game/<patch>-<n>` 同一约定：
+
+```sh
+mise run release:build                  # 打包 release/<patch>.json 固定的语言发布（默认最高 patch）
+mise run release:publish                # 默认 dry run：构建、暂存资产并打印将执行的命令
+mise run release:publish -- --yes       # 打 tag、推送并创建 Release（--reuse 复用当前提交的构建）
+# 在 PoBR 中：
+mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>
+```
+
+- **输入**：`release/<patch>.json` 声明目标（game、game_patch、realm）、仓库内源发布清单（`poe2-retained-locale-publication/v1`）的路径与字节／SHA-256，以及该清单最初的 tag 与提交。源文件按原字节提交在 `handoff/` 下，构建不重新生成。
+- **输出**（`.cache/release/<game>-<realm>-<patch>/`）：`pobr-locale-<patch>.zip`（`manifest.json` 加上源发布全部 `i18n/*`，映射为 `data/<patch>/i18n/*`，字节不变）、`receipt.json`（`poe2-locale-release-receipt/v1`：生产提交、是否 dirty、配置与代码摘要、包括 evidence 在内的每个源文件及源清单的摘要、zip 与其清单的摘要）和 `SHA256SUMS`。
+- **可重现**：zip 只取决于源字节和目标，与提交无关；成员排序、时间固定为 1980-01-01、0644 普通文件、不压缩（STORED），与 Python `zipfile` 按 RePoE 约定写出的字节完全一致，不受 zlib 版本影响。`receipt.json` 记录生产提交，因此每次发布都有自己的回执。
+- **发布**：`<n>` 从 1 开始，取远端同 patch 最大序号加一；同一提交不会得到第二个序号。`--yes` 要求工作区干净、HEAD 位于 `origin/main`、`gh auth status` 通过；中途失败后重跑即可从未完成的步骤继续，已存在的 Release 只核对资产、不覆盖。
+- **CI**：`verify.yml` 的 release 任务对每个 `release/*.json` 构建两次并逐字节比较，`--check` 核对源目录与原 tag 提交的 tree 相同；发布后把 `published`（tag、asset、bytes、sha256）写入配置，CI 即下载该 Release 并要求与重建结果逐字节相同。
 
 发布需要完成生成、完整校验、不可变产物交付及远端核验，再登记发布索引；PoBR 采用是后续独立步骤。`mise run publication:check` 只校验声明和既有证据，不重新采集客户端或执行整轮生产。已被引用的交付 tag 必须持续可取。
 
