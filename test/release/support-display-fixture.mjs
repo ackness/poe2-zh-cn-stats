@@ -1,8 +1,8 @@
 // Shared support display fixtures for test/support-display.test.mjs and the publish tests (no tests of its own).
-import { storedZip } from '../src/stored-zip.mjs';
-import { pin, sha256 } from '../src/locale-release.mjs';
-import { DISPLAY_ASSET } from '../src/support-display.mjs';
-import { bytes, commitAll, config, gitIn, write } from './locale-release-fixture.mjs';
+import { storedZip } from '../../src/release/stored-zip.mjs';
+import { pin, sha256 } from '../../src/release/build.mjs';
+import { DISPLAY_ASSET } from '../../src/release/support-display.mjs';
+import { bytes, commitAll, config, gitIn, write } from './fixture.mjs';
 
 export const DISPLAY_DIR = 'inputs/support-display-test';
 export const COMMIT = 'd'.repeat(40); // the fixture's i18n/zh-CN/_meta.json source_commit

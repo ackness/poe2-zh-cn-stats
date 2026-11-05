@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { build, pin, sha256 } from '../src/locale-release.mjs';
+import { build, pin, sha256 } from '../../src/release/build.mjs';
 import {
   commands, main, nextSequence, plan, preflight, remoteTags, sequences, stage, tagName,
-} from '../src/locale-release-publish.mjs';
-import { bytes, commitAll, config, fixture, gitIn, write } from './locale-release-fixture.mjs';
+} from '../../src/release/publish.mjs';
+import { bytes, commitAll, config, fixture, gitIn, write } from './fixture.mjs';
 import { addRetainedDisplay, retained } from './support-display-fixture.mjs';
 
 const STAGE = 'publish/poe2-international-9.9';

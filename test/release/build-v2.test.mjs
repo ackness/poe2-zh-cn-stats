@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { strictJson } from '../src/strict-json.mjs';
-import { readZip } from '../src/stored-zip.mjs';
-import { build, check, defaultConfig, loadConfig, pin } from '../src/locale-release.mjs';
-import { localeIndex, rekeyByEnglish } from '../src/locale-package.mjs';
-import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './locale-release-fixture.mjs';
+import { strictJson } from '../../src/strict-json.mjs';
+import { readZip } from '../../src/release/stored-zip.mjs';
+import { build, check, defaultConfig, loadConfig, pin } from '../../src/release/build.mjs';
+import { localeIndex, rekeyByEnglish } from '../../src/release/package.mjs';
+import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
 // zh-TW mods keyed by mod id, and the pairing receipt that pins exactly those bytes.
 const MODS = bytes({ Strength1: '野蠻之', Strength2: '野蠻之', Fire1: '火山之', Fire2: '之火山', Fire3: '之火山', Cold1: '冰之', Cold2: '之冰' });

@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { DICTIONARY_FILES, produceLocale } from '../src/locale-producer.mjs';
-import { build, pin } from '../src/locale-release.mjs';
-import { loadRecipe, problems, recipeFiles, regenerate } from '../src/locale-regenerate.mjs';
-import { strictJson } from '../src/strict-json.mjs';
-import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './locale-release-fixture.mjs';
+import { DICTIONARY_FILES, produceLocale } from '../../src/locale-producer.mjs';
+import { build, pin } from '../../src/release/build.mjs';
+import { loadRecipe, problems, recipeFiles, regenerate } from '../../src/release/regenerate.mjs';
+import { strictJson } from '../../src/strict-json.mjs';
+import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
 const table = (column, values) => ({ entries: values.map(([id, en, zh]) => ({ id, columns: { [column]: [{ en, zh }] } })) });
 const DICTIONARY = {

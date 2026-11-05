@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { supportDescriptions } from '../src/support-description-projection.mjs';
+import { supportDescriptions } from '../../src/release/support-description-projection.mjs';
 
 const dictionary = pairs => ({ table: 'GemEffects', entries: [{ columns: { SupportText: pairs } }] });
 const gem = (skill_id, description, is_support = true) => ({ skill_id, description, is_support });

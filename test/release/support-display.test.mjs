@@ -2,12 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { strictJson } from '../src/strict-json.mjs';
-import { readZip, storedZip } from '../src/stored-zip.mjs';
-import { ROOT, build, check, checkRelease, loadConfig, pin, releaseUrl, sha256 } from '../src/locale-release.mjs';
-import { releaseBody, coveredBy, stage } from '../src/locale-release-publish.mjs';
-import { DISPLAY_ASSET, MANIFEST_ASSET, displayInputs, fetchDisplayInputs, regenCommand } from '../src/support-display.mjs';
-import { bytes, commitAll, fixture, write } from './locale-release-fixture.mjs';
+import { strictJson } from '../../src/strict-json.mjs';
+import { readZip, storedZip } from '../../src/release/stored-zip.mjs';
+import { ROOT, build, check, checkRelease, loadConfig, pin, releaseUrl, sha256 } from '../../src/release/build.mjs';
+import { releaseBody, coveredBy, stage } from '../../src/release/publish.mjs';
+import { DISPLAY_ASSET, MANIFEST_ASSET, displayInputs, fetchDisplayInputs, regenCommand } from '../../src/release/support-display.mjs';
+import { bytes, commitAll, fixture, write } from './fixture.mjs';
 import {
   CATALOG, CATALOG_SHA, DICTIONARY, DISPLAY_DIR, ENTRIES, GAME_ZIP, MEMBER, UNTRANSLATED, addRetainedDisplay, catalog, dictionary,
   releaseConfig, retained, retainedSpec, sourceFields, writeConfig,
@@ -113,7 +113,7 @@ test('retained: declared inputs must regenerate its entries (check)', async t =>
   assert.throws(() => build({ repo }), /support_display\.dictionary source_commit differ/u);
 });
 
-// What the regenerate mode must write, spelled out independently of src/support-display.mjs.
+// What the regenerate mode must write, spelled out independently of src/release/support-display.mjs.
 function expectedRegenerated(configPath, applicability) {
   const assetRaw = bytes({ _meta: { ...sourceFields, data_version: '9.9', catalog_sha256: CATALOG_SHA, regen_command: regenCommand(configPath) },
     entries: ENTRIES, untranslated: UNTRANSLATED });

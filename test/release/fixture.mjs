@@ -2,7 +2,7 @@
 import { execFileSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { CODE, ROOT, pin } from '../src/locale-release.mjs';
+import { CODE, ROOT, pin } from '../../src/release/build.mjs';
 
 export const TARGET = { game: 'poe2', game_patch: '9.9', realm: 'international' };
 export const SOURCE_DIR = 'inputs/locale-test';

@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { strictJson } from '../src/strict-json.mjs';
-import { crc32, readZip, storedZip } from '../src/stored-zip.mjs';
+import { strictJson } from '../../src/strict-json.mjs';
+import { crc32, readZip, storedZip } from '../../src/release/stored-zip.mjs';
 import {
   ROOT, build, check, checkRelease, defaultConfig, download, loadConfig, pin, releaseUrl, remoteLocaleTags, sha256, unpinnedTags,
-} from '../src/locale-release.mjs';
-import { SOURCE_DIR, SOURCE_FILES, TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './locale-release-fixture.mjs';
+} from '../../src/release/build.mjs';
+import { SOURCE_DIR, SOURCE_FILES, TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
 const members = () => new Map([['b.json', Buffer.from('{"b":1}\n')], ['a/x.json', Buffer.from('[]')], ['manifest.json', Buffer.from('{}\n')]]);
 
@@ -77,8 +77,9 @@ test('build: members are the source i18n bytes and the manifest pins them in ord
   assert.deepEqual({ ...receipt.producer, code: undefined, config: undefined },
     { repository: 'ackness/poe2-zh-cn-stats', commit, dirty: false, dirty_paths: [], code: undefined, config: undefined });
   assert.deepEqual(receipt.producer.config, { 'release/9.9.json': pin(readFileSync(path.join(repo, 'release/9.9.json'))) });
-  assert.deepEqual(Object.keys(receipt.producer.code), ['src/locale-release.mjs', 'src/locale-package.mjs',
-    'src/support-display.mjs', 'src/support-description-projection.mjs', 'src/stored-zip.mjs', 'src/strict-json.mjs', 'mise.lock']);
+  assert.deepEqual(Object.keys(receipt.producer.code), ['src/release/build.mjs', 'src/release/package.mjs',
+    'src/release/support-display.mjs', 'src/release/support-description-projection.mjs', 'src/release/stored-zip.mjs', 'src/strict-json.mjs',
+    'mise.lock']);
   assert.deepEqual(receipt.source.manifest, { path: `${SOURCE_DIR}/manifest.json`, ...pin(manifestRaw), schema: 'poe2-retained-locale-publication/v1' });
   assert.deepEqual(receipt.source.files, Object.fromEntries(Object.entries(SOURCE_FILES).sort(([a], [b]) => (a < b ? -1 : 1))
     .map(([name, raw]) => [`${SOURCE_DIR}/${name}`, pin(raw)])));

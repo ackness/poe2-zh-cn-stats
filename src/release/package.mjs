@@ -4,7 +4,7 @@
 // snapshot manifest, so a new member such as an index.json would be rejected; the index stays out
 // of the zip).
 import { createHash } from 'node:crypto';
-import { strictJson } from './strict-json.mjs';
+import { strictJson } from '../strict-json.mjs';
 
 const sha256 = raw => createHash('sha256').update(raw).digest('hex');
 const pin = raw => ({ bytes: raw.length, sha256: sha256(raw) });

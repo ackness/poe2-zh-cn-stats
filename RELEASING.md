@@ -119,7 +119,7 @@ a new display needs release/<patch>-<n+1>.json`。判断“已发布”时比较
   `tag`、完整 `revision`，目录被移动过时 `path` 写原清单路径）。可选 `dictionary` 和
   `catalog`（写法同下）记录它的生成输入，`--check` 用它们核对 `entries`／`untranslated`
   （`_meta` 是历史记录，不比较）。
-- `regenerate`：`src/support-description-projection.mjs` 的 `supportDescriptions` 跑两个固定
+- `regenerate`：`src/release/support-description-projection.mjs` 的 `supportDescriptions` 跑两个固定
   下载：`dictionary` 是 GemEffects 词典（`source` 为 `https://github.com/<owner>/<repo>`、完整
   `source_commit`、`source_file`、指向该提交的 `raw.githubusercontent.com` `url`、`bytes`、
   `sha256`），`catalog` 是游戏 Release 的包（`repository: ackness/repoe`、`tag: game/<patch>-<n>`、
@@ -205,7 +205,7 @@ mise run release:regenerate -- --fetch   # 每个 release/regenerate/<patch>.jso
    （`pobr:display-texts`、`pobr:names`、`pobr:stat-lines`）或
    [离线简中生成](docs/locale-generation.md)，输出在 `.cache/`。
 2. 新建一个源目录 `inputs/locale-<patch>[-<n>]/`（`release:build` 的 dirty 检查覆盖
-   `inputs/`，见 `src/locale-release.mjs` 的 `PRODUCER_PATHS`），未改动的文件按原字节
+   `inputs/`，见 `src/release/build.mjs` 的 `PRODUCER_PATHS`），未改动的文件按原字节
    复制，写 `manifest.json` 固定每个文件，证据放 `evidence/`。
 3. 经 PR 合并到 `main`，再新建一个 `release/<patch>-<n>.json` 指向它（`<n>` 是要发布的
    序号；也可以写 v2 配置，在已有配置的包上声明 transform）。**带 `published` 的配置一律

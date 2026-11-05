@@ -9,7 +9,7 @@
 // A release config declares it in `support_display`, in one of two modes:
 // - retained: a checked-in directory (manifest.json + the asset, optionally README.md) restored byte
 //   for byte from its origin commit; `--check` compares its tree with that commit's.
-// - regenerate: src/support-description-projection.mjs over two pinned downloads, the GemEffects
+// - regenerate: src/release/support-description-projection.mjs over two pinned downloads, the GemEffects
 //   dictionary and the game Release's package (its trade catalog member); `_meta` and the manifest
 //   are written deterministically from those pins and the target.
 // Both modes pin the two output files and the catalog SHA-256. A retained display may also declare
@@ -17,12 +17,12 @@
 // from them and requires the same entries and untranslated IDs.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { strictJson } from './strict-json.mjs';
+import { strictJson } from '../strict-json.mjs';
 import { readZip } from './stored-zip.mjs';
 import { supportDescriptions } from './support-description-projection.mjs';
 import {
   REPOSITORY, download, encoded, git, isPin, listFiles, pin, readRegular, releaseUrl, require, safeRelative, samePin,
-} from './locale-release.mjs';
+} from './build.mjs';
 
 export const LOCALE = 'zh-CN';
 export const DISPLAY_ASSET = `supportDescriptions.${LOCALE}.json`;
@@ -149,7 +149,7 @@ export function catalogBytes(zip, spec) {
   return raw;
 }
 
-// entries/untranslated of src/support-description-projection.mjs over the cached inputs.
+// entries/untranslated of src/release/support-description-projection.mjs over the cached inputs.
 export function project(repo, spec, cache) {
   const [dictionary, catalog] = displayInputs(spec).map(input => cachedInput(repo, input, cache));
   const { gems } = strictJson(catalogBytes(catalog, spec));
