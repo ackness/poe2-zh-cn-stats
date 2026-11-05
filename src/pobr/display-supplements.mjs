@@ -214,6 +214,7 @@ export function validateOfficialNames(doc, target, catalogIndexSha256 = null) {
   const sameClient = HEX64.test(catalogIndexSha256 ?? '') && hashes.some(([, value]) => value === catalogIndexSha256);
   let acceptedBy;
   if (locale === 'zh-CN') {
+    require(realm === null || realm === 'china', `official names: zh-CN declares realm ${realm}; only the China client is official zh-CN`);
     require(sameClient || realm === 'china', 'official names: zh-CN must come from the China client (its client index SHA-256 '
       + 'equals the catalog\'s observed_client.index_sha256, or it declares realm china)');
     acceptedBy = sameClient ? 'catalog-client-index' : 'declared-realm-china';
@@ -230,7 +231,7 @@ export function validateOfficialNames(doc, target, catalogIndexSha256 = null) {
     names.set(id, { english: row.english, text: row[field] });
   }
   return { format: doc.format, locale, game_patch: patch ?? null, client: Object.fromEntries(hashes), names,
-    provenance: { accepted_by: acceptedBy, declared_realm: realm, realm_basis: realm === null ? null : 'declared',
+    provenance: { accepted_by: acceptedBy, declared_realm: realm, realm_basis: sameClient ? 'catalog-client-index' : 'declared',
       catalog_client_index_sha256: catalogIndexSha256 ?? null, same_client_as_catalog: sameClient } };
 }
 

@@ -116,6 +116,8 @@ test('a correction of the English gives way to a base row for that English; an e
     [['covered-by-correction', true, ['羁绊： {0}']]]);
   assert.equal(covered.lines.filter(row => row.en === 'Bonded {0}').length, 1);
   assert.equal(run([entry(life, ['life'], '最大生命提高 {0}%')], []).entries[0].lifecycle, 'official');
+  // An output of this producer is not a base.
+  assert.throws(() => run([], [rename], result.lines.concat({ src: '甲', en: 'A', origin: 'agent' })), /without origin/);
 });
 
 test('an empty document reproduces the base exactly', () => {
