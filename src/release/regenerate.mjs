@@ -129,6 +129,19 @@ export function loadRecipe(file, repo = ROOT) {
   for (const job of recipe.jobs) for (const [member, owner] of Object.entries(job.replaced_by ?? {})) {
     require(recipe.jobs.some(other => other.id === owner && other.members.includes(member)), `${job.id}: ${member} is not a member of job ${owner}`);
   }
+  // package_texts must be this package's own official texts: passive_names is the publication's
+  // member, stat_lines the base of its supplement-lines job (the member itself when no job adds rows).
+  const publication = recipe.jobs.some(job => job.package_texts)
+    ? strictJson(readFileSync(path.join(repo, loaded.config.source.manifest.path))) : null;
+  for (const job of recipe.jobs) if (job.package_texts) {
+    const lines = recipe.jobs.find(other => other.kind === 'supplement-lines' && other.locale === job.locale);
+    const expected = { passive_names: publication.files?.[`i18n/${job.locale}/passive_names.json`],
+      stat_lines: lines ? lines.base : publication.files?.[`i18n/${job.locale}/stat_lines.json`] };
+    for (const [key, want] of Object.entries(expected)) {
+      require(want && samePin(job.package_texts[key], want), `${job.id}: package_texts.${key} is not this package's ${lines && key === 'stat_lines'
+        ? `supplement-lines base (${lines.id})` : `i18n/${job.locale}/${key}.json`}`);
+    }
+  }
   for (const job of recipe.jobs) for (const [member, layers] of Object.entries(job.composed_evidence ?? {})) {
     for (const layer of layers) {
       require(Object.hasOwn(recipe.categories, layer.category), `${job.id}: ${member} layer ${layer.input} names an undeclared category`);

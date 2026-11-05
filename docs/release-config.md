@@ -150,7 +150,8 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
   `pobr-game-<patch>.zip`，与 `supplement-lines` 相同）：`--fetch` 下载并核对后作为请求的 `game_package`
   传入，怪物名按其中的目标英文决定。给出 `names` 时还要 `package_texts: {stat_lines, passive_names}`（各为本仓库
   某个提交里的文件 `{revision, path, bytes, sha256}`，通常是作为底的已发布成员），作为请求的 `package_texts`
-  传入：补译不得遮住这些官方文本，跳过的条数记在任务摘要 `official_elsewhere_skipped`。
+  传入：补译不得遮住这些官方文本，跳过的条数记在任务摘要 `official_elsewhere_skipped`。`passive_names` 必须等于
+  源目录的成员，`stat_lines` 必须等于同 locale `supplement-lines` 任务的 `base`（没有该任务时等于源目录成员）。
 - `supplement-lines`：`src/pobr/supplement-lines.mjs`（见
   [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)）。`base` 是作为底的
   `stat_lines.json`，`edits` 是 `curation/display-supplements.json`，可选 `meta` 是作为底的 `_meta.json`，
