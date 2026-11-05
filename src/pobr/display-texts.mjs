@@ -173,7 +173,7 @@ function projectNames({ names, official, game, catalogIndexSha256, packageTexts,
   requireValue(game?.targets instanceof Map, 'Monster names need the pinned game package (target English)');
   if (names) validateSupplements(names);
   const officialNames = official ? validateOfficialNames(official, catalog, catalogIndexSha256) : null;
-  const ours = new Map(), entries = [];
+  const reviewed = new Map(), entries = [];
   for (const entry of names?.entries ?? []) {
     const { identity } = entry;
     if (identity.kind !== 'monster-name') continue;
@@ -183,12 +183,12 @@ function projectNames({ names, official, game, catalogIndexSha256, packageTexts,
     if (entry.status !== 'reviewed') { decision.lifecycle = entry.status; continue; }
     if (entry.based_on.game_package.sha256 !== game.sha256) decision.needs_review = 'based_on differs from the pinned game package';
     decision.ids = entry.ids.map(id => {
-      requireValue(!ours.has(id), `Two reviewed monster names for ${id}`);
-      ours.set(id, { entry, decision });
+      requireValue(!reviewed.has(id), `Two reviewed monster names for ${id}`);
+      reviewed.set(id, { entry, decision });
       return { id };
     });
   }
-  if (officialNames || ours.size) requireValue(runtimeScopes.has(NAME_SCOPE), `Monster names need ${NAME_SCOPE} in projection.scopes`);
+  if (officialNames || reviewed.size) requireValue(runtimeScopes.has(NAME_SCOPE), `Monster names need ${NAME_SCOPE} in projection.scopes`);
   const row = (id, english, text) => {
     if (!scopes.has(NAME_SCOPE)) scopes.set(NAME_SCOPE, new Map());
     scopes.get(NAME_SCOPE).set(id, [english, text]);
@@ -212,8 +212,8 @@ function projectNames({ names, official, game, catalogIndexSha256, packageTexts,
       counts.official++;
     }
   }
-  if (ours.size) requireValue(packageTexts, 'Monster names need packageTexts (the package\'s official stat_lines and passive_names)');
-  for (const [id, { entry, decision }] of ours) {
+  if (reviewed.size) requireValue(packageTexts, 'Monster names need packageTexts (the package\'s official stat_lines and passive_names)');
+  for (const [id, { entry, decision }] of reviewed) {
     const item = decision.ids.find(row => row.id === id);
     const target = game.targets.get(id);
     const elsewhere = officialElsewhere(entry.identity.english) ?? officialByEnglish.get(entry.identity.english) ?? null;
