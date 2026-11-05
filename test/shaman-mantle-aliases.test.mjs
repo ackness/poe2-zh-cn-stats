@@ -16,7 +16,7 @@ const block = {
   en: aliases.map(row => row.en).join('\n'),
 };
 const source = 'https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/i18n/zh-CN/stat_lines.json#L54015-L54016';
-const curated = JSON.parse(await readFile(new URL('../curated.json', import.meta.url)));
+const curated = JSON.parse(await readFile(new URL('../curation/curated.json', import.meta.url)));
 // The retained 0.5.5.4.2 stat_lines.json (tag handoff/locale-retained-20261101) is no longer in the
 // tree. It is exactly the Shaman Mantle publication's stat_lines.json without the four aliases, which
 // its evidence pins by SHA-256 (evidence/production-snapshots.json).

@@ -9,10 +9,10 @@ const json = value => JSON.stringify(value, null, 2) + '\n';
 
 export async function generateFiles(root, directory) {
   const { manifest, contents } = await readSnapshot(directory);
-  const overridesRaw = await readFile(path.join(root, 'overrides.json'), 'utf8');
+  const overridesRaw = await readFile(path.join(root, 'curation/overrides.json'), 'utf8');
   const overrides = JSON.parse(overridesRaw);
-  const translations = JSON.parse(await readFile(path.join(root, 'translations.json'), 'utf8'));
-  const curatedRaw = await readFile(path.join(root, 'curated.json'), 'utf8');
+  const translations = JSON.parse(await readFile(path.join(root, 'curation/translations.json'), 'utf8'));
+  const curatedRaw = await readFile(path.join(root, 'curation/curated.json'), 'utf8');
   const curated = JSON.parse(curatedRaw);
   const pairs = [];
   const pages = [];
@@ -78,15 +78,15 @@ export async function checkGenerated(root, directory) {
   return JSON.parse(files.get('coverage.json'));
 }
 
-// The root table is an editable working copy; the published snapshot retains
+// curation/translations.json is an editable working copy; the published snapshot retains
 // its exact reconciled table. Never overwrite edits detected during publication.
 export async function activateGenerated(root, directory) {
-  const tablePath = path.join(root, 'translations.json');
+  const tablePath = path.join(root, 'curation/translations.json');
   const before = await readFile(tablePath, 'utf8');
   const report = await checkGenerated(root, directory);
   const table = await readFile(path.join(directory, 'generated', 'translations.json'), 'utf8');
   if (await readFile(tablePath, 'utf8') !== before) throw new Error('Translation table changed; rebuild before activation');
-  const temporary = path.join(root, `.translations-${process.pid}.json`);
+  const temporary = path.join(root, 'curation', `.translations-${process.pid}.json`);
   try {
     await writeFile(temporary, table);
     await activateSnapshot(root, directory, report.snapshot);

@@ -55,7 +55,7 @@ function requireCatalog(value, source) {
 // Mandatory trade failures abort the candidate. Supplemental failures are receipts,
 // never permission to silently relabel old data as a fresh download.
 export async function fetchSnapshot(root, { tradeOnly = false, log = console.log } = {}) {
-  const configText = await readFile(path.join(root, 'sources.json'), 'utf8');
+  const configText = await readFile(path.join(root, 'curation/trade-sources.json'), 'utf8');
   const config = JSON.parse(configText);
   validateConfig(config);
   const started = new Date().toISOString();

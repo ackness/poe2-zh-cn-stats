@@ -183,7 +183,7 @@ test('repeated includes validate as a graph and retain all literal occurrences',
 test('fresh CLI processes replay exactly and never change current/manual inputs', async t => {
   const directory = await mkdtemp(path.join(tmpdir(), 'native-cli-'));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  const watched = ['data/CURRENT', 'translations.json', 'overrides.json', 'curated.json'];
+  const watched = ['data/CURRENT', 'curation/translations.json', 'curation/overrides.json', 'curation/curated.json'];
   const before = new Map(await Promise.all(watched.map(async name => [name, await readFile(path.join(root, name))])));
   const args = ['src/cli.mjs', 'native', '--facts', fixture, '--expected-manifest-sha256', await pin(fixture)];
   const one = execFileSync(process.execPath, args, { cwd: root });

@@ -224,9 +224,10 @@ async function snapshotFixture(t) {
     id: 'explicit.stat_1', english: '+# to maximum Life', status: 'pending',
     manual_chinese: null, manual_note: '', manual_source_url: null,
   }]) + '\n';
-  await writeFile(path.join(root, 'curated.json'), curatedRaw);
-  await writeFile(path.join(root, 'overrides.json'), '[]\n');
-  await writeFile(path.join(root, 'translations.json'), translationsRaw);
+  await mkdir(path.join(root, 'curation'));
+  await writeFile(path.join(root, 'curation/curated.json'), curatedRaw);
+  await writeFile(path.join(root, 'curation/overrides.json'), '[]\n');
+  await writeFile(path.join(root, 'curation/translations.json'), translationsRaw);
   const manifest = { schema_version: 1, id: snapshot, captured_at: '2026-01-01T00:00:00.000Z', sources: [], pages: [], errors: [] };
   for (const [key, text] of [['trade-en', '+# to maximum Life'], ['trade-cn', '+# 最大生命']]) {
     const raw = JSON.stringify({ result: [{ id: 'explicit', label: 'Explicit', entries: [{ id: 'explicit.stat_1', text }] }] });
@@ -257,15 +258,15 @@ test('snapshot generation copies and hashes curated input and activation checks 
   await writeFile(path.join(directory, 'generated', 'templates.json'), '{}\n');
   await assert.rejects(activateGenerated(root, directory), /templates.json/);
   await assert.rejects(readFile(path.join(root, 'data', 'CURRENT')), { code: 'ENOENT' });
-  assert.equal(await readFile(path.join(root, 'translations.json'), 'utf8'), translationsRaw);
+  assert.equal(await readFile(path.join(root, 'curation/translations.json'), 'utf8'), translationsRaw);
   await writeGenerated(directory, files);
   await activateGenerated(root, directory);
   assert.equal(await readFile(path.join(root, 'data', 'CURRENT'), 'utf8'), snapshot + '\n');
   const published = path.join(root, 'data', 'snapshots', snapshot);
   assert.equal(await readFile(path.join(published, 'generated', 'templates.json'), 'utf8'), files.get('templates.json'));
-  assert.equal(await readFile(path.join(root, 'translations.json'), 'utf8'), files.get('translations.json'));
+  assert.equal(await readFile(path.join(root, 'curation/translations.json'), 'utf8'), files.get('translations.json'));
   await checkGenerated(root, published);
-  await writeFile(path.join(root, 'curated.json'), curatedRaw + '\n');
+  await writeFile(path.join(root, 'curation/curated.json'), curatedRaw + '\n');
   await assert.rejects(checkGenerated(root, published), /stale or modified/);
   assert.equal(await readFile(path.join(published, 'generated', 'curated.json'), 'utf8'), curatedRaw);
 });
