@@ -18,6 +18,7 @@ import { strictJson } from '../strict-json.mjs';
 import { readZip } from './stored-zip.mjs';
 import { produceLocale } from '../pobr/locale-producer.mjs';
 import { validateProjection } from '../pobr/display-texts.mjs';
+import { OFFICIAL_REALMS, validateOfficialSpec } from '../pobr/official-lines.mjs';
 import {
   REPOSITORY, ROOT, assetName, download, encoded, fetchOrigin, loadConfig, log, originManifestPath, packageArchive, packageMembers,
   pin, producerIdentity, publicationSource, readSource, releaseUrl, require, samePin, sha256,
@@ -79,6 +80,17 @@ function validateJob(job, members, patch) {
     // src/pobr/supplement-lines.mjs: a base stat_lines.json (and optional _meta.json) as Git pins, the
     // game Release package, and curation/display-supplements.json as a Git pin.
     for (const key of ['base', 'edits', ...(job.meta ? ['meta'] : [])]) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
+    // The official layer (src/pobr/official-lines.mjs): RePoE input Release assets, newest first, each
+    // with the native descriptions member the frozen reader reads and that member's manifest pin.
+    if (job.official !== undefined) {
+      require(OFFICIAL_REALMS[job.locale] && Array.isArray(job.official) && job.official.length && job.meta,
+        `${job.id}: official lists RePoE input packages, newest first, for zh-CN with meta pinned`);
+      job.official.forEach((spec, index) => {
+        validateOfficialSpec(spec, `${job.id} official[${index}]`);
+        require(Object.keys(spec).every(key => ['repository', 'tag', 'asset', 'bytes', 'sha256', 'member', 'manifest_sha256'].includes(key)),
+          `${job.id} official[${index}]: fields are repository, tag, asset, bytes, sha256, member, manifest_sha256`);
+      });
+    }
     require(typeof job.locale === 'string' && JSON.stringify(job.members) === JSON.stringify([`i18n/${job.locale}/stat_lines.json`,
       ...(job.meta ? [`i18n/${job.locale}/_meta.json`] : [])]),
     `${job.id}: members are i18n/<locale>/stat_lines.json, then i18n/<locale>/_meta.json when meta is pinned`);
@@ -130,16 +142,19 @@ export function loadRecipe(file, repo = ROOT) {
     require(recipe.jobs.some(other => other.id === owner && other.members.includes(member)), `${job.id}: ${member} is not a member of job ${owner}`);
   }
   // package_texts must be this package's own official texts: passive_names is the publication's
-  // member, stat_lines the base of its supplement-lines job (the member itself when no job adds rows).
+  // member; stat_lines is the publication's own member (the projection ignores rows with origin) or,
+  // for a supplement-lines job without an official layer, that job's base. With an official layer the
+  // base is not the package's official text any more, so only the member itself is accepted.
   const publication = recipe.jobs.some(job => job.package_texts)
     ? strictJson(readFileSync(path.join(repo, loaded.config.source.manifest.path))) : null;
   for (const job of recipe.jobs) if (job.package_texts) {
     const lines = recipe.jobs.find(other => other.kind === 'supplement-lines' && other.locale === job.locale);
-    const expected = { passive_names: publication.files?.[`i18n/${job.locale}/passive_names.json`],
-      stat_lines: lines ? lines.base : publication.files?.[`i18n/${job.locale}/stat_lines.json`] };
-    for (const [key, want] of Object.entries(expected)) {
-      require(want && samePin(job.package_texts[key], want), `${job.id}: package_texts.${key} is not this package's ${lines && key === 'stat_lines'
-        ? `supplement-lines base (${lines.id})` : `i18n/${job.locale}/${key}.json`}`);
+    const own = publication.files?.[`i18n/${job.locale}/stat_lines.json`];
+    const expected = { passive_names: [publication.files?.[`i18n/${job.locale}/passive_names.json`]],
+      stat_lines: [own, ...(lines && !lines.official ? [lines.base] : [])] };
+    for (const [key, wants] of Object.entries(expected)) {
+      require(wants.some(want => want && samePin(job.package_texts[key], want)), `${job.id}: package_texts.${key} is not this package's `
+        + `i18n/${job.locale}/${key}.json${key === 'stat_lines' && lines && !lines.official ? ` or the supplement-lines base (${lines.id})` : ''}`);
     }
   }
   for (const job of recipe.jobs) for (const [member, layers] of Object.entries(job.composed_evidence ?? {})) {
@@ -317,7 +332,15 @@ async function supplementLinesJob(job, inputs, work) {
   const zip = await inputs.url(releaseUrl(repository, tag, asset), job.game_package, `${job.id}:game_package`);
   request.game_package = { ...materialize('game_package', asset, zip), repository, tag, asset };
   request.edits = materialize('edits', 'display-supplements.json', inputs.git(job.edits, job.edits, `${job.id}:edits`));
-  const receipt = createSupplementLines(request, path.join(work, 'out'));
+  if (job.official) {
+    request.official = [];
+    for (const [index, spec] of job.official.entries()) {
+      const raw = await inputs.url(releaseUrl(spec.repository, spec.tag, spec.asset), spec, `${job.id}:official[${index}]`);
+      request.official.push({ ...materialize(`official[${index}]`, `official-${index}-${spec.asset}`, raw),
+        repository: spec.repository, tag: spec.tag, asset: spec.asset, member: spec.member, manifest_sha256: spec.manifest_sha256 });
+    }
+  }
+  const receipt = await createSupplementLines(request, path.join(work, 'out'));
   const outputs = new Map();
   for (const member of job.members) {
     const raw = readFileSync(path.join(work, 'out', path.basename(member)));
@@ -326,7 +349,8 @@ async function supplementLinesJob(job, inputs, work) {
   }
   // Only the base members can be carried verbatim; the game package and edits never are.
   const carried = new Map([...files].filter(([key]) => key === 'base' || key === 'meta'));
-  return { outputs, inputs: carried, summary: { counts: receipt.counts, corrections: receipt.corrections.length, entries: receipt.entries.length } };
+  return { outputs, inputs: carried, summary: { counts: receipt.counts, corrections: receipt.corrections.length, entries: receipt.entries.length,
+    ...(receipt.official ? { official: receipt.official.counts } : {}) } };
 }
 
 const JOBS = { 'locale-producer': localeProducer, 'display-texts': displayTexts, 'supplement-lines': supplementLinesJob };
