@@ -1,0 +1,107 @@
+{
+  "schema": "poe2-locale-regeneration/v1",
+  "reproduces": "release/0.5.5.5-3.json",
+  "categories": {
+    "unpinned-input": "A producer exists in src/; an input it needs was never committed or published, only its hash is recorded.",
+    "unpinned-selection": "A composed layer is pinned evidence; the selection that chose its rows needs inputs that are only recorded by hash."
+  },
+  "jobs": [
+    {
+      "id": "zh-cn-dictionary",
+      "kind": "locale-producer",
+      "manifest": {
+        "revision": "9aba3687e6366597bc69a0795c63a20090cb02f5",
+        "path": "handoff/locale-generation-shaman-mantle-20261103/input-manifest.json",
+        "bytes": 7344,
+        "sha256": "cc33dc60aa6ae2689f12f00db30efd6e92fcc84deb077651d878da9ed97f04a8"
+      },
+      "producer_commit": "9aba3687e6366597bc69a0795c63a20090cb02f5",
+      "members": [
+        "i18n/zh-CN/_meta.json",
+        "i18n/zh-CN/base_items.json",
+        "i18n/zh-CN/classes.json",
+        "i18n/zh-CN/mods.json",
+        "i18n/zh-CN/passive_names.json",
+        "i18n/zh-CN/rare_words.json",
+        "i18n/zh-CN/skills.json",
+        "i18n/zh-CN/stat_lines.json",
+        "i18n/zh-CN/words.json"
+      ],
+      "passthrough": {
+        "i18n/zh-CN/_meta.json": "The retained-selected profile emits its pinned layered metadata (the historical dictionary metadata plus the native selection receipt hashes) verbatim after checking it against the regenerated counts and identity."
+      },
+      "composed_evidence": {
+        "i18n/zh-CN/stat_lines.json": [
+          {
+            "input": "evidence/native-140-pairs.json",
+            "category": "unpinned-selection",
+            "reason": "The 140 native socketable/tree/CSD-unit pairs are a pinned whole-pair delta. The selections that chose them (ordinary-facts receipts c372c89c…, 504f9593…, 7bfe2411…; native candidate 16f5253d…) were never committed or published.",
+            "exit": "RePoE publishes the ordinary-facts producer receipts of its socketables and passive-tree jobs and complete native description packages (descriptions.json with diagnostics.json and source-lock.json) with its game Release; then pobr:stat-lines selects these pairs afresh from those pins."
+          },
+          {
+            "input": "evidence/selected-literals.json",
+            "category": "unpinned-selection",
+            "reason": "Two of its six rows are the original Vivid Wisp literals; their selection receipt (f140212c…, 4799513 bytes) exists only as a hash. The four Shaman Mantle aliases are reviewed copies from curated.json at 5c25a6ac.",
+            "exit": "Same as the 140-pair delta: a published passive-tree ordinary-facts receipt and native candidate let pobr:stat-lines reselect the two literals."
+          }
+        ]
+      }
+    },
+    {
+      "id": "zh-cn-display-texts",
+      "kind": "display-texts",
+      "locale": "zh-CN",
+      "catalog": {
+        "revision": "e61f1332e22dcbd199c3265b61b4e597b7da7b37",
+        "path": "handoff/windows-fk-20261101/catalog.zip",
+        "bytes": 17177228,
+        "sha256": "f4bbbd01c5aeea8f8a19b99c7cea67f38550949d5ef8c62e1245304013d129ef"
+      },
+      "supplement": {
+        "revision": "5d019466678522e1ff3535b27951ad8056498ff8",
+        "path": "handoff/reviewed-supplements-20261101/runtime.zip",
+        "bytes": 1585,
+        "sha256": "989293a62f212f56c2f8e2b26aec6439709d55600f5cb8360d6c9ab5ccc968a8"
+      },
+      "supplement_module": {
+        "revision": "0e7778c4e7db217b79fcf33f9718315dcf223a60",
+        "path": "src/translation-workbench.mjs"
+      },
+      "projection": {
+        "scopes": [
+          "BaseItemTypes.Name",
+          "Characters.Name",
+          "Ascendancy.Name",
+          "PassiveSkills.Name"
+        ],
+        "literals": "all-catalog-conflict-participants"
+      },
+      "members": [
+        "i18n/zh-CN/display_texts.json"
+      ]
+    }
+  ],
+  "frozen": {
+    "i18n/zh-TW/base_items.json": {
+      "bytes": 375343,
+      "sha256": "67c3db66b47c39e4148eaa365eec8a0050b6eee2a84032fd579d70f5395025aa",
+      "category": "unpinned-input",
+      "reason": "pobr:names (src/pobr/name-sidecars.mjs) produced it from names.json (poe2-native-names/v1, sha256 0b2ff2e2…), which was never committed; names.json pairs RePoE's English facts (manifest 56e71e00…, pinned in repoe handoff/ordinary-uniques-20261103) with the Traditional Chinese client tables (repoe-localized-tables/v1, manifest 94dcfdc5…), which exist only as hashes in repoe sources/sources.lock.json. The pairing is recorded row by row in evidence/zh-TW-receipt.json.",
+      "exit": "RePoE publishes the Traditional Chinese localized-tables package (manifest 94dcfdc5…); then a pobr:names job replays src/native-names.mjs and src/pobr/name-sidecars.mjs with the PoBR 0.5.5.4.2 zh-TW legacy files and must reproduce these bytes."
+    },
+    "i18n/zh-TW/mods.json": {
+      "bytes": 94179,
+      "sha256": "0de2188d6d86d253ced23aa4edb6d090513c9e9831b6abeccaad2e4e4bba317d",
+      "category": "unpinned-input",
+      "reason": "The locale/0.5.5.5-2 member: release/0.5.5.5-2.json's rekey-by-english transform (src/release/package.mjs, most-common-then-first-row) of the ID-keyed i18n/zh-TW/mods.json (c0212690…) with evidence/zh-TW-receipt.json; evidence/locale-0.5.5.5-2-receipt.json is that Release's receipt and records the 178 conflict choices. release:build --check of release/0.5.5.5-2.json replays the transform on every CI run. The ID-keyed input is itself frozen in release/regenerate/0.5.5.5.json: pobr:names produced it from the uncommitted names.json (0b2ff2e2…).",
+      "exit": "As i18n/zh-TW/base_items.json, followed by the same rekey-by-english transform of the regenerated ID-keyed file."
+    },
+    "i18n/zh-TW/skills.json": {
+      "bytes": 34080,
+      "sha256": "af64e24e26657e9b5bfa11fb186e145c8ff5fbbabf7a80af6b47e681bd0d02bb",
+      "category": "unpinned-input",
+      "reason": "As i18n/zh-TW/base_items.json: produced by pobr:names from the uncommitted names.json (0b2ff2e2…).",
+      "exit": "As i18n/zh-TW/base_items.json."
+    }
+  }
+}
