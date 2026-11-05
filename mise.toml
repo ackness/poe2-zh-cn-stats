@@ -35,7 +35,8 @@ run = "node src/release/build.mjs"
 
 [tasks."release:regenerate"]
 description = "Rebuild every member of release/regenerate/<patch>.json's config from pinned producer inputs and compare it byte for byte (--recipe, --fetch, --out, --keep-work)"
-run = "node src/release/regenerate.mjs"
+# The official stat-line layer parses a ~200 MB native descriptions package per source (about 1.3 GB RSS).
+run = "node --max-old-space-size=6144 src/release/regenerate.mjs"
 
 [tasks."release:publish"]
 description = "Stage the release:build package as the locale/<patch>-<n> GitHub Release and print the plan; --yes tags, pushes and creates the Release (--config, --dry-run, --reuse)"
@@ -54,5 +55,5 @@ description = "Append selected native effect translations to PoBR's stat_lines.j
 run = "node src/pobr/stat-lines.mjs"
 
 [tasks."pobr:supplement-lines"]
-description = "Apply curation/display-supplements.json (reviewed corrections and stat-line entries, each with origin) to a pinned base stat_lines.json; --request FILE --out .cache/FRESH"
-run = "node src/pobr/supplement-lines.mjs"
+description = "Apply the optional official layer (pinned China stat descriptions), then curation/display-supplements.json (reviewed corrections and stat-line entries, each with origin) to a pinned base stat_lines.json; --request FILE --out .cache/FRESH"
+run = "node --max-old-space-size=6144 src/pobr/supplement-lines.mjs"

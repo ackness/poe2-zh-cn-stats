@@ -88,15 +88,16 @@ export function storedZip(members) {
 }
 
 // Read a classic (non-ZIP64) archive through its central directory and check
-// every member's CRC. Returns Map name -> {raw, method, mode}.
-export function readZip(archive) {
+// every member's CRC. Returns Map name -> {raw, method, mode}. With `select`, only the members whose
+// name it accepts are read (a large input package need not be inflated whole); names stay unique.
+export function readZip(archive, select = null) {
   const endAt = archive.length - 22;
   if (endAt < 0 || archive.readUInt32LE(endAt) !== 0x06054b50) {
     throw new Error('Not a comment-free ZIP archive');
   }
   const count = archive.readUInt16LE(endAt + 10);
   let at = archive.readUInt32LE(endAt + 16);
-  const members = new Map();
+  const members = new Map(), seen = new Set();
   for (let i = 0; i < count; i++) {
     if (archive.readUInt32LE(at) !== 0x02014b50) throw new Error('Corrupt ZIP central directory');
     const method = archive.readUInt16LE(at + 10);
@@ -109,11 +110,13 @@ export function readZip(archive) {
     const offset = archive.readUInt32LE(at + 42);
     const name = archive.subarray(at + 46, at + 46 + nameLength).toString('utf8');
     at += 46 + nameLength + skip;
+    if (seen.has(name)) throw new Error(`Duplicate ZIP member: ${name}`);
+    seen.add(name);
+    if (select && !select(name)) continue;
     const dataAt = offset + 30 + archive.readUInt16LE(offset + 26) + archive.readUInt16LE(offset + 28);
     const stored = archive.subarray(dataAt, dataAt + compressed);
     const raw = method === 0 ? Buffer.from(stored) : method === 8 ? inflateRawSync(stored) : null;
     if (raw === null || raw.length !== size || crc32(raw) !== crc) throw new Error(`Corrupt ZIP member: ${name}`);
-    if (members.has(name)) throw new Error(`Duplicate ZIP member: ${name}`);
     members.set(name, { raw, method, mode });
   }
   return members;
