@@ -26,9 +26,10 @@ jobs:
       # --fetch fetches each source's origin commit (Git only). --check fails unless
       # the checkout is clean, the frozen source tree equals that origin commit's
       # and the zip equals the config's expected and published pins; --check-release downloads
-      # that Release and compares it byte for byte. A declared support display is checked too:
-      # --fetch downloads its pinned inputs, --check compares a retained one with its origin tree
-      # and its declared inputs. A second build must match.
+      # that Release and compares it byte for byte, and fails unless every locale/* tag on origin is
+      # pinned by exactly one release config's `published` (the post-publish PR writes it). A
+      # declared support display is checked too: --fetch downloads its pinned inputs, --check
+      # compares a retained one with its origin tree and its declared inputs. A second build must match.
       - name: Rebuild every declared patch's language package from its pinned source
         run: |
           for config in release/*.json; do

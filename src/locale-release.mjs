@@ -454,6 +454,31 @@ export async function checkRelease(built, fetcher = download) {
   require(built.display || !listed.length, `${published.tag} SHA256SUMS lists ${listed}, but the config declares no support display`);
 }
 
+// The names of a remote's locale/* tags (`git ls-remote`, so it needs the network).
+export function remoteLocaleTags(repo, remote = 'origin') {
+  const result = git(repo, ['ls-remote', '--tags', '--refs', remote, 'refs/tags/locale/*'], { online: true });
+  require(result.status === 0, `Cannot list ${remote}'s locale/* tags: ${result.stderr}`);
+  return result.stdout.split('\n').filter(Boolean).map(line => line.split('\t')[1].replace(/^refs\/tags\//u, '')).sort();
+}
+
+// Every published locale/<patch>-<n> tag must be the `published.tag` of exactly one release config,
+// so that --check-release keeps proving its bytes; the post-publish PR writes it. Returns the failures.
+export function unpinnedTags(repo, tags) {
+  const pinnedBy = {};
+  for (const name of readdirSync(path.join(repo, 'release')).filter(file => file.endsWith('.json')).sort()) {
+    const { published } = strictJson(readFileSync(path.join(repo, 'release', name)));
+    if (published) (pinnedBy[published.tag] ??= []).push(`release/${name}`);
+  }
+  return tags.flatMap(tag => {
+    const configs = pinnedBy[tag] ?? [];
+    if (configs.length > 1) return [`${tag} is pinned by several release configs: ${configs.join(', ')}`];
+    if (configs.length) return [];
+    const [, patch, sequence] = /^locale\/(.+)-([1-9][0-9]*)$/u.exec(tag) ?? [];
+    const expected = patch ? `release/${patch}-${sequence}.json${sequence === '1' ? ` or release/${patch}.json` : ''}` : 'a release config';
+    return [`${tag} is published, but no release config pins it: write "published" into ${expected}`];
+  });
+}
+
 function displayReport(shown) {
   return [
     `support display (${shown.mode}, ${shown.locale}): ${shown.counts.entries} entries, ${shown.counts.untranslated} untranslated, `
@@ -496,7 +521,8 @@ export async function main(argv = process.argv.slice(2)) {
       + '  --check          exit 1 unless the build is clean, the source equals its origin tag tree and\n'
       + '                   the zip equals the config\'s expected and published pins (when declared); a retained\n'
       + '                   support display must equal its origin tree and regenerate from its declared inputs\n'
-      + '  --check-release  download the config\'s published Release (when declared) and compare it byte for byte');
+      + '  --check-release  download the config\'s published Release (when declared) and compare it byte for byte,\n'
+      + '                   and fail unless every locale/* tag on origin is pinned by one release config\'s published');
     return;
   }
   if (values.fetch) {
@@ -526,6 +552,10 @@ export async function main(argv = process.argv.slice(2)) {
       await checkRelease(built);
       console.log(`check-release: ${published.tag} serves the rebuilt zip byte for byte`);
     }
+    const tags = remoteLocaleTags(ROOT);
+    const unpinned = unpinnedTags(ROOT, tags);
+    require(!unpinned.length, `check-release failed:\n${unpinned.map(p => `  - ${p}`).join('\n')}`);
+    console.log(`check-release: each of origin's ${tags.length} locale/* tags is pinned by one release config's published`);
   }
 }
 

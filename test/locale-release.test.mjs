@@ -5,7 +5,9 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { strictJson } from '../src/strict-json.mjs';
 import { crc32, readZip, storedZip } from '../src/stored-zip.mjs';
-import { ROOT, build, check, checkRelease, defaultConfig, download, loadConfig, pin, releaseUrl, sha256 } from '../src/locale-release.mjs';
+import {
+  ROOT, build, check, checkRelease, defaultConfig, download, loadConfig, pin, releaseUrl, remoteLocaleTags, sha256, unpinnedTags,
+} from '../src/locale-release.mjs';
 import { SOURCE_DIR, SOURCE_FILES, TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './locale-release-fixture.mjs';
 
 const members = () => new Map([['b.json', Buffer.from('{"b":1}\n')], ['a/x.json', Buffer.from('[]')], ['manifest.json', Buffer.from('{}\n')]]);
@@ -226,6 +228,33 @@ test('the committed release configs build their pinned publications and expected
       if (!transformed.has(packaged)) assert.deepEqual(manifest.files[packaged], expected, `${name}: ${member}`);
     }
   }
+});
+
+test('check-release: every locale/* tag on origin is pinned by exactly one release config', t => {
+  const { root, repo, manifestRaw } = fixture();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const published = tag => ({ tag, asset: 'pobr-locale-9.9.zip', bytes: 1, sha256: '0'.repeat(64) });
+  const tagged = (...tags) => {
+    for (const tag of tags) gitIn(repo, 'tag', tag);
+    gitIn(repo, 'push', '-q', 'origin', ...tags.map(tag => `refs/tags/${tag}`));
+  };
+  tagged('handoff/other');
+  assert.deepEqual(remoteLocaleTags(repo), []);
+  tagged('locale/9.9-1');
+  assert.deepEqual(remoteLocaleTags(repo), ['locale/9.9-1']);
+  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), ['locale/9.9-1 is published, but no release config pins it: '
+    + 'write "published" into release/9.9-1.json or release/9.9.json']);
+  write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published: published('locale/9.9-1') })));
+  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), []);
+  // Published, but its config's post-publish PR has not landed.
+  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw)));
+  tagged('locale/9.9-2');
+  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), ['locale/9.9-2 is published, but no release config pins it: '
+    + 'write "published" into release/9.9-2.json']);
+  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { published: published('locale/9.9-2') })));
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { published: published('locale/9.9-1') })));
+  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)),
+    ['locale/9.9-1 is pinned by several release configs: release/9.9-1.json, release/9.9.json']);
 });
 
 test('config: a published tag must name the config patch', t => {
