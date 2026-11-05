@@ -8,7 +8,8 @@ import { createSupplementLines } from '../../src/pobr/supplement-lines.mjs';
 import { storedZip } from '../../src/release/stored-zip.mjs';
 import { loadRecipe, problems, recipeFiles, regenerate } from '../../src/release/regenerate.mjs';
 import { strictJson } from '../../src/strict-json.mjs';
-import { chinaPackage } from '../pobr/official-fixture.mjs';
+import { chinaPackage, tablePackage } from '../pobr/official-fixture.mjs';
+import { createDisplayTexts } from '../../src/pobr/display-texts.mjs';
 import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
 const table = (column, values) => ({ entries: values.map(([id, en, zh]) => ({ id, columns: { [column]: [{ en, zh }] } })) });
@@ -38,8 +39,20 @@ const EDITS = bytes({ schema: 'poe2-display-supplements/v1', entries: [], correc
   basis: 'official-terms', author: 'claude-opus-5-5', note: 'synthetic', evidence: ['synthetic'], status: 'reviewed', review: REVIEW }] });
 
 const CHINA = chinaPackage();
+// A zh-TW display_texts.json without a catalog: official Traditional Chinese tables of the
+// international client, decided against a game package that carries gem descriptions and minions.
+const TC = tablePackage({ realm: 'international', language: 'Traditional Chinese', localizedDir: 'display-tables/traditional-chinese/',
+  tables: { GemEffects: { Fire: ['Supports [Fire] Skills', '輔助[Fire|火焰]技能'] }, MonsterVarieties: { 'Metadata/Wolf': ['Wolf', '狼盟友'] } } });
+const TABLE_GAME_ZIP = storedZip({
+  'data/9.9/overlay/gem_descriptions.json': Buffer.from(JSON.stringify({ _meta: { schema: 'repoe-gem-descriptions/v1', game_patch: '9.9' },
+    scopes: { 'GemEffects.SupportText': { Fire: 'Supports [Fire] Skills' }, 'ActiveSkills.Description': {} } })),
+  'data/9.9/overlay/minions.json': Buffer.from(JSON.stringify({ minions: [{ id: 'W', monster_variety_id: 'Metadata/Wolf', name: 'Wolf' }] })),
+  'data/9.9/overlay/spectres.json': Buffer.from(JSON.stringify({ minions: [] })),
+});
+const TABLE_GAME = { repository: 'ackness/repoe', tag: 'game/9.9-2', asset: 'pobr-game-9.9.zip', ...pin(TABLE_GAME_ZIP) };
+const TABLE_PROJECTION = { scopes: ['GemEffects.SupportText', 'MonsterVarieties.Name'], literals: 'all-catalog-conflict-participants' };
 
-async function setup(t, { edit, supplement, official } = {}) {
+async function setup(t, { edit, supplement, official, tables } = {}) {
   const made = fixture('locale-regenerate');
   t.after(() => rmSync(made.root, { recursive: true, force: true }));
   const { repo, root } = made;
@@ -85,6 +98,19 @@ async function setup(t, { edit, supplement, official } = {}) {
       meta: git('base/_meta.json'), game_package: GAME, edits: git('curation/display-supplements.json'),
       members: ['i18n/zh-CN/stat_lines.json', 'i18n/zh-CN/_meta.json'], ...(official ? { official: [CHINA.spec] } : {}) };
   }
+  let tablesJob;
+  if (tables) {
+    const out = path.join(ROOT, '.cache', `${path.basename(root)}-tables`);
+    t.after(() => rmSync(out, { recursive: true, force: true }));
+    write(root, 'tables.zip', TC.zip);
+    write(root, 'table-game.zip', TABLE_GAME_ZIP);
+    await createDisplayTexts({ schema: 'pobr-native-display-texts-request/v1', game_patch: '9.9', realm: TARGET.realm, locale: 'zh-TW',
+      projection: TABLE_PROJECTION, game_package: { file: path.join(root, 'table-game.zip'), ...TABLE_GAME },
+      official_tables: [{ file: path.join(root, 'tables.zip'), ...TC.spec }] }, out);
+    files['i18n/zh-TW/display_texts.json'] = readFileSync(path.join(out, 'display_texts.json'));
+    tablesJob = { id: 'zh-tw-display-texts', kind: 'display-texts', locale: 'zh-TW', projection: TABLE_PROJECTION,
+      official_tables: [TC.spec], game_package: TABLE_GAME, members: ['i18n/zh-TW/display_texts.json'] };
+  }
   gitIn(repo, 'rm', '-rq', 'inputs');
   for (const [name, raw] of Object.entries(files)) write(repo, `inputs/locale-test/${name}`, raw);
   const sourceRaw = sourceManifest(files);
@@ -103,10 +129,11 @@ async function setup(t, { edit, supplement, official } = {}) {
       manifest: { revision: commit, path: 'generation/input-manifest.json', ...pin(manifestRaw) }, producer_commit: commit, members: ZH_CN }],
     frozen: { 'i18n/zh-TW/base_items.json': { ...pin(ZH_TW), category: 'unpinned-input', reason: 'no names.json', exit: 'publish it' } },
   };
+  if (tablesJob) recipe.jobs.push(tablesJob);
   if (supplementJob) {
     const replaced = supplementJob.members;
     recipe.jobs = [{ ...recipe.jobs[0], members: ZH_CN.filter(member => !replaced.includes(member)),
-      replaced_by: Object.fromEntries(replaced.map(member => [member, supplementJob.id])) }, supplementJob];
+      replaced_by: Object.fromEntries(replaced.map(member => [member, supplementJob.id])) }, supplementJob, ...recipe.jobs.slice(1)];
   }
   write(repo, 'release/regenerate/9.9.json', bytes(recipe));
   commitAll(repo, 'recipe');
@@ -115,6 +142,8 @@ async function setup(t, { edit, supplement, official } = {}) {
     served.push(address);
     if (address === releaseUrl(GAME.repository, GAME.tag, GAME.asset)) return GAME_ZIP;
     if (address === releaseUrl(CHINA.spec.repository, CHINA.spec.tag, CHINA.spec.asset)) return CHINA.zip;
+    if (address === releaseUrl(TC.spec.repository, TC.spec.tag, TC.spec.asset)) return TC.zip;
+    if (address === releaseUrl(TABLE_GAME.repository, TABLE_GAME.tag, TABLE_GAME.asset)) return TABLE_GAME_ZIP;
     const file = DICTIONARY_FILES.find(name => url(name) === address);
     assert.ok(file, `unexpected download ${address}`);
     return bytes(DICTIONARY[file]);
@@ -302,4 +331,28 @@ test('regenerate: a supplement-lines job reads its official sources from pinned 
   const { official: _, ...plainJob } = job;
   write(repo, 'release/regenerate/9.9.json', bytes({ ...recipe, jobs: [producer, plainJob, { ...display, package_texts: { stat_lines: job.base, passive_names: passive } }] }));
   assert.doesNotThrow(() => loadRecipe(path.join(repo, 'release/regenerate/9.9.json'), repo));
+});
+
+test('regenerate: a display-texts job without a catalog rebuilds zh-TW from official tables only', async t => {
+  const { repo, recipe, recipeFile, fetcher, served } = await setup(t, { tables: true });
+  const done = await regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+  assert.deepEqual(problems(done), []);
+  const { result } = done;
+  assert.equal(result.members['i18n/zh-TW/display_texts.json'].class, 'generated-identical');
+  assert.ok(served.includes(releaseUrl(TC.spec.repository, TC.spec.tag, TC.spec.asset)));
+  assert.deepEqual(result.jobs.at(-1).summary.official_tables.adopted, { 'GemEffects.SupportText': 1, 'MonsterVarieties.Name': 1 });
+  const sidecar = strictJson(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-TW/display_texts.json')));
+  assert.deepEqual(sidecar.entries, {});
+  assert.equal(sidecar.catalog_sha256, TC.spec.localized_manifest_sha256);
+  const attempt = async value => {
+    write(repo, 'release/regenerate/9.9.json', bytes(value));
+    return regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+  };
+  const jobs = recipe.jobs.slice(0, -1), job = recipe.jobs.at(-1);
+  await assert.rejects(attempt({ ...recipe, jobs: [...jobs, { ...job, official_tables: undefined }] }),
+    /without a catalog needs official_tables and takes no supplement/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [...jobs, { ...job, official_tables: [{ ...TC.spec, file: 'x' }] }] }), /fields are repository/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [...jobs, { ...job, game_package: undefined }] }), /game_package needs repository/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [...jobs, { ...job, locale: 'en', members: ['i18n/en/display_texts.json'] }] }),
+    /official_tables lists RePoE input packages, newest first, for zh-CN or zh-TW/u);
 });
