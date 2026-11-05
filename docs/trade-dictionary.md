@@ -230,7 +230,8 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 - `manual_origin`：`agent` 或 `human`，缺省 `human`。agent 行必须同时写 `manual_status` 和 `manual_author`。
 - `manual_basis`：措辞来源，`official-same-id-branch`、`official-same-text`、`official-composed`、`official-terms`、
   `official-same-stat-other-category`、`client-dictionary-same-line`、`poe1-official`、`community` 或 `own`。
-- `manual_author`：实际作者（模型 ID 或 GitHub 账号）。
+- `manual_author`：实际作者（模型 ID、GitHub 账号，或确定性生成器的标识，例如
+  `zh-supp-plan generator (deterministic)`；后者表示译文由固定规则生成，审核仍写在 `manual_review`）。
 - `manual_status`：`draft`、`reviewed` 或 `rejected`，缺省 `reviewed`。只有 `reviewed` 的译文被采用；草稿和
   已拒绝的行保留在表里，状态仍是 `pending`。已拒绝的行不再做译文格式检查。
 - `manual_review`：`null` 或 `{by, note}`；`reviewed` 与 `rejected` 必填。Opus 模型的审核可以标

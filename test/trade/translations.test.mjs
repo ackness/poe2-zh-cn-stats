@@ -143,6 +143,9 @@ test('supplement attribution is validated', () => {
   const agent = { ...manual, manual_origin: 'agent', manual_author: 'claude-haiku-4-5', manual_status: 'draft' };
   assert.throws(() => build([{ ...agent, manual_status: undefined }]), /requires manual_status and manual_author/);
   assert.throws(() => build([{ ...agent, manual_author: undefined }]), /requires manual_status and manual_author/);
+  assert.throws(() => build([{ ...agent, manual_author: ' ' }]), /manual_author must be nonempty/);
+  // The author may be a model id, a GitHub account or a deterministic generator id.
+  assert.doesNotThrow(() => build([{ ...agent, manual_author: 'zh-supp-plan generator (deterministic)' }]));
   assert.throws(() => build([{ ...agent, manual_origin: 'official' }]), /agent or human/);
   assert.throws(() => build([{ ...agent, manual_status: 'approved' }]), /draft, reviewed or rejected/);
   assert.throws(() => build([{ ...agent, manual_status: 'reviewed' }]), /requires manual_review/);
