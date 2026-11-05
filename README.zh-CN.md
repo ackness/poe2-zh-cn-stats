@@ -69,16 +69,17 @@ mise run report                # 查看覆盖报告
 
 | 要改的内容 | 编辑位置 |
 | --- | --- |
-| 已有交易 ID＋英文分支缺译 | [`curation/translations.json`](curation/translations.json) 的 `manual_chinese`、`manual_note`、`manual_source_url` |
+| 已有交易 ID＋英文分支缺译 | [`curation/translations.json`](curation/translations.json) 的 `manual_chinese`、`manual_note`、`manual_source_url`（agent 补译另写可选的 `manual_origin`、`manual_status`、`manual_review`） |
 | 明确覆盖既有交易译文 | [`curation/overrides.json`](curation/overrides.json)，附理由与来源 |
 | 非交易模板、多参数模板、稀有名组成词 | [`curation/curated.json`](curation/curated.json) |
 | 原生名称／描述补译 | [`curation/native-translations.json`](curation/native-translations.json)，按[工作表流程](docs/translation-workbench.md)审核 |
+| 交易目录以外的词条模板、召唤生物／幽魂名称、已发布 `stat_lines.json` 行的修正 | [`curation/display-supplements.json`](curation/display-supplements.json)；每条都写 `origin`（`agent` 或 `human`），一直带到 PoBR（[显示补译与来源标记](docs/translation-workbench.md#显示补译与来源标记)） |
 | 补充采集页面 | [`curation/trade-sources.json`](curation/trade-sources.json) |
 
 ## 目录
 
 ```text
-curation/                     人工维护的输入（交易补译、模板、修正、原生补译、采集页面）
+curation/                     人工维护的输入（交易补译、模板、修正、原生补译、显示补译、采集页面）
 data/CURRENT                  当前交易快照的目录名
 data/snapshots/<id>/          原始交易响应与页面证据（raw/）、词典与报告（generated/）
 reports/                      已提交的可读待办快照，由 workbench 命令生成，不是输入

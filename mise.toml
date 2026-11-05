@@ -52,3 +52,7 @@ run = "node src/pobr/name-sidecars.mjs"
 [tasks."pobr:stat-lines"]
 description = "Append selected native effect translations to PoBR's stat_lines.json; pinned --selection/--native/--legacy, --out .cache/FRESH"
 run = "node src/pobr/stat-lines.mjs"
+
+[tasks."pobr:supplement-lines"]
+description = "Apply curation/display-supplements.json (reviewed corrections and stat-line entries, each with origin) to a pinned base stat_lines.json; --request FILE --out .cache/FRESH"
+run = "node src/pobr/supplement-lines.mjs"
