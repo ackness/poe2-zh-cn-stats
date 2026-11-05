@@ -61,21 +61,32 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   SHA-256）, names: {<变种 ID>: {english, zh_cn}}}`（文本字段是 locale 小写、`-` 换成 `_`）。文件的 locale 必须等于
   请求的 locale，声明了 `game_patch` 时必须相同，客户端身份必须有 SHA-256。来源必须对得上 locale：
   zh-CN 只接受国服客户端，即客户端索引 SHA-256 等于 catalog manifest 的 `observed_client.index_sha256`，
-  或文件声明 `realm: "china"`；国际服客户端的简体表不是官方 zh-CN，直接报错。zh-TW 必须声明
-  `realm: "international"`。receipt 的 `names.official.provenance` 记录 `accepted_by`
-  （`catalog-client-index`、`declared-realm-china` 或 `declared-realm-international`）、`declared_realm`、
-  `realm_basis`（只凭声明时为 `declared`，例如 RePoE lock 对简体文件的 `declared_not_verified`）以及
-  `same_client_as_catalog`。
+  或文件声明 `realm: "china"`；国际服客户端的简体表不是官方 zh-CN，直接报错，声明了其他 realm 的 zh-CN
+  文件即使索引相同也报错。客户端身份可以在 `index_identity` 顶层，也可以是本地读取的索引
+  `index_identity.index.sha256`。zh-TW 必须声明 `realm: "international"`。receipt 的
+  `names.official.provenance` 记录 `accepted_by`（`catalog-client-index`、`declared-realm-china` 或
+  `declared-realm-international`）、`declared_realm`、`realm_basis`（索引与 catalog 相同时为
+  `catalog-client-index`，只凭声明时为 `declared`）、`same_client_as_catalog`，文件列出
+  `declared_not_verified`（例如 RePoE lock 对国服文件的 `game_patch`、`realm`）时一并记录。
 - `game_package: {file, repository, tag, asset, bytes, sha256}`：给出 `names` 或 `official_names` 时必填，
-  RePoE 游戏 Release 资产 `pobr-game-<patch>.zip`。读其中 `data/<patch>/overlay/minions.json`
+  RePoE 游戏 Release 资产 `pobr-game-<patch>.zip`（文件名必须是这个）。读其中 `data/<patch>/overlay/minions.json`
   （`monster_variety_id` → `name`）和 `spectres.json`（`id` → `name`），作为每个变种 ID 的**目标英文**；
   同一 ID 出现两个不同英文时视为不确定。
+- `package_texts: {stat_lines, passive_names}`（各为 `{file, bytes, sha256}`）：同一语言包里的官方文本，
+  `stat_lines` 用作底的 `stat_lines.json`（只取不带 `origin` 的行），`passive_names` 用 `passive_names.json`。
+  给出 `names` 时必填；catalog 查询返回我们的补译（reviewed supplement）时也必填。**补译不得遮住官方文本**：
+  某英文在 `package_texts`、catalog 的官方值或已采用的官方怪物名里已有官方译文时，这条补译不出货，
+  catalog 行回到未翻译（`null`，decision 记 `skipped: "official-elsewhere"`），怪物名记 `official-elsewhere`
+  （`official`、`source`）。receipt 的 `official_elsewhere` 记录跳过条数 `skipped` 和每一行 `rows`
+  （`kind`、`identity`、`english`、`origin`、我们的 `text`、`official`、`source`）。例：-3 的 `display_texts.json`
+  里 `Bulwark` 为 `null`，而 `stat_lines.json` 有官方 `壁垒`，补译不能填它。
 
   怪物名逐 ID 按目标英文决定：
   - catalog 自身有该 ID 的行时 catalog 优先（官方名记 `catalog-row`，补译记 `superseded`，`by: "catalog"`）。
+  - 补译所针对的英文与目标英文不同时记 `retired`（即使该 ID 有官方名出货）。
   - 官方名的英文等于目标英文、且非空、不同于英文：写入 `[english, 官方名]`，不写 `origins`；
-    我们对该 ID 的补译记 `superseded`（`by: "official-names"`、官方文本、`supplement_differs`），
-    补译所针对的英文与目标英文不同时则记 `retired`。
+    我们对该 ID 的补译记 `superseded`（`by: "official-names"`、官方文本、`supplement_differs`）。
+  - 同一英文已有官方译文（见上面 `package_texts`，含其他 ID 已采用的官方名）：`official-elsewhere`，不出货。
   - 官方名的英文与目标英文不同：不采用，记入 `names.official.not_applied["english-differs"]`
     （`official_english`、`target_english`）；该 ID 不在游戏包里只计数（`not-in-game`），目标不确定记
     `ambiguous-target`，空或与英文相同记 `untranslated`。
@@ -84,7 +95,8 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
     记录仍保留在 curation。
   - 补译的 `based_on.game_package.sha256` 与固定的游戏包不同时标 `needs_review`。
 
-  receipt 的 `names.counts` 为 `{official, supplemented, superseded, retired}`（按 ID 计），并记录游戏包 SHA-256。
+  receipt 的 `names.counts` 为 `{official, supplemented, superseded, retired, official-elsewhere}`（按 ID 计），
+  并记录游戏包 SHA-256。`not_applied["not-in-game"]` 是计数，其余键是 ID 列表。
   两个输入都不给时行为不变，也不需要游戏包。
 
 输出有两种视图：
@@ -175,7 +187,7 @@ mise run pobr:supplement-lines -- --request /absolute/request.json --out .cache/
 | 字段 | 含义 |
 | --- | --- |
 | `target` | `{game: "poe2", game_patch, realm, locale}` |
-| `base` | `{file, bytes, sha256}`：作为底的 `stat_lines.json`，例如上一份已发布语言包的成员 |
+| `base` | `{file, bytes, sha256}`：作为底的 `stat_lines.json`，例如上一份已发布语言包的成员；行必须正好是 `{src, en}`（本生产者的输出带 `origin`，不能再当底：`edits` 是累积的，应对它的底重新应用） |
 | `meta` | 可选 `{file, bytes, sha256}`：作为底的 `_meta.json`；给出时也写 `_meta.json` |
 | `game_package` | `{file, repository, tag, asset, bytes, sha256}`：RePoE 游戏 Release 资产 `pobr-game-<patch>.zip`，读其中的 `data/<patch>/overlay/stat_descriptions.json` |
 | `edits` | `{file, bytes, sha256}`：[`curation/display-supplements.json`](../curation/display-supplements.json) |

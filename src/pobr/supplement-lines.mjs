@@ -41,8 +41,10 @@ function count(map, ...parts) {
  */
 export function supplementLines(base, supplements, templates, target, game) {
   validateSupplements(supplements);
-  require(Array.isArray(base) && base.every(row => object(row) && typeof row.src === 'string' && typeof row.en === 'string'),
-    'base stat_lines.json must be an array of {src, en}');
+  // A base is a layer without our marks: an output of this producer is never a base (its edits are
+  // cumulative, so apply them to that output's own base instead).
+  require(Array.isArray(base) && base.every(row => object(row) && typeof row.src === 'string' && typeof row.en === 'string'
+    && Object.keys(row).length === 2), 'base stat_lines.json must be an array of {src, en} without origin');
   const rows = new Map(base.map(row => [pairKey(row), row]));
   require(rows.size === base.length, 'base stat_lines.json repeats a pair');
   const corrections = [], entries = [], counts = {};
