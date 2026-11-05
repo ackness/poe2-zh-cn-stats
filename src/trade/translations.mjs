@@ -19,6 +19,7 @@ function attribution(row) {
     if (!MANUAL_BASES.includes(row.manual_basis)) throw new Error(`Unknown manual_basis: ${row.id}`);
     fields.manual_basis = row.manual_basis;
   }
+  // A model id, a GitHub account, or a deterministic generator id; only its presence is checked.
   if (row.manual_author !== undefined) {
     if (!nonempty(row.manual_author)) throw new Error(`manual_author must be nonempty text: ${row.id}`);
     fields.manual_author = row.manual_author;
