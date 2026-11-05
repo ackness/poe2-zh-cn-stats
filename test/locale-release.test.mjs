@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { strictJson } from '../src/strict-json.mjs';
 import { crc32, readZip, storedZip } from '../src/stored-zip.mjs';
@@ -204,19 +204,27 @@ test('check: a source moved after its origin commit keeps its tree and package b
   assert.throws(() => build({ repo }), /Unsafe path/u);
 });
 
-test('the committed release config builds its pinned publication unchanged', t => {
+test('the committed release configs build their pinned publications and expected packages', t => {
   const parent = mkdtempSync(path.join(ROOT, '.cache', 'locale-release-real-'));
   t.after(() => rmSync(parent, { recursive: true, force: true }));
-  const out = path.join(parent, 'build');
-  const configFile = defaultConfig(ROOT);
-  const { config: declared } = loadConfig(configFile);
-  const built = build({ config: configFile, out });
-  const source = strictJson(readFileSync(path.join(ROOT, declared.source.manifest.path)));
-  const i18n = Object.entries(source.files).filter(([name]) => name.startsWith('i18n/'));
-  const manifest = strictJson(readZip(built.zip).get('manifest.json').raw);
-  assert.deepEqual(manifest.files, Object.fromEntries(i18n.map(([n, p]) => [`data/${declared.target.game_patch}/${n}`, p])
-    .sort(([a], [b]) => (a < b ? -1 : 1))));
-  assert.equal(Object.keys(built.receipt.source.files).length, Object.keys(source.files).length);
+  const files = readdirSync(path.join(ROOT, 'release')).filter(name => name.endsWith('.json'));
+  assert.ok(files.includes(path.basename(defaultConfig(ROOT))));
+  for (const name of files) {
+    const configFile = path.join(ROOT, 'release', name);
+    const loaded = loadConfig(configFile), { config: declared } = loaded;
+    const built = build({ config: configFile, out: path.join(parent, name) });
+    const { published, expect } = declared;
+    for (const wanted of [published, expect?.package].filter(Boolean)) assert.deepEqual(pin(built.zip), { bytes: wanted.bytes, sha256: wanted.sha256 }, name);
+    const sourceConfig = (loaded.base ?? loaded).config;
+    const source = strictJson(readFileSync(path.join(ROOT, sourceConfig.source.manifest.path)));
+    const i18n = Object.entries(source.files).filter(([member]) => member.startsWith('i18n/'));
+    const manifest = strictJson(readZip(built.zip).get('manifest.json').raw);
+    const transformed = new Set((declared.transforms ?? []).map(transform => `data/${declared.target.game_patch}/${transform.member}`));
+    for (const [member, expected] of i18n) {
+      const packaged = `data/${declared.target.game_patch}/${member}`;
+      if (!transformed.has(packaged)) assert.deepEqual(manifest.files[packaged], expected, `${name}: ${member}`);
+    }
+  }
 });
 
 test('config: a published tag must name the config patch', t => {

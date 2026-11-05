@@ -5,7 +5,8 @@ PoBR 的语言包是本仓库的 GitHub Release `locale/<patch>-<n>`，附件为
 [PoBR 数据架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md)。
 
 ```sh
-mise run release:build -- --check       # 打包最高 patch 的 release/<patch>.json，核对可重现
+mise run release:build -- --check       # 打包默认配置（最高 patch、最大 -<n>），核对可重现
+mise run release:regenerate -- --fetch  # 从固定输入重新生成已发布包的成员，逐字节比较
 mise run release:publish                # dry run：构建、暂存附件、打印将执行的命令
 mise run release:publish -- --yes       # 打 tag、推送、创建 Release
 # 在 PoBR 中：
@@ -120,6 +121,30 @@ mise run release:regenerate -- --fetch   # 每个 release/regenerate/<patch>.jso
 3. 经 PR 合并到 `main`，再让配置指向它：同一 patch 就改 `release/<patch>.json` 的
    `source` 并去掉 `published`（每个 patch 只有一个配置，发布得到下一个 `<n>`），
    新 patch 见下节。
+
+## 下一个语言包：`release/0.5.5.5-2.json`
+
+v2 配置，基础包是 `release/0.5.5.5.json`，字节有变化，带 `hold`，暂不发布：
+
+- 每张表固定一种键，与 PoBR 的查法一致：`base_items`、`skills` 用稳定 ID；`mods`、
+  `passive_names`、`words`、`rare_words`、`classes` 用英文。已发布包里繁中 `mods.json`
+  以 mod ID 为键（6384 条），PoBR 按英文词缀名查，所以繁中词缀从来查不到。
+  `zh-tw-mods-by-english` 按 `evidence/zh-TW-receipt.json` 的配对记录改成英文键：
+  2557 个英文名，其中 178 个在客户端里有不止一种译法（如 `of the Volcano` 的
+  `火山之`／`之火山`），按出现次数取一个，全部写进回执。改后覆盖简中 `mods.json` 2536 个键中的 2531 个。
+- 新增繁中 `_meta.json`：`{"fallback": ["zh-CN"]}`，把 PoBR Web 里写死的繁→简回退改由语言包声明。
+- 表内没有 `zh_cn`／`zh_tw` 之类的字段名（只有 `display_texts.json` 的 `locale` 值）；
+  `name_zh_cn`／`name_zh_tw` 是 PoBR Web 读表后自己拼的字段，要在 PoBR 里改。
+- 包：6926306 字节，SHA-256 `2166398c…`（`expect.package`）；14 个成员，其余 12 个与
+  `locale/0.5.5.5-1` 逐字节相同。
+
+**为什么 hold**：PoBR `pipeline/runtime/build_data.py` 要求数据包里 `data/<patch>/i18n/*`
+的清单和哈希等于**游戏包**（RePoE）快照清单 `data/<patch>/manifest.json` 里列的那份，
+`game/0.5.5.5-1` 固定的是已发布的 13 个哈希。语言包因此不能单独改任何字节、也不能加成员
+（`index.json`、`_meta.json` 都会被拒）。要发布这个包，需要 PoBR 改为从语言包的
+`manifest.json` 取 `i18n/` 的清单和 pin（快照清单只核对非 `i18n/` 部分，`languages` 由
+语言包得出），或者 RePoE 先发一个重新 pin 这些成员的游戏包。语言索引因此先放在回执的
+`package.index`。
 
 ## 新补丁
 

@@ -1,0 +1,38 @@
+{
+  "schema": "poe2-locale-release-config/v2",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "hold": "PoBR checks every data/0.5.5.5/i18n/* member against the game package's snapshot manifest, and RePoE game/0.5.5.5-1 pins the 13 published locale/0.5.5.5-1 hashes (no zh-TW/_meta.json). Publish after PoBR takes the i18n inventory and pins from the language part, or after a RePoE game package re-pins these members.",
+  "base": {
+    "config": "release/0.5.5.5.json"
+  },
+  "transforms": [
+    {
+      "id": "zh-tw-mods-by-english",
+      "kind": "rekey-by-english",
+      "member": "i18n/zh-TW/mods.json",
+      "records": "evidence/zh-TW-receipt.json",
+      "table": "mods.json",
+      "conflicts": "most-common-then-first-row"
+    },
+    {
+      "id": "zh-tw-meta",
+      "kind": "json",
+      "member": "i18n/zh-TW/_meta.json",
+      "value": {
+        "fallback": [
+          "zh-CN"
+        ]
+      }
+    }
+  ],
+  "expect": {
+    "package": {
+      "bytes": 6926306,
+      "sha256": "2166398cff4b44622281265ed8e3bf0c583055872f80cc570c3d421530b74056"
+    }
+  }
+}

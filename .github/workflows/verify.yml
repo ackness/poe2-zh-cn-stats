@@ -25,16 +25,16 @@ jobs:
           version: '2026.10.23'
       # --fetch fetches each source's origin commit (Git only). --check fails unless
       # the checkout is clean, the frozen source tree equals that origin commit's
-      # and the zip equals the config's published pin; --check-release downloads
+      # and the zip equals the config's expected and published pins; --check-release downloads
       # that Release and compares it byte for byte. A second build must match.
       - name: Rebuild every declared patch's language package from its pinned source
         run: |
           for config in release/*.json; do
-            patch=$(basename "$config" .json)
-            first=".cache/release/ci-$patch-1" second=".cache/release/ci-$patch-2"
+            name=$(basename "$config" .json)
+            first=".cache/release/ci-$name-a" second=".cache/release/ci-$name-b"
             mise run release:build -- --config "$config" --out "$first" --fetch --check --check-release
             mise run release:build -- --config "$config" --out "$second"
-            cmp "$first/pobr-locale-$patch.zip" "$second/pobr-locale-$patch.zip"
+            cmp "$first"/pobr-locale-*.zip "$second"/pobr-locale-*.zip
             cmp "$first/receipt.json" "$second/receipt.json"
           done
       - uses: actions/upload-artifact@v4.6.2
@@ -42,9 +42,9 @@ jobs:
         with:
           name: locale-release-receipt
           path: |
-            .cache/release/ci-*-1/receipt.json
-            .cache/release/ci-*-1/manifest.json
-            .cache/release/ci-*-1/SHA256SUMS
+            .cache/release/ci-*-a/receipt.json
+            .cache/release/ci-*-a/manifest.json
+            .cache/release/ci-*-a/SHA256SUMS
           if-no-files-found: ignore
   regenerate:
     name: release:regenerate rebuilds the published members from pinned inputs
