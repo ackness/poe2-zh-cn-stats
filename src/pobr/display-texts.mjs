@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { NAME_SCOPE, validateSupplements } from './display-supplements.mjs';
+import { NAME_SCOPE, validateOfficialNames, validateSupplements } from './display-supplements.mjs';
 
 const requireValue = (value, message) => { if (!value) throw new Error(message); };
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -49,9 +49,11 @@ const strip = text => text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu,
 // the plain catalog lookup returns none, which is official.
 const originOf = result => result.status === 'translated' ? result.origin ?? 'official' : null;
 
-// names: an optional validated poe2-display-supplements/v1 document; its reviewed monster-name
-// entries fill the MonsterVarieties.Name scope for ids the catalog does not have.
-export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection(), names = null) {
+// Names with no catalog table (MonsterVarieties.Name), both optional:
+// - official: a RePoE-decoded official names file (validateOfficialNames) of the same client;
+// - names: a poe2-display-supplements/v1 document whose reviewed monster-name entries are ours.
+// Precedence per variety id: catalog row, then official name, then our reviewed entry.
+export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection(), { names = null, official = null } = {}) {
   validateProjection(projection);
   const runtimeScopes = new Set(projection.scopes);
   const scopes = new Map(), identities = new Set(), literalRows = new Map(), decisions = [];
@@ -119,7 +121,8 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     const origins = new Set(rows.map(row => row.origin));
     if (text !== null && !origins.has('official')) originEntries.set(english, origins.has('agent') ? 'agent' : 'human');
   }
-  const nameDecisions = names ? projectNames(names, catalog, runtimeScopes, identities, scopes, markScope) : null;
+  const nameDecisions = names || official
+    ? projectNames({ names, official }, catalog, runtimeScopes, identities, scopes, markScope) : null;
   const sidecar = { schema: 'pobr-native-display-texts/v1', game_patch: catalog.game_patch,
     realm: catalog.realm, locale: catalog.locale, catalog_sha256: catalogSha256,
     entries: sorted(entries), scopes: sorted([...scopes].map(([key, rows]) => [key, sorted(rows)])) };
@@ -130,31 +133,68 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
   return { sidecar, decisions, conflicts, ...(nameDecisions ? { names: nameDecisions } : {}) };
 }
 
-// Reviewed monster-name entries for this catalog's realm and locale. A catalog row with the same
-// MonsterVarieties id always wins (official decode); the entry is kept in curation, not shipped.
-function projectNames(names, catalog, runtimeScopes, identities, scopes, markScope) {
-  validateSupplements(names);
-  const decisions = [], named = new Set();
-  for (const entry of names.entries) {
+// MonsterVarieties.Name rows from the official names file and our reviewed monster-name entries.
+// A catalog row with the same id always wins. An official name applies when it is nonempty and
+// differs from its English, and that English equals the English our entries target for the id
+// (otherwise the official text belongs to other English and is not applied, as in other scopes).
+// Our entry ships only for ids with no applicable official name; it is otherwise kept as superseded.
+function projectNames({ names, official }, catalog, runtimeScopes, identities, scopes, markScope) {
+  if (names) validateSupplements(names);
+  const officialNames = official ? validateOfficialNames(official, catalog) : null;
+  const ours = new Map(), entries = [];
+  for (const entry of names?.entries ?? []) {
     const { identity } = entry;
     if (identity.kind !== 'monster-name') continue;
-    const decision = { entry_id: entry.entry_id, english: identity.english, ids: entry.ids, origin: entry.origin };
-    decisions.push(decision);
+    const decision = { entry_id: entry.entry_id, english: identity.english, origin: entry.origin };
+    entries.push(decision);
     if (identity.realm !== catalog.realm || identity.locale !== catalog.locale) { decision.lifecycle = 'other-target'; continue; }
     if (entry.status !== 'reviewed') { decision.lifecycle = entry.status; continue; }
-    requireValue(runtimeScopes.has(NAME_SCOPE), `Reviewed monster names need ${NAME_SCOPE} in projection.scopes`);
     decision.ids = entry.ids.map(id => {
-      if (identities.has(JSON.stringify([NAME_SCOPE, id]))) return { id, lifecycle: 'official' };
-      requireValue(!named.has(id), `Two reviewed monster names for ${id}`);
-      named.add(id);
-      if (!scopes.has(NAME_SCOPE)) scopes.set(NAME_SCOPE, new Map());
-      scopes.get(NAME_SCOPE).set(id, [identity.english, entry.text]);
-      markScope(NAME_SCOPE, id, entry.origin);
-      return { id, lifecycle: 'supplemented' };
+      requireValue(!ours.has(id), `Two reviewed monster names for ${id}`);
+      ours.set(id, { entry, decision });
+      return { id };
     });
-    decision.lifecycle = decision.ids.every(row => row.lifecycle === 'official') ? 'official' : 'supplemented';
   }
-  return decisions;
+  if (officialNames || ours.size) requireValue(runtimeScopes.has(NAME_SCOPE), `Monster names need ${NAME_SCOPE} in projection.scopes`);
+  const row = (id, english, text) => {
+    if (!scopes.has(NAME_SCOPE)) scopes.set(NAME_SCOPE, new Map());
+    scopes.get(NAME_SCOPE).set(id, [english, text]);
+  };
+  const counts = { official: 0, supplemented: 0, superseded: 0 };
+  const officialDecisions = { 'english-differs': [], untranslated: [], 'catalog-row': [] };
+  const shipped = new Set();
+  for (const [id, { english, text }] of officialNames?.names ?? []) {
+    if (identities.has(JSON.stringify([NAME_SCOPE, id]))) { officialDecisions['catalog-row'].push(id); continue; }
+    if (!text || !text.trim() || text === english) { officialDecisions.untranslated.push(id); continue; }
+    const target = ours.get(id)?.entry.identity.english;
+    if (target !== undefined && target !== english) {
+      officialDecisions['english-differs'].push({ id, official_english: english, target_english: target });
+      continue;
+    }
+    row(id, english, text);
+    shipped.add(id);
+    counts.official++;
+  }
+  for (const [id, { entry, decision }] of ours) {
+    const item = decision.ids.find(row => row.id === id);
+    if (identities.has(JSON.stringify([NAME_SCOPE, id]))) Object.assign(item, { lifecycle: 'superseded', by: 'catalog' });
+    else if (shipped.has(id)) Object.assign(item, { lifecycle: 'superseded', by: 'official-names',
+      official: scopes.get(NAME_SCOPE).get(id)[1], supplement_differs: scopes.get(NAME_SCOPE).get(id)[1] !== entry.text });
+    else {
+      row(id, entry.identity.english, entry.text);
+      markScope(NAME_SCOPE, id, entry.origin);
+      item.lifecycle = 'supplemented';
+    }
+    counts[item.lifecycle]++;
+  }
+  for (const decision of entries) if (decision.ids) {
+    const states = new Set(decision.ids.map(row => row.lifecycle));
+    decision.lifecycle = states.has('supplemented') ? 'supplemented' : 'superseded';
+  }
+  return { counts, entries,
+    official: officialNames ? { format: officialNames.format, locale: officialNames.locale, game_patch: officialNames.game_patch,
+      realm: officialNames.realm, client: officialNames.client, names: officialNames.names.size,
+      not_applied: officialDecisions } : null };
 }
 
 function readPinned(file, pin, reads) {
@@ -270,14 +310,22 @@ export async function createDisplayTexts(request, out) {
     projectionSource = { source: 'file', file: PROJECTION_FILE, bytes: raw.length, sha256: digest(raw) };
   }
   validateProjection(projection);
-  // Optional pinned curation/display-supplements.json for names with no catalog table.
-  let names = null;
-  if (request.names !== undefined) {
-    requireValue(request.names && typeof request.names.file === 'string' && Number.isSafeInteger(request.names.bytes),
-      'Invalid names pin: {file, bytes, sha256}');
-    names = strictJson(readPinned(request.names.file, request.names, reads));
+  // Optional pinned names with no catalog table: our curation/display-supplements.json (`names`)
+  // and a RePoE-decoded official MonsterVarieties.Name file (`official_names`).
+  const pinnedJson = key => {
+    if (request[key] === undefined) return null;
+    requireValue(request[key] && typeof request[key].file === 'string' && Number.isSafeInteger(request[key].bytes),
+      `Invalid ${key} pin: {file, bytes, sha256}`);
+    return strictJson(readPinned(request[key].file, request[key], reads));
+  };
+  const names = pinnedJson('names'), official = pinnedJson('official_names');
+  const projected = projectDisplayTexts(catalog, lookup, manifest.files['catalog.json'].sha256, projection, { names, official });
+  // Recorded, not enforced: whether the official names come from the client the catalog observed.
+  if (projected.names?.official) {
+    const index = manifest.observed_client?.index_sha256 ?? null;
+    Object.assign(projected.names.official, { catalog_client_index_sha256: index,
+      same_client_as_catalog: index !== null && Object.values(projected.names.official.client).includes(index) });
   }
-  const projected = projectDisplayTexts(catalog, lookup, manifest.files['catalog.json'].sha256, projection, names);
   for (const [file, pin] of [...reads]) readPinned(file, pin, reads);
   const output = path.resolve(out), cache = path.join(REPO_ROOT, '.cache');
   requireValue(output.startsWith(cache + path.sep) && !fs.existsSync(output), 'Output must be a fresh repository cache candidate');

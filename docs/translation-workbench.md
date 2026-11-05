@@ -236,7 +236,7 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 
 | 事件 | stat-line（`pobr:supplement-lines`） | monster-name（`pobr:display-texts` 的 `names`） | 修正 |
 | --- | --- | --- | --- |
-| 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 有同一 ID：catalog 优先，记 `official` | 底已是 `to`：`already-in-base` |
+| 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 或 RePoE 官方名文件（`official_names`）有同一 ID：官方优先，补译记 `superseded` | 底已是 `to`：`already-in-base` |
 | 官方文本再次消失 | 补译重新出货 | 补译重新出货 | 再次应用 |
 | 英文或上下文变化 | `retired`；新英文是新 `entry_id` | 新 identity；旧记录 `retired` | 英文还在但译文变了：`superseded`（底优先） |
 | 游戏移除该英文 | `retired` | — | `retired` |
