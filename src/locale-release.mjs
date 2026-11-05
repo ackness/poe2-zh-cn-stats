@@ -172,9 +172,10 @@ export function loadConfig(file, repo = ROOT) {
 // --- Git -----------------------------------------------------------------------------------------
 
 // Offline calls must not lazily fetch missing objects of a partial clone.
-export function git(repo, args, { online = false } = {}) {
-  const env = online ? process.env : { ...process.env, GIT_NO_LAZY_FETCH: '1' };
-  const result = spawnSync('git', ['--no-replace-objects', '-C', repo, ...args], { env, maxBuffer: 1 << 26 });
+// Online calls never wait on a credential prompt.
+export function git(repo, args, { online = false, timeout } = {}) {
+  const env = online ? { ...process.env, GIT_TERMINAL_PROMPT: '0' } : { ...process.env, GIT_NO_LAZY_FETCH: '1' };
+  const result = spawnSync('git', ['--no-replace-objects', '-C', repo, ...args], { env, maxBuffer: 1 << 26, timeout });
   if (result.error) throw result.error;
   return { status: result.status, stdout: result.stdout.toString(), stderr: result.stderr.toString().trim() };
 }
@@ -456,27 +457,36 @@ export async function checkRelease(built, fetcher = download) {
 
 // The names of a remote's locale/* tags (`git ls-remote`, so it needs the network).
 export function remoteLocaleTags(repo, remote = 'origin') {
-  const result = git(repo, ['ls-remote', '--tags', '--refs', remote, 'refs/tags/locale/*'], { online: true });
+  let result;
+  try {
+    result = git(repo, ['ls-remote', '--tags', '--refs', remote, 'refs/tags/locale/*'], { online: true, timeout: 60_000 });
+  } catch (error) {
+    throw new Error(`Cannot list ${remote}'s locale/* tags: ${error.message}`);
+  }
   require(result.status === 0, `Cannot list ${remote}'s locale/* tags: ${result.stderr}`);
   return result.stdout.split('\n').filter(Boolean).map(line => line.split('\t')[1].replace(/^refs\/tags\//u, '')).sort();
 }
 
 // Every published locale/<patch>-<n> tag must be the `published.tag` of exactly one release config,
-// so that --check-release keeps proving its bytes; the post-publish PR writes it. Returns the failures.
+// so that --check-release keeps proving its bytes; the post-publish PR writes it. Every pinned tag must
+// also be on the remote, so a tagless mirror or stale fork cannot pass by listing nothing. Returns the failures.
 export function unpinnedTags(repo, tags) {
   const pinnedBy = {};
   for (const name of readdirSync(path.join(repo, 'release')).filter(file => file.endsWith('.json')).sort()) {
     const { published } = strictJson(readFileSync(path.join(repo, 'release', name)));
     if (published) (pinnedBy[published.tag] ??= []).push(`release/${name}`);
   }
-  return tags.flatMap(tag => {
+  const missing = Object.keys(pinnedBy).sort().filter(tag => !tags.includes(tag))
+    .map(tag => `${tag} is pinned by ${pinnedBy[tag].join(', ')}, but the remote has no such tag`);
+  return missing.concat(tags.flatMap(tag => {
     const configs = pinnedBy[tag] ?? [];
     if (configs.length > 1) return [`${tag} is pinned by several release configs: ${configs.join(', ')}`];
     if (configs.length) return [];
     const [, patch, sequence] = /^locale\/(.+)-([1-9][0-9]*)$/u.exec(tag) ?? [];
     const expected = patch ? `release/${patch}-${sequence}.json${sequence === '1' ? ` or release/${patch}.json` : ''}` : 'a release config';
-    return [`${tag} is published, but no release config pins it: write "published" into ${expected}`];
-  });
+    return [`${tag} is published, but no release config pins it: write "published" into ${expected} `
+      + '(or delete the tag if its publish stopped before creating the Release)'];
+  }));
 }
 
 function displayReport(shown) {
@@ -555,7 +565,7 @@ export async function main(argv = process.argv.slice(2)) {
     const tags = remoteLocaleTags(ROOT);
     const unpinned = unpinnedTags(ROOT, tags);
     require(!unpinned.length, `check-release failed:\n${unpinned.map(p => `  - ${p}`).join('\n')}`);
-    console.log(`check-release: each of origin's ${tags.length} locale/* tags is pinned by one release config's published`);
+    console.log(`check-release: each of origin's ${tags.length} locale/* tags is pinned by one release config's published, and every pin is on origin`);
   }
 }
 
