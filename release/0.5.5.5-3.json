@@ -51,5 +51,11 @@
       "sha256": "3edc9b1eb3e813781ef63dcc7db5be29cfd6a15ef29b92773eaa7fb45082df4d",
       "member": "data/0.5.5.5/overlay/trade_catalog.json"
     }
+  },
+  "published": {
+    "tag": "locale/0.5.5.5-3",
+    "asset": "pobr-locale-0.5.5.5.zip",
+    "bytes": 7492433,
+    "sha256": "dc3a809805bf415e05b9f097f38a43cf5afe65c1799d7b7ecb459bf4a3543f16"
   }
 }
