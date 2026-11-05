@@ -1,0 +1,28 @@
+{
+  "schema": "poe2-locale-release-config/v2",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "hold": "PoBR prerequisites, both in the PoBR PR that bumps to this package: (a) pipeline/runtime/build_data.py takes the data/<patch>/i18n/* inventory and pins from the language part's own manifest.json instead of the game package's snapshot manifest (RePoE game/0.5.5.5-1 pins locale/0.5.5.5-1's zh-TW mods.json); (b) crates/pobr-gamedata/tests/mods/load_mods.rs (traditional_chinese_mod_names_available looks up Strength1) and the docs of GameData::mod_names (crates/pobr-gamedata/src/lib.rs) and pobr-i18n (src/lib.rs, src/pack.rs NameKind::Affix) move from mod-id keys to English affix-name keys for zh-TW mods.json.",
+  "base": {
+    "config": "release/0.5.5.5.json"
+  },
+  "transforms": [
+    {
+      "id": "zh-tw-mods-by-english",
+      "kind": "rekey-by-english",
+      "member": "i18n/zh-TW/mods.json",
+      "records": "evidence/zh-TW-receipt.json",
+      "table": "mods.json",
+      "conflicts": "most-common-then-first-row"
+    }
+  ],
+  "expect": {
+    "package": {
+      "bytes": 6925862,
+      "sha256": "bdfb38f4f8db84f0f16544756fab3fcfc7bf6fee17fd24592f603bc87331be37"
+    }
+  }
+}

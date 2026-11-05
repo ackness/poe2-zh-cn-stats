@@ -82,7 +82,7 @@ mise run pobr:names --request /absolute/name-request.json --out .cache/fresh-nam
 对当前来源里的 ID，有译文就覆盖旧值；来源缺失、为空或未翻译时删除旧值，回退
 英文。新清单里完全不存在的 ID 保留旧值，并逐条列入 receipt 的
 `historical_compatibility`。表行覆盖和重复都会检查；同英文多译只在 ID 不同时
-允许，因为 PoBR 按表与 ID 精确读取。简中词缀文件按英文为键，不经过这个入口。
+允许，因为 PoBR 按表与 ID 精确读取。简中词缀文件按英文为键，不经过这个入口；繁中 `mods.json` 由本入口按 mod ID 写出，下一个语言包（`release/0.5.5.5-2.json`）再按 receipt 的配对记录改成英文键，见 [RELEASING.md](../RELEASING.md#下一个语言包release0555-2json)。
 
 ## 词条译文：`stat_lines.json`
 
@@ -118,3 +118,7 @@ receipt 的 `implementation` 固定本入口和 `native-selected-translations.mj
   未进入 Git。
 - `stat_lines.json` 未重放：当时的选取收据只存在于已清理的 PoBR 缓存。命令行入口由
   合成测试覆盖，配对核心沿用本库已有的 `native-selected-translations.mjs` 及其测试。
+
+显示文本和简中词典的重放现在由 `release:regenerate`（`release/regenerate/0.5.5.5.json`）在 CI
+里每次执行，见 [RELEASING.md](../RELEASING.md#从固定输入重新生成)；繁中名称和
+`stat_lines.json` 的两层原生选取仍按上面的原因冻结。
