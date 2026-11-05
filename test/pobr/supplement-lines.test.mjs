@@ -55,7 +55,7 @@ test('reviewed corrections replace exact base pairs and mark them; other states 
     { from: { src: 'Bonded: 已不存在', en: 'Bonded: Gone' }, to: { src: '羁绊： 已不存在', en: 'Bonded: Gone' } },
   ]);
   const slash = correction('literal-backslash-line-break', [{ from: BASE[3], to: { src: '献祭 {0}%\n完全献祭', en: BASE[3].en } }],
-    { basis: 'format-repair' });
+    { basis: 'official-typo-format-fix' });
   const result = run([], [bonded, slash]);
   assert.deepEqual(result.lines, [
     { src: '献祭 {0}%\n完全献祭', en: 'Sacrifice {0}%\nFully made', origin: 'agent' },
@@ -143,6 +143,11 @@ test('the file schema and the template form are validated', () => {
   assert.throws(() => validateSupplements(doc([], [correction('x', [{ from: BASE[3], to: { ...BASE[3], src: '献祭 {0}%\\完全' } }])])),
     /stray-whitespace-or-backslash/);
   assert.throws(() => validateSupplements(doc([], [correction('x', []), correction('y', [])])), /rows lists/);
+  // A format-only fix of official text: a backslash becomes a line break and nothing else changes.
+  const typo = rows => doc([], [correction('x', rows, { basis: 'official-typo-format-fix' })]);
+  assert.doesNotThrow(() => validateSupplements(typo([{ from: BASE[3], to: { ...BASE[3], src: '献祭 {0}%\n完全献祭' } }])));
+  assert.throws(() => validateSupplements(typo([{ from: BASE[3], to: { ...BASE[3], src: '献祭 {0}%\n完全献祭了' } }])), /byte-identical/);
+  assert.throws(() => validateSupplements(typo([{ from: BASE[0], to: { ...BASE[0], src: '羁绊： 生命提高 10%' } }])), /byte-identical/);
   assert.throws(() => validateSupplements({ ...doc(), extra: [] }), /fields must be/);
   assert.equal(templateProblem('{0:+d} to Strength', '{0:+d} 力量'), null);
   assert.equal(templateProblem('{0:+d} to Strength', '{0} 力量'), 'placeholder-mismatch');

@@ -15,8 +15,10 @@ export const STATUSES = ['draft', 'reviewed', 'rejected'];
 export const KINDS = ['stat-line', 'monster-name'];
 export const BASES = ['official-same-id-branch', 'official-same-text', 'official-composed', 'official-terms',
   'poe1-official', 'community', 'own'];
-// A correction repairs existing text; `format-repair` changes only layout characters.
-export const CORRECTION_BASES = ['official-terms', 'official-same-text', 'format-repair'];
+// A correction repairs existing text. `official-typo-format-fix` repairs only the layout of official
+// text (a stray backslash where the official text means a line break): its rows must be byte-identical
+// once each backslash is read as a line break, so the official wording itself never changes.
+export const CORRECTION_BASES = ['official-terms', 'official-same-text', 'official-typo-format-fix'];
 export const NAME_SCOPE = 'MonsterVarieties.Name';
 
 const HEX64 = /^[0-9a-f]{64}$/u;
@@ -135,6 +137,10 @@ function validateCorrection(correction, label) {
       require(nonempty(row[side].src) && nonempty(row[side].en), `${where}.${side}: src and en are nonempty`);
     }
     require(row.from.src !== row.to.src || row.from.en !== row.to.en, `${where}: from and to are the same pair`);
+    if (correction.basis === 'official-typo-format-fix') {
+      require(['src', 'en'].every(side => row.from[side].replaceAll('\\', '\n') === row.to[side]),
+        `${where}: official-typo-format-fix only turns a backslash into a line break; the wording stays byte-identical`);
+    }
     if (correction.status === 'reviewed') {
       const problem = templateProblem(row.to.en, row.to.src);
       require(!problem, `${where}: the corrected pair fails the form check (${problem})`);

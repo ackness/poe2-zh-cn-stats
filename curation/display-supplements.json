@@ -251,10 +251,10 @@
       "origin": "agent",
       "basis": "official-terms",
       "author": "claude-opus-5-5",
-      "note": "把“Bonded:”前缀统一为腾讯官方译法“羁绊： ”（全角冒号后一个空格）。23 行历史逐字行的 src 保留了英文前缀“Bonded: ”，curated 模板“Bonded: {0}”为历史 curated 译法“纽带：{0}”（curation/curated.json curated.bonded）。只替换前缀，其余文字不变。",
+      "note": "把“Bonded:”前缀统一为腾讯官方译法“羁绊： ”（全角冒号后一个空格）。23 行来自 evidence/native-140-pairs.json：正文是国服客户端 stat 描述的官方译文，英文前缀“Bonded: ”由 RePoE 的 socketables 生产者硬编码（ackness/repoe tools/pobr-data-adapter/src/ordinary_facts/socketables.rs），src/pobr/native-selected-translations.mjs 原样保留在 src 里，所以 src 带英文前缀；模板“Bonded: {0}”是本仓库 curated 译法“纽带：{0}”（curation/curated.json curated.bonded）。只替换前缀，其余文字不变。",
       "evidence": [
         "Tencent trade2 stats https://poe.game.qq.com/api/trade2/data/stats, as captured in data/snapshots/20261104T031003350Z/raw/trade-cn.json.gz (source sha256 db26a1aa3e74fe110983b17478fca81661869d9c79c0ad4491fc7d5967204f34): all 208 rows paired by id with a GGG row starting \"Bonded:\" start with \"羁绊： \" (4 English rows have no Chinese branch).",
-        "Base: inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json (locale/0.5.5.5-3, sha256 5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95): 23 rows with en \"Bonded: …\" keep \"Bonded: \" in src, and \"Bonded: {0}\" is \"纽带：{0}\" (curation/curated.json curated.bonded)."
+        "Base: inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json (locale/0.5.5.5-3, sha256 5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95): 23 rows with en \"Bonded: …\" keep \"Bonded: \" in src; all 23 are pairs of inputs/locale-0.5.5.5-3/evidence/native-140-pairs.json, whose \"Bonded: \" prefix is the RePoE socketables producer's hard-coded English kept by src/pobr/native-selected-translations.mjs. \"Bonded: {0}\" is \"纽带：{0}\" (curation/curated.json curated.bonded)."
       ],
       "status": "reviewed",
       "review": {
@@ -329,10 +329,11 @@
         }
       ],
       "origin": "agent",
-      "basis": "format-repair",
+      "basis": "official-typo-format-fix",
       "author": "claude-opus-5-5",
-      "note": "历史词典把换行写成了字面反斜杠“\\”，PoBR 会原样显示（如“…上限的 5%\\完全献祭后…”）。改为真正的换行“\\n”，与其他多行模板和英文的行数一致；文字不变。其中一行是英文 en 里的反斜杠，游戏英文为换行，原行永远匹配不到。",
+      "note": "国服客户端的官方 stat 描述在该处本身写着字面反斜杠“\\”（如“…上限的 {0}%\\完全[Sacrifice|献祭]后…”），游戏英文在同一位置是换行；PoBR 会原样显示反斜杠。只把“\\”改为真正的换行“\\n”，属于纯排版修正：措辞与官方文本逐字节相同，行数与英文一致。其中一行（魔力药剂）是 en 里的反斜杠，游戏英文为换行，原行永远匹配不到。",
       "evidence": [
+        "China client capture repoe .cache/sc-capture/sc-capture-20261105T133039Z (realm china, _.index.bin sha256 1fa59396c8f9a57de082098ec024f680dd9218c78ca11497f7887032f54e1578, PathOfExile_x64.exe 0.5.5.172): the Simplified Chinese stat descriptions carry the literal backslash, e.g. \"…上限的 {0}%\\完全[Sacrifice|献祭]后…\".",
         "Base: inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json (locale/0.5.5.5-3, sha256 5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95): the only 6 rows containing a backslash; 1043 other rows contain \\n line breaks.",
         "Game package ackness/repoe game/0.5.5.5-2 pobr-game-0.5.5.5.zip (sha256 c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb), data/0.5.5.5/overlay/stat_descriptions.json: the English of the Sacrifice and Mana Flask templates has a line break (\\n) at that position."
       ],
