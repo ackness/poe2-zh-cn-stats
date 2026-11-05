@@ -19,6 +19,7 @@ import { readZip } from './stored-zip.mjs';
 import { produceLocale } from '../pobr/locale-producer.mjs';
 import { validateProjection } from '../pobr/display-texts.mjs';
 import { OFFICIAL_REALMS, validateOfficialSpec } from '../pobr/official-lines.mjs';
+import { TABLE_REALMS, validateTableSpec } from '../pobr/official-tables.mjs';
 import {
   REPOSITORY, ROOT, assetName, download, encoded, fetchOrigin, loadConfig, log, originManifestPath, packageArchive, packageMembers,
   pin, producerIdentity, publicationSource, readSource, releaseUrl, require, samePin, sha256,
@@ -95,14 +96,24 @@ function validateJob(job, members, patch) {
       ...(job.meta ? [`i18n/${job.locale}/_meta.json`] : [])]),
     `${job.id}: members are i18n/<locale>/stat_lines.json, then i18n/<locale>/_meta.json when meta is pinned`);
   } else if (job.kind === 'display-texts') {
-    for (const key of ['catalog', 'supplement']) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
+    // Official client-table sources (src/pobr/official-tables.mjs): RePoE input Release assets, newest
+    // first. Without a catalog (a locale that has none, e.g. zh-TW) they are the only per-ID source.
+    if (job.official_tables !== undefined) {
+      require(TABLE_REALMS[job.locale] && Array.isArray(job.official_tables) && job.official_tables.length,
+        `${job.id}: official_tables lists RePoE input packages, newest first, for zh-CN or zh-TW`);
+      job.official_tables.forEach((spec, index) => validateTableSpec(spec, `${job.id} official_tables[${index}]`, { exact: true }));
+    }
+    if (job.catalog === undefined) {
+      require(job.official_tables && job.supplement === undefined && job.supplement_module === undefined,
+        `${job.id}: a display-texts job without a catalog needs official_tables and takes no supplement`);
+    } else for (const key of ['catalog', 'supplement']) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
     if (job.names !== undefined) require(isPin(gitRef(job.names, `${job.id} names`)), `${job.id}: pin the names file`);
     // The official names file is a Git pin of this repository or an HTTPS download (e.g. a RePoE Release asset).
     if (job.official_names !== undefined) require(isPin(job.official_names) && (typeof job.official_names.url === 'string'
       ? job.official_names.url.startsWith('https://') : gitRef(job.official_names, `${job.id} official_names`)),
     `${job.id}: pin official_names as {revision, path, bytes, sha256} or {url, bytes, sha256}`);
-    // Monster names are decided against the target English of the game Release package.
-    if (job.names !== undefined || job.official_names !== undefined) validateGamePackage(job, patch);
+    // Monster names and official tables are decided against the target English of the game Release package.
+    if (job.names !== undefined || job.official_names !== undefined || job.official_tables !== undefined) validateGamePackage(job, patch);
     // The package's official stat_lines (the base without our rows) and passive_names, as Git pins:
     // no supplement may mask their English. Required with names.
     if (job.names !== undefined || job.package_texts !== undefined) {
@@ -110,7 +121,7 @@ function validateJob(job, members, patch) {
         && Object.entries(job.package_texts).every(([key, value]) => isPin(gitRef(value, `${job.id} package_texts.${key}`))),
       `${job.id}: pin package_texts {stat_lines, passive_names} (official texts no supplement may mask)`);
     }
-    gitRef(job.supplement_module, `${job.id} supplement_module`);
+    if (job.catalog !== undefined) gitRef(job.supplement_module, `${job.id} supplement_module`);
     // The projection is pinned in the recipe, never read from src/pobr/display-projection.json:
     // a new default scope there must not change a member that a published package already holds.
     try { validateProjection(job.projection); } catch {
@@ -263,24 +274,36 @@ async function localeProducer(job, inputs, work) {
 // checkout's library modules (a v3 catalog's producer closure must equal them), the reviewed
 // module, which must equal its file at the pinned revision, and the job's pinned projection.
 async function displayTexts(job, inputs, work, repo) {
-  require(path.resolve(repo) === ROOT, `${job.id}: display texts are produced by this checkout's modules`);
+  // A catalog's producer closure must equal this checkout's library modules; without a catalog there is none.
+  require(!job.catalog || path.resolve(repo) === ROOT, `${job.id}: display texts are produced by this checkout's modules`);
   const { createDisplayTexts } = await import('../pobr/display-texts.mjs');
   const extract = (key, directory) => {
     const archive = readZip(inputs.git(job[key], job[key], `${job.id}:${key}`));
     writeTree(directory, [...archive].map(([name, { raw }]) => [name, raw]));
     return pin(archive.get('manifest.json').raw);
   };
-  const catalog = path.join(work, 'catalog'), supplement = path.join(work, 'supplement');
-  const catalogPin = extract('catalog', catalog), supplementPin = extract('supplement', supplement);
-  const moduleRaw = readFileSync(path.join(ROOT, job.supplement_module.path));
-  inputs.git(job.supplement_module, pin(moduleRaw), `${job.id}:supplement_module`);
   const request = {
     schema: 'pobr-native-display-texts-request/v1', game_patch: job.target.game_patch, realm: job.target.realm, locale: job.locale,
-    catalog: { manifest: path.join(catalog, 'manifest.json'), ...catalogPin },
-    supplement: { manifest: path.join(supplement, 'manifest.json'), ...supplementPin,
-      module: { file: job.supplement_module.path, ...pin(moduleRaw), revision: job.supplement_module.revision } },
     projection: job.projection,
   };
+  if (job.catalog) {
+    const catalog = path.join(work, 'catalog'), supplement = path.join(work, 'supplement');
+    const catalogPin = extract('catalog', catalog), supplementPin = extract('supplement', supplement);
+    const moduleRaw = readFileSync(path.join(ROOT, job.supplement_module.path));
+    inputs.git(job.supplement_module, pin(moduleRaw), `${job.id}:supplement_module`);
+    request.catalog = { manifest: path.join(catalog, 'manifest.json'), ...catalogPin };
+    request.supplement = { manifest: path.join(supplement, 'manifest.json'), ...supplementPin,
+      module: { file: job.supplement_module.path, ...pin(moduleRaw), revision: job.supplement_module.revision } };
+  }
+  if (job.official_tables) {
+    request.official_tables = [];
+    for (const [index, spec] of job.official_tables.entries()) {
+      const raw = await inputs.url(releaseUrl(spec.repository, spec.tag, spec.asset), spec, `${job.id}:official_tables[${index}]`);
+      const file = path.join(work, `official-tables-${index}-${spec.asset}`);
+      writeFileSync(file, raw);
+      request.official_tables.push({ file, ...spec });
+    }
+  }
   if (job.names) {
     const raw = inputs.git(job.names, job.names, `${job.id}:names`);
     writeFileSync(path.join(work, 'names.json'), raw);
@@ -300,7 +323,7 @@ async function displayTexts(job, inputs, work, repo) {
       request.package_texts[key] = { file: path.join(work, `package-${key}.json`), ...pin(raw) };
     }
   }
-  if (job.names || job.official_names) {
+  if (job.names || job.official_names || job.official_tables) {
     const { repository, tag, asset } = job.game_package;
     const zip = await inputs.url(releaseUrl(repository, tag, asset), job.game_package, `${job.id}:game_package`);
     writeFileSync(path.join(work, asset), zip);
@@ -312,7 +335,9 @@ async function displayTexts(job, inputs, work, repo) {
   return { outputs: new Map([[job.members[0], raw]]), inputs: new Map(),
     summary: { decisions: receipt.decisions.length, conflicts: receipt.conflicts.length, supplement_records: receipt.supplement?.records,
       projection: receipt.projection, ...(receipt.names ? { names: receipt.names.counts } : {}),
-      ...(receipt.official_elsewhere ? { official_elsewhere_skipped: receipt.official_elsewhere.skipped } : {}) } };
+      ...(receipt.official_elsewhere ? { official_elsewhere_skipped: receipt.official_elsewhere.skipped } : {}),
+      ...(receipt.official_tables ? { official_tables: { adopted: receipt.official_tables.adopted, missing: receipt.official_tables.missing,
+        owned_catalog_rows: receipt.official_tables.owned_catalog_rows } } : {}) } };
 }
 
 // src/pobr/supplement-lines.mjs over a pinned base member, the game Release package and the pinned
