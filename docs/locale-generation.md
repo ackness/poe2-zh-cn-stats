@@ -1,6 +1,6 @@
 # Offline Simplified Chinese generation
 
-`src/locale-producer.mjs` projects a caller-supplied community dictionary and
+`src/pobr/locale-producer.mjs` projects a caller-supplied community dictionary and
 independent translation template bundle into the legacy Simplified Chinese
 sidecars. This is actual generation from input tables and templates. It does
 not acquire network data, mutate PoBR snapshots, or decide source acceptance.
@@ -21,7 +21,7 @@ lookup is involved. Four small selected-layer and metadata inputs come from the
 producer commit. A consumer may materialize them however it wishes.
 
 ```sh
-node src/locale-producer.mjs \
+node src/pobr/locale-producer.mjs \
   --manifest <checkout-of-629be2d9>/handoff/locale-generation-20261101/input-manifest.json \
   --manifest-sha256 <pinned-manifest-sha256> \
   --input-dir <materialized-input-directory> --out <new-output-directory>
@@ -36,8 +36,8 @@ pins in `receipt.json.files`; the receipt includes schema, target, profile,
 manifest digest, input pins, source identity and layer counts. Its own bytes are
 not self-pinned. Paths and timestamps from the host are not included. Consumers
 must independently verify the receipt against the pinned manifest and outputs.
-The producer closure is `src/locale-producer.mjs`,
-`src/legacy-translation-merge.mjs`, and `src/strict-json.mjs`; Node's built-in
+The producer closure is `src/pobr/locale-producer.mjs`,
+`src/pobr/legacy-translation-merge.mjs`, and `src/strict-json.mjs`; Node's built-in
 modules are its only runtime dependencies.
 
 Two explicit profiles are supported:
@@ -60,7 +60,7 @@ Two explicit profiles are supported:
   original `(src, en)` UTF-16 ordering. Its checked fixture is 27,896 + 140 +
   2 = 28,038 pairs. Neither selected layer constitutes full client acceptance.
 
-`src/native-selected-translations.mjs` separately exports
+`src/pobr/native-selected-translations.mjs` separately exports
 `nativeSelectedTranslations(legacy, selection, candidate)` to generate new
 context-bound literal selections from the pinned ordinary-producer receipt and
 native candidate. It returns `{pairs, report}` including full additions,

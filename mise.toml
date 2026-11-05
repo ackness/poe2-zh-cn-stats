@@ -43,12 +43,12 @@ run = "node src/release/publish.mjs"
 
 [tasks."pobr:display-texts"]
 description = "Project a pinned native catalog into PoBR's display_texts.json; --request FILE --out .cache/FRESH"
-run = "node src/pobr-display-texts.mjs"
+run = "node src/pobr/display-texts.mjs"
 
 [tasks."pobr:names"]
 description = "Adapt pinned native names into PoBR's three zh-TW ID-keyed sidecars; --request FILE --out .cache/FRESH"
-run = "node src/pobr-name-sidecars.mjs"
+run = "node src/pobr/name-sidecars.mjs"
 
 [tasks."pobr:stat-lines"]
 description = "Append selected native effect translations to PoBR's stat_lines.json; pinned --selection/--native/--legacy, --out .cache/FRESH"
-run = "node src/pobr-stat-lines.mjs"
+run = "node src/pobr/stat-lines.mjs"

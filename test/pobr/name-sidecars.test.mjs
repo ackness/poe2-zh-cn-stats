@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { nativeNameSidecars } from '../src/pobr-name-sidecars.mjs';
+import { nativeNameSidecars } from '../../src/pobr/name-sidecars.mjs';
 const schemas = [['BaseItemTypes', 'Name', 'base_items.json'], ['ActiveSkills', 'DisplayedName', 'skills.json'], ['Mods', 'Name', 'mods.json']];
 function fixture() {
   return { candidate: { schema: 'poe2-native-names/v1', status: 'candidate', production_ready: false,

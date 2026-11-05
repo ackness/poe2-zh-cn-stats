@@ -17,10 +17,10 @@ const FK_LIBRARY_FILES = [...BINDING_LIBRARY_FILES, 'src/native-catalog-fk-bindi
 // One optional closed module, pinned separately from the official catalog producer
 // closure: it only adds reviewed-only supplement lookup, never a new official module.
 const REVIEWED_MODULE = 'src/translation-workbench.mjs';
-const REPO_ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
+const REPO_ROOT = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 // PoBR's exact-ID readers live in its web/src/lib/nativeDisplayNames.ts. Other
 // fields can supply literal text, but do not need a second per-ID browser index.
-const PROJECTION_PATH = fileURLToPath(new URL('./pobr-display-projection.json', import.meta.url));
+const PROJECTION_PATH = fileURLToPath(new URL('./display-projection.json', import.meta.url));
 const defaultProjection = () => JSON.parse(fs.readFileSync(PROJECTION_PATH, 'utf8'));
 // Without an explicit closure, a v3 catalog runs this checkout's six modules,
 // whose hashes still have to equal the manifest's producer closure. v1/v2

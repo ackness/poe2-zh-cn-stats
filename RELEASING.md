@@ -161,11 +161,11 @@ mise run release:regenerate -- --fetch   # 每个 release/regenerate/<patch>.jso
 （`reproduces`，文件名相同）、生产任务（`jobs`）和暂时无法重新生成的成员（`frozen`）。
 源目录的每个 `i18n/*` 成员必须正好被一个任务或一条冻结记录覆盖。
 
-- `locale-producer`：`src/locale-producer.mjs` 跑固定的生成清单（`manifest` 是本库某个
+- `locale-producer`：`src/pobr/locale-producer.mjs` 跑固定的生成清单（`manifest` 是本库某个
   提交里的文件，带字节数和 SHA-256）。清单的每个输入按它自己的来源取：URL（本库的
   `raw.githubusercontent.com` 地址改从 Git 读），或 `producer-commit`（任务的
   `producer_commit`）里的路径。
-- `display-texts`：`src/pobr-display-texts.mjs` 跑固定的 catalog 与审核补译 zip（都是本库某个
+- `display-texts`：`src/pobr/display-texts.mjs` 跑固定的 catalog 与审核补译 zip（都是本库某个
   提交里的文件）。库模块用本 checkout 的，v3 catalog 的 producer 闭包必须等于它们；
   `supplement_module` 必须等于它在固定提交里的字节。
 - `passthrough`：输出等于任务的某个输入时必须声明（会自动检测），例如 `retained-selected`

@@ -5,7 +5,7 @@ import { readFile, mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
-import { strictJson } from './strict-json.mjs';
+import { strictJson } from '../strict-json.mjs';
 import { mergeTranslations, validateBundle } from './legacy-translation-merge.mjs';
 
 export const DICTIONARY_FILES = ['lookup/stat_lines.json', 'lookup/en_to_cn.json',
@@ -149,7 +149,7 @@ export async function produceLocale({ manifestPath, manifestSha256, inputDir, ou
   } else {
     projection.files['_meta.json'] = { source: m.identity.dictionary.repository, source_commit: m.identity.dictionary.commit,
       source_generated_at: projection.upstreamGeneratedAt, translation_source: m.identity.translation,
-      regen_command: 'node src/locale-producer.mjs --manifest <pinned-manifest> --manifest-sha256 <sha256> --input-dir <input-dir> --out <new-directory>', counts: projection.counts };
+      regen_command: 'node src/pobr/locale-producer.mjs --manifest <pinned-manifest> --manifest-sha256 <sha256> --input-dir <input-dir> --out <new-directory>', counts: projection.counts };
   }
   const files = {};
   for (const [name, value] of Object.entries(projection.files)) files[`i18n/zh-CN/${name}`] = jsonBytes(value);

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { createDisplayTexts, projectDisplayTexts } from '../src/pobr-display-texts.mjs';
+import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-texts.mjs';
 
 const row = (id, english, localized, extra = {}) => ({
   table: 'BaseItemTypes', field: 'Name', id, english, localized,
@@ -118,7 +118,7 @@ test('browser indexes retain only active exact-ID scopes while all fields still 
 });
 
 function fixture(t, version, modules, options = {}) {
-  const cache = fileURLToPath(new URL('../.cache/', import.meta.url));
+  const cache = fileURLToPath(new URL('../../.cache/', import.meta.url));
   fs.mkdirSync(cache, { recursive: true });
   const root = fs.mkdtempSync(path.join(cache, 'display-contract-test-'));
   t.after(() => fs.rmSync(root, { recursive: true }));
@@ -405,7 +405,7 @@ test('official-only requests still publish the same sidecar without a supplement
 });
 
 test('omitting the library runs this checkout only for v3 and still compares the producer closure', async t => {
-  const repo = fileURLToPath(new URL('..', import.meta.url));
+  const repo = fileURLToPath(new URL('../..', import.meta.url));
   for (const [version, modules] of [[1, 3], [2, 5]]) {
     const input = fixture(t, version, modules);
     delete input.request.library;
@@ -428,8 +428,8 @@ test('omitting the library runs this checkout only for v3 and still compares the
   assert.equal(fs.existsSync(local.out), false);
 });
 
-test('omitting the projection pins and applies src/pobr-display-projection.json', async t => {
-  const file = fileURLToPath(new URL('../src/pobr-display-projection.json', import.meta.url));
+test('omitting the projection pins and applies src/pobr/display-projection.json', async t => {
+  const file = fileURLToPath(new URL('../../src/pobr/display-projection.json', import.meta.url));
   const declared = JSON.parse(fs.readFileSync(file, 'utf8'));
   const records = ['BaseItemTypes', 'Characters', 'Ascendancy', 'PassiveSkills'].map((table, i) =>
     row(`r${i}`, `Text ${i}`, null, { table }));

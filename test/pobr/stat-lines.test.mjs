@@ -4,12 +4,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { createStatLines, parseStatLineArgs } from '../src/pobr-stat-lines.mjs';
+import { createStatLines, parseStatLineArgs } from '../../src/pobr/stat-lines.mjs';
 
 const digest = raw => createHash('sha256').update(raw).digest('hex');
 
 function inputs(t) {
-  const cache = fileURLToPath(new URL('../.cache/', import.meta.url));
+  const cache = fileURLToPath(new URL('../../.cache/', import.meta.url));
   fs.mkdirSync(cache, { recursive: true });
   const root = fs.mkdtempSync(path.join(cache, 'stat-lines-test-'));
   t.after(() => fs.rmSync(root, { recursive: true }));
@@ -44,8 +44,8 @@ test('writes the appended pairs and a receipt into a fresh cache candidate', t =
   assert.deepEqual(JSON.parse(raw), [{ src: '+12 点护甲', en: '+12 to Armour' }, { src: '旧', en: 'Old' }]);
   assert.deepEqual(receipt.files['stat_lines.json'], { bytes: raw.length, sha256: digest(raw) });
   assert.equal(receipt.adoption, 'not-adopted');
-  for (const file of ['src/pobr-stat-lines.mjs', 'src/native-selected-translations.mjs'])
-    assert.equal(receipt.implementation[file], digest(fs.readFileSync(new URL(`../${file}`, import.meta.url))));
+  for (const file of ['src/pobr/stat-lines.mjs', 'src/pobr/native-selected-translations.mjs'])
+    assert.equal(receipt.implementation[file], digest(fs.readFileSync(new URL(`../../${file}`, import.meta.url))));
   assert.deepEqual(fs.readdirSync(options.out).sort(), ['receipt.json', 'stat_lines.json']);
   assert.throws(() => createStatLines(options), /EEXIST/);
 });

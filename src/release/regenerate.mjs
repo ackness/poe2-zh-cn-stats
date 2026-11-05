@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { strictJson } from '../strict-json.mjs';
 import { readZip } from './stored-zip.mjs';
-import { produceLocale } from '../locale-producer.mjs';
+import { produceLocale } from '../pobr/locale-producer.mjs';
 import {
   REPOSITORY, ROOT, assetName, download, encoded, fetchOrigin, loadConfig, log, originManifestPath, packageArchive, packageMembers,
   pin, producerIdentity, publicationSource, readSource, require, samePin, sha256,
@@ -158,7 +158,7 @@ function writeTree(directory, files) {
   }
 }
 
-// src/locale-producer.mjs over its pinned generation manifest; each manifest input comes from its
+// src/pobr/locale-producer.mjs over its pinned generation manifest; each manifest input comes from its
 // declared source: a URL, this repository at a commit, or (`producer-commit`) the job's producer commit.
 async function localeProducer(job, inputs, work) {
   const manifestRaw = inputs.git(job.manifest, job.manifest, `${job.id}:manifest`);
@@ -187,12 +187,12 @@ async function localeProducer(job, inputs, work) {
   return { outputs, inputs: files, summary: { layers: receipt.layers, profile: receipt.profile } };
 }
 
-// src/pobr-display-texts.mjs over a pinned catalog archive and reviewed supplement archive, with this
+// src/pobr/display-texts.mjs over a pinned catalog archive and reviewed supplement archive, with this
 // checkout's library modules (a v3 catalog's producer closure must equal them) and the reviewed
 // module, which must equal its file at the pinned revision.
 async function displayTexts(job, inputs, work, repo) {
   require(path.resolve(repo) === ROOT, `${job.id}: display texts are produced by this checkout's modules`);
-  const { createDisplayTexts } = await import('../pobr-display-texts.mjs');
+  const { createDisplayTexts } = await import('../pobr/display-texts.mjs');
   const extract = (key, directory) => {
     const archive = readZip(inputs.git(job[key], job[key], `${job.id}:${key}`));
     writeTree(directory, [...archive].map(([name, { raw }]) => [name, raw]));

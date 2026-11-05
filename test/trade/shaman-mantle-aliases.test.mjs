@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { buildTemplateExport } from '../../src/trade/template-export.mjs';
-import { mergeTranslations } from '../../src/legacy-translation-merge.mjs';
+import { mergeTranslations } from '../../src/pobr/legacy-translation-merge.mjs';
 
 const aliases = [
   { src: '无法使用生命药剂', en: 'Cannot use Life Flasks' },

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { mergeTranslations } from '../src/legacy-translation-merge.mjs';
+import { mergeTranslations } from '../../src/pobr/legacy-translation-merge.mjs';
 
 const snapshot = '20261012T000000000Z';
 const row = (src, en, kind = 'trade') => ({ src, en, kind, provenance: { source: 'fixture' } });

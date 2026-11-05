@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { DICTIONARY_FILES, projectLegacy, layerSelectedPairs, produceLocale } from '../src/locale-producer.mjs';
+import { DICTIONARY_FILES, projectLegacy, layerSelectedPairs, produceLocale } from '../../src/pobr/locale-producer.mjs';
 
 const bytes = x => Buffer.from(JSON.stringify(x, null, 2) + '\n');
 const pin = b => ({ bytes: b.length, sha256: createHash('sha256').update(b).digest('hex') });

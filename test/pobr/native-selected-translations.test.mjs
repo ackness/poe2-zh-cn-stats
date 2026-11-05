@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { nativeSocketableTranslations } from '../src/native-selected-translations.mjs';
+import { nativeSocketableTranslations } from '../../src/pobr/native-selected-translations.mjs';
 
 function fixture() {
   const file = 'Data/StatDescriptions/stat_descriptions.csd';

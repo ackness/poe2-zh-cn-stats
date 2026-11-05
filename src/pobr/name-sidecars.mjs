@@ -79,7 +79,7 @@ export function createNameSidecars(request, out) {
   const legacy = Object.fromEntries(Object.values(domains).map(([, file]) => [file,
     pinned(request.legacy[file].path, request.legacy[file].sha256)]));
   const result = nativeNameSidecars(candidate, legacy, request.version, request.locale);
-  const output = path.resolve(out), cache = path.resolve(fileURLToPath(new URL('../.cache', import.meta.url)));
+  const output = path.resolve(out), cache = path.resolve(fileURLToPath(new URL('../../.cache', import.meta.url)));
   required(output.startsWith(cache + path.sep), 'Output must be a fresh repository cache candidate');
   required(!fs.existsSync(output), 'Output already exists');
   const parent = path.dirname(output);
