@@ -3045,36 +3045,6 @@
         "by": "claude-opus-5-5",
         "note": "已核对：基线中仅这 6 行含反斜杠，6 行 from 各恰好一次，to 仅把“\\”改为“\\n”，其余文字不变，无冲突，修正后 src/en 行数一致，form 检查通过。游戏 stat_descriptions.json 中献祭 2 行与魔力药剂行的英文在该处为换行；增益反射与失血 2 行的英文不在 stat_descriptions，以基线 en（已用 \\n）为准。"
       }
-    },
-    {
-      "correction_id": "bonded-modifiers-and-idols-official-terms",
-      "locale": "zh-CN",
-      "member": "stat_lines.json",
-      "rows": [
-        {
-          "from": {
-            "src": "从符文和魔偶上获得纽带词缀效果",
-            "en": "Gain the benefits of Bonded modifiers on Runes and Idols"
-          },
-          "to": {
-            "src": "从符文和雕像上获得羁绊词缀效果",
-            "en": "Gain the benefits of Bonded modifiers on Runes and Idols"
-          }
-        }
-      ],
-      "origin": "agent",
-      "basis": "official-terms",
-      "author": "claude-opus-5-5",
-      "note": "本修正同时改两个术语：历史词典行把“Bonded modifiers”译为“纽带词缀”、“Idols”译为“魔偶”，改用腾讯官方术语“羁绊词缀”与“雕像”，句式不变。",
-      "evidence": [
-        "Tencent trade2 stats https://poe.game.qq.com/api/trade2/data/stats, data/snapshots/20261104T031003350Z/raw/trade-cn.json.gz (source sha256 db26a1aa3e74fe110983b17478fca81661869d9c79c0ad4491fc7d5967204f34): rune.stat_726496846 \"Idols socketed in this item gain the benefits of their Bonded modifiers\" = \"镶嵌在该物品上的雕像获得其自身的羁绊词缀的强化效果\"; rune.stat_1073847159 uses 雕像 for Idol.",
-        "Base: inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json (sha256 5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95): other Idol rows use 雕像 (e.g. \"{0:+d} to Spirit per Idol socketed in your Equipment\" = \"你的装备中每镶嵌一个雕像，{0:+d} 点精魂\"); display_texts.json names Idol bases …雕像 (Bear Idol 巨熊雕像). The bare \"Idol\" and the \" Idol\" suffix in display_texts.json entries are 魔偶, but no Idol augment base or official stat uses it."
-      ],
-      "status": "reviewed",
-      "review": {
-        "by": "claude-opus-5-5",
-        "note": "已核对：from 行在基线中恰好一次，to 行尚不存在，仅把“魔偶”改为“雕像”、“纽带词缀”改为“羁绊词缀”，句式与 en 不变。腾讯 trade2（解压后 sha256 db26a1aa…）中 217 条英文含 Bonded 的行按 id 配对得 212 条中文，全部用“羁绊”，无一用“纽带”，其中 rune.stat_726496846 将“Bonded modifiers”译为“羁绊词缀”；trade 中 2 条 Idol 行均为“雕像”，基线 11 条 Idol 行中 10 条为“雕像”（仅本行为“魔偶”），base_items 中各 Idol 增幅器底材亦均为“…雕像”。"
-      }
     }
   ]
 }

@@ -212,3 +212,16 @@ test('the committed curation/display-supplements.json is valid', () => {
   const doc = JSON.parse(fs.readFileSync(new URL('../../curation/display-supplements.json', import.meta.url)));
   assert.doesNotThrow(() => validateSupplements(doc));
 });
+
+test('the committed corrections leave the official China-client Shaman row as it is', () => {
+  // ascendancy_shaman_gain_additional_socketable_mods in the China client (index 1fa59396…, 0.5.5.172):
+  // 从[Rune|符文]和[Idol|魔偶]上获得[ShamanOnlyMods|纽带]词缀效果. Official text wins over the
+  // 羁绊/雕像 used elsewhere, so no correction may replace it.
+  const official = { src: '从符文和魔偶上获得纽带词缀效果', en: 'Gain the benefits of Bonded modifiers on Runes and Idols' };
+  const base = JSON.parse(fs.readFileSync(new URL('../../inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json', import.meta.url)));
+  assert.deepEqual(base.filter(row => row.en === official.en), [official]);
+  const doc = JSON.parse(fs.readFileSync(new URL('../../curation/display-supplements.json', import.meta.url)));
+  const result = supplementLines(base, doc, new Map(), { ...TARGET, game_patch: '0.5.5.5' }, GAME);
+  assert.deepEqual(result.lines.filter(row => row.en === official.en), [official]);
+  assert.equal(doc.corrections.some(correction => correction.rows.some(row => row.from.en === official.en)), false);
+});
