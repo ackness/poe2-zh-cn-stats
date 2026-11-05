@@ -1,0 +1,347 @@
+{
+  "schema": "poe2-display-supplements/v1",
+  "entries": [],
+  "corrections": [
+    {
+      "correction_id": "bonded-prefix-official",
+      "locale": "zh-CN",
+      "member": "stat_lines.json",
+      "rows": [
+        {
+          "from": {
+            "src": "Bonded: 你受到的增益消减速度减慢 10%",
+            "en": "Bonded: Buffs on you expire 10% slower"
+          },
+          "to": {
+            "src": "羁绊： 你受到的增益消减速度减慢 10%",
+            "en": "Bonded: Buffs on you expire 10% slower"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 你受到的异常状态的减速强度降低 20%",
+            "en": "Bonded: 20% reduced Slowing Potency of Debuffs on You"
+          },
+          "to": {
+            "src": "羁绊： 你受到的异常状态的减速强度降低 20%",
+            "en": "Bonded: 20% reduced Slowing Potency of Debuffs on You"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 你受到的异常状态的减速强度降低 50%",
+            "en": "Bonded: 50% reduced Slowing Potency of Debuffs on You"
+          },
+          "to": {
+            "src": "羁绊： 你受到的异常状态的减速强度降低 50%",
+            "en": "Bonded: 50% reduced Slowing Potency of Debuffs on You"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 你受到的非伤害性异常状态的效果降低 25%",
+            "en": "Bonded: 25% reduced Effect of Non-Damaging Ailments on you"
+          },
+          "to": {
+            "src": "羁绊： 你受到的非伤害性异常状态的效果降低 25%",
+            "en": "Bonded: 25% reduced Effect of Non-Damaging Ailments on you"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 你的无常被引爆时，你有 15% 的几率重新获得等量的无常",
+            "en": "Bonded: 15% chance that when Volatility on you explodes, you regain an equivalent amount of Volatility"
+          },
+          "to": {
+            "src": "羁绊： 你的无常被引爆时，你有 15% 的几率重新获得等量的无常",
+            "en": "Bonded: 15% chance that when Volatility on you explodes, you regain an equivalent amount of Volatility"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 你身上的流血强度降低 25%",
+            "en": "Bonded: 25% reduced Magnitude of Bleeding on You"
+          },
+          "to": {
+            "src": "羁绊： 你身上的流血强度降低 25%",
+            "en": "Bonded: 25% reduced Magnitude of Bleeding on You"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 你造成的流血强度提高 10%",
+            "en": "Bonded: 10% increased Magnitude of Bleeding you inflict"
+          },
+          "to": {
+            "src": "羁绊： 你造成的流血强度提高 10%",
+            "en": "Bonded: 10% increased Magnitude of Bleeding you inflict"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 则击中你的敌人造成的伤害为不幸",
+            "en": "Bonded: your Runic Ward has been damaged Recently"
+          },
+          "to": {
+            "src": "羁绊： 则击中你的敌人造成的伤害为不幸",
+            "en": "Bonded: your Runic Ward has been damaged Recently"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 召唤生物技能的保留效能降低 25%",
+            "en": "Bonded: 25% reduced Reservation Efficiency of Minion Skills"
+          },
+          "to": {
+            "src": "羁绊： 召唤生物技能的保留效能降低 25%",
+            "en": "Bonded: 25% reduced Reservation Efficiency of Minion Skills"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 处于低魔时，技能速度提高 12%",
+            "en": "Bonded: 12% increased Skill Speed while on Low Mana"
+          },
+          "to": {
+            "src": "羁绊： 处于低魔时，技能速度提高 12%",
+            "en": "Bonded: 12% increased Skill Speed while on Low Mana"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 对投射物的格挡几率提高 100%",
+            "en": "Bonded: 100% increased Block chance against Projectiles"
+          },
+          "to": {
+            "src": "羁绊： 对投射物的格挡几率提高 100%",
+            "en": "Bonded: 100% increased Block chance against Projectiles"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 战吼技能的效果范围提高 20%",
+            "en": "Bonded: Warcry Skills have 20% increased Area of Effect"
+          },
+          "to": {
+            "src": "羁绊： 战吼技能的效果范围提高 20%",
+            "en": "Bonded: Warcry Skills have 20% increased Area of Effect"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 技能的精魂保留效能提高 5%",
+            "en": "Bonded: 5% increased Spirit Reservation Efficiency of Skills"
+          },
+          "to": {
+            "src": "羁绊： 技能的精魂保留效能提高 5%",
+            "en": "Bonded: 5% increased Spirit Reservation Efficiency of Skills"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 招架伤害提高 50%",
+            "en": "Bonded: 50% increased Parry Damage"
+          },
+          "to": {
+            "src": "羁绊： 招架伤害提高 50%",
+            "en": "Bonded: 50% increased Parry Damage"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 收集元素灌注时有 12% 的几率",
+            "en": "Bonded: 12% chance when collecting an Elemental Infusion to gain an"
+          },
+          "to": {
+            "src": "羁绊： 收集元素灌注时有 12% 的几率",
+            "en": "Bonded: 12% chance when collecting an Elemental Infusion to gain an"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 生命再生率降低 25%",
+            "en": "Bonded: 25% reduced Life Regeneration rate"
+          },
+          "to": {
+            "src": "羁绊： 生命再生率降低 25%",
+            "en": "Bonded: 25% reduced Life Regeneration rate"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 符文结界消耗效能降低 10%",
+            "en": "Bonded: 10% reduced Runic Ward Cost Efficiency"
+          },
+          "to": {
+            "src": "羁绊： 符文结界消耗效能降低 10%",
+            "en": "Bonded: 10% reduced Runic Ward Cost Efficiency"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 若你的符文结界近期受到伤害，",
+            "en": "Bonded: Damage of Enemies Hitting you is Unlucky if"
+          },
+          "to": {
+            "src": "羁绊： 若你的符文结界近期受到伤害，",
+            "en": "Bonded: Damage of Enemies Hitting you is Unlucky if"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 被格挡伤害的 20% 吸纳为魔力",
+            "en": "Bonded: 20% of damage Blocked is Recouped as Mana"
+          },
+          "to": {
+            "src": "羁绊： 被格挡伤害的 20% 吸纳为魔力",
+            "en": "Bonded: 20% of damage Blocked is Recouped as Mana"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 被触发法术的法术伤害提高 20%",
+            "en": "Bonded: Triggered Spells deal 20% increased Spell Damage"
+          },
+          "to": {
+            "src": "羁绊： 被触发法术的法术伤害提高 20%",
+            "en": "Bonded: Triggered Spells deal 20% increased Spell Damage"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 非凡技能的保留效能降低 25%",
+            "en": "Bonded: Meta Skills have 25% reduced Reservation Efficiency"
+          },
+          "to": {
+            "src": "羁绊： 非凡技能的保留效能降低 25%",
+            "en": "Bonded: Meta Skills have 25% reduced Reservation Efficiency"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 额外获得一个同类型的元素灌注",
+            "en": "Bonded: additional Elemental Infusion of the same type"
+          },
+          "to": {
+            "src": "羁绊： 额外获得一个同类型的元素灌注",
+            "en": "Bonded: additional Elemental Infusion of the same type"
+          }
+        },
+        {
+          "from": {
+            "src": "Bonded: 魔力消耗效能降低 30%",
+            "en": "Bonded: 30% reduced Mana Cost Efficiency"
+          },
+          "to": {
+            "src": "羁绊： 魔力消耗效能降低 30%",
+            "en": "Bonded: 30% reduced Mana Cost Efficiency"
+          }
+        },
+        {
+          "from": {
+            "src": "纽带：{0}",
+            "en": "Bonded: {0}"
+          },
+          "to": {
+            "src": "羁绊： {0}",
+            "en": "Bonded: {0}"
+          }
+        }
+      ],
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-opus-5-5",
+      "note": "把“Bonded:”前缀统一为腾讯官方译法“羁绊： ”（全角冒号后一个空格）。23 行来自 evidence/native-140-pairs.json：正文是国服客户端 stat 描述的官方译文，英文前缀“Bonded: ”由 RePoE 的 socketables 生产者硬编码（ackness/repoe tools/pobr-data-adapter/src/ordinary_facts/socketables.rs），src/pobr/native-selected-translations.mjs 原样保留在 src 里，所以 src 带英文前缀；模板“Bonded: {0}”是本仓库 curated 译法“纽带：{0}”（curation/curated.json curated.bonded）。只替换前缀，其余文字不变。",
+      "evidence": [
+        "Tencent trade2 stats https://poe.game.qq.com/api/trade2/data/stats, as captured in data/snapshots/20261104T031003350Z/raw/trade-cn.json.gz (source sha256 db26a1aa3e74fe110983b17478fca81661869d9c79c0ad4491fc7d5967204f34): all 208 rows paired by id with a GGG row starting \"Bonded:\" start with \"羁绊： \" (4 English rows have no Chinese branch).",
+        "Base: inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json (locale/0.5.5.5-3, sha256 5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95): 23 rows with en \"Bonded: …\" keep \"Bonded: \" in src; all 23 are pairs of inputs/locale-0.5.5.5-3/evidence/native-140-pairs.json, whose \"Bonded: \" prefix is the RePoE socketables producer's hard-coded English kept by src/pobr/native-selected-translations.mjs. \"Bonded: {0}\" is \"纽带：{0}\" (curation/curated.json curated.bonded)."
+      ],
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "已核对：24 行 from 在基线中各恰好一次，to 仅把前缀替换为“羁绊： ”，其余文字和 en 不变，无冲突，form 检查通过。腾讯 trade2（解压后 sha256 db26a1aa…）中 212 条 GGG “Bonded:” 行按 id 配对得 208 条，全部以“羁绊： ”（全角冒号＋一个半角空格）开头，4 条无中文；基线已有 204 行同一前缀。"
+      }
+    },
+    {
+      "correction_id": "literal-backslash-line-break",
+      "locale": "zh-CN",
+      "member": "stat_lines.json",
+      "rows": [
+        {
+          "from": {
+            "src": "你施放法术时，献祭能量护盾上限的 {0}%\\完全献祭后，该法术造成的伤害总增 {1}%",
+            "en": "Sacrifice {0}% of maximum Energy Shield when you Cast a Spell\nSpells for which this Sacrifice was fully made deal {1}% more Damage"
+          },
+          "to": {
+            "src": "你施放法术时，献祭能量护盾上限的 {0}%\n完全献祭后，该法术造成的伤害总增 {1}%",
+            "en": "Sacrifice {0}% of maximum Energy Shield when you Cast a Spell\nSpells for which this Sacrifice was fully made deal {1}% more Damage"
+          }
+        },
+        {
+          "from": {
+            "src": "你施放法术时，献祭能量护盾上限的 {0}%\\完全献祭后，该法术造成的伤害总降 {1}%",
+            "en": "Sacrifice {0}% of maximum Energy Shield when you Cast a Spell\nSpells for which this Sacrifice was fully made deal {1}% less Damage"
+          },
+          "to": {
+            "src": "你施放法术时，献祭能量护盾上限的 {0}%\n完全献祭后，该法术造成的伤害总降 {1}%",
+            "en": "Sacrifice {0}% of maximum Energy Shield when you Cast a Spell\nSpells for which this Sacrifice was fully made deal {1}% less Damage"
+          }
+        },
+        {
+          "from": {
+            "src": "未保留的魔力全满时不移除魔力药剂效果\n魔力药剂效果不能堆叠",
+            "en": "Mana Flask Effects are not removed when Unreserved Mana is Filled\\Mana Flask Effects do not Queue"
+          },
+          "to": {
+            "src": "未保留的魔力全满时不移除魔力药剂效果\n魔力药剂效果不能堆叠",
+            "en": "Mana Flask Effects are not removed when Unreserved Mana is Filled\nMana Flask Effects do not Queue"
+          }
+        },
+        {
+          "from": {
+            "src": "该增益将受到伤害的 {0}% 每秒以火焰伤害的形式反射回去，\\除非该增益效果时间结束或耗尽",
+            "en": "Reflects {0}% of Damage taken from Buff as Fire Damage each second,\nor when Buff expires or is depleted"
+          },
+          "to": {
+            "src": "该增益将受到伤害的 {0}% 每秒以火焰伤害的形式反射回去，\n除非该增益效果时间结束或耗尽",
+            "en": "Reflects {0}% of Damage taken from Buff as Fire Damage each second,\nor when Buff expires or is depleted"
+          }
+        },
+        {
+          "from": {
+            "src": "造成爆炸敌人的失血 {0:+d}% 的\\不可调整的物理攻击伤害",
+            "en": "Deals {0:+d}% of exploded enemy's Blood Loss\nas unscalable Physical Attack Damage"
+          },
+          "to": {
+            "src": "造成爆炸敌人的失血 {0:+d}% 的\n不可调整的物理攻击伤害",
+            "en": "Deals {0:+d}% of exploded enemy's Blood Loss\nas unscalable Physical Attack Damage"
+          }
+        },
+        {
+          "from": {
+            "src": "造成爆炸敌人的失血 {0}% 的\\不可调整的物理攻击伤害",
+            "en": "Deals {0}% of exploded enemy's Blood Loss\nas unscalable Physical Attack Damage"
+          },
+          "to": {
+            "src": "造成爆炸敌人的失血 {0}% 的\n不可调整的物理攻击伤害",
+            "en": "Deals {0}% of exploded enemy's Blood Loss\nas unscalable Physical Attack Damage"
+          }
+        }
+      ],
+      "origin": "agent",
+      "basis": "official-typo-format-fix",
+      "author": "claude-opus-5-5",
+      "note": "国服客户端的官方 stat 描述在该处本身写着字面反斜杠“\\”（如“…上限的 {0}%\\完全[Sacrifice|献祭]后…”），游戏英文在同一位置是换行；PoBR 会原样显示反斜杠。只把“\\”改为真正的换行“\\n”，属于纯排版修正：措辞与官方文本逐字节相同，行数与英文一致。其中一行（魔力药剂）是 en 里的反斜杠，游戏英文为换行，原行永远匹配不到。",
+      "evidence": [
+        "China client capture repoe .cache/sc-capture/sc-capture-20261105T133039Z (realm china, _.index.bin sha256 1fa59396c8f9a57de082098ec024f680dd9218c78ca11497f7887032f54e1578, PathOfExile_x64.exe 0.5.5.172): the Simplified Chinese stat descriptions carry the literal backslash, e.g. \"…上限的 {0}%\\完全[Sacrifice|献祭]后…\".",
+        "Base: inputs/locale-0.5.5.5-3/i18n/zh-CN/stat_lines.json (locale/0.5.5.5-3, sha256 5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95): the only 6 rows containing a backslash; 1043 other rows contain \\n line breaks.",
+        "Game package ackness/repoe game/0.5.5.5-2 pobr-game-0.5.5.5.zip (sha256 c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb), data/0.5.5.5/overlay/stat_descriptions.json: the English of the Sacrifice and Mana Flask templates has a line break (\\n) at that position."
+      ],
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "已核对：基线中仅这 6 行含反斜杠，6 行 from 各恰好一次，to 仅把“\\”改为“\\n”，其余文字不变，无冲突，修正后 src/en 行数一致，form 检查通过。游戏 stat_descriptions.json 中献祭 2 行与魔力药剂行的英文在该处为换行；增益反射与失血 2 行的英文不在 stat_descriptions，以基线 en（已用 \\n）为准。"
+      }
+    }
+  ]
+}

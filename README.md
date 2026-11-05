@@ -80,10 +80,11 @@ What to edit, by purpose:
 
 | To change | Edit |
 | --- | --- |
-| A missing translation for an existing trade ID + English branch | [`curation/translations.json`](curation/translations.json): `manual_chinese`, `manual_note`, `manual_source_url` |
+| A missing translation for an existing trade ID + English branch | [`curation/translations.json`](curation/translations.json): `manual_chinese`, `manual_note`, `manual_source_url` (optional `manual_origin`, `manual_status`, `manual_review` for agent work) |
 | Explicitly override an existing trade translation | [`curation/overrides.json`](curation/overrides.json), with reason and source |
 | Non-trade templates, multi-slot templates, rare-name words | [`curation/curated.json`](curation/curated.json) |
 | Native name or description supplements | [`curation/native-translations.json`](curation/native-translations.json), reviewed through the [workbench flow](docs/translation-workbench.md) (Chinese) |
+| Mod-line templates outside the trade catalog, minion/spectre names, corrections of shipped `stat_lines.json` rows | [`curation/display-supplements.json`](curation/display-supplements.json); every record carries `origin` (`agent` or `human`), which reaches PoBR ([display supplements](docs/translation-workbench.md#显示补译与来源标记), Chinese) |
 | Additional pages to fetch | [`curation/trade-sources.json`](curation/trade-sources.json) |
 
 ## Layout

@@ -219,11 +219,27 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 **[`curation/translations.json`](../curation/translations.json)** 是日常维护入口。首次生成已将当前全部 265 条缺口放入表中，后续数量以 `mise run report` 为准。它不是每次清空的临时报表；已解决项会保留下来，便于核对人工内容与新来源的差异。
 
-只编辑这三个字段，不要改 `id`／`english` 来迁移译文：
+只编辑这三个字段（以及下面可选的来源字段），不要改 `id`／`english` 来迁移译文：
 
 - `manual_chinese`：人工译文；`null` 或空字符串表示不提供人工补缺。
 - `manual_note`：核对说明；提供人工译文时必填，可以在未翻译时先记研究线索。
 - `manual_source_url`：可选 HTTPS 来源链接；自己翻译、没有外部来源时保留 `null`，不要编造链接。
+
+补译来源与审核可另写下面五个可选字段（不写时等同历史行为：人工译文、已审核，表格字节不变）：
+
+- `manual_origin`：`agent` 或 `human`，缺省 `human`。agent 行必须同时写 `manual_status` 和 `manual_author`。
+- `manual_basis`：措辞来源，`official-same-id-branch`、`official-same-text`、`official-composed`、`official-terms`、
+  `official-same-stat-other-category`、`client-dictionary-same-line`、`poe1-official`、`community` 或 `own`。
+- `manual_author`：实际作者（模型 ID、GitHub 账号，或确定性生成器的标识，例如
+  `zh-supp-plan generator (deterministic)`；后者表示译文由固定规则生成，审核仍写在 `manual_review`）。
+- `manual_status`：`draft`、`reviewed` 或 `rejected`，缺省 `reviewed`。只有 `reviewed` 的译文被采用；草稿和
+  已拒绝的行保留在表里，状态仍是 `pending`。已拒绝的行不再做译文格式检查。
+- `manual_review`：`null` 或 `{by, note}`；`reviewed` 与 `rejected` 必填。Opus 模型的审核可以标
+  `reviewed`，`by` 写模型 ID（例如 `claude-opus-5-5`），见[显示补译与来源标记](translation-workbench.md#显示补译与来源标记)。
+
+采用后主表 `evidence` 为 `{source: "manual-fallback", reason, url, origin[, basis, author, review]}`，
+`templates.json` 把它复制进 `provenance`，所以来源标记随译文一起走。官方或 PoE2DB 译文出现后仍然优先，
+补译保留并记 `manual_differs`。
 
 `status`、`chinese`、`method`、`reason`、`manual_differs` 和 `evidence` 都由生成器重算。`chinese` 是最终采用的译文，**不是输入栏**；手工补译请填写 `manual_chinese`。
 

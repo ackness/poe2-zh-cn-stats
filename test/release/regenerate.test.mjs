@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { DICTIONARY_FILES, produceLocale } from '../../src/pobr/locale-producer.mjs';
-import { build, pin } from '../../src/release/build.mjs';
+import { ROOT, build, pin, releaseUrl } from '../../src/release/build.mjs';
+import { createSupplementLines } from '../../src/pobr/supplement-lines.mjs';
+import { storedZip } from '../../src/release/stored-zip.mjs';
 import { loadRecipe, problems, recipeFiles, regenerate } from '../../src/release/regenerate.mjs';
 import { strictJson } from '../../src/strict-json.mjs';
 import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
@@ -25,7 +27,16 @@ const ZH_CN = ['_meta.json', 'base_items.json', 'classes.json', 'mods.json', 'pa
 
 // A checkout whose release/9.9.json publication is what the legacy producer writes (plus a frozen zh-TW
 // file), with the producer manifest and template bundle committed, and its recipe.
-async function setup(t, { edit } = {}) {
+// With `supplement`, stat_lines.json and _meta.json of the publication come from pobr:supplement-lines
+// over the producer's own members (committed as a base), a game package and a correction.
+const GAME_ZIP = storedZip({ 'data/9.9/overlay/stat_descriptions.json': Buffer.from('{"scopes":{}}') });
+const GAME = { repository: 'ackness/repoe', tag: 'game/9.9-1', asset: 'pobr-game-9.9.zip', ...pin(GAME_ZIP) };
+const REVIEW = { by: 'claude-opus-5-5', note: 'synthetic' };
+const EDITS = bytes({ schema: 'poe2-display-supplements/v1', entries: [], corrections: [{ correction_id: 'fixture', locale: 'zh-CN',
+  member: 'stat_lines.json', rows: [{ from: { src: '生命', en: 'Life' }, to: { src: '生命值', en: 'Life' } }], origin: 'agent',
+  basis: 'official-terms', author: 'claude-opus-5-5', note: 'synthetic', evidence: ['synthetic'], status: 'reviewed', review: REVIEW }] });
+
+async function setup(t, { edit, supplement } = {}) {
   const made = fixture('locale-regenerate');
   t.after(() => rmSync(made.root, { recursive: true, force: true }));
   const { repo, root } = made;
@@ -50,6 +61,25 @@ async function setup(t, { edit } = {}) {
   const files = Object.fromEntries(ZH_CN.map(name => [name, readFileSync(path.join(produced, name))]));
   files['i18n/zh-TW/base_items.json'] = ZH_TW;
   if (edit) files[edit] = bytes({ edited: true });
+  let supplementJob;
+  if (supplement) {
+    write(repo, 'base/stat_lines.json', files['i18n/zh-CN/stat_lines.json']);
+    write(repo, 'base/_meta.json', files['i18n/zh-CN/_meta.json']);
+    write(repo, 'curation/display-supplements.json', EDITS);
+    const revision = commitAll(repo, 'supplement inputs');
+    const local = name => ({ file: path.join(repo, name), ...pin(readFileSync(path.join(repo, name))) });
+    write(root, 'game.zip', GAME_ZIP);
+    const out = path.join(ROOT, '.cache', `${path.basename(root)}-supplement`);
+    t.after(() => rmSync(out, { recursive: true, force: true }));
+    createSupplementLines({ schema: 'pobr-supplement-lines-request/v1', target: { ...TARGET, locale: 'zh-CN' },
+      base: local('base/stat_lines.json'), meta: local('base/_meta.json'), edits: local('curation/display-supplements.json'),
+      game_package: { file: path.join(root, 'game.zip'), ...GAME } }, out);
+    for (const name of ['stat_lines.json', '_meta.json']) files[`i18n/zh-CN/${name}`] = readFileSync(path.join(out, name));
+    const git = name => ({ revision, path: name, ...pin(readFileSync(path.join(repo, name))) });
+    supplementJob = { id: 'zh-cn-supplement-lines', kind: 'supplement-lines', locale: 'zh-CN', base: git('base/stat_lines.json'),
+      meta: git('base/_meta.json'), game_package: GAME, edits: git('curation/display-supplements.json'),
+      members: ['i18n/zh-CN/stat_lines.json', 'i18n/zh-CN/_meta.json'] };
+  }
   gitIn(repo, 'rm', '-rq', 'inputs');
   for (const [name, raw] of Object.entries(files)) write(repo, `inputs/locale-test/${name}`, raw);
   const sourceRaw = sourceManifest(files);
@@ -68,11 +98,17 @@ async function setup(t, { edit } = {}) {
       manifest: { revision: commit, path: 'generation/input-manifest.json', ...pin(manifestRaw) }, producer_commit: commit, members: ZH_CN }],
     frozen: { 'i18n/zh-TW/base_items.json': { ...pin(ZH_TW), category: 'unpinned-input', reason: 'no names.json', exit: 'publish it' } },
   };
+  if (supplementJob) {
+    const replaced = supplementJob.members;
+    recipe.jobs = [{ ...recipe.jobs[0], members: ZH_CN.filter(member => !replaced.includes(member)),
+      replaced_by: Object.fromEntries(replaced.map(member => [member, supplementJob.id])) }, supplementJob];
+  }
   write(repo, 'release/regenerate/9.9.json', bytes(recipe));
   commitAll(repo, 'recipe');
   const served = [];
   const fetcher = async address => {
     served.push(address);
+    if (address === releaseUrl(GAME.repository, GAME.tag, GAME.asset)) return GAME_ZIP;
     const file = DICTIONARY_FILES.find(name => url(name) === address);
     assert.ok(file, `unexpected download ${address}`);
     return bytes(DICTIONARY[file]);
@@ -156,6 +192,22 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
     await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, projection: bad }] }), /display: pin the projection \{scopes, literals\}/u);
   }
   await assert.rejects(attempt({ ...recipe, jobs: [job, display] }), /extra: i18n\/zh-CN\/display_texts\.json/u);
+  // An optional names pin (curation/display-supplements.json) is a full Git pin.
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names: { revision: 'f'.repeat(40), path: 'n.json' } }] }),
+    /display: pin the names file/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, official_names: { url: 'http://x.test/n.json', bytes: 1, sha256: '0'.repeat(64) } }] }),
+    /display: pin official_names/u);
+  // Monster names are decided against the game English, so names need the game Release package pinned too.
+  const names = { revision: 'f'.repeat(40), path: 'n.json', bytes: 1, sha256: '0'.repeat(64) };
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names }] }), /display: game_package needs repository/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: GAME }] }), /display: pin package_texts/u);
+  // They must be this package's own official texts, not any pinned file.
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: GAME,
+    package_texts: { stat_lines: names, passive_names: names } }] }), /display: package_texts\.passive_names is not this package's i18n\/zh-CN\/passive_names\.json/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, asset: '../x.zip' } }] }),
+    /asset pobr-game-9\.9\.zip/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, tag: '' } }] }),
+    /display: game_package needs repository/u);
   write(repo, 'release/regenerate/9.9.json', bytes(recipe));
   mkdirSync(path.join(repo, 'release/regenerate/other'), { recursive: true });
   write(repo, 'release/regenerate/9.8.json', bytes(recipe));
@@ -171,4 +223,33 @@ test('the committed recipes cover their configs and name a reason and an exit fo
       assert.deepEqual({ bytes: entry.bytes, sha256: entry.sha256 }, source.files[member], member);
     }
   }
+});
+
+test('regenerate: a supplement-lines job owns stat_lines.json and _meta.json over its pinned base', async t => {
+  const { repo, recipe, recipeFile, fetcher, served } = await setup(t, { supplement: true });
+  const done = await regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+  assert.deepEqual(problems(done), []);
+  const { result } = done;
+  assert.deepEqual(result.summary, { 'generated-identical': 9, frozen: 1 });
+  assert.equal(result.members['i18n/zh-CN/stat_lines.json'].job, 'zh-cn-supplement-lines');
+  assert.equal(result.members['i18n/zh-CN/_meta.json'].job, 'zh-cn-supplement-lines');
+  assert.ok(served.includes(releaseUrl(GAME.repository, GAME.tag, GAME.asset)));
+  assert.equal(result.inputs['zh-cn-supplement-lines:edits'].source.path, 'curation/display-supplements.json');
+  const lines = strictJson(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/stat_lines.json')));
+  assert.deepEqual(lines.filter(row => row.origin), [{ src: '生命值', en: 'Life', origin: 'agent' }]);
+  assert.equal(result.jobs[1].summary.counts.corrections.applied, 1);
+  const attempt = async value => {
+    write(repo, 'release/regenerate/9.9.json', bytes(value));
+    return regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+  };
+  const [producer, job] = recipe.jobs;
+  await assert.rejects(attempt({ ...recipe, jobs: [{ ...producer, replaced_by: undefined }, job] }),
+    /the producer also writes i18n\/zh-CN\/(_meta|stat_lines)\.json/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [{ ...producer, replaced_by: { ...producer.replaced_by, 'i18n/zh-CN/stat_lines.json': 'nobody' } }, job] }),
+    /stat_lines\.json is not a member of job nobody/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, members: ['i18n/zh-CN/stat_lines.json'] }] }),
+    /members are i18n\/<locale>\/stat_lines\.json/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, game_package: { ...job.game_package, sha256: '0'.repeat(64) } }] }),
+    /game_package/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [producer, { ...job, edits: { ...job.edits, bytes: 1 } }] }), /edits.*differs from its pin/u);
 });

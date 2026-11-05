@@ -20,7 +20,7 @@ import { produceLocale } from '../pobr/locale-producer.mjs';
 import { validateProjection } from '../pobr/display-texts.mjs';
 import {
   REPOSITORY, ROOT, assetName, download, encoded, fetchOrigin, loadConfig, log, originManifestPath, packageArchive, packageMembers,
-  pin, producerIdentity, publicationSource, readSource, require, samePin, sha256,
+  pin, producerIdentity, publicationSource, readSource, releaseUrl, require, samePin, sha256,
 } from './build.mjs';
 
 export const RECIPE_SCHEMA = 'poe2-locale-regeneration/v1';
@@ -43,7 +43,16 @@ function gitRef(value, label) {
   return value;
 }
 
-function validateJob(job, members) {
+// A game Release asset {repository, tag, asset, bytes, sha256}, downloaded with --fetch.
+// The asset is the target patch's pobr-game-<patch>.zip (it is also the file name in the work directory).
+function validateGamePackage(job, patch) {
+  const game = job.game_package;
+  require(object(game) && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/u.test(game.repository ?? '') && typeof game.tag === 'string' && game.tag
+    && game.asset === `pobr-game-${patch}.zip` && isPin(game),
+  `${job.id}: game_package needs repository, tag, asset pobr-game-${patch}.zip, bytes and sha256`);
+}
+
+function validateJob(job, members, patch) {
   require(object(job) && /^[a-z0-9][a-z0-9-]*$/u.test(job.id ?? ''), `Invalid job id: ${job?.id}`);
   require(Array.isArray(job.members) && job.members.length, `${job.id}: no members`);
   for (const member of job.members) {
@@ -61,8 +70,34 @@ function validateJob(job, members) {
     gitRef(job.manifest, `${job.id} manifest`);
     require(isPin(job.manifest) && HEX40.test(job.producer_commit ?? ''), `${job.id}: pin the manifest and name the producer commit`);
     require(job.members.every(member => member.startsWith('i18n/zh-CN/')), `${job.id}: the producer writes i18n/zh-CN/* only`);
+    // A member the producer also writes but another job of the recipe owns (loadRecipe checks the owner).
+    require(job.replaced_by === undefined || (object(job.replaced_by) && Object.entries(job.replaced_by)
+      .every(([member, owner]) => !job.members.includes(member) && typeof owner === 'string' && owner !== job.id)),
+    `${job.id}: replaced_by maps a member it does not list to the job that produces it`);
+  } else if (job.kind === 'supplement-lines') {
+    validateGamePackage(job, patch);
+    // src/pobr/supplement-lines.mjs: a base stat_lines.json (and optional _meta.json) as Git pins, the
+    // game Release package, and curation/display-supplements.json as a Git pin.
+    for (const key of ['base', 'edits', ...(job.meta ? ['meta'] : [])]) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
+    require(typeof job.locale === 'string' && JSON.stringify(job.members) === JSON.stringify([`i18n/${job.locale}/stat_lines.json`,
+      ...(job.meta ? [`i18n/${job.locale}/_meta.json`] : [])]),
+    `${job.id}: members are i18n/<locale>/stat_lines.json, then i18n/<locale>/_meta.json when meta is pinned`);
   } else if (job.kind === 'display-texts') {
     for (const key of ['catalog', 'supplement']) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
+    if (job.names !== undefined) require(isPin(gitRef(job.names, `${job.id} names`)), `${job.id}: pin the names file`);
+    // The official names file is a Git pin of this repository or an HTTPS download (e.g. a RePoE Release asset).
+    if (job.official_names !== undefined) require(isPin(job.official_names) && (typeof job.official_names.url === 'string'
+      ? job.official_names.url.startsWith('https://') : gitRef(job.official_names, `${job.id} official_names`)),
+    `${job.id}: pin official_names as {revision, path, bytes, sha256} or {url, bytes, sha256}`);
+    // Monster names are decided against the target English of the game Release package.
+    if (job.names !== undefined || job.official_names !== undefined) validateGamePackage(job, patch);
+    // The package's official stat_lines (the base without our rows) and passive_names, as Git pins:
+    // no supplement may mask their English. Required with names.
+    if (job.names !== undefined || job.package_texts !== undefined) {
+      require(object(job.package_texts) && JSON.stringify(Object.keys(job.package_texts).sort()) === '["passive_names","stat_lines"]'
+        && Object.entries(job.package_texts).every(([key, value]) => isPin(gitRef(value, `${job.id} package_texts.${key}`))),
+      `${job.id}: pin package_texts {stat_lines, passive_names} (official texts no supplement may mask)`);
+    }
     gitRef(job.supplement_module, `${job.id} supplement_module`);
     // The projection is pinned in the recipe, never read from src/pobr/display-projection.json:
     // a new default scope there must not change a member that a published package already holds.
@@ -86,11 +121,27 @@ export function loadRecipe(file, repo = ROOT) {
   require(Array.isArray(recipe.jobs) && recipe.jobs.length, 'A recipe has at least one job');
   const members = new Set(), ids = new Set();
   for (const job of recipe.jobs) {
-    validateJob(job, members);
+    validateJob(job, members, loaded.config.target.game_patch);
     require(!ids.has(job.id), `Duplicate job id ${job.id}`);
     ids.add(job.id);
   }
   require(object(recipe.categories) && object(recipe.frozen ?? {}), 'categories and frozen are objects');
+  for (const job of recipe.jobs) for (const [member, owner] of Object.entries(job.replaced_by ?? {})) {
+    require(recipe.jobs.some(other => other.id === owner && other.members.includes(member)), `${job.id}: ${member} is not a member of job ${owner}`);
+  }
+  // package_texts must be this package's own official texts: passive_names is the publication's
+  // member, stat_lines the base of its supplement-lines job (the member itself when no job adds rows).
+  const publication = recipe.jobs.some(job => job.package_texts)
+    ? strictJson(readFileSync(path.join(repo, loaded.config.source.manifest.path))) : null;
+  for (const job of recipe.jobs) if (job.package_texts) {
+    const lines = recipe.jobs.find(other => other.kind === 'supplement-lines' && other.locale === job.locale);
+    const expected = { passive_names: publication.files?.[`i18n/${job.locale}/passive_names.json`],
+      stat_lines: lines ? lines.base : publication.files?.[`i18n/${job.locale}/stat_lines.json`] };
+    for (const [key, want] of Object.entries(expected)) {
+      require(want && samePin(job.package_texts[key], want), `${job.id}: package_texts.${key} is not this package's ${lines && key === 'stat_lines'
+        ? `supplement-lines base (${lines.id})` : `i18n/${job.locale}/${key}.json`}`);
+    }
+  }
   for (const job of recipe.jobs) for (const [member, layers] of Object.entries(job.composed_evidence ?? {})) {
     for (const layer of layers) {
       require(Object.hasOwn(recipe.categories, layer.category), `${job.id}: ${member} layer ${layer.input} names an undeclared category`);
@@ -187,7 +238,7 @@ async function localeProducer(job, inputs, work) {
   const receipt = await produceLocale({ manifestPath: path.join(work, 'manifest.json'), manifestSha256: job.manifest.sha256, inputDir: input, out });
   const outputs = new Map(job.members.map(member => [member, readFileSync(path.join(out, member))]));
   for (const [name, expected] of Object.entries(receipt.files)) {
-    if (name.startsWith('i18n/')) require(job.members.includes(name), `${job.id}: the producer also writes ${name}; list or drop it`);
+    if (name.startsWith('i18n/')) require(job.members.includes(name) || job.replaced_by?.[name], `${job.id}: the producer also writes ${name}; list or drop it`);
     require(samePin(pin(readFileSync(path.join(out, name))), expected), `${job.id}: ${name} differs from the producer receipt`);
   }
   return { outputs, inputs: files, summary: { layers: receipt.layers, profile: receipt.profile } };
@@ -215,15 +266,70 @@ async function displayTexts(job, inputs, work, repo) {
       module: { file: job.supplement_module.path, ...pin(moduleRaw), revision: job.supplement_module.revision } },
     projection: job.projection,
   };
+  if (job.names) {
+    const raw = inputs.git(job.names, job.names, `${job.id}:names`);
+    writeFileSync(path.join(work, 'names.json'), raw);
+    request.names = { file: path.join(work, 'names.json'), ...pin(raw) };
+  }
+  if (job.official_names) {
+    const spec = job.official_names, label = `${job.id}:official_names`;
+    const raw = spec.url ? await inputs.url(spec.url, spec, label) : inputs.git(spec, spec, label);
+    writeFileSync(path.join(work, 'official-names.json'), raw);
+    request.official_names = { file: path.join(work, 'official-names.json'), ...pin(raw) };
+  }
+  if (job.package_texts) {
+    request.package_texts = {};
+    for (const [key, spec] of Object.entries(job.package_texts)) {
+      const raw = inputs.git(spec, spec, `${job.id}:package_texts.${key}`);
+      writeFileSync(path.join(work, `package-${key}.json`), raw);
+      request.package_texts[key] = { file: path.join(work, `package-${key}.json`), ...pin(raw) };
+    }
+  }
+  if (job.names || job.official_names) {
+    const { repository, tag, asset } = job.game_package;
+    const zip = await inputs.url(releaseUrl(repository, tag, asset), job.game_package, `${job.id}:game_package`);
+    writeFileSync(path.join(work, asset), zip);
+    request.game_package = { file: path.join(work, asset), ...pin(zip), repository, tag, asset };
+  }
   const receipt = await createDisplayTexts(request, path.join(work, 'out'));
   const raw = readFileSync(path.join(work, 'out', 'display_texts.json'));
   require(samePin(pin(raw), receipt.files['display_texts.json']), `${job.id}: display_texts.json differs from its receipt`);
   return { outputs: new Map([[job.members[0], raw]]), inputs: new Map(),
     summary: { decisions: receipt.decisions.length, conflicts: receipt.conflicts.length, supplement_records: receipt.supplement?.records,
-      projection: receipt.projection } };
+      projection: receipt.projection, ...(receipt.names ? { names: receipt.names.counts } : {}),
+      ...(receipt.official_elsewhere ? { official_elsewhere_skipped: receipt.official_elsewhere.skipped } : {}) } };
 }
 
-const JOBS = { 'locale-producer': localeProducer, 'display-texts': displayTexts };
+// src/pobr/supplement-lines.mjs over a pinned base member, the game Release package and the pinned
+// display supplements. Every input is materialized from its pin; the producer re-checks each pin.
+async function supplementLinesJob(job, inputs, work) {
+  const { createSupplementLines } = await import('../pobr/supplement-lines.mjs');
+  const files = new Map(), request = { schema: 'pobr-supplement-lines-request/v1',
+    target: { game: job.target.game, game_patch: job.target.game_patch, realm: job.target.realm, locale: job.locale } };
+  const materialize = (key, name, raw) => {
+    writeFileSync(path.join(work, name), raw);
+    files.set(key, raw);
+    return { file: path.join(work, name), ...pin(raw) };
+  };
+  request.base = materialize('base', 'stat_lines.json', inputs.git(job.base, job.base, `${job.id}:base`));
+  if (job.meta) request.meta = materialize('meta', '_meta.json', inputs.git(job.meta, job.meta, `${job.id}:meta`));
+  const { repository, tag, asset } = job.game_package;
+  const zip = await inputs.url(releaseUrl(repository, tag, asset), job.game_package, `${job.id}:game_package`);
+  request.game_package = { ...materialize('game_package', asset, zip), repository, tag, asset };
+  request.edits = materialize('edits', 'display-supplements.json', inputs.git(job.edits, job.edits, `${job.id}:edits`));
+  const receipt = createSupplementLines(request, path.join(work, 'out'));
+  const outputs = new Map();
+  for (const member of job.members) {
+    const raw = readFileSync(path.join(work, 'out', path.basename(member)));
+    require(samePin(pin(raw), receipt.files[path.basename(member)]), `${job.id}: ${member} differs from its receipt`);
+    outputs.set(member, raw);
+  }
+  // Only the base members can be carried verbatim; the game package and edits never are.
+  const carried = new Map([...files].filter(([key]) => key === 'base' || key === 'meta'));
+  return { outputs, inputs: carried, summary: { counts: receipt.counts, corrections: receipt.corrections.length, entries: receipt.entries.length } };
+}
+
+const JOBS = { 'locale-producer': localeProducer, 'display-texts': displayTexts, 'supplement-lines': supplementLinesJob };
 
 // --- regeneration --------------------------------------------------------------------------------
 

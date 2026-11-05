@@ -108,3 +108,52 @@ test('invalid or duplicated manual work fails rather than quietly contaminating 
   assert.throws(() => build([{ ...manual, manual_source_url: 'https://' }]), /HTTPS URL/);
   assert.throws(() => build([{ ...manual, manual_source_url: 'http://example.org' }]), /HTTPS URL/);
 });
+
+test('agent supplements carry origin into evidence, and only reviewed rows are applied', () => {
+  const review = { by: 'claude-opus-5-5', note: 'Checked the term against the official Life rows' };
+  const agent = { ...manual, manual_origin: 'agent', manual_basis: 'official-same-stat-other-category',
+    manual_author: 'claude-haiku-4-5', manual_status: 'reviewed', manual_review: review };
+  const result = build([agent]);
+  assert.equal(result.entries[0].chinese, manual.manual_chinese);
+  assert.deepEqual(result.entries[0].evidence, [{ source: 'manual-fallback', reason: manual.manual_note, url: null,
+    origin: 'agent', basis: 'official-same-stat-other-category', author: 'claude-haiku-4-5', review }]);
+  assert.equal(result.translations[0].manual_origin, 'agent');
+  assert.deepEqual(build(result.translations), result);
+  // A legacy row without the new fields is a human, reviewed fallback and keeps its table shape.
+  const legacy = build([manual]);
+  assert.equal(legacy.entries[0].evidence[0].origin, 'human');
+  assert.deepEqual(Object.keys(legacy.translations[0]).filter(key => key.startsWith('manual_')),
+    ['manual_chinese', 'manual_note', 'manual_source_url', 'manual_differs']);
+  for (const status of ['draft', 'rejected']) {
+    const kept = build([{ ...agent, manual_status: status, ...(status === 'draft' ? { manual_review: null } : {}) }]);
+    assert.equal(kept.entries[0].chinese, null);
+    assert.equal(kept.translations[0].status, 'pending');
+    assert.equal(kept.translations[0].manual_status, status);
+    assert.equal(kept.translations[0].manual_chinese, manual.manual_chinese);
+    assert.deepEqual(build(kept.translations), kept);
+  }
+  // Official text that appears later still wins over a reviewed agent row and records the difference.
+  const official = build(result.translations, [{ id: life.id, text: '# 生命上限' }]);
+  assert.equal(official.entries[0].method, 'trade');
+  assert.equal(official.translations[0].manual_differs, true);
+  assert.equal(official.translations[0].manual_origin, 'agent');
+});
+
+test('supplement attribution is validated', () => {
+  const agent = { ...manual, manual_origin: 'agent', manual_author: 'claude-haiku-4-5', manual_status: 'draft' };
+  assert.throws(() => build([{ ...agent, manual_status: undefined }]), /requires manual_status and manual_author/);
+  assert.throws(() => build([{ ...agent, manual_author: undefined }]), /requires manual_status and manual_author/);
+  assert.throws(() => build([{ ...agent, manual_author: ' ' }]), /manual_author must be nonempty/);
+  // The author may be a model id, a GitHub account or a deterministic generator id.
+  assert.doesNotThrow(() => build([{ ...agent, manual_author: 'zh-supp-plan generator (deterministic)' }]));
+  assert.throws(() => build([{ ...agent, manual_origin: 'official' }]), /agent or human/);
+  assert.throws(() => build([{ ...agent, manual_status: 'approved' }]), /draft, reviewed or rejected/);
+  assert.throws(() => build([{ ...agent, manual_status: 'reviewed' }]), /requires manual_review/);
+  assert.throws(() => build([{ ...agent, manual_status: 'reviewed', manual_review: { by: '', note: 'x' } }]), /\{by, note\}/);
+  assert.throws(() => build([{ ...agent, manual_basis: 'guess' }]), /Unknown manual_basis/);
+  assert.throws(() => build([{ ...agent, manual_chinese: null, manual_status: 'reviewed',
+    manual_review: { by: 'a', note: 'b' } }]), /requires manual_chinese/);
+  // A rejected draft may keep text that would not pass; it is never applied.
+  assert.equal(build([{ ...agent, manual_chinese: '生命', manual_status: 'rejected', manual_review: { by: 'a', note: 'slot lost' } }])
+    .entries[0].chinese, null);
+});

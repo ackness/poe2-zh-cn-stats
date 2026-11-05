@@ -36,7 +36,7 @@ The split is maintained once, in
 
 | Path | What | Status |
 | --- | --- | --- |
-| `curation/` | Hand-maintained inputs: trade worklist `translations.json`, templates `curated.json`, overrides `overrides.json`, native supplements `native-translations.json`, fetch list `trade-sources.json` | editable |
+| `curation/` | Hand-maintained inputs: trade worklist `translations.json`, templates `curated.json`, overrides `overrides.json`, native supplements `native-translations.json`, display supplements and stat-line corrections `display-supplements.json`, fetch list `trade-sources.json` | editable |
 | `src/cli.mjs` | Command entry for the trade dictionary, native candidates and the workbench | editable |
 | `src/trade/` | Trade dictionary: fetch, pairing, generation, checks | editable |
 | `src/release/` | `release:build`, `release:publish`, `release:regenerate` and helpers | editable |
@@ -97,6 +97,7 @@ mise run release:build -- --check-release        # also compare with its Release
 mise run release:regenerate -- --fetch           # rebuild members from pinned inputs (~40 s, ~4 GB)
 mise run release:publish                         # dry run of a publish
 mise run pobr:display-texts -- --request FILE --out .cache/NEW
+mise run pobr:supplement-lines -- --request FILE --out .cache/NEW
 mise run native:candidate -- --facts DIR --expected-manifest-sha256 SHA
 mise exec -- node src/cli.mjs workbench --config FILE --out .cache/NEW
 ```

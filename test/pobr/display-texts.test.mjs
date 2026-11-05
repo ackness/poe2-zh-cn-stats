@@ -5,6 +5,8 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-texts.mjs';
+import { entryId, monsterTargets, validateOfficialNames } from '../../src/pobr/display-supplements.mjs';
+import { storedZip } from '../../src/release/stored-zip.mjs';
 
 const row = (id, english, localized, extra = {}) => ({
   table: 'BaseItemTypes', field: 'Name', id, english, localized,
@@ -158,6 +160,10 @@ function fixture(t, version, modules, options = {}) {
     catalog: { manifest: path.join(root, 'manifest.json'), ...write('manifest.json', JSON.stringify(manifest)) } };
   const output = { root, manifest, catalog, library, request, write, pin, out: path.join(root, 'out') };
   if (options.supplement) addSupplement(output, pin, write);
+  // The package's official stat lines and passive names, which no supplement may mask.
+  const [lines, passives] = options.packageTexts ?? [[], {}];
+  request.package_texts = { stat_lines: { file: path.join(root, 'stat_lines.json'), ...write('stat_lines.json', JSON.stringify(lines)) },
+    passive_names: { file: path.join(root, 'passive_names.json'), ...write('passive_names.json', JSON.stringify(passives)) } };
   return output;
 }
 
@@ -305,6 +311,9 @@ test('a pinned reviewed supplement projects exact-context text and keeps the off
   assert.deepEqual(sidecar.entries, { Flask: '药剂', Sword: null });
   assert.deepEqual(sidecar.scopes['BaseItemTypes.Name'],
     { flask: ['Flask', '药剂'], sword: ['Sword', null] });
+  // The supplemented value is marked as ours in the literal and in its scope; official values are not listed.
+  assert.deepEqual(sidecar.origins, { entries: { Flask: 'agent' }, scopes: { 'BaseItemTypes.Name': { flask: 'agent' } } });
+  assert.deepEqual(Object.keys(sidecar), ['schema', 'game_patch', 'realm', 'locale', 'catalog_sha256', 'entries', 'scopes', 'origins']);
   assert.equal(sidecar.catalog_sha256, input.manifest.files['catalog.json'].sha256);
   // Only the complete English context of each row reaches the library lookup.
   const scope = { game_patch: 'test', realm: 'international', locale: 'zh-CN' };
@@ -329,6 +338,48 @@ test('a pinned reviewed supplement projects exact-context text and keeps the off
     assert.equal(typeof receipt.inputs[path.join(input.root, file)], 'object', file);
   }
   assert.deepEqual(fs.readdirSync(input.out).sort(), ['display_texts.json', 'receipt.json']);
+  assert.deepEqual(receipt.official_elsewhere, { skipped: 0, rows: [] });
+  // Without the package's official texts a supplement cannot ship.
+  const bare = fixture(t, 3, 6, { supplement: true, records: supplementRecords });
+  delete bare.request.package_texts;
+  await assert.rejects(createDisplayTexts(bare.request, bare.out), /need packageTexts/);
+});
+
+test('a supplement never masks an official translation elsewhere in the package (Bulwark)', async t => {
+  // -3 has Bulwark null in display_texts but the official 壁垒 in stat_lines: ours must not fill it.
+  const records = [row('bulwark', 'Bulwark', null), row('plain', 'Plain', null), row('stone', 'Stone', '石')];
+  const agent = { bulwark: '堡垒', plain: '朴素', stone: '石头' };
+  const lookup = query => {
+    const match = records.find(r => r.id === query.id);
+    if (agent[query.id] && query.id !== 'stone') return { status: 'translated', text: agent[query.id], origin: 'agent' };
+    return match.localized === null ? { status: 'fallback', text: query.english } : { status: 'translated', text: match.localized };
+  };
+  const packageTexts = new Map([['Bulwark', { text: '壁垒', source: 'stat_lines' }]]);
+  const { sidecar, skipped, decisions } = projectDisplayTexts({ game_patch: 'test', realm: 'international', locale: 'zh-TW', records },
+    lookup, 'a'.repeat(64), undefined, { packageTexts });
+  assert.equal(sidecar.entries.Bulwark, null);
+  assert.deepEqual(sidecar.scopes['BaseItemTypes.Name'].bulwark, ['Bulwark', null]);
+  assert.equal(sidecar.entries.Plain, '朴素');
+  assert.deepEqual(sidecar.origins, { entries: { Plain: 'agent' }, scopes: { 'BaseItemTypes.Name': { plain: 'agent' } } });
+  assert.deepEqual(skipped, [{ kind: 'catalog', identity: ['BaseItemTypes', 'Name', 'bulwark'], english: 'Bulwark', origin: 'agent',
+    text: '堡垒', official: '壁垒', source: 'stat_lines' }]);
+  assert.equal(decisions[0].skipped, 'official-elsewhere');
+  // An official catalog value for the same English blocks ours as well.
+  const twice = [row('a', 'Stone', '石'), row('b', 'Stone', null)];
+  const result = projectDisplayTexts({ game_patch: 'test', realm: 'international', locale: 'zh-TW', records: twice },
+    query => query.id === 'a' ? { status: 'translated', text: '石' } : { status: 'translated', text: '石头', origin: 'agent' },
+    'a'.repeat(64), undefined, { packageTexts: new Map() });
+  assert.equal(result.skipped[0].source, 'catalog');
+  assert.equal(Object.hasOwn(result.sidecar, 'origins'), false);
+  // Through createDisplayTexts: the pinned stat_lines row (without origin) masks the supplemented Flask.
+  const input = fixture(t, 3, 6, { supplement: true, records: supplementRecords,
+    packageTexts: [[{ src: '药瓶', en: 'Flask' }, { src: '剑', en: 'Sword', origin: 'agent' }], {}] });
+  const receipt = await createDisplayTexts(input.request, input.out);
+  const written = JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json')));
+  assert.equal(written.entries.Flask, null);
+  assert.equal(Object.hasOwn(written, 'origins'), false);
+  assert.equal(receipt.official_elsewhere.skipped, 1);
+  assert.equal(receipt.official_elsewhere.rows[0].official, '药瓶');
 });
 
 test('reviewed supplement pins, module closure and catalog version fail closed', async t => {
@@ -466,4 +517,188 @@ test('a request projection replaces the default file, which is then neither read
   await assert.rejects(createDisplayTexts({ ...other.request, projection: { ...projection, extra: true } }, other.out),
     /Invalid runtime projection/);
   assert.equal(fs.existsSync(other.out), false);
+});
+
+const BASED_ON = { game_patch: 'test', game_package: { repository: 'ackness/repoe', tag: 'game/test-1', sha256: 'c'.repeat(64) },
+  stat_descriptions_sha256: 'd'.repeat(64) };
+const monster = (english, ids, extra = {}) => {
+  const identity = { game: 'poe2', realm: 'international', locale: 'zh-TW', kind: 'monster-name',
+    table: 'MonsterVarieties', field: 'Name', english, ...extra.identity };
+  return { entry_id: entryId(identity), identity, ids, based_on: BASED_ON, text: extra.text ?? '骷髏', origin: 'agent',
+    basis: 'own', author: 'claude-haiku-4-5', note: '音译', status: extra.status ?? 'reviewed',
+    review: (extra.status ?? 'reviewed') === 'draft' ? null : { by: 'claude-opus-5-5', note: 'checked' } };
+};
+// The shape of RePoE's decoded MonsterVarieties.Name files (one client, one localized language).
+const officialNames = (names, extra = {}) => ({ format: 'scratch-monster-variety-names/v1',
+  localized: { language: 'Traditional Chinese', game_patch: 'test', realm: 'international' },
+  index_identity: { kind: 'cdn-index-partial-ranges', index_receipt_sha256: 'e'.repeat(64) },
+  names: Object.fromEntries(Object.entries(names).map(([id, [english, zh_tw]]) => [id, { english, zh_tw }])), ...extra });
+const NAMES = { scopes: ['BaseItemTypes.Name', 'MonsterVarieties.Name'], literals: 'all-catalog-conflict-participants' };
+// Target English of the game package: minions by monster_variety_id, spectres by id.
+const TARGETS = monsterTargets(
+  { minions: [{ id: 'SkeletonMinion', monster_variety_id: 'Metadata/Monsters/Skeleton', name: 'Skeleton' }] },
+  { minions: ['Skeleton2', 'Official', 'Draft', 'Elsewhere', 'Wolf', 'Same', 'Empty']
+    .map(name => ({ id: `Metadata/Monsters/${name}`, name: { Skeleton2: 'Skeleton', Official: 'Official Beast' }[name] ?? name }))
+    .concat([{ id: 'Metadata/Monsters/Renamed', name: 'Renamed Beast' }, { id: 'Metadata/Monsters/Stale', name: 'New Beast' },
+      { id: 'Metadata/Monsters/Twice', name: 'One' }, { id: 'Metadata/Monsters/Twice', name: 'Two' }]) });
+const GAME = { sha256: 'c'.repeat(64), targets: TARGETS };
+const projectNames = (records, entries, projection = NAMES, official = null, extra = {}) => projectDisplayTexts(
+  { game_patch: 'test', realm: 'international', locale: 'zh-TW', records }, query => {
+    const match = records.find(r => r.table === query.table && r.id === query.id);
+    return match.localized === null ? { status: 'fallback', text: query.english }
+      : { status: 'translated', text: match.localized, origin: match.origin };
+  }, 'a'.repeat(64), projection,
+  { names: entries === null ? null : { schema: 'poe2-display-supplements/v1', entries, corrections: [] }, official, game: GAME,
+    packageTexts: new Map(), ...extra });
+
+test('without supplements the sidecar has no origins block, so existing members keep their bytes', () => {
+  const { sidecar } = project([row('a', 'Same', '甲')]);
+  assert.equal(Object.hasOwn(sidecar, 'origins'), false);
+  // An empty names document adds nothing either, even with the scope declared.
+  const empty = projectNames([row('a', 'Same', '甲')], []);
+  assert.deepEqual(empty.sidecar, sidecar);
+  assert.deepEqual(empty.names.counts, { official: 0, supplemented: 0, superseded: 0, retired: 0, 'official-elsewhere': 0 });
+  assert.throws(() => projectNames([], [], NAMES, null, { game: null }), /pinned game package/);
+});
+
+test('game targets: minions by variety id, spectres by id, an id named twice is ambiguous', () => {
+  assert.equal(TARGETS.get('Metadata/Monsters/Skeleton'), 'Skeleton');
+  assert.equal(TARGETS.get('Metadata/Monsters/Twice'), null);
+  assert.equal(TARGETS.has('SkeletonMinion'), false);
+});
+
+test('reviewed monster names fill MonsterVarieties.Name with origin; a catalog row and other states win', () => {
+  const records = [row('Metadata/Monsters/Official', 'Official Beast', '官方野獸', { table: 'MonsterVarieties' })];
+  const entries = [
+    monster('Skeleton', ['Metadata/Monsters/Skeleton', 'Metadata/Monsters/Skeleton2']),
+    monster('Official Beast', ['Metadata/Monsters/Official'], { text: '我們的野獸' }),
+    monster('Draft', ['Metadata/Monsters/Draft'], { status: 'draft' }),
+    monster('Elsewhere', ['Metadata/Monsters/Elsewhere'], { identity: { locale: 'zh-CN' } }),
+    monster('Old Beast', ['Metadata/Monsters/Stale', 'Metadata/Monsters/Gone'], { text: '舊野獸' }),
+  ];
+  const { sidecar, names } = projectNames(records, entries);
+  assert.deepEqual(sidecar.scopes['MonsterVarieties.Name'], {
+    'Metadata/Monsters/Official': ['Official Beast', '官方野獸'],
+    'Metadata/Monsters/Skeleton': ['Skeleton', '骷髏'], 'Metadata/Monsters/Skeleton2': ['Skeleton', '骷髏'] });
+  assert.deepEqual(sidecar.origins, { entries: {}, scopes: { 'MonsterVarieties.Name': {
+    'Metadata/Monsters/Skeleton': 'agent', 'Metadata/Monsters/Skeleton2': 'agent' } } });
+  // Names never become literal entries (an English name can be shared by unrelated things).
+  assert.equal(Object.hasOwn(sidecar.entries, 'Skeleton'), false);
+  assert.deepEqual(names.entries.map(name => name.lifecycle), ['supplemented', 'superseded', 'draft', 'other-target', 'retired']);
+  assert.deepEqual(names.entries[1].ids, [{ id: 'Metadata/Monsters/Official', lifecycle: 'superseded', by: 'catalog' }]);
+  // Our English is no longer the game's, or the id left the game: retired, kept in curation.
+  assert.deepEqual(names.entries[4].ids, [
+    { id: 'Metadata/Monsters/Stale', lifecycle: 'retired', reason: 'english-differs', target_english: 'New Beast' },
+    { id: 'Metadata/Monsters/Gone', lifecycle: 'retired', reason: 'not-in-game', target_english: null }]);
+  assert.deepEqual(names.counts, { official: 0, supplemented: 2, superseded: 1, retired: 2, 'official-elsewhere': 0 });
+  assert.equal(names.entries[0].needs_review, undefined);
+  const moved = projectNames([], [entries[0]], NAMES, null, { game: { ...GAME, sha256: 'f'.repeat(64) } });
+  assert.equal(moved.names.entries[0].needs_review, 'based_on differs from the pinned game package');
+  assert.throws(() => projectNames([], [entries[0], monster('Skeleton Two', ['Metadata/Monsters/Skeleton'])]), /Two reviewed monster names/);
+  assert.throws(() => projectNames([], [entries[0]], { ...NAMES, scopes: ['BaseItemTypes.Name'] }), /MonsterVarieties\.Name in projection\.scopes/);
+  assert.throws(() => projectNames([], [{ ...entries[0], entry_id: 'f'.repeat(64) }]), /entry_id/);
+});
+
+test('official names win when their English is the game English; otherwise neither a mismatched name ships', () => {
+  const official = officialNames({
+    'Metadata/Monsters/Skeleton': ['Skeleton', '骷髏戰士'], 'Metadata/Monsters/Wolf': ['Wolf', '狼'],
+    'Metadata/Monsters/Same': ['Same', 'Same'], 'Metadata/Monsters/Empty': ['Empty', null],
+    'Metadata/Monsters/Renamed': ['Renamed Beast', '改名野獸'], 'Metadata/Monsters/Stale': ['Old Beast', '舊名野獸'],
+    'Metadata/Monsters/Twice': ['One', '一'], 'Metadata/Monsters/NotInGame': ['Hidden', '隱藏'],
+  });
+  const entries = [
+    monster('Skeleton', ['Metadata/Monsters/Skeleton', 'Metadata/Monsters/Skeleton2']),
+    monster('Empty', ['Metadata/Monsters/Empty'], { text: '空' }),
+    // Ours targets other English than the game: official wins (its English is the game's), ours is retired.
+    monster('Old Beast', ['Metadata/Monsters/Renamed'], { text: '舊野獸' }),
+    // The official name is for older English than the game: not applied; ours ships, its English is current.
+    monster('New Beast', ['Metadata/Monsters/Stale'], { text: '新野獸' }),
+  ];
+  const { sidecar, names } = projectNames([], entries, NAMES, official);
+  assert.deepEqual(sidecar.scopes['MonsterVarieties.Name'], {
+    'Metadata/Monsters/Empty': ['Empty', '空'],
+    'Metadata/Monsters/Renamed': ['Renamed Beast', '改名野獸'],
+    'Metadata/Monsters/Skeleton': ['Skeleton', '骷髏戰士'],
+    'Metadata/Monsters/Stale': ['New Beast', '新野獸'],
+    'Metadata/Monsters/Wolf': ['Wolf', '狼'] });
+  // Only our values are marked; official ones never appear in origins.
+  assert.deepEqual(sidecar.origins.scopes['MonsterVarieties.Name'], { 'Metadata/Monsters/Empty': 'agent',
+    'Metadata/Monsters/Stale': 'agent' });
+  assert.deepEqual(names.counts, { official: 3, supplemented: 2, superseded: 1, retired: 1, 'official-elsewhere': 1 });
+  assert.deepEqual(names.entries[2].ids, [{ id: 'Metadata/Monsters/Renamed', lifecycle: 'retired', reason: 'english-differs',
+    target_english: 'Renamed Beast' }]);
+  assert.deepEqual(names.entries[0].ids, [
+    { id: 'Metadata/Monsters/Skeleton', lifecycle: 'superseded', by: 'official-names', official: '骷髏戰士', supplement_differs: true },
+    // The official name of another id has this English: ours never ships beside it.
+    { id: 'Metadata/Monsters/Skeleton2', lifecycle: 'official-elsewhere', official: '骷髏戰士', source: 'official-names' }]);
+  // So does an official stat line or passive name with the same English.
+  const passive = projectNames([], [entries[1]], NAMES, null, { packageTexts: new Map([['Empty', { text: '虛空', source: 'passive_names' }]]) });
+  assert.deepEqual(passive.names.entries[0].ids, [{ id: 'Metadata/Monsters/Empty', lifecycle: 'official-elsewhere', official: '虛空',
+    source: 'passive_names' }]);
+  assert.equal(Object.hasOwn(passive.sidecar, 'origins'), false);
+  assert.deepEqual(passive.skipped.map(row => row.identity), [['MonsterVarieties', 'Name', 'Metadata/Monsters/Empty']]);
+  assert.throws(() => projectNames([], [entries[1]], NAMES, null, { packageTexts: null }), /need packageTexts/);
+  assert.deepEqual(names.official.not_applied, { 'catalog-row': [], untranslated: ['Metadata/Monsters/Same', 'Metadata/Monsters/Empty'],
+    'not-in-game': 1, 'ambiguous-target': ['Metadata/Monsters/Twice'],
+    'english-differs': [{ id: 'Metadata/Monsters/Stale', official_english: 'Old Beast', target_english: 'New Beast' }] });
+  assert.deepEqual(names.official.provenance, { accepted_by: 'declared-realm-international', declared_realm: 'international',
+    realm_basis: 'declared', catalog_client_index_sha256: null, same_client_as_catalog: false });
+  // Official names alone, without our document.
+  assert.deepEqual(projectNames([], null, NAMES, official).names.counts, { official: 3, supplemented: 0, superseded: 0, retired: 0, 'official-elsewhere': 0 });
+  assert.equal(Object.hasOwn(projectNames([], null, NAMES, official).sidecar, 'origins'), false);
+  // The file must be for this locale and patch, name its client, and zh-TW must be the international client.
+  assert.throws(() => projectNames([], null, NAMES, { ...official, localized: { ...official.localized, language: 'Simplified Chinese' } }),
+    /locale zh-CN differs from zh-TW/);
+  assert.throws(() => projectNames([], null, NAMES, { ...official, localized: { ...official.localized, game_patch: '0.1' } }), /game_patch/);
+  assert.throws(() => projectNames([], null, NAMES, { ...official, localized: { ...official.localized, realm: 'china' } }), /realm international/);
+  assert.throws(() => projectNames([], null, NAMES, { ...official, index_identity: { kind: 'x' } }), /client identity/);
+  assert.throws(() => projectNames([], null, NAMES, { ...official, names: { a: { english: 'A', zh_cn: '甲' } } }), /fields must be/);
+  assert.throws(() => projectNames([], null, { ...NAMES, scopes: ['BaseItemTypes.Name'] }, official), /projection\.scopes/);
+});
+
+test('official zh-CN names must come from the China client', () => {
+  const zhCN = (extra = {}) => ({ format: 'f', localized: { language: 'Simplified Chinese', game_patch: '0.5.5.5', ...extra.localized },
+    index_identity: { index_receipt_sha256: '1'.repeat(64), ...extra.index }, names: { 'Metadata/Monsters/A': { english: 'A', zh_cn: '甲' } } });
+  const target = { locale: 'zh-CN', game_patch: '0.5.5.5' };
+  // The client index of the catalog's observed client, or a declared realm china (recorded as a declaration).
+  assert.deepEqual(validateOfficialNames(zhCN(), target, '1'.repeat(64)).provenance, { accepted_by: 'catalog-client-index',
+    declared_realm: null, realm_basis: 'catalog-client-index', catalog_client_index_sha256: '1'.repeat(64), same_client_as_catalog: true });
+  const declared = validateOfficialNames(zhCN({ localized: { realm: 'china' } }), target, '2'.repeat(64)).provenance;
+  assert.deepEqual(declared, { accepted_by: 'declared-realm-china', declared_realm: 'china', realm_basis: 'declared',
+    catalog_client_index_sha256: '2'.repeat(64), same_client_as_catalog: false });
+  // An international-client zh-CN table is never official zh-CN.
+  assert.throws(() => validateOfficialNames(zhCN(), target, '2'.repeat(64)), /must come from the China client/);
+  // A declared international realm contradicts zh-CN even when the index matches.
+  for (const index of ['1', '2']) {
+    assert.throws(() => validateOfficialNames(zhCN({ localized: { realm: 'international' } }), target, index.repeat(64)),
+      /declares realm international; only the China client/);
+  }
+});
+
+test('createDisplayTexts reads names, official names and the game package only from pinned files', async t => {
+  const input = fixture(t, 3, 6);
+  const doc = JSON.stringify({ schema: 'poe2-display-supplements/v1', corrections: [],
+    entries: [monster('Skeleton', ['Metadata/Monsters/Skeleton', 'Metadata/Monsters/Other'], { identity: { locale: 'zh-CN' }, text: '骷髅' })] });
+  input.request.names = { file: path.join(input.root, 'names.json'), ...input.write('names.json', doc) };
+  const official = JSON.stringify({ format: 'scratch-monster-variety-names/v1', locale: 'zh-CN', realm: 'china',
+    observed_client: { index_sha256: '1'.repeat(64) }, names: { 'Metadata/Monsters/Skeleton': { english: 'Skeleton', zh_cn: '骷髅战士' } } });
+  input.request.official_names = { file: path.join(input.root, 'official.json'), ...input.write('official.json', official) };
+  input.request.projection = NAMES;
+  const zip = storedZip({ 'data/test/overlay/minions.json': Buffer.from(JSON.stringify({ minions: [] })),
+    'data/test/overlay/spectres.json': Buffer.from(JSON.stringify({ minions: [{ id: 'Metadata/Monsters/Skeleton', name: 'Skeleton' },
+      { id: 'Metadata/Monsters/Other', name: 'Skeleton' }] })) });
+  await assert.rejects(createDisplayTexts(input.request, input.out + '-nogame'), /need game_package/);
+  input.request.game_package = { file: path.join(input.root, 'pobr-game-test.zip'), ...input.write('pobr-game-test.zip', zip),
+    repository: 'ackness/repoe', tag: 'game/test-1', asset: 'pobr-game-test.zip' };
+  const receipt = await createDisplayTexts(input.request, input.out);
+  const sidecar = JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json')));
+  // Our Skeleton for the other id is skipped: the official name of the same English ships.
+  assert.deepEqual(sidecar.scopes['MonsterVarieties.Name'], { 'Metadata/Monsters/Skeleton': ['Skeleton', '骷髅战士'] });
+  assert.equal(Object.hasOwn(sidecar, 'origins'), false);
+  assert.deepEqual(receipt.names.counts, { official: 1, supplemented: 0, superseded: 1, retired: 0, 'official-elsewhere': 1 });
+  assert.equal(receipt.official_elsewhere.skipped, 1);
+  assert.equal(receipt.names.official.provenance.accepted_by, 'declared-realm-china');
+  for (const file of ['names.json', 'official.json', 'pobr-game-test.zip']) assert.equal(typeof receipt.inputs[path.join(input.root, file)], 'object');
+  input.request.official_names.sha256 = '0'.repeat(64);
+  await assert.rejects(createDisplayTexts(input.request, input.out + '-bad'), /SHA256 mismatch/);
 });
