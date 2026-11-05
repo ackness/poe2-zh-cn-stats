@@ -49,13 +49,17 @@ test('Shaman Mantle exports exactly four reviewed, verbatim single-line aliases 
   }
 });
 
+// curated.json rows changed after the Shaman Mantle publication; the merge adds them too. curated.bonded
+// moved from 纽带：{0} to Tencent's official prefix (the retained bytes keep the old pair).
+const changedSince = [{ src: '羁绊： {0}', en: 'Bonded: {0}' }];
+
 test('locale merge adds only the four aliases and preserves every retained pair and the original block', () => {
   const before = JSON.stringify(retained);
   const result = mergeTranslations(retained, bundle);
   const retainedKeys = new Set(retained.map(key));
   const added = result.pairs.filter(row => !retainedKeys.has(key(row)));
-  assert.deepEqual(new Set(added.map(key)), new Set(aliases.map(key)));
-  assert.equal(result.pairs.length, retained.length + 4);
+  assert.deepEqual(new Set(added.map(key)), new Set([...aliases, ...changedSince].map(key)));
+  assert.equal(result.pairs.length, retained.length + 4 + changedSince.length);
   assert.deepEqual(result.pairs.filter(row => retainedKeys.has(key(row))), retained);
   assert.deepEqual(result.pairs.filter(row => row.en === block.en), [block]);
   assert.equal(JSON.stringify(retained), before);
