@@ -195,6 +195,8 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
   // An optional names pin (curation/display-supplements.json) is a full Git pin.
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names: { revision: 'f'.repeat(40), path: 'n.json' } }] }),
     /display: pin the names file/u);
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, official_names: { url: 'http://x.test/n.json', bytes: 1, sha256: '0'.repeat(64) } }] }),
+    /display: pin official_names/u);
   write(repo, 'release/regenerate/9.9.json', bytes(recipe));
   mkdirSync(path.join(repo, 'release/regenerate/other'), { recursive: true });
   write(repo, 'release/regenerate/9.8.json', bytes(recipe));

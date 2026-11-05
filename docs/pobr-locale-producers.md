@@ -55,8 +55,19 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   [`curation/display-supplements.json`](../curation/display-supplements.json)（见
   [显示补译与来源标记](translation-workbench.md#显示补译与来源标记)）。其中与请求同 realm、locale 的
   `reviewed` 怪物名（`kind: "monster-name"`）写入 `scopes["MonsterVarieties.Name"][变种 ID] = [英文, 译文]`；
-  这时投影必须声明 `MonsterVarieties.Name`。catalog 自身已有同一 ID 的行时 catalog 优先，补译只记在
-  receipt 的 `names` 里（`lifecycle: "official"`）。同一 ID 有两条已审核名称时报错。怪物名不写入 `entries`。
+  这时投影必须声明 `MonsterVarieties.Name`。同一 ID 有两条已审核名称时报错。怪物名不写入 `entries`。
+- `official_names: {file, bytes, sha256}` 可选，指向 RePoE 从客户端解出的官方 `MonsterVarieties.Name` 文件：
+  `{format, localized: {language, game_patch, realm} 或 locale, index_identity 或 observed_client（至少一个
+  SHA-256）, names: {<变种 ID>: {english, zh_cn}}}`（文本字段是 locale 小写、`-` 换成 `_`）。文件的 locale 必须等于
+  请求的 locale，声明了 `game_patch` 时必须相同，客户端身份必须有 SHA-256；receipt 记录它，并记录是否与
+  catalog manifest 的 `observed_client.index_sha256` 相同（只记录，不强制）。
+  非空且不同于英文的官方名写入 `scopes["MonsterVarieties.Name"][ID] = [english, 官方名]`，不写 `origins`。
+  某 ID 已有我们的补译、而官方文件对该 ID 的英文与补译所针对的英文不同时，与其他 scope 一样不采用这条官方名，
+  记入 receipt 的 `names.official.not_applied["english-differs"]`；与英文相同或为空的官方名记为 `untranslated`。
+
+  每个 ID 的优先级：catalog 自身的行，其次官方名，最后我们已审核的补译。补译只用于官方文件没有或为空的 ID；
+  被官方名或 catalog 取代的补译仍保留在 curation，receipt 记为 `superseded`（`by`、官方文本、`supplement_differs`）。
+  receipt 的 `names.counts` 为 `{official, supplemented, superseded}`（按 ID 计）。两个输入都不给时行为不变。
 
 输出有两种视图：
 

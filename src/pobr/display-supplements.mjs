@@ -188,3 +188,32 @@ export function statTemplates(descriptions) {
   }
   return new Map([...templates].map(([english, stats]) => [english, [...stats].sort()]));
 }
+
+// --- official names ----------------------------------------------------------------------------
+
+// A RePoE-decoded MonsterVarieties.Name table of one client (the shape RePoE's monster-names
+// research files use): {format, localized: {language, game_patch, realm, …} | locale, client identity
+// (index_identity or observed_client with at least one SHA-256), names: {<variety id>: {english,
+// <zh_cn|zh_tw>}}}. The text field is the locale with '-' -> '_', lowercased. Returns the parts the
+// projection uses; throws unless the file is for `target` (locale, game_patch when declared).
+const LANGUAGES = { 'Simplified Chinese': 'zh-CN', 'Traditional Chinese': 'zh-TW' };
+export function validateOfficialNames(doc, target) {
+  require(object(doc) && nonempty(doc.format) && object(doc.names), 'official names: expected {format, names, …}');
+  const locale = doc.locale ?? LANGUAGES[doc.localized?.language];
+  require(locale === target.locale, `official names: locale ${locale} differs from ${target.locale}`);
+  const patch = doc.game_patch ?? doc.localized?.game_patch;
+  require(patch === undefined || patch === target.game_patch, `official names: game_patch ${patch} differs from ${target.game_patch}`);
+  const client = doc.index_identity ?? doc.observed_client;
+  const hashes = object(client) ? Object.entries(client).filter(([key, value]) => /sha256$/u.test(key) && HEX64.test(value ?? '')) : [];
+  require(hashes.length, 'official names: the client identity (index_identity or observed_client with a SHA-256) is required');
+  const field = locale.toLowerCase().replace('-', '_');
+  const names = new Map();
+  for (const [id, row] of Object.entries(doc.names)) {
+    keys(row, ['english', field], [], `official names[${id}]`);
+    require(nonempty(id) && typeof row.english === 'string' && (row[field] === null || typeof row[field] === 'string'),
+      `official names[${id}]: english is text, ${field} is text or null`);
+    names.set(id, { english: row.english, text: row[field] });
+  }
+  return { format: doc.format, locale, game_patch: patch ?? null, realm: doc.realm ?? doc.localized?.realm ?? null,
+    client: Object.fromEntries(hashes), names };
+}

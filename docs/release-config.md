@@ -143,7 +143,9 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
   scope 不会改变已发布成员的重新生成结果；要发布新 scope，就在新配置的配方里写新的 `projection`。
   `regeneration.json` 的任务摘要记录生产者回执里的 `projection`。可选 `names`（本仓库某个提交里的
   `curation/display-supplements.json`，带 `bytes`、`sha256`）作为请求的 `names` 传入，为
-  `MonsterVarieties.Name` 提供已审核的怪物名补译；这时 `projection.scopes` 必须含该 scope。
+  `MonsterVarieties.Name` 提供已审核的怪物名补译；可选 `official_names`（本仓库某个提交里的文件
+  `{revision, path, bytes, sha256}`，或 HTTPS 下载 `{url, bytes, sha256}`，例如 RePoE Release 资产）作为请求的
+  `official_names` 传入，提供官方怪物名。两者都要求 `projection.scopes` 含该 scope。
 - `supplement-lines`：`src/pobr/supplement-lines.mjs`（见
   [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)）。`base` 是作为底的
   `stat_lines.json`，`edits` 是 `curation/display-supplements.json`，可选 `meta` 是作为底的 `_meta.json`，

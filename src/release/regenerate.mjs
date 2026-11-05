@@ -78,6 +78,10 @@ function validateJob(job, members) {
   } else if (job.kind === 'display-texts') {
     for (const key of ['catalog', 'supplement']) require(isPin(gitRef(job[key], `${job.id} ${key}`)), `${job.id}: pin the ${key}`);
     if (job.names !== undefined) require(isPin(gitRef(job.names, `${job.id} names`)), `${job.id}: pin the names file`);
+    // The official names file is a Git pin of this repository or an HTTPS download (e.g. a RePoE Release asset).
+    if (job.official_names !== undefined) require(isPin(job.official_names) && (typeof job.official_names.url === 'string'
+      ? job.official_names.url.startsWith('https://') : gitRef(job.official_names, `${job.id} official_names`)),
+    `${job.id}: pin official_names as {revision, path, bytes, sha256} or {url, bytes, sha256}`);
     gitRef(job.supplement_module, `${job.id} supplement_module`);
     // The projection is pinned in the recipe, never read from src/pobr/display-projection.json:
     // a new default scope there must not change a member that a published package already holds.
@@ -238,12 +242,18 @@ async function displayTexts(job, inputs, work, repo) {
     writeFileSync(path.join(work, 'names.json'), raw);
     request.names = { file: path.join(work, 'names.json'), ...pin(raw) };
   }
+  if (job.official_names) {
+    const spec = job.official_names, label = `${job.id}:official_names`;
+    const raw = spec.url ? await inputs.url(spec.url, spec, label) : inputs.git(spec, spec, label);
+    writeFileSync(path.join(work, 'official-names.json'), raw);
+    request.official_names = { file: path.join(work, 'official-names.json'), ...pin(raw) };
+  }
   const receipt = await createDisplayTexts(request, path.join(work, 'out'));
   const raw = readFileSync(path.join(work, 'out', 'display_texts.json'));
   require(samePin(pin(raw), receipt.files['display_texts.json']), `${job.id}: display_texts.json differs from its receipt`);
   return { outputs: new Map([[job.members[0], raw]]), inputs: new Map(),
     summary: { decisions: receipt.decisions.length, conflicts: receipt.conflicts.length, supplement_records: receipt.supplement?.records,
-      projection: receipt.projection, ...(receipt.names ? { names: receipt.names.length } : {}) } };
+      projection: receipt.projection, ...(receipt.names ? { names: receipt.names.counts } : {}) } };
 }
 
 // src/pobr/supplement-lines.mjs over a pinned base member, the game Release package and the pinned
