@@ -1,8 +1,7 @@
 // Language-package helpers shared by release:build and release:regenerate: the declared member
 // transforms of a poe2-locale-release-config/v2 package, and the per-package language index the
-// build receipt carries (PoBR checks every data/<patch>/i18n/* member against the game package's
-// snapshot manifest, so a new member such as an index.json would be rejected; the index stays out
-// of the zip).
+// build receipt carries (the index stays out of the zip, so adding it changed no published package
+// bytes; PoBR reads the language members from this package's own manifest).
 import { createHash } from 'node:crypto';
 import { strictJson } from '../strict-json.mjs';
 
