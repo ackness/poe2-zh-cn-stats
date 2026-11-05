@@ -1,6 +1,2709 @@
 {
   "schema": "poe2-display-supplements/v1",
-  "entries": [],
+  "entries": [
+    {
+      "entry_id": "edc6f1de566ae7d377ba2a953e06b95fd2584eba945ad907efe9a374577ff543",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Ancestral Jade Hulk"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueAncestral/AncestralJadeHulkTotemSpirit"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "先祖翠玉巨兽",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“先祖”“翠玉”取自官方名；Hulk 译“巨兽”为自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：去掉逐词拼接的“魁梧”（形容词 Hulking）；繁中先祖玉獸为野兽，巨兽为自拟。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "3de4a408fd5e0980878d40d2bc78f4db3cd6dac9326fba8e0fdd65f6f1db3dcc",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Ancestral Jadecaster"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueAncestral/AncestralSpiritCasterTotemSpirit"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "先祖翠玉法师",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“先祖”取自先祖之灵；“翠玉”取自翠玉战棒；“法师”同魔侍冰霜法师。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：原7字过长，“施法者”改“法师”（同官方魔侍冰霜法师）；繁中先祖玉法師义同。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "bbe366951874e5fde5f23c317ccc1601a516904e62baa5b86ea6f32bcf633c16",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Ancestral Spirit Turtle"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueAncestral/AncestralTurtleTotemSpirit"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "先祖灵龟",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“先祖之灵”为技能官方名；“灵龟”取自灵龟护符。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：Spirit 在此指先祖之灵，非精魂资源；官方先祖之灵+灵龟护符；繁中先祖靈龜同义。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "78cbd4d948beb366ee8a72effc9b67559d8ecd9edb5cdec0c71bd8ee94764ffc",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Ancestral Warhorn"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueAncestral/AncestralKaruiHornTotemSpirit"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "先祖战角",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“先祖”取自先祖之灵；Words 词条“ Horn”官方译“战角”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：战号→战角，Words 官方“Horn→战角”；繁中先祖戰角同义。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "1f7e5cfecb0a01eb0e175fe07a281374019347d21808b1b5624a6549d6e139ad",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Animated Weapon"
+      },
+      "ids": [
+        "Metadata/Monsters/AnimatedItem/AnimatedWeaponPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "显化武器",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "召唤技能“显化武器”官方描述称召出物为“显化武器”（Manifested Weapon）。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：官方技能描述作显化武器；繁中幻化武器不采用。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "ba9b3ff3534d56c0b9f8d8d2b9e4de2cc530938a973cb3fd926dfd8c2e7d73cd",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Antlion Charger"
+      },
+      "ids": [
+        "Metadata/Monsters/ArmadilloDemon/ArmadilloDemon"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "蚁狮冲锋者",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "“蚁狮”“冲锋者”为自拟，无官方词条。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "保留：义合（繁中蟻蛉衝鋒者）；无官方词，自拟。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "bffde64635aadf63e46f81be79c4bd38193bcf98f697f3935dd8c8055956ae4f",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Artillery Squad"
+      },
+      "ids": [
+        "Metadata/Monsters/Daemon/ArtilleryPlayer/SummonArtilleryDaemon"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "火力小队",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方技能描述“artillery squad”译“火力小队”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：炮击小队→火力小队，支援火力技能描述逐字作“火力小队”。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "4e8e818b3595057e48fdcc9f428c85d042f9405eef3079cd85398c4991097475",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Azmerian Wolf"
+      },
+      "ids": [
+        "Metadata/Monsters/UniqueItemMonsters/AzmerianPackleader/PackleaderWolfMinion"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "阿兹莫里巨狼",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“阿兹莫里巨狼”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）；技能描述同称阿兹莫里巨狼。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "2d2b724095812ef306dbb4052ed8c03e024c765c1836ba10547e924f1dc71841",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Bane Sapling"
+      },
+      "ids": [
+        "Metadata/Monsters/BaneSapling/BaneSapling"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "灭魂树苗",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "Words 官方“Bane→灭魂者”取“灭魂”；“树苗”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：祸殃幼苗为拼接；Words 官方作灭魂，繁中滅魂樹苗一致。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "d74986ab679a49d8d9d3b4e5fb38c4bcdfc8ba7681302ba77bc9fa2a61e949b1",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Blood Elemental"
+      },
+      "ids": [
+        "Metadata/Monsters/LiquidElementals/LiquidElementalBlood"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "鲜血元素",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“鲜血”取自 Words Blood；“元素”取自词汇表 Elemental。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：官方术语组合，义合。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "34df26eb074ea31ae5084921fed87d5ed09679d1b17a53a4af208c56dd103877",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Blood-fevered Tuskbeast"
+      },
+      "ids": [
+        "Metadata/Monsters/BloodFeverKarui/BloodFeverBoar"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "血狂獠牙兽",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“獠牙”取自冰霜獠牙等官方名；“血狂”“兽”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：原7字逐词拼接；压缩为血狂獠牙兽，繁中血熱牙獸。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "752907630b80bb3b09921f61a2c184d8f43eb1836d57e7dced88db5f8a35c85a",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Bloodthief Wasp"
+      },
+      "ids": [
+        "Metadata/Monsters/PlagueSwarm/BloodDrone"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "窃血黄蜂",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方词缀“Wasp's→黄蜂的”；“窃血”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：黄蜂官方；义合，繁中竊血黃蜂同。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "524264bf1aa7dba987aab07c7b97e8d7f4fbc311d8ede2cf117019a437ebab5a",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Bone Crawler"
+      },
+      "ids": [
+        "Metadata/Monsters/SkeletalConstruct/BoneConstructPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "白骨爬行者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“白骨”取自白骨锁链；“爬行者”为自拟（Words crawl→爬行）。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "保留：开掘描述只称“构造体”，无专名；繁中白骨食腐蟲；爬行者为自拟，待官方替换。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "51b927fb7c614f7ff54198b6efcc81a222132a89bc1d6277af860ba8350fd2a5",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Bramble Ape"
+      },
+      "ids": [
+        "Metadata/Monsters/Monkeys/Bramble/BrambleMonkey1"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "刺荆狂猿",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“刺荆”取自 Words Bramble；Ape 官方作“狂猿”（狂猿之契）。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：刺荆、狂猿均有官方依据；繁中刺荊狂猿同。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "0c2dd60c7cae61615126db1b50817557463b42ad09946ad86c6a5cac2cab65dc",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Bramble Rhoa"
+      },
+      "ids": [
+        "Metadata/Monsters/StonebackRhoa/BrambleRhoa"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "刺荆恐喙鸟",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“刺荆”取自 Words Bramble；“恐喙鸟”取自恐喙鸟坐骑。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：两词均官方。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "ff28628f6623fb1e81986c6155d7a1fd4a9b783936374f55ee97343a605ba0eb",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Brimstone Crab"
+      },
+      "ids": [
+        "Metadata/Monsters/ShellMonster/ShellMonster"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "硫石蟹",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“硫石”取自 Words Brimstone；Crab 统一作“蟹”（官方词缀 Crab's→螃蟹的）。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：硫石官方；蟹统一。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "d28c5914165f8f1a502b235146271141a5dda1db7f1b41841af5c313aecc6f42",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Brine Maiden"
+      },
+      "ids": [
+        "Metadata/Monsters/BrineMaiden/BrineMaiden"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "卤水少女",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "Words 官方“Brine→卤水”；“少女”为自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "保留：术语有据但“卤水”作海妖名偏怪；繁中鹽風少女，待官方。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "45a5837394223d72b95897a54be59f787fbac14c089e9bad971bde350deb29b1",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Cackling Companion"
+      },
+      "ids": [
+        "Metadata/Monsters/HyenaMonster/HyenaCompanionPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "鬣狗伙伴",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "技能描述称鬣狗“伙伴”；Companion 官方关键词“伙伴”。技能宝石名为“鬣狗同伴”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：Companion 统一“伙伴”（官方关键词及全部词缀/描述）；宝石名鬣狗同伴为唯一例外。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "5e973df863acc93b3e05cdc502b6457a88545979747a3ed5d4af5631e95475c2",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Chaw Mongrel"
+      },
+      "ids": [
+        "Metadata/Monsters/ChawMongrel/ChawMongrel",
+        "Metadata/Monsters/ChawMongrel/ChawMongrelLeashBoss"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "啃咬杂犬",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "Chaw 译“啃咬”、Mongrel 译“杂犬”，均自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：咀嚼读来生硬，改啃咬（繁中啃咬混種獸同义）；犬与狂犬一致。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "99fa99e2fb4d1b590db940851ab3ffa7e65cbbda34a7292492d67c41ce180d8e",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Coconut Crab"
+      },
+      "ids": [
+        "Metadata/Monsters/CrabMonsters/CrabCoconut"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "椰子蟹",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "椰子蟹为该物种通用中文名；无官方词条。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：椰子蟹为通用物种名，自然准确；置信升为中。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "8724dfaaba68b49197da2a0b3896481a699c2bc58c32186659e7d9206be1f101",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Corpse Beetle"
+      },
+      "ids": [
+        "Metadata/Monsters/Monsters/CorpseBeetlePlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "灵柩甲虫",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方技能描述原文“Corpse Beetle”译“灵柩甲虫”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：官方 Corpse Beetles 技能描述逐字作“灵柩甲虫”；Corpse 官方关键词灵柩。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "0837e493c66fb9f740569946369253819d58715a9da3d9f33183b17752450dde",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Dezzic Nettler"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueExpeditionNew/Expedition2/AntFaction/NettleAntExpedition"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "德兹克刺虫",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "Dezzic 音译“德兹克”；Nettler 译“刺虫”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：“荨刺虫”非成词，改刺虫；繁中德齊克刺蟲同义。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "2026c5f74ecae216a998bc29381201d5ea610394e02532572513abd6f4dd6650",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Diretusk Boar"
+      },
+      "ids": [
+        "Metadata/Monsters/GoreCharger/GoreCharger"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "恐牙野猪",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“野猪”取自野猪雕像；Diretusk 译“恐牙”为自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：野猪官方；恐牙自拟但简洁，繁中同义。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "f8b986ca9e2845da917ebb993c6d1079b99b7dcdf507403ec50dd60a2e2d0717",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Feral Primate"
+      },
+      "ids": [
+        "Metadata/Monsters/Monkeys/MonkeyJungle",
+        "Metadata/Monsters/Monkeys/MonkeyJungleTamed"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "野性狂猿",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“野性”取自野性召唤；“狂猿”取自狂猿雕像。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：两词均官方；繁中野性靈長類。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "25b4fe8e0c4c1cb9b02c8f1cdd3ff76b85c5d89fe2d1434ce9d0582b43544d9a",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Flesh Larva"
+      },
+      "ids": [
+        "Metadata/Monsters/HuhuGrub/HuhuGrubLarvaeRanged1Spectre",
+        "Metadata/Monsters/HuhuGrub/HuhuGrubLarvaeSpectre"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "血肉幼虫",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“血肉”取自血肉盛宴等官方名；“幼虫”为自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "保留：血肉官方，幼虫直译自然；繁中作血肉孵化者，义有出入，待官方。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "85e18875ce056dec76740f7dccbddc0100529906f7ab5c6aee0bbfeb88b95658",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Fungal Wolf"
+      },
+      "ids": [
+        "Metadata/Monsters/Wolves/FungalWolf1_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "真菌巨狼",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“真菌”取自真菌魔符；Wolf 统一作“巨狼”（召唤巨狼）。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：Wolf 统一巨狼。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "6b6df9b74c45b9c1b8fa1bfa2ff2c5f0993fffa9dae30598ffad10cb837a774c",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Infernal Hound"
+      },
+      "ids": [
+        "Metadata/Monsters/Hellhound/HellhoundPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "炽焰猎犬",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方技能描述原文“Infernal Hound”译“炽焰猎犬”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：召唤炽焰猎犬技能描述逐字作炽焰猎犬；繁中獄炎獵犬不采用。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "974604c7a43ea1e870155809d53f6900b84017e544eb167c955033dd3fef815b",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Kelari, the Tainted Sands"
+      },
+      "ids": [
+        "Metadata/Monsters/MarakethSamdDjinn/SandDjinn"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "凯拉里，污秽沙暴",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石/技能名“凯拉里，污秽沙暴”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用召唤技能官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "0363ea82f6e1e19715c6eedf2a1137940cdfdf441f5bb81c7e5795e07c0f3152",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Living Lightning"
+      },
+      "ids": [
+        "Metadata/Monsters/Monsters/LivingLightningPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "活体闪电",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能名“活体闪电”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能官方名（非怪物表）；繁中作復甦閃電，不采用。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "98b72b60de845b1465e10c37604f20d5aea9b59c11d3e902aa3bf17cb521b111",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Mantis Rat"
+      },
+      "ids": [
+        "Metadata/Monsters/MantisRat/MantisRat"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "螳螂鼠",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "“螳螂”“鼠”为通用词，无官方整名。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：直译自然；原注所引鼠巢无据，改为自拟。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "a471bc67e5c131437121dc61f8edb979a6b50b9e6dfe04ad868e11237e9a2dd3",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Nameless Hulk"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueRitual/DemonFaction/DemonHulk_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "无名巨兽",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“无名”取自无名者时刻；Hulk 统一作“巨兽”（自拟）。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：Hulk 与先祖翠玉巨兽统一为巨兽；繁中無名巨怪。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "01ad594609170aad00bfa0ec6ba0952f3e3c0c10a7f1e1278c571cb8c883c82d",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Navira, the Last Mirage"
+      },
+      "ids": [
+        "Metadata/Monsters/MarakethWaterDjinn/WaterDjinn"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "纳薇拉，终末幻影",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石/技能名“纳薇拉，终末幻影”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用召唤技能官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "2a6aa772a7b6538414d17d7f7525d4a4b349213c3c2dd6b25ae1242cd5f68d35",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Pack Werewolf"
+      },
+      "ids": [
+        "Metadata/Monsters/Werewolves/WerewolfPack1"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "群猎狼人",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "“狼人”为官方关键词；Pack 译“群猎”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：群居偏习性，群猎更贴合狼群；繁中群行狼人。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "ffbf324e9907c9e3c4f58973139b9fc002303020853cede6d80689184e9bd419",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Plague Harvester"
+      },
+      "ids": [
+        "Metadata/Monsters/PlagueBringer/PlagueBringer"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "疫源收割者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "Words 官方“Plague→疫源”；“收割者”取自恐喙鸟收割者。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：Plague 统一疫源（Words 官方，繁中怪物名亦一致用疫源）。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "f90b5d4e6a91305594928a79cb0a47a49a33956a2185c12a30b77348f678e4a6",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Plague Nymph"
+      },
+      "ids": [
+        "Metadata/Monsters/PlagueNymph/PlagueNymphFoundry",
+        "Metadata/Monsters/PlagueNymph/PlagueNymph_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "疫源若虫",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "Words 官方“Plague→疫源”；昆虫 Nymph 译“若虫”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：Plague 统一疫源；若虫与 Flesh Larva 幼虫区分。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "a26f2b37e9ec16d8e8f43728c55d9ffd10af07ce652dfb327c53900ddd0f97c3",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Plague Swarm"
+      },
+      "ids": [
+        "Metadata/Monsters/PlagueSwarm/PlagueSwarm"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "疫源虫群",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "Words 官方“Plague→疫源”；“虫群”取自饕餮虫群。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：Plague 统一疫源。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "60f861224f385534b27874fc2795ea3f5ee3b5198fd66774da5b036f542589fb",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Porcupine Crab"
+      },
+      "ids": [
+        "Metadata/Monsters/QuillCrab/QuillCrab",
+        "Metadata/Monsters/QuillCrab/QuillCrabBig",
+        "Metadata/Monsters/QuillCrab/QuillCrabBigElite"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "豪猪蟹",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "Porcupine 按字面译“豪猪”；无官方词条。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "保留：直译清楚，并与 Quill Crab（棘刺蟹）区分；繁中尖刺蟹。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "bdb53b5543ac805e973949461f1e68d2f210ddc228506b3b8c2ae44f0f9ac8d9",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Powered Zealot"
+      },
+      "ids": [
+        "Metadata/Monsters/VaalMonsters/Zealots/VaalZealotDaggersLightning",
+        "Metadata/Monsters/VaalMonsters/Zealots/VaalZealotSpearLightning"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "供能狂热者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“供能”取自官方“Powered by Verisium→维金供能”；“狂热者”取自狂热者手套。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：去掉英文没有的“维金”；狂徒为头衔用字，改狂热者。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "5950337198ab7df8e4a2fa08dd7e9923f16b14b4994792d4822e4b9cb96657e4",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Quadrilla"
+      },
+      "ids": [
+        "Metadata/Monsters/Quadrilla/Quadrilla"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "四臂巨猿",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“四臂”取自 Words“，Quadrilla Sergeant→，四臂军士”；“巨猿”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：单用“四臂”不成名；补巨猿表物种（四臂+猩猩）；繁中四手巨獸。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "30e13b744421c46d76748f045f52eb1ba4bde5ebf84faf27f88da85fd74d03c2",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Quadrilla Sergeant"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueIncursionNew/MiniBosses/SoulCoreQuadrillaBoss/SoulCoreQuadrillaMinion"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "四臂军士",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自 Words 名称词条“，Quadrilla Sergeant→，四臂军士”，去前导逗号；非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：Words 官方同文；基础改为 official-same-text 并注明出处。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "14d62478f7e8a30fad3c02065f5a47800453300a1a7967a1e80c07674849cc97",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Quill Crab"
+      },
+      "ids": [
+        "Metadata/Monsters/QuillCrab/QuillCrabBigTropical",
+        "Metadata/Monsters/QuillCrab/QuillCrabTropical"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "棘刺蟹",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "Quill 取自官方技能 Quill Burst“棘刺爆发”；蟹统一。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：凌羽为装备名用字，指生物棘刺时官方作“棘刺”。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "2959c9c4667ed92bc7ed9fe514725dac54e4e8ee11b152e27130ae874e74320c",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Rabid Dog"
+      },
+      "ids": [
+        "Metadata/Monsters/RabidFeralDogMonster/RabidDog",
+        "Metadata/Monsters/RabidFeralDogMonster/RabidDogLargeFarmlandsNoName"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "狂犬",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "取自狂犬魔符（Rabid Talisman）的“狂犬”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：狂犬即 Rabid Dog，官方用字。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "f52b84d4aedac742be475e27cfa0de73abde25491accb2a67e6682fb36988baf",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Raging Spirit"
+      },
+      "ids": [
+        "Metadata/Monsters/RagingSpirit/RagingSpiritPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "愤怒狂灵",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能“召唤愤怒狂灵”，去掉“召唤”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：官方技能名去“召唤”即得，含义吻合。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "97a3c01ff9d21f40c9ad68932ffdc375566583460c80a77cd9bf671f4f5baea3",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Raised Zombie"
+      },
+      "ids": [
+        "Metadata/Monsters/Zombies/PlayerSummoned/PlayerSummonedZombie_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔卫",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方“Limit {0} Raised Zombie”译“{0} 个魔卫”；魔卫复苏技能描述称召出物“魔卫”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：魔卫复苏为技能名，作单位名易混；官方词缀与描述均以“魔卫”指该召唤物。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "f90de543d781a452c8ceb3a3bc9617e7d19857cba7fbb7d94a3696989663a92f",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Raven Conspiracy"
+      },
+      "ids": [
+        "Metadata/Monsters/Daemon/TangmazuRavensDaemon/TangmazuRavensDaemon"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "鸦群密谋",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "取自召唤技能名“鸦群密谋”；技能描述称其为“鸦群”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能官方名并与描述“鸦群”一致；非怪物表。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "6ae3dbca4bd9bfc1034aee02c986eeef36d0723e08467312229b7417aff14695",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Ravenous Swarm"
+      },
+      "ids": [
+        "Metadata/Monsters/Daemon/RavenousSwarmPlayer/RavenousSwarmPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "饕餮虫群",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“饕餮虫群”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "2f11f956e4509b7167e5ac29187cc74817b5e5a41f944d7e55f955ee1828d566",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Rhoa Companion"
+      },
+      "ids": [
+        "Metadata/Monsters/RhoaPlayerSummoned/RhoaPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "恐喙鸟伙伴",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“恐喙鸟”取自恐喙鸟坐骑；Companion 官方关键词“伙伴”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：技能描述作“伙伴恐喙鸟”；Companion 统一伙伴。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "d09b137b3d6a0ac77c5199bac02d4d6024c86bce06e7cf3b036b32ddde04f23e",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Ribrattle"
+      },
+      "ids": [
+        "Metadata/Monsters/PitifulFabrications/Canopy/PitifulFabrication02",
+        "Metadata/Monsters/PitifulFabrications/PitifulFabrication02"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "颤骨者",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "Rib+rattle 意译“颤骨者”，自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：原“魔侍”为凭空添加（英文无 Skeletal）；改为简短意译，待官方。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "acd080eeee444301c25bdcc0a9286c19bf7b82dc8b432aed7ad91ec7d8c63b1e",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Ruzhan, the Blazing Sword"
+      },
+      "ids": [
+        "Metadata/Monsters/MarakethTimeDjinn/FireDjinn"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "鲁詹，炽焰之剑",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石/技能名“鲁詹，炽焰之剑”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用召唤技能宝石官方名（非怪物表）；X，Y 格式符合官方。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "2cc3a1cf2d74b86c7b95040cb96f569b9b7cf4a17787275056a7175a695a1aee",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Arsonist"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonArsonistPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍焚焰使",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍焚焰使”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "caa00cab739e19e6f68e715161f127bda124fdb616fe66b5c6be5c0ebc927c32",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Brute"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonBrutePlayerSummoned_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍蛮兵",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍蛮兵”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "2a29b500cf07ac854aad6d60b32225fae4c5d2b8505fadae34d369424be4167d",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Cleric"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonClericPlayerSummoned_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍祭司",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍祭司”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "f07de207a560111831ba0ffcfd632fe63a3a621c0cadf8baccf7ea57f65515bf",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Frost Mage"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonFrostMagePlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍冰霜法师",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍冰霜法师”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "bf3ccadcf688d074cfb3160217900de4b1fccfcd0937cb6ade3e43e2f9797134",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Reaver"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonReaverPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍掠夺者",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍掠夺者”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "6d12301334ecbbb066841698ecac6815d3d4eaa1b406163be9ac5d34e080a5fe",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Sniper"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonArcherPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍神射手",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍神射手”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "11a9fac9ef6be158ab8590aa5c980500fc7be587fe0e9025ab0100ec1a72a7a9",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Storm Mage"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonStormMagePlayerSummoned_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍风暴法师",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍风暴法师”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "383a38e425ac7dd11b4983f5a1f1b7c447fcbb2a8f7d8b61e1c925893ea41933",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Skeletal Warrior"
+      },
+      "ids": [
+        "Metadata/Monsters/Skeletons/PlayerSummoned/SkeletonWarriorPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "魔侍武士",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "取自技能宝石名“魔侍武士”，非怪物表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "沿用技能宝石官方名（非怪物表）。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "9a28f57133fb03ad1161137644b71be0f5b495a8fdc47a5525dbd6265f0b7c2d",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Sun Clan Scavenger"
+      },
+      "ids": [
+        "Metadata/Monsters/HyenaMonster/HyenaCentaurSpear",
+        "Metadata/Monsters/HyenaMonster/HyenaCentaurSpearBossMinion_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "烈日部族食腐者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“烈日部族”取自烈日部族遗物；“食腐者”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：鬣狗人马，Scavenger 指食腐，拾荒者义偏；繁中食腐者同。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "1fe97bc8b05006dedb2ca67504cf16d470209b0067647c1f83f10a8facf7af0e",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Swarming Wasp"
+      },
+      "ids": [
+        "Metadata/Monsters/PlagueSwarm/TwilightOrderPlagueSwarm"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "集群黄蜂",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方词缀“Swarming→集群的”“Wasp's→黄蜂的”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：成群→集群，两词均官方。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "ea84dbb522988da681ffd87361a404ef84497c7b8dc60136dedeafa90034d0f7",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Tombshrieker"
+      },
+      "ids": [
+        "Metadata/Monsters/CaveDweller/CaveDweller",
+        "Metadata/Monsters/CaveDweller/CaveDwellerSanctumTrial__"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "陵墓尖啸者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "Words 官方“Tomb→陵墓”“shrieker→尖啸者”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：墓穴→陵墓，两词均有官方 Words 依据。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "6d7b727e26b132b27bc69e016b5d1afe99cab428b0c730302aa57e4c30dc10ba",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Vault Lurker"
+      },
+      "ids": [
+        "Metadata/Monsters/DemonSpiders/MeleeSpider"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "宝库潜伏者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“宝库”取自宝库钥匙；“潜伏者”为自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：义合，繁中寶庫潛伏者同。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "a4f459367eb8a416997ae7e50fcf2d81ed895f22030c73d093925b1c509b2af6",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Venomous Crab"
+      },
+      "ids": [
+        "Metadata/Monsters/QuillCrab/QuillCrabPoison"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "剧毒蟹",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方词缀“Venomous”译“剧毒的”；蟹统一。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：烈毒取自“烈毒之灵”头衔；形容词官方作剧毒，更自然。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "4600b6d0240a7353cbe8398660025db55c49943b85746bb79695ae9647961969",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Venomous Crab Matriarch"
+      },
+      "ids": [
+        "Metadata/Monsters/QuillCrab/QuillCrabBigPoisonElite",
+        "Metadata/Monsters/QuillCrab/QuillCrabBigPoison_"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "剧毒蟹母",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方词缀“Venomous”译“剧毒的”；“蟹母”自拟。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：随剧毒蟹统一；繁中毒蟹之母同义。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "d1d799d7a91eb1651b07363981389a2ac1532540248aaab7068cc5190f0c6712",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Voracious Werewolf"
+      },
+      "ids": [
+        "Metadata/Monsters/Werewolves/WerewolfMoonClan1"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "贪欲狼人",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“贪欲”取自贪欲之灵；“狼人”为官方关键词。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：两词均官方。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "33a027865b9164cae384de9edd20e42b379d9b48d24b392f06942be359acae6b",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Wardbound Caster"
+      },
+      "ids": [
+        "Metadata/Monsters/LeagueExpeditionNew/PlayerSummoned/WardboundMinionPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "结界施法者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "官方技能描述“Wardbound Casters”译“结界施法者”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "核：结界仆从技能描述逐字作结界施法者。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "c64a45d6c8e13e025839a83e9455979782eab8a8146bc887b9637c58bb586762",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Werewolf Prowler"
+      },
+      "ids": [
+        "Metadata/Monsters/Werewolves/WerewolfProwler1"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "狼人徘徊者",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“狼人”为官方关键词；Words 官方“prowler→徘徊者”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：潜猎者为自拟，官方 Words 已有徘徊者。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "b509e9d6349a8e1b59a2f8ac3425fe6c2edf1c327460524842d6cbaa6d7b9cca",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Wild Bear Spirit"
+      },
+      "ids": [
+        "Metadata/Monsters/CompanionBear/CompanionBearPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "野性熊灵",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "召唤技能 Wild Protector 官方“野性守护”，其描述称 Bear Spirit 为“熊灵”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：精魂为资源术语不宜；依官方技能名野性守护与描述“熊灵”。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "42fc1c3301e37a30c6942bbff4b53df6961b291a91b8ae2fd6b97c2828341992",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Winged Fiend"
+      },
+      "ids": [
+        "Metadata/Monsters/WingedFiend/WingedFiend"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "飞翼魔兽",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“飞翼”取自飞翼长矛；Fiend 译“魔兽”为自拟（标签为野兽）。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：恶魔易误为恶魔类，标签为野兽；繁中魔翼獸。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "c5e8662bd16b38ef68cd0cd6abebb64e8307051d368c818379da019200f5ce22",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Winged Horror"
+      },
+      "ids": [
+        "Metadata/Monsters/WingedCreature/WingedCreature"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "飞翼幽惧",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "“飞翼”取自飞翼长矛；Words 官方“Horror→幽惧”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "保留：术语有据但作怪物名偏生硬；繁中幽懼之翼，待官方替换。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "86d205f1f375d45ce69ca711b09e72e4bd7306d42f1a2cb71b2e1214f0b05c8c",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Wolf Companion"
+      },
+      "ids": [
+        "Metadata/Monsters/Wolves/WolfCompanionPlayerSummoned"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "巨狼伙伴",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "召唤技能“召唤巨狼”/阿兹莫里巨狼用“巨狼”；Companion 官方关键词“伙伴”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "改：Wolf 统一巨狼（召唤巨狼技能即召出此单位），Companion 统一伙伴。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "a680015746bf5e879356186baabf1d0add075c40500034a9f8817f8b1afa996f",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "monster-name",
+        "table": "MonsterVarieties",
+        "field": "Name",
+        "english": "Zekoa, the Headcrusher"
+      },
+      "ids": [
+        "Metadata/Monsters/Quadrilla/QuadrillaBossMinion2"
+      ],
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "泽柯亚，碎颅者",
+      "origin": "agent",
+      "basis": "own",
+      "author": "claude-haiku-5-5",
+      "note": "泽柯亚为音译；“碎颅者”自拟；按官方“X，Y”格式。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "保留：音译自然，格式符合官方；繁中碎顱者同义。"
+      },
+      "confidence": "low"
+    },
+    {
+      "entry_id": "dbd0f993f474dfc03e9dd82f03bc0a9d6eba97f326446676407f2639c69670be",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "stat-line",
+        "english": "Gain {0}% of damage as Fire damage per 1% Chance to Block",
+        "stats": [
+          "non_skill_all_damage_%_to_gain_as_fire_+_per_1%_attack_block_chance"
+        ]
+      },
+      "ids": null,
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "每 1% 格挡几率获得相当于伤害 {0}% 的火焰伤害",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "与交易官方译文逐字一致，仅将 # 换为 {0}。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "与官方 explicit.stat_2771095426 逐字一致，仅 # 换 {0}；stat id 为 1% 攻击格挡。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "9f99eba61647aaaf8622ca59e94ff882ba3c62a87516f33b575b6cbb7559c2bc",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "stat-line",
+        "english": "Gain {0}% of damage as Fire damage per 2% Chance to Block",
+        "stats": [
+          "non_skill_all_damage_%_to_gain_as_fire_+_per_2%_attack_block_chance"
+        ]
+      },
+      "ids": null,
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "每 2% 格挡几率获得相当于伤害 {0}% 的火焰伤害",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "句式照抄同类官方行“每 1% 格挡几率…”，仅改数字为 2%。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "以官方 1% 行为模板仅改数字为 2%，与 stat id per_2% 吻合；术语全为官方，句式非官方原句，basis 如实。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "0593ade090c5f20c7740d6a281d76f8baaf11b37c3b1c692f91c63baae2438db",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "stat-line",
+        "english": "Non-Channelling Skills have {0}% reduced Spell Critical Hit Chance per 100 maximum Mana",
+        "stats": [
+          "spell_critical_strike_chance_+%_per_100_max_mana_with_non_channelling_skills"
+        ]
+      },
+      "ids": null,
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "每 100 点魔力上限使非吟唱技能的法术暴击几率降低 {0}%",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "反义分支取官方“提高”译文，将“提高”改为“降低”。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "取官方增加分支“每 100 点魔力上限使非吟唱技能的法术暴击几率提高 #%”，提高→降低；与 reduced 分支吻合。"
+      },
+      "confidence": "medium"
+    },
+    {
+      "entry_id": "16ae4f153856191e7d0c5b1747f32d279af1937589b69cde0c45652a13a52f44",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "stat-line",
+        "english": "Runic Ward recovery can Overflow maximum Runic Ward",
+        "stats": [
+          "ward_can_overcap"
+        ]
+      },
+      "ids": null,
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "符文结界回复可溢出符文结界上限",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "与交易官方译文逐字一致，无占位符。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "与官方 implicit.stat_3408607858 逐字一致。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "b848df50987bde24f8a9bbcf30800dd6be5e1647e0642d9ba4931933966f182f",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "stat-line",
+        "english": "{0}% of Chaos Damage from Hits taken as Damage of a random Element",
+        "stats": [
+          "chaos_damage_from_hits_%_taken_as_random_element"
+        ]
+      },
+      "ids": null,
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "受到混沌击中伤害的 {0}% 转化为一种随机元素伤害",
+      "origin": "agent",
+      "basis": "official-same-text",
+      "author": "claude-haiku-5-5",
+      "note": "与交易官方译文逐字一致，仅将 # 换为 {0}。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "与官方交易行 rune.stat_4217453078 逐字一致，仅 # 换 {0}；含义与 stat id 吻合。"
+      },
+      "confidence": "high"
+    },
+    {
+      "entry_id": "7c50a552ee88142c940c42e29a1c7b8bcfdc48e8dd0f58220e27c99f203a7179",
+      "identity": {
+        "game": "poe2",
+        "realm": "international",
+        "locale": "zh-CN",
+        "kind": "stat-line",
+        "english": "{0}% of damage taken from enemies with an Open Weakness Recouped as Life and Energy Shield",
+        "stats": [
+          "recoup_%_of_damage_taken_from_enemies_with_open_weakness_as_life_and_energy_shield"
+        ]
+      },
+      "ids": null,
+      "based_on": {
+        "game_patch": "0.5.5.5",
+        "game_package": {
+          "repository": "ackness/repoe",
+          "tag": "game/0.5.5.5-2",
+          "sha256": "c46df616c802d9c068b9516d77403147b9515a2d551d668e134623539d692ecb"
+        },
+        "stat_descriptions_sha256": "9b451579b0a545853020da5e8ed92a9e13de2032780ecd6a5377d6fa4c1daf66"
+      },
+      "text": "将所受来自带有弱点暴露敌人 {0}% 的伤害吸纳为生命和能量护盾",
+      "origin": "agent",
+      "basis": "official-terms",
+      "author": "claude-haiku-5-5",
+      "note": "句式参照官方“将所受来自带有弱点暴露敌人 #% 的伤害吸纳为生命”；能量护盾取自词汇表。",
+      "status": "reviewed",
+      "review": {
+        "by": "claude-opus-5-5",
+        "note": "句式照官方“将所受来自带有弱点暴露敌人 #% 的伤害吸纳为生命”，补“和能量护盾”（官方术语）；含义正确。"
+      },
+      "confidence": "medium"
+    }
+  ],
   "corrections": [
     {
       "correction_id": "bonded-prefix-official",

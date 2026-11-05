@@ -59,10 +59,10 @@
     },
     {
       "id": "curated.bonded",
-      "src": "纽带：{0}",
+      "src": "羁绊： {0}",
       "en": "Bonded: {0}",
-      "note": "Migrated verbatim from the linked source. The bare placeholder captures a nested stat for recursive translation, not just a number.",
-      "source_url": "https://github.com/ackness/pobr/blob/6bd4ceed20157a457be973181b20c28a980ac371/pipeline/gen-zh-cn.mjs#L129-L130"
+      "note": "Official prefix from Tencent's trade catalog: all 208 rows paired by id with a GGG \"Bonded:\" row start with \"羁绊： \" (full-width colon, one space; snapshot 20261104T031003350Z raw/trade-cn.json.gz, source sha256 db26a1aa…). Replaces 纽带：{0}, migrated from ackness/pobr pipeline/gen-zh-cn.mjs at 6bd4ceed. The bare placeholder captures a nested stat for recursive translation, not just a number.",
+      "source_url": "https://poe.game.qq.com/api/trade2/data/stats"
     },
     {
       "id": "curated.grants-skill-level",
