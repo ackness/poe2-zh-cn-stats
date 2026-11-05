@@ -57,9 +57,10 @@ function substitute(template, values) {
   return plain(rendered.replaceAll('%%', '%'));
 }
 
-// Stable schema IDs of the adapter outputs this selection reads (`adapter.output_schema`).
-export const RUNES_SCHEMA = 'pobr-runes/v1';
-export const PASSIVE_TREE_SCHEMA = 'pobr-passive-tree/v1';
+// Schema IDs of the adapter outputs this selection reads (`adapter.output_schema`), from the
+// adapter's registry (repoe tools/pobr-data-adapter/src/schema_id.rs, the contract's <name>/v1 style).
+export const RUNES_SCHEMA = 'runes/v1';
+export const PASSIVE_TREE_SCHEMA = 'passive_tree/v1';
 // Receipts written before the adapter emitted schema IDs name the Rust output type instead.
 const LEGACY_SCHEMAS = new Map([
   ['pobr_data::catalog::item_overlay::RunesDef', RUNES_SCHEMA],

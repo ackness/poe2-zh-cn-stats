@@ -94,7 +94,7 @@ mise run pobr:stat-lines --selection <receipt.json> --selection-sha256 <sha> \
 
 这是 `src/native-selected-translations.mjs` 的命令行入口。`--selection` 是 RePoE
 `tools/pobr-data-adapter --ordinary-facts` 写出的 `pobr-ordinary-facts-receipt/v1`
-（`adapter.output_schema` 为符文 `pobr-runes/v1` 或天赋树 `pobr-passive-tree/v1`；
+（`adapter.output_schema` 为符文 `runes/v1` 或天赋树 `passive_tree/v1`，与 repoe adapter 的 `src/schema_id.rs` 一致；
 旧收据里的 Rust 类型路径 `pobr_data::catalog::item_overlay::RunesDef`、
 `pobr_data::catalog::{PassiveNodeDef[],PassiveTreeMeta}` 按同一 ID 接受），`--native` 是 `native` 命令产出的
 `poe2-native-localization-candidate/v1`，`--legacy` 是上一份 `stat_lines.json`。
