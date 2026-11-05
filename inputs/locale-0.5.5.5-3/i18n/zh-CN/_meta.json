@@ -1,0 +1,43 @@
+{
+  "source": "https://github.com/vagrant-soul/poe2-en-cn-dict",
+  "source_commit": "288d8b9d999c5ea5664149e408847156dbd83ff4",
+  "source_generated_at": "2026-07-06T12:58:11.790959+00:00",
+  "translation_source": {
+    "repository": "https://github.com/ackness/poe2-zh-cn-stats",
+    "commit": "d67f08f696be6470a5c3837fdd20385976068389",
+    "snapshot": "20261012T081820011Z",
+    "sha256": "5d4363ffd1233b28f52b1f338f386381ad3c63b6e5d9d396fa3d4aad5270788d",
+    "mode": "pinned"
+  },
+  "regen_command": "node pipeline/gen-zh-cn.mjs --version 0.5.5.4.2 --ref 288d8b9d999c5ea5664149e408847156dbd83ff4 --translations-ref d67f08f696be6470a5c3837fdd20385976068389",
+  "counts": {
+    "base_items": 4902,
+    "skills": 854,
+    "stat_lines": 27896,
+    "words": 3914,
+    "passive_names": 3040,
+    "mods": 2536,
+    "rare_words": 4805,
+    "curated_templates": 11,
+    "added_trade_templates": 1822
+  },
+  "native_socketable_translations": {
+    "library_candidate_sha256": "16f5253d665052816a35fbc3f80aaebfe35906f6898decaa9da844ca15dcec92",
+    "selection_receipt_sha256": "c372c89c0ce5c04c69d326d5a9e1dff316df3fd9de7e287b60ddca53813bbb61",
+    "translation_receipt_sha256": "d5d1ff8888a6c922537ae40eba04027c1666ae6a57ed7b02e0ec4f672ccaf8d6",
+    "scope": "selected literal effect text; candidate, not complete target language approval"
+  },
+  "native_tree_translations": {
+    "library_candidate_sha256": "16f5253d665052816a35fbc3f80aaebfe35906f6898decaa9da844ca15dcec92",
+    "selection_receipt_sha256": "504f959307fe6aabc59cfb14ecf18e1778742e501372868c16a1891b571606d3",
+    "translation_receipt_sha256": "34f257a6ae9aa9c86bf1b4ed9afdb1125b43773aa35acbf3183ae7804d8c4e0c",
+    "scope": "selected target node/variant literal text, not full language approval"
+  },
+  "native_csd_unit_translations": {
+    "library_candidate_sha256": "16f5253d665052816a35fbc3f80aaebfe35906f6898decaa9da844ca15dcec92",
+    "selection_receipt_sha256": "7bfe24116d4520ac4853f28de12e3f86aad222269fe4d8ce0e036486675045bc",
+    "translation_receipt_sha256": "bb2b5e28e9a934a4ebdc2fc72f8f6a6814113b09ede5f3c7386e64eab4b44b17",
+    "socketable_receipt_sha256": "ad03cd44b01f70a51e980116cf4e668adcf4ebeb2f6a6e5da1bd81f80351fc20",
+    "scope": "shared renderer target socketables/node/variant literal text; not full language approval"
+  }
+}
