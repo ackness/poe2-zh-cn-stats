@@ -21,7 +21,7 @@ function inputs(t) {
     restrictions_raw: [], quantifier_tokens_raw: [] }],
     input: { manifest_sha256: 'a'.repeat(64), source_identity: { game_patch: 'test' } } };
   const selection = { format: 'pobr-ordinary-facts-receipt/v1',
-    adapter: { output_schema: 'pobr_data::catalog::item_overlay::RunesDef' }, target: { version: 'test' },
+    adapter: { output_schema: 'pobr-runes/v1' }, target: { version: 'test' },
     conversion: { descriptions: { manifest_sha256: 'a'.repeat(64) }, records: [{
       id: 'rune', mode: 'target-csd', selected_descriptions: [{ source_row: 3, packet: 'normal', prefix: '',
         evidence: [{ pointer: '/files/Data~1StatDescriptions~1stat_descriptions.csd/records/2',

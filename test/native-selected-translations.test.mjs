@@ -12,7 +12,7 @@ function fixture() {
   const candidate = { format: 'poe2-native-localization-candidate/v1', pairs: [pair],
     input: { manifest_sha256: 'a'.repeat(64), source_identity: { game_patch: 'test' } } };
   const selection = { format: 'pobr-ordinary-facts-receipt/v1',
-    adapter: { output_schema: 'pobr_data::catalog::item_overlay::RunesDef' }, target: { version: 'test' },
+    adapter: { output_schema: 'pobr-runes/v1' }, target: { version: 'test' },
     conversion: { descriptions: { manifest_sha256: 'a'.repeat(64) }, records: [{
       id: 'rune', mode: 'target-csd', selected_descriptions: [{ source_row: 3, packet: 'normal', prefix: '',
         evidence: [{ pointer: '/files/Data~1StatDescriptions~1stat_descriptions.csd/records/2',
@@ -84,7 +84,7 @@ test('signed values use the same selected handler, never an untranslated raw mag
 test('ordinary tree nodes and ascendancy variants select their own library records', () => {
   const { candidate, selection } = fixture();
   const evidence = selection.conversion.records[0].selected_descriptions[0].evidence;
-  selection.adapter.output_schema = 'pobr_data::catalog::{PassiveNodeDef[],PassiveTreeMeta}';
+  selection.adapter.output_schema = 'pobr-passive-tree/v1';
   selection.conversion.projection = { source_records: [{ id: 'base', target_row: 5,
     text: { owner: 'prepared-whole-text' }, variants: [{ class: 'Lich', target: 'variant', source_row: 8,
       text: { owner: 'target-csd', descriptions: evidence } }] }] };
@@ -98,7 +98,7 @@ test('ordinary tree nodes and ascendancy variants select their own library recor
 
 test('an old prepared tree receipt cannot impersonate selected CSD evidence', () => {
   const { candidate, selection } = fixture();
-  selection.adapter.output_schema = 'pobr_data::catalog::{PassiveNodeDef[],PassiveTreeMeta}';
+  selection.adapter.output_schema = 'pobr-passive-tree/v1';
   assert.throws(() => nativeSocketableTranslations([], selection, candidate), /missing target tree projection/);
 });
 
@@ -146,7 +146,7 @@ test('mixed tree text selects only its CSD evidence and retains separate ClientS
   const descriptions = selection.conversion.records[0].selected_descriptions[0].evidence;
   const field = { owner: 'target-client-strings', id: 'PassiveNodeGrantsPassivePoint',
     text: 'Grants 1 Passive Skill Point', source_row: 7, arguments: ['1'] };
-  selection.adapter.output_schema = 'pobr_data::catalog::{PassiveNodeDef[],PassiveTreeMeta}';
+  selection.adapter.output_schema = 'pobr-passive-tree/v1';
   selection.conversion.projection = { source_records: [{ id: 'node', target_row: 5, variants: [],
     text: { owner: 'target-csd-and-client-strings', descriptions, non_stat: [field] } }] };
   const result = nativeSocketableTranslations([], selection, candidate);
@@ -157,4 +157,13 @@ test('mixed tree text selects only its CSD evidence and retains separate ClientS
   assert.deepEqual(nativeSocketableTranslations([], selection, candidate).pairs, []);
   selection.conversion.projection.source_records[0].text.owner = 'prepared-whole-text';
   assert.deepEqual(nativeSocketableTranslations([], selection, candidate).report.excluded, []);
+});
+
+test('receipts that name the Rust output type select the same records as the schema ID', () => {
+  const { candidate, selection } = fixture();
+  const expected = nativeSocketableTranslations([], selection, candidate);
+  selection.adapter.output_schema = 'pobr_data::catalog::item_overlay::RunesDef';
+  assert.deepEqual(nativeSocketableTranslations([], selection, candidate), expected);
+  selection.adapter.output_schema = 'pobr-unknown/v1';
+  assert.throws(() => nativeSocketableTranslations([], selection, candidate), /unsupported ordinary selection schema/u);
 });
