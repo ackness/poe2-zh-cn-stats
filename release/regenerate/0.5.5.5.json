@@ -67,6 +67,14 @@
         "revision": "0e7778c4e7db217b79fcf33f9718315dcf223a60",
         "path": "src/translation-workbench.mjs"
       },
+      "projection": {
+        "scopes": [
+          "BaseItemTypes.Name",
+          "Characters.Name",
+          "Ascendancy.Name"
+        ],
+        "literals": "all-catalog-conflict-participants"
+      },
       "members": [
         "i18n/zh-CN/display_texts.json"
       ]

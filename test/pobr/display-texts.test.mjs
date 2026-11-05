@@ -109,10 +109,16 @@ test('browser indexes retain only active exact-ID scopes while all fields still 
     row('asc', 'Titan', '泰坦', { table: 'Ascendancy' }),
     row('skill', 'Same', null, { table: 'ActiveSkills', field: 'Description' }),
     row('empty', '', null, { table: 'Words', field: 'Inflection' }),
+    // One English passive name, two client translations: the literal is blocked,
+    // each PassiveSkills Id keeps its own translation.
+    row('mana10', 'Mana Regeneration', '魔力再生', { table: 'PassiveSkills' }),
+    row('energy_shield_recovery10', 'Mana Regeneration', '魔力回复', { table: 'PassiveSkills' }),
   ];
   const { sidecar, decisions } = project(records);
-  assert.deepEqual(Object.keys(sidecar.scopes), ['Ascendancy.Name', 'BaseItemTypes.Name', 'Characters.Name']);
-  assert.deepEqual(sidecar.entries, { Same: null, Titan: '泰坦', Warrior: '战士' });
+  assert.deepEqual(Object.keys(sidecar.scopes), ['Ascendancy.Name', 'BaseItemTypes.Name', 'Characters.Name', 'PassiveSkills.Name']);
+  assert.deepEqual(sidecar.scopes['PassiveSkills.Name'], {
+    energy_shield_recovery10: ['Mana Regeneration', '魔力回复'], mana10: ['Mana Regeneration', '魔力再生'] });
+  assert.deepEqual(sidecar.entries, { 'Mana Regeneration': null, Same: null, Titan: '泰坦', Warrior: '战士' });
   assert.equal(decisions.length, records.length);
   assert.throws(() => project([...records, records[4]]), /Duplicate/);
 });
@@ -440,4 +446,24 @@ test('omitting the projection pins and applies src/pobr/display-projection.json'
   assert.deepEqual(receipt.inputs[file], { sha256: createHash('sha256').update(raw).digest('hex'), bytes: raw.length });
   assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json'))).scopes).sort(),
     [...declared.scopes].sort());
+  assert.deepEqual(receipt.projection, { source: 'file', file: 'src/pobr/display-projection.json',
+    ...receipt.inputs[file], scopes: declared.scopes, literals: declared.literals });
+});
+
+test('a request projection replaces the default file, which is then neither read nor pinned', async t => {
+  const file = fileURLToPath(new URL('../../src/pobr/display-projection.json', import.meta.url));
+  const records = ['BaseItemTypes', 'Characters', 'Ascendancy', 'PassiveSkills'].map((table, i) =>
+    row(`r${i}`, `Text ${i}`, null, { table }));
+  const projection = { scopes: ['Characters.Name'], literals: 'all-catalog-conflict-participants' };
+  const input = fixture(t, 3, 6, { records });
+  const receipt = await createDisplayTexts({ ...input.request, projection }, input.out);
+  assert.deepEqual(receipt.runtime_scopes, ['Characters.Name']);
+  assert.deepEqual(receipt.request.projection, projection);
+  assert.deepEqual(receipt.projection, { source: 'request', ...projection });
+  assert.equal(Object.hasOwn(receipt.inputs, file), false);
+  assert.deepEqual(Object.keys(JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json'))).scopes), ['Characters.Name']);
+  const other = fixture(t, 3, 6, { records });
+  await assert.rejects(createDisplayTexts({ ...other.request, projection: { ...projection, extra: true } }, other.out),
+    /Invalid runtime projection/);
+  assert.equal(fs.existsSync(other.out), false);
 });
