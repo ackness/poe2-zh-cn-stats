@@ -8,7 +8,7 @@ PoBR 读取的运行时文件格式。
 | `i18n/zh-CN/display_texts.json` | `src/pobr/display-texts.mjs` | `mise run pobr:display-texts` |
 | `i18n/zh-TW/{base_items,skills,mods}.json` | `src/pobr/name-sidecars.mjs` | `mise run pobr:names` |
 | `i18n/zh-CN/stat_lines.json` | `src/pobr/stat-lines.mjs` | `mise run pobr:stat-lines` |
-| `i18n/zh-CN/stat_lines.json`（补译与修正）、`_meta.json` | `src/pobr/supplement-lines.mjs` | `mise run pobr:supplement-lines` |
+| `i18n/zh-CN/stat_lines.json`（官方层、补译与修正）、`_meta.json` | `src/pobr/supplement-lines.mjs`（官方层在 `src/pobr/official-lines.mjs`） | `mise run pobr:supplement-lines` |
 
 四个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
 产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、所执行实现的 SHA-256
@@ -75,8 +75,9 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
 - `package_texts: {stat_lines, passive_names}`（各为 `{file, bytes, sha256}`）：同一语言包里的官方文本，
   `stat_lines` 用作底的 `stat_lines.json`（只取不带 `origin` 的行），`passive_names` 用 `passive_names.json`。
   有已审核的怪物名要决定时，或 catalog 查询返回我们的补译（reviewed supplement）时必填（重新生成配方给出
-  `names` 就必须固定它，并核对它就是本包的文件：`passive_names` 等于源目录成员，`stat_lines` 等于
-  `supplement-lines` 任务的底，没有该任务时等于源目录成员）。**补译不得遮住官方文本**：catalog 补译的英文在
+  `names` 就必须固定它，并核对它就是本包的文件：`passive_names` 等于源目录成员；`stat_lines` 等于源目录成员
+  （带 `origin` 的行不计入），同 locale 的 `supplement-lines` 任务没有官方层时也可以是该任务的底。有官方层时
+  底已不是本包的官方文本，只接受源目录成员）。**补译不得遮住官方文本**：catalog 补译的英文在
   `package_texts` 或 catalog 的官方值里已有官方译文时，catalog 行回到未翻译（`null`，decision 记
   `skipped: "official-elsewhere"`）；怪物名的英文在这些地方或已采用的官方怪物名里已有官方译文时记
   `official-elsewhere`（`official`、`source`），都不出货。receipt 的 `official_elsewhere` 记录跳过条数 `skipped` 和每一行 `rows`
@@ -193,13 +194,39 @@ mise run pobr:supplement-lines -- --request /absolute/request.json --out .cache/
 | `meta` | 可选 `{file, bytes, sha256}`：作为底的 `_meta.json`；给出时也写 `_meta.json` |
 | `game_package` | `{file, repository, tag, asset, bytes, sha256}`：RePoE 游戏 Release 资产 `pobr-game-<patch>.zip`，读其中的 `data/<patch>/overlay/stat_descriptions.json` |
 | `edits` | `{file, bytes, sha256}`：[`curation/display-supplements.json`](../curation/display-supplements.json) |
+| `official` | 可选，只用于 zh-CN，且必须同时给出 `meta`：官方来源数组，**新的在前**。每项 `{file, repository, tag, asset, bytes, sha256, member, manifest_sha256}`：RePoE 输入 Release 资产（`repoe-release-input/v1` zip，例如 `inputs/0.5.5.5-1` 的 `repoe-input-china_text-0.5.5.5.zip`），`member` 是其中原生描述包的目录（如 `stat-descriptions/china/`），`manifest_sha256` 是该目录 `manifest.json` 的 SHA-256 |
 
 处理顺序：
 
+0. 官方层（给出 `official` 时）。每个来源：zip 的根 `manifest.json` 必须是 `repoe-release-input/v1`，`member`
+   目录下必须正好是冻结读取器要的四个文件（`descriptions.json`、`diagnostics.json`、`manifest.json`、
+   `source-lock.json`），每个都等于根 manifest 的 pin，`manifest.json` 等于 `manifest_sha256`；解到临时目录后
+   原样调用冻结的 `readNativeDescriptions` 与 `buildNativeLocalization`。来源 realm 必须是 `china`：国际服客户端的
+   简中不是官方 zh-CN。每个配对写成 `{src: plain(中文), en: plain(英文)}`（`[A|B]`→B，`[A]`→A，`[A|]`→空，
+   字面 `\n`→换行），按英文分组后与底比较：
+
+   | 决定 | 规则 |
+   | --- | --- |
+   | `confirmed` | 该英文的官方译文集合等于底的集合 |
+   | `revised`（共享某个译文时 `revised-partial`） | 集合不同：官方行替换底里该英文的所有行（旧的别译，如 轮箭雨，被丢弃） |
+   | `kept-pairing-incomplete` | 集合不同，但冻结读取器排除了该英文的某个分支（官方集合可能缺一个别译）：保留底 |
+   | `added` | 底没有该英文，它是游戏包的当前模板，且官方配对的 stat ID 都在模板的 stat ID 里 |
+   | `skipped-not-game-template`、`skipped-other-stats` | 底没有该英文，游戏包没有该模板（或 stat ID 不同）：不加 |
+   | `skipped-unresolved-markup` | `plain()` 之后英文或译文还留有 `[`／`]`（未知的标记形式）：不出货，保留底 |
+
+   底里没有任何来源提供的英文原样保留（`kept_historical`）。多个来源时，每个英文由**第一个**提供它的来源决定；
+   较旧的来源只补新来源缺少的英文（例如后来版本删掉的行），被新来源盖住的计 `shadowed`。官方层的行不带 `origin`，
+   其结果是第 1、2 步的底。官方文本的优先级：官方来源（新的在前）→ 历史底（vagrant-soul 词典，较旧的国服文本）
+   → 我们的补译。
 1. `corrections`：只应用 `reviewed` 且 locale 相同的修正组。每行 `{from, to}` 的 `from` 必须是底里完全相同的
    `{src, en}`，它被替换成 `to` 并加上该组的 `origin`。底里已经是 `to` 时记 `already-in-base`；`from` 的英文
    还在但译文已变，记 `superseded`（底优先）；英文已不在，记 `retired`。修正改了英文（`to.en` 不同于 `from.en`）
-   而底里已有 `to.en` 的行时，也记 `superseded`：底优先，同一英文永远不出现第二行。
+   而底里已有 `to.en` 的行时，也记 `superseded`：底优先，同一英文永远不出现第二行。当前官方层（第 0 步，不含
+   历史底）提供 `from.en` 或 `to.en`、且底里还没有 `to` 这一对时，记 `superseded-by-official`：官方文本决定该英文，
+   我们的修正留在 curation 里，不出货（例：`bonded-modifiers-and-idols-official-terms` 想把 纽带/魔偶 改成
+   羁绊/雕像，国服原文就是 从符文和魔偶上获得纽带词缀效果）。唯一例外是 basis `official-typo-format-fix`：
+   它只把官方文本里多余的 `\` 改成换行、措辞逐字节不变，国服原文本身也有这个 `\`，所以仍然应用。CSD 里没有的
+   英文（例如 `Bonded: …` 前缀行，是 ClientStrings 的 羁绊 加 CSD 余下部分的组合）不受影响。
 2. `entries`：只看 `kind: "stat-line"`。英文必须是游戏包里的当前模板且 stat ID 与 `identity.stats` 相同，
    否则 `retired`；草稿与已拒绝的记录不出货；底里已有同一 `en` 的行时底优先（`official`，并记
    `supplement_differs`）；英文只由我们修正过的行提供时记 `covered-by-correction`（记 `supplement_differs`
@@ -217,9 +244,44 @@ PoBR 的 `StatLineTemplate` 没有拒绝未知字段，旧版本会忽略 `origi
 
 给出 `meta` 时，`_meta.json` 是底的内容后加一个 `supplements` 块：`schema`、`edits` 与
 `base_stat_lines` 的 pin、`game_package`（含 `stat_descriptions_sha256`）、`producer`，以及 `stat_lines` 计数
-（每个修正组改了几行、追加几行、按 origin 统计带标记的行）。块里只有数据 pin，不放实现摘要，所以以后
-改代码不会改变已发布成员的重新生成结果。`receipt.json`（`pobr-supplement-lines-receipt/v1`）记录请求、
-输入、游戏包、实现摘要（`supplement-lines.mjs`、`display-supplements.mjs`）、计数，以及每行修正和每条记录的决定。
+（每个修正组改了几行、追加几行、按 origin 统计带标记的行；有官方层时另有 `superseded_by_official`：每个
+修正组有几行让位给官方文本）。块里只有数据 pin，不放实现摘要，所以以后改代码不会改变已发布成员的重新生成结果。
+
+有官方层时 `_meta.json` 还在 `supplements` 前加一个 `official` 块，服别与语言分开记录：
+
+```json
+"official": {
+  "locale": "zh-CN",
+  "precedence": "official sources in order (the first that supplies an English decides it), then the base, then supplements",
+  "sources": [{
+    "realm": "china", "repository": "ackness/repoe", "tag": "inputs/0.5.5.5-1",
+    "asset": "repoe-input-china_text-0.5.5.5.zip", "bytes": 20301687, "sha256": "fcbf5dc5…",
+    "member": "stat-descriptions/china/", "manifest_sha256": "4dfca51f…",
+    "package_target": {"game": "poe2", "game_patch": "0.5.5.5", "realm": "china"},
+    "source_identity": {"game_patch": "0.5.5.5", "source": "china-stat-descriptions", "acquisition": {"status": "…", "evidence": […]}, …},
+    "client": {"capture_receipt": {"path": "capture/capture-receipt.json", "sha256": "e557ccbe…"},
+      "capture_json_sha256": "b06de636…", "client_index_sha256": "1fa59396…",
+      "executables": [{"name": "PathOfExile_x64.exe", "file_version": "0.5.5.172", "sha256": "2b0de29e…"}],
+      "declared": {"game_patch": "0.5.5.5", "realm": "china", "not_verified": ["game_patch", "realm"]}},
+    "reader": {"pairs": 24844, "excluded": 1408, "excluded_by_reason": {…}},
+    "counts": {"official_english": 22750, "confirmed": 22517, "revised": 103, "added": 28, …}
+  }],
+  "counts": {"official_english": 22750, "confirmed": 22517, "revised": 103, "revised_partial": 10, "added": 28,
+    "skipped_not_game_template": 102, "kept_historical": 5300, …}
+}
+```
+
+`client` 只在来源锁的 acquisition evidence 有 `client-capture-receipt`、且输入包里有该 SHA-256 的文件时写出：
+按哈希找回执，不按路径。`game_patch` 与 `realm` 是所有者的声明（`declared.not_verified`），可执行文件版本是采集脚本
+观察到的值。每个英文由哪个来源、以何种决定处理，只写在 receipt 里，不进 PoBR 文件。
+
+`receipt.json`（`pobr-supplement-lines-receipt/v1`）记录请求、输入、游戏包、实现摘要（`supplement-lines.mjs`、
+`display-supplements.mjs`、`official-lines.mjs`）、计数、每行修正和每条记录的决定，有官方层时还有 `official`
+（同上的块，加上逐英文的 `decisions`）。官方层要解析约 200 MB 的描述包（约 9 秒、1.3 GB RSS），
+`pobr:supplement-lines` 与 `release:regenerate` 两个 mise task 都以 `--max-old-space-size=6144` 运行。
+重新生成配方的 `supplement-lines` 任务用 `official: [{repository, tag, asset, bytes, sha256, member, manifest_sha256}]`
+固定这些来源，按 Release 地址下载到 `.cache/regenerate/inputs/<sha256>`（发布前可预先放好这个缓存离线运行）。
+任务名不变：配方按 kind 固定任务，官方层就放在 `supplement-lines` 里。
 
 ## 重放
 

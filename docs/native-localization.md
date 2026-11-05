@@ -52,7 +52,14 @@ ASCII `+`／`-` 和数学负号 `−` 都保留在显式符号比较中；不会
 
 隐式默认语言保留为隐式默认。把它理解为英文是项目约定，不伪称客户端有显式
 `lang "English"`。国际客户端的简中组仍是国际服文本证据，不证明国服数值、补丁或面板相同。
-当前实物验证覆盖国际服候选；China 身份通道尚无真实客户端验收。
+实物验证覆盖国际服候选和国服客户端：2026-11-05 所有者采集的国服客户端（`client:capture` 回执
+`e557ccbe…`，index `1fa59396…`，可执行文件 0.5.5.172，声明补丁 0.5.5.5）的 27 个 CSD 经 RePoE
+`descriptions:candidate` 得到 realm `china` 的描述包（`manifest.json` `4dfca51f…`），冻结的读取器原样接受：
+24,844 个配对、1,408 个排除（`literal-number-mismatch` 625、`unmatched-branch-signature` 556、
+`unresolved-template-syntax` 167、`missing-simplified-chinese-group` 40、`nonunique-branch-signature` 14、
+`no-han-in-declared-chinese` 6），约 9 秒、1.3 GB RSS。`pobr:supplement-lines` 的官方层用它产出 zh-CN 官方词条
+（见 [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)）。读取器与上限没有改动：
+`descriptions.json` 约 199 MB，接近 256 MiB 的载荷上限，更大的国服补丁会按设计失败关闭。
 
 `stat_ids` 为原生 ID 列表；文件／记录／分支位置只是该精确 manifest 内的证据地址，
 不能当作跨版本实体 ID。完整原始事实继续在输入 RePoE 包中保存。

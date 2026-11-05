@@ -151,13 +151,18 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
   传入，怪物名按其中的目标英文决定。给出 `names` 时还要 `package_texts: {stat_lines, passive_names}`（各为本仓库
   某个提交里的文件 `{revision, path, bytes, sha256}`，通常是作为底的已发布成员），作为请求的 `package_texts`
   传入：补译不得遮住这些官方文本，跳过的条数记在任务摘要 `official_elsewhere_skipped`。`passive_names` 必须等于
-  源目录的成员，`stat_lines` 必须等于同 locale `supplement-lines` 任务的 `base`（没有该任务时等于源目录成员）。
+  源目录的成员，`stat_lines` 必须等于源目录成员（带 `origin` 的行不计入）；同 locale 的 `supplement-lines` 任务没有
+  `official` 时，也可以等于该任务的 `base`。
 - `supplement-lines`：`src/pobr/supplement-lines.mjs`（见
   [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)）。`base` 是作为底的
   `stat_lines.json`，`edits` 是 `curation/display-supplements.json`，可选 `meta` 是作为底的 `_meta.json`，
   三者都是本仓库某个提交里的文件，带 `bytes`、`sha256`；`game_package` 是游戏 Release 资产
   `{repository, tag, asset, bytes, sha256}`（`--fetch` 下载）。`members` 依次为
-  `i18n/<locale>/stat_lines.json`，固定了 `meta` 时再加 `i18n/<locale>/_meta.json`。
+  `i18n/<locale>/stat_lines.json`，固定了 `meta` 时再加 `i18n/<locale>/_meta.json`。可选 `official`（仅 zh-CN，
+  且要固定 `meta`）是官方层的来源数组，新的在前，每项正好是 `{repository, tag, asset, bytes, sha256, member,
+  manifest_sha256}`：RePoE 输入 Release 资产（例如 `inputs/0.5.5.5-1` 的 `repoe-input-china_text-0.5.5.5.zip`，
+  `member` 为 `stat-descriptions/china/`），`--fetch` 下载到 `.cache/regenerate/inputs/<sha256>`；任务摘要的
+  `official` 是官方层计数。官方层每个来源约 9 秒、1.3 GB RSS。
 
 任务可选：
 
