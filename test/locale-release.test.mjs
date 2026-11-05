@@ -120,12 +120,12 @@ test('build: records a dirty producer on tracked changes and untracked inputs on
 test('build: refuses changed, unlisted or mislabelled source bytes', t => {
   const { root, repo, manifestRaw } = fixture();
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  const reset = () => { gitIn(repo, 'checkout', '-q', '--', '.'); gitIn(repo, 'clean', '-fdq', 'handoff'); };
+  const reset = () => { gitIn(repo, 'checkout', '-q', '--', '.'); gitIn(repo, 'clean', '-fdq', 'inputs'); };
   write(repo, `${SOURCE_DIR}/i18n/zh-CN/_meta.json`, '{"lang":"zh-TW"}\n');
   assert.throws(() => build({ repo }), /_meta\.json differs from its pin/u);
   reset();
   write(repo, `${SOURCE_DIR}/i18n/zh-CN/stray.json`, '{}\n');
-  assert.throws(() => build({ repo }), /Unlisted files in handoff\/locale-test: i18n\/zh-CN\/stray\.json/u);
+  assert.throws(() => build({ repo }), /Unlisted files in inputs\/locale-test: i18n\/zh-CN\/stray\.json/u);
   reset();
   write(repo, `${SOURCE_DIR}/manifest.json`, sourceManifest(SOURCE_FILES, { ...TARGET, realm: 'china' }));
   assert.throws(() => build({ repo }), /differs from its pin in the release config/u);
@@ -170,6 +170,33 @@ test('check: clean, origin tree and published pin', async t => {
   served.set([...served.keys()][1], Buffer.from('other'));
   await assert.rejects(checkRelease(built, async url => served.get(url)), /differs from the rebuilt package/u);
   assert.equal(releaseUrl('o/r', 'locale/9.9-1', 'a.zip', 'http://127.0.0.1:1/'), 'http://127.0.0.1:1/o/r/releases/download/locale/9.9-1/a.zip');
+});
+
+test('check: a source moved after its origin commit keeps its tree and package bytes', t => {
+  const { root, repo, manifestRaw } = fixture();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const before = build({ repo });
+  const commit = gitIn(repo, 'rev-parse', 'HEAD');
+  const moved = 'inputs/locale-moved';
+  gitIn(repo, 'mv', SOURCE_DIR, moved);
+  const declared = config(manifestRaw);
+  const origin = { repository: 'ackness/poe2-zh-cn-stats', tag: 'handoff/test', revision: commit,
+    path: `${SOURCE_DIR}/manifest.json` };
+  write(repo, 'release/9.9.json', bytes({ ...declared,
+    source: { manifest: { ...declared.source.manifest, path: `${moved}/manifest.json` }, origin } }));
+  commitAll(repo, 'move the source');
+  const built = build({ repo });
+  // The package records the origin path, so its bytes do not depend on the current directory.
+  assert.deepEqual(built.zip, before.zip);
+  assert.equal(strictJson(readZip(built.zip).get('manifest.json').raw).source.publication.path, `${SOURCE_DIR}/manifest.json`);
+  assert.equal(built.receipt.source.manifest.path, `${moved}/manifest.json`);
+  assert.deepEqual(check(repo, built), []);
+  write(repo, `${moved}/README.md`, 'changed\n');
+  commitAll(repo, 'change the moved tree');
+  assert.deepEqual(check(repo, build({ repo })), [`${moved} differs from ${SOURCE_DIR} at handoff/test`]);
+  write(repo, 'release/9.9.json', bytes({ ...declared, source: { ...declared.source,
+    origin: { ...origin, path: '../escape/manifest.json' } } }));
+  assert.throws(() => build({ repo }), /Unsafe path/u);
 });
 
 test('the committed release config builds its pinned publication unchanged', t => {

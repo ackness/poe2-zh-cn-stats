@@ -120,7 +120,7 @@ data/snapshots/<时间戳>/
 
 从选定的完整 Git commit 读取 `data/CURRENT` 与其指向的快照，两者必须来自同一提交。
 可以使用固定 commit 的本地检出或下载原文件；产品构建不要追踪浮动 `main`。
-本节只介绍独立交易词典；PoBR 的完整语言交付使用[发布索引](publication-index.md)。
+本节只介绍独立交易词典；PoBR 的完整语言交付使用 `locale/<patch>-<n>` GitHub Release（见 [RELEASING.md](../RELEASING.md)）。
 
 保存下面示例为消费仓库中的 `example.mjs`，执行 `node example.mjs third_party/poe2-zh-cn-stats`：
 

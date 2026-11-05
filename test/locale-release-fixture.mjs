@@ -5,7 +5,7 @@ import path from 'node:path';
 import { CODE, ROOT, pin } from '../src/locale-release.mjs';
 
 export const TARGET = { game: 'poe2', game_patch: '9.9', realm: 'international' };
-export const SOURCE_DIR = 'handoff/locale-test';
+export const SOURCE_DIR = 'inputs/locale-test';
 export const bytes = value => Buffer.from(JSON.stringify(value, null, 2) + '\n');
 
 export const SOURCE_FILES = {

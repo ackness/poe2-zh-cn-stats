@@ -147,6 +147,5 @@ const lookup = createCatalogLookup(catalog, {
 当前固定 SC 产物有 58588 字段／18 列，lookup 状态为 25097 translated／33491 fallback；
 这是该固定目录的结果，不是全游戏汉化率。观察客户端 patch／realm 仍为 null，
 目标 `0.5.5.5/international` 绑定不认证整个观察客户端或国服数值。
-当前 descriptor 固定 catalog、六模块库和原 validation 收据；发布索引只复核声明与小证据，
-完整 v3 guard 仍负责内容验证。PoBR 已导入该目录并生成精简显示资产，
+当前固定 catalog、六模块库和原 validation 收据；内容验证仍由完整 v3 guard 负责。PoBR 已导入该目录并生成精简显示资产，
 原大 sidecar 留作构建／离线校验输入，不进入玩家运行包。

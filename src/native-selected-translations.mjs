@@ -57,15 +57,31 @@ function substitute(template, values) {
   return plain(rendered.replaceAll('%%', '%'));
 }
 
+// Schema IDs of the adapter outputs this selection reads (`adapter.output_schema`), from the
+// adapter's registry (repoe tools/pobr-data-adapter/src/schema_id.rs, the contract's <name>/v1 style).
+export const RUNES_SCHEMA = 'runes/v1';
+export const PASSIVE_TREE_SCHEMA = 'passive_tree/v1';
+// Receipts written before the adapter emitted schema IDs name the Rust output type instead.
+const LEGACY_SCHEMAS = new Map([
+  ['pobr_data::catalog::item_overlay::RunesDef', RUNES_SCHEMA],
+  ['pobr_data::catalog::{PassiveNodeDef[],PassiveTreeMeta}', PASSIVE_TREE_SCHEMA],
+]);
+
+/** The stable schema ID of an ordinary producer receipt's output (legacy type paths mapped). */
+export function selectionSchema(selection) {
+  const schema = selection.adapter?.output_schema;
+  return LEGACY_SCHEMAS.get(schema) ?? schema;
+}
+
 /** Preserve existing wording and add only context-bound, globally unambiguous literals. */
 export function nativeSelectedTranslations(legacy, selection, candidate) {
   required(Array.isArray(legacy) && legacy.every(p => typeof p.src === 'string' && typeof p.en === 'string'), 'invalid legacy translation pairs');
   required(selection.format === 'pobr-ordinary-facts-receipt/v1', 'not an ordinary producer receipt');
-  const schema = selection.adapter?.output_schema;
+  const schema = selectionSchema(selection);
   let records;
   const unselectedFields = [];
-  if (schema === 'pobr_data::catalog::item_overlay::RunesDef') records = selection.conversion.records;
-  else if (schema === 'pobr_data::catalog::{PassiveNodeDef[],PassiveTreeMeta}') {
+  if (schema === RUNES_SCHEMA) records = selection.conversion.records;
+  else if (schema === PASSIVE_TREE_SCHEMA) {
     records = [];
     required(Array.isArray(selection.conversion?.projection?.source_records), 'missing target tree projection');
     for (const node of selection.conversion.projection.source_records) {

@@ -13,9 +13,10 @@ PoBR 只消费本库发布的固定语言文件，不再生成语言数据。下
 
 三个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
 产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、所执行实现的 SHA-256
-和逐条取舍，`adoption` 固定为 `not-adopted`。交付给 PoBR 仍走既有流程：把产物
-放进新的 `handoff/<name>` 目录与 tag，在 `manifest.json` 固定字节数和 SHA-256，
-再由 PoBR 在 `pipeline/data.lock.json` 引用该 commit。生成本身不修改任何已发布目录。
+和逐条取舍，`adoption` 固定为 `not-adopted`。交付给 PoBR 时把审核过的产物放进新的源
+发布目录（`manifest.json` 固定字节数和 SHA-256），由 `release/<patch>.json` 指向它，再按
+[RELEASING.md](../RELEASING.md) 发布 `locale/<patch>-<n>` Release，PoBR 用 `data:bump` 采用。
+生成本身不修改任何已发布目录。
 
 ## 显示文本：`display_texts.json`
 
@@ -93,7 +94,9 @@ mise run pobr:stat-lines --selection <receipt.json> --selection-sha256 <sha> \
 
 这是 `src/native-selected-translations.mjs` 的命令行入口。`--selection` 是 RePoE
 `tools/pobr-data-adapter --ordinary-facts` 写出的 `pobr-ordinary-facts-receipt/v1`
-（符文 `RunesDef` 或天赋树 `PassiveNodeDef[]` 两种），`--native` 是 `native` 命令产出的
+（`adapter.output_schema` 为符文 `runes/v1` 或天赋树 `passive_tree/v1`，与 repoe adapter 的 `src/schema_id.rs` 一致；
+旧收据里的 Rust 类型路径 `pobr_data::catalog::item_overlay::RunesDef`、
+`pobr_data::catalog::{PassiveNodeDef[],PassiveTreeMeta}` 按同一 ID 接受），`--native` 是 `native` 命令产出的
 `poe2-native-localization-candidate/v1`，`--legacy` 是上一份 `stat_lines.json`。
 只追加按实际 CSD 分支选取、且英文和中文都无歧义的整行译文；已有模板保持不变。
 receipt 的 `implementation` 固定本入口和 `native-selected-translations.mjs` 两个文件。

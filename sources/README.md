@@ -58,7 +58,7 @@ Item-level results:
   `accepted-retained-compatibility`.
 - `L3` — the 140 native selected-text pairs inside the same file,
   `accepted-target-text-applicability`; per-pair evidence lives in this
-  repository's `handoff/locale-retained-20261101/evidence/native-140-pairs.json`.
+  repository's `handoff/locale-retained-20261101/evidence/native-140-pairs.json` (commit `a4bd9b5b`).
 - `L4` — the two selected CSD literal pairs (stat_descriptions.csd record
   20965, branch 1), `accepted-target-text-applicability`.
 - `L5` — the three `i18n/zh-TW` sidecars additive over the previous patch,
@@ -82,13 +82,13 @@ rights, freshness, remote release or deployment.
 ## Where the bytes and evidence live
 
 The entry's byte-identical publication copy is
-[`handoff/locale-retained-20261101/evidence/locale-decision.json`](../handoff/locale-retained-20261101/evidence/locale-decision.json),
+[`handoff/locale-retained-20261101/evidence/locale-decision.json`](https://github.com/ackness/poe2-zh-cn-stats/blob/a4bd9b5b0534d706a7b19975dae5cfa43a1d57fb/handoff/locale-retained-20261101/evidence/locale-decision.json),
 shipped with the retained locale package under tag
 `handoff/locale-retained-20261101` (revision `a4bd9b5b`). That package's
 `manifest.json` and `evidence/` directory carry the pinned dictionary bytes,
 the original zh-CN `_meta`, the zh-TW consumer receipt and the 140-pair delta.
 The support-display asset's provenance is its own
-[`handoff/support-display-20261101/manifest.json`](../handoff/support-display-20261101/manifest.json)
+[`handoff/support-display-20261101/manifest.json`](https://github.com/ackness/poe2-zh-cn-stats/blob/5046a18af9974e8914fa1ea1b2b0db9202b2908b/handoff/support-display-20261101/manifest.json)
 `provenance` block; it never had a `sources.lock.json` entry.
 
 Evidence paths inside the entry still name PoBR `.cache/` receipts, PoBR

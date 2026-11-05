@@ -25,7 +25,7 @@ const MARKER = '.release-build';
 // Pinned in the receipt; the commit identifies them too, the pins make a receipt self-describing.
 export const CODE = ['src/locale-release.mjs', 'src/stored-zip.mjs', 'src/strict-json.mjs', 'mise.lock'];
 // Untracked files here could change the build, so they make the producer dirty.
-export const PRODUCER_PATHS = ['src', 'release', 'handoff', 'package.json', 'package-lock.json', 'mise.toml', 'mise.lock'];
+export const PRODUCER_PATHS = ['src', 'release', 'inputs', 'package.json', 'package-lock.json', 'mise.toml', 'mise.lock'];
 const HEX40 = /^[0-9a-f]{40}$/u;
 const HEX64 = /^[0-9a-f]{64}$/u;
 const PATCH = /^[0-9]+(?:\.[0-9]+)+$/u;
@@ -101,6 +101,8 @@ export function loadConfig(file, repo = ROOT) {
   const origin = source.origin;
   require(origin?.repository === REPOSITORY && typeof origin.tag === 'string' && HEX40.test(origin.revision ?? ''),
     'The source origin needs this repository, its tag and the full revision');
+  require(origin.path === undefined || (safeRelative(origin.path) && origin.path.endsWith('/manifest.json')),
+    'The source origin path must name the manifest at the origin revision');
   require(published === undefined || (typeof published.tag === 'string'
     && published.tag.startsWith(`locale/${target.game_patch}-`) && /^[1-9][0-9]*$/u.test(published.tag.slice(`locale/${target.game_patch}-`.length))
     && published.asset === assetName(target.game_patch) && isPin(published)), 'Invalid published package pin');
@@ -182,6 +184,13 @@ export function readSource(repo, config) {
 
 // --- package -------------------------------------------------------------------------------------
 
+// Where the source manifest lives at its origin revision: `source.origin.path` when the directory
+// was moved after that commit (its tree must be unchanged), otherwise `source.manifest.path`.
+// The package records this path, so moving the directory does not change the package bytes.
+export function originManifestPath(config) {
+  return config.source.origin.path ?? config.source.manifest.path;
+}
+
 export function partManifest(target, source, files) {
   return {
     schema: PART_SCHEMA,
@@ -220,7 +229,7 @@ export function build({ repo = ROOT, config: configFile, out } = {}) {
   out = outputDirectory(repo, out, target);
   const source = readSource(repo, config);
   const { members, origins } = packageMembers(target, source);
-  const manifestRaw = encoded(partManifest(target, config.source.manifest, members));
+  const manifestRaw = encoded(partManifest(target, { ...config.source.manifest, path: originManifestPath(config) }, members));
   const zip = storedZip(new Map([...members, ['manifest.json', manifestRaw]]));
   // The archive must read back as exactly these members and bytes.
   const read = readZip(zip);
@@ -275,10 +284,11 @@ export function check(repo, built) {
   const problems = [];
   if (receipt.producer.dirty) problems.push(`the checkout is dirty: ${receipt.producer.dirty_paths.slice(0, 5)}`);
   const directory = path.posix.dirname(config.source.manifest.path);
-  const tree = rev => git(repo, ['rev-parse', '--verify', '--quiet', `${rev}:${directory}`]);
-  const [origin, head] = [tree(config.source.origin.revision), tree('HEAD')];
+  const originDirectory = path.posix.dirname(originManifestPath(config));
+  const tree = (rev, dir) => git(repo, ['rev-parse', '--verify', '--quiet', `${rev}:${dir}`]);
+  const [origin, head] = [tree(config.source.origin.revision, originDirectory), tree('HEAD', directory)];
   if (origin.status !== 0) problems.push(`origin ${config.source.origin.revision} is not present locally (pass --fetch)`);
-  else if (origin.stdout !== head.stdout) problems.push(`${directory} differs from ${config.source.origin.tag}`);
+  else if (origin.stdout !== head.stdout) problems.push(`${directory} differs from ${originDirectory} at ${config.source.origin.tag}`);
   if (config.published && !samePin(receipt.package, config.published)) {
     problems.push(`the package differs from the published ${config.published.tag} (${config.published.sha256})`);
   }

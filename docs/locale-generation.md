@@ -7,8 +7,10 @@ not acquire network data, mutate PoBR snapshots, or decide source acceptance.
 The retained publication exporter is a separate byte replay operation.
 
 The fixed historical composition is specified by
-[`input-manifest.json`](../handoff/locale-generation-20261101/input-manifest.json).
-Pin that manifest by SHA-256 and its producer Git commit independently. Every
+[`input-manifest.json`](https://github.com/ackness/poe2-zh-cn-stats/blob/629be2d902a886dd1ad0961b5ac704c1909ce4f9/handoff/locale-generation-20261101/input-manifest.json)
+(tag `handoff/locale-generation-20261101`, commit `629be2d9`; the directory is no
+longer in the current tree, so check that commit out, for example with
+`git worktree add --detach`, to replay it). Pin that manifest by SHA-256 and its producer Git commit independently. Every
 `inputs` key is a path **under a caller-created input directory**, not a path
 relative to this manifest. Fetch each entry from its `source.url`, or from its
 `source.repository` and `source.path` at the separately pinned producer commit
@@ -20,7 +22,7 @@ producer commit. A consumer may materialize them however it wishes.
 
 ```sh
 node src/locale-producer.mjs \
-  --manifest handoff/locale-generation-20261101/input-manifest.json \
+  --manifest <checkout-of-629be2d9>/handoff/locale-generation-20261101/input-manifest.json \
   --manifest-sha256 <pinned-manifest-sha256> \
   --input-dir <materialized-input-directory> --out <new-output-directory>
 ```
@@ -102,11 +104,7 @@ other locale file is byte-identical and the stat pair delta is exactly those
 four additions, with no removals and the original block intact.
 
 Keep research and candidate directories under `.cache`. Copy verified files
-into new immutable `handoff/` paths only for delivery, retaining all original
-evidence files. Publish a new descriptor with both `language` and
-`locale_generation` role sequences incremented; their output pins must agree.
-The other five roles and display bindings remain pinned to their own production
-snapshots. Commit the descriptor before registering its exact pin in a separate
-index commit. Local commits, tags and a valid registry do not establish remote
-availability or PoBR adoption; those are separate coordinator steps in the
-[publication workflow](publication-index.md).
+into a new source publication directory, retaining all original evidence files,
+and point a `release/<patch>.json` at its manifest; publishing it as a
+`locale/<patch>-<n>` GitHub Release and PoBR's `data:bump` are separate steps
+(see [RELEASING.md](../RELEASING.md)).
