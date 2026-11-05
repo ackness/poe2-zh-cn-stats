@@ -88,7 +88,7 @@ src/                          采集、配对、生成与验证代码
 test/                         离线回归用例
 docs/                         数据契约和维护指南
 sources/                      语言来源台账（自 PoBR 迁入）与说明
-inputs/                       release/<patch>.json 固定的源发布（只读，字节与原 tag 相同）
+inputs/                       release/<patch>.json 固定的源发布与保留的辅助宝石说明（只读，字节与原 tag 相同）
 .cache/                       本地候选与临时文件，不提交
 ```
 
@@ -102,7 +102,7 @@ PoBR 的显示文本、繁中名称和词条译文由本库三个[语言文件�
 
 ### 语言包 GitHub Release
 
-PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布（`release:build` → `release:publish` → PoBR `data:bump`），构建只打包 `release/<patch>.json` 固定的源字节、不重新生成；`release:regenerate` 另行从固定输入重新生成各成员并逐字节比较，CI 每次都跑。步骤、新补丁和排障见 [RELEASING.md](RELEASING.md)。
+PoBR 的语言包以不可变的 GitHub Release `locale/<patch>-<n>` 发布（`release:build` → `release:publish` → PoBR `data:bump`），构建只打包 `release/<patch>.json` 固定的源字节、不重新生成；`release:regenerate` 另行从固定输入重新生成各成员并逐字节比较，CI 每次都跑。配置声明了 `support_display` 时，同一个 Release 还附带简中辅助宝石说明 `support-display.zh-CN.json` 和 `supportDescriptions.zh-CN.json`（在 zip 之外，列入 `SHA256SUMS`），它绑定游戏包的交易目录 SHA-256，PoBR 的 `data:bump` 随语言包一起采用。步骤、新补丁和排障见 [RELEASING.md](RELEASING.md)。
 
 已被 PoBR 锁引用的 `handoff/*` tag 必须持续可取，不能删除或移动。
 

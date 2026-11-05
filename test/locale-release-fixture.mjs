@@ -10,7 +10,8 @@ export const bytes = value => Buffer.from(JSON.stringify(value, null, 2) + '\n')
 
 export const SOURCE_FILES = {
   'i18n/zh-CN/stat_lines.json': Buffer.from('{"a":"甲"}\n'),
-  'i18n/zh-CN/_meta.json': Buffer.from('{"lang":"zh-CN"}\n'),
+  // source_commit: the dictionary commit a support display must share (test/support-display.test.mjs).
+  'i18n/zh-CN/_meta.json': Buffer.from(`{"lang":"zh-CN","source_commit":"${'d'.repeat(40)}"}\n`),
   'i18n/zh-TW/mods.json': Buffer.from('{"m":"乙"}'), // no final newline: bytes must pass through untouched
   'evidence/receipt.json': Buffer.from('{"evidence":true}\n'),
 };
