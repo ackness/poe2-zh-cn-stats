@@ -4,9 +4,9 @@ import { createHash } from 'node:crypto';
 import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { pairDisplayCatalog, createCatalogLookup } from '../src/native-catalog.mjs';
+import { pairDisplayCatalog, createCatalogLookup } from '../../src/native-catalog.mjs';
 import { reconcileNativeTranslations, createSupplementedLookup, exportReviewedSupplements,
-  createReviewedSupplementLookup, entryId, writeWorkbench, workbenchCommand } from '../src/translation-workbench.mjs';
+  createReviewedSupplementLookup, entryId, writeWorkbench, workbenchCommand } from '../../src/translation-workbench.mjs';
 
 const hash = raw => createHash('sha256').update(raw).digest('hex');
 const edits = entries => ({ schema: 'poe2-native-translation-edits/v1', entries });
@@ -148,7 +148,7 @@ test('corrupt pins, duplicate edits, missing reviewer and duplicate current scop
 });
 
 test('fresh workbench CLI files replay exactly, list by region/status, never overwrite or activate', async t => {
-  const root = fileURLToPath(new URL('../', import.meta.url));
+  const root = fileURLToPath(new URL('../../', import.meta.url));
   const base = await mkdtemp(path.join(root, '.cache/workbench-test-')); t.after(() => rm(base, { recursive: true, force: true }));
   const source = input(), c = JSON.parse(source.bytes);
   await writeFile(path.join(base, 'catalog.json'), source.bytes);
@@ -172,7 +172,7 @@ test('fresh workbench CLI files replay exactly, list by region/status, never ove
 });
 
 test('Git JSON inputs have no fixed cap while catalog byte and hash pins remain mandatory', async t => {
-  const root = fileURLToPath(new URL('../', import.meta.url));
+  const root = fileURLToPath(new URL('../../', import.meta.url));
   const base = await mkdtemp(path.join(root, '.cache/workbench-test-')); t.after(() => rm(base, { recursive: true, force: true }));
   const source = input(), c = JSON.parse(source.bytes);
   await writeFile(path.join(base, 'catalog.json'), source.bytes);
@@ -325,7 +325,7 @@ test('v3 ingress requires original pinned Buffer and independently verifies its 
   assert.throws(() => reconcileNativeTranslations([{ ...source, verification: Buffer.from('tampered') }]), /pinned FK verification sidecar/);
   assert.throws(() => reconcileNativeTranslations([{ ...source, verification: verification.toString() }]), /pinned FK verification sidecar/);
   assert.throws(() => reconcileNativeTranslations([{ ...source, verification }]), /Invalid strict v2 parent/);
-  const root = fileURLToPath(new URL('../', import.meta.url));
+  const root = fileURLToPath(new URL('../../', import.meta.url));
   const base = await mkdtemp(path.join(root, '.cache/workbench-test-')); t.after(() => rm(base, { recursive: true, force: true }));
   await writeFile(path.join(base, 'catalog.json'), source.bytes);
   const manifest = { schema: 'poe2-native-catalog-manifest/v3', status: c.status, production_ready: false,

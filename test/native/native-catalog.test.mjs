@@ -4,10 +4,10 @@ import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { CATALOG_FIELDS, CONTEXT_FIELDS, pairDisplayCatalog, createNativeCatalog, createCatalogLookup } from '../src/native-catalog.mjs';
-import { NAME_FIELDS, createNativeNames } from '../src/native-names.mjs';
+import { CATALOG_FIELDS, CONTEXT_FIELDS, pairDisplayCatalog, createNativeCatalog, createCatalogLookup } from '../../src/native-catalog.mjs';
+import { NAME_FIELDS, createNativeNames } from '../../src/native-names.mjs';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
+const root = fileURLToPath(new URL('../../', import.meta.url));
 const hash = raw => createHash('sha256').update(raw).digest('hex');
 const expected = { game_patch: '0.5.5.5', realm: 'international', locale: 'zh-TW' };
 function tables(localized = false, language = 'Traditional Chinese') {

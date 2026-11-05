@@ -4,8 +4,8 @@ import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { createNativeNames, pairNames, NAME_FIELDS } from '../src/native-names.mjs';
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+import { createNativeNames, pairNames, NAME_FIELDS } from '../../src/native-names.mjs';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const hash = raw => createHash('sha256').update(raw).digest('hex');
 const fields = Object.keys(NAME_FIELDS);
 function tables(localized = false) {

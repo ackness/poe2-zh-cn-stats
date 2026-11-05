@@ -6,12 +6,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { strictJson } from '../src/strict-json.mjs';
-import { buildNativeLocalization, canonical, generateNativeLocalization, nativeBytes, readNativeDescriptions } from '../src/native-localization.mjs';
+import { strictJson } from '../../src/strict-json.mjs';
+import { buildNativeLocalization, canonical, generateNativeLocalization, nativeBytes, readNativeDescriptions } from '../../src/native-localization.mjs';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
-const fixture = fileURLToPath(new URL('fixtures/native-descriptions/', import.meta.url));
-const dag = fileURLToPath(new URL('fixtures/native-descriptions-dag/', import.meta.url));
+const root = fileURLToPath(new URL('../../', import.meta.url));
+const fixture = fileURLToPath(new URL('../fixtures/native-descriptions/', import.meta.url));
+const dag = fileURLToPath(new URL('../fixtures/native-descriptions-dag/', import.meta.url));
 const sha = data => createHash('sha256').update(data).digest('hex');
 const pin = async directory => sha(await readFile(path.join(directory, 'manifest.json')));
 const read = async () => readNativeDescriptions(fixture, await pin(fixture));
@@ -48,8 +48,8 @@ test('strict JSON rejects escaped duplicates at every depth and unsafe input enc
 
 test('synthetic upstream facts bind their complete raw inputs', async () => {
   for (const name of ['native-descriptions', 'native-descriptions-dag']) {
-    const source = JSON.parse(await readFile(new URL(`fixtures/${name}-source.json`, import.meta.url)));
-    const manifest = JSON.parse(await readFile(new URL(`fixtures/${name}/manifest.json`, import.meta.url)));
+    const source = JSON.parse(await readFile(new URL(`../fixtures/${name}-source.json`, import.meta.url)));
+    const manifest = JSON.parse(await readFile(new URL(`../fixtures/${name}/manifest.json`, import.meta.url)));
     assert.equal(source.producer_commit, '3e1e488ff2763acb692387f4d8fbb69019985cf2');
     assert.deepEqual(Object.keys(source.raw_files_base64).sort(), Object.keys(manifest.source_identity.raw_resources).sort());
     for (const [file, encoded] of Object.entries(source.raw_files_base64)) {

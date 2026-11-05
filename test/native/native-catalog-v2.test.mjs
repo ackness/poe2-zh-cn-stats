@@ -4,13 +4,13 @@ import { readFile, writeFile, mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createNativeCatalog, createCatalogLookup } from '../src/native-catalog.mjs';
-import { nativeBytes } from '../src/native-localization.mjs';
+import { createNativeCatalog, createCatalogLookup } from '../../src/native-catalog.mjs';
+import { nativeBytes } from '../../src/native-localization.mjs';
 
 // Source-owner synthetic example metadata; no Windows or acquired game rows.
-const seed = JSON.parse(await readFile(new URL('fixtures/native-catalog-v2-target.json', import.meta.url)));
-const wordsSeed = JSON.parse(await readFile(new URL('fixtures/native-catalog-v2-words.json', import.meta.url)));
-const root = fileURLToPath(new URL('../', import.meta.url));
+const seed = JSON.parse(await readFile(new URL('../fixtures/native-catalog-v2-target.json', import.meta.url)));
+const wordsSeed = JSON.parse(await readFile(new URL('../fixtures/native-catalog-v2-words.json', import.meta.url)));
+const root = fileURLToPath(new URL('../../', import.meta.url));
 const hash = b => createHash('sha256').update(b).digest('hex');
 const fp = b => ({ bytes: b.length, sha256: hash(b) });
 const policy = 'stable-key-current-english-all-nontext/v1';

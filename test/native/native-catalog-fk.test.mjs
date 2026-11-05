@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Correspondence } from '../src/native-catalog-fk-binding.mjs';
+import { Correspondence } from '../../src/native-catalog-fk-binding.mjs';
 
 const roles = ['source_default', 'source_localized', 'target'];
 const fields = { BaseItemTypes: { Name: 'name', Inflection: 'inflection' }, Mods: { Name: 'name' } };

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildNativeLocalization, canonical } from '../src/native-localization.mjs';
+import { buildNativeLocalization, canonical } from '../../src/native-localization.mjs';
 
 // Synthetic branch envelopes only, not acquired game rows or source approval.
 // Keep the source lexer's raw metadata, including its escaped-brace diagnostic.
