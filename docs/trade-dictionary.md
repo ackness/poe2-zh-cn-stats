@@ -1,7 +1,7 @@
 # 交易词典：采集、补译与消费
 
 GGG／腾讯交易目录、分裂词缀复用和 PoE2DB 补缺组成独立的交易词典。
-原生客户端语言、名称目录与 PoBR 语言文件另见[仓库首页](../README.md)。
+原生客户端语言、名称目录与 PoBR 语言文件另见[文档导航](README.md)。
 
 ## 使用
 
@@ -17,18 +17,18 @@ mise run report
 `setup` 按 `package-lock.json` 安装依赖，不运行依赖包的生命周期脚本；首次安装需要访问 npm registry。
 `check` 顺序运行现有测试和当前快照的离线校验；只跑测试可用 `mise run test`。
 GitHub Actions 使用同一份 mise 工具版本和任务入口，不另外维护一套 Node 版本或校验命令。
-以下数据维护命令在 mise 环境执行，例如 `mise exec -- npm run build`；已激活 mise 时也可直接使用原有 npm 命令。
+命令统一经 mise 执行：有 mise 任务的用 `mise run <任务>`，其余用 `mise exec -- <命令>`。
 
 更新官方目录与配置中的 PoE2DB 页面：
 
 ```sh
-npm run refresh
+mise exec -- npm run refresh
 ```
 
 只获取官方交易目录，不访问 PoE2DB：
 
 ```sh
-npm run refresh -- --trade-only
+mise exec -- npm run refresh -- --trade-only
 ```
 
 `--trade-only` 生成不含 PoE2DB 证据的新快照，覆盖率可能下降，不会暗中沿用旧页面。每次成功更新会创建独立快照并切换 `data/CURRENT`。旧快照保留，可通过 Git 历史比较。
@@ -36,25 +36,25 @@ npm run refresh -- --trade-only
 修改匹配规则或人工修正后，从当前原始响应重建：
 
 ```sh
-npm run build
-npm run check
-npm run report
+mise exec -- npm run build
+mise run check
+mise run report
 ```
 
 已发布快照不可原地写入。`build` 对当前或指定的 `data/snapshots/<ID>` 创建新候选，保留原始采集时间并记录 `rebuilt_from`，全部校验成功后切换 `CURRENT`；失败时旧快照不变。对 `.cache` 候选的构建不会自动激活。
 
 成功激活还会同步 `curation/translations.json` 补译工作表。新缺口自动加入，已补全和已退出上游目录的条目保留状态与人工内容。快照内保存同一张表，便于追溯；检测到发布期间有人编辑工作表时，不覆盖这些编辑，按报错重新构建。
 
-`check` 重新核对原始响应的 SHA-256 和字节数，并离线再生成所有产物进行逐字节比较。它不会联网，不会修改数据。GitHub Actions 也只运行离线测试与校验，不定期抓取网站、不自动发布。
+`mise run check` 先跑测试，再重新核对原始响应的 SHA-256 和字节数，并离线再生成所有产物进行逐字节比较。它不会联网，不会修改数据。GitHub Actions 也只运行离线测试与校验，不定期抓取网站、不自动发布。
 
 ### 中断恢复
 
 抓取的候选位于 `.cache/candidate-<时间戳>/`。两个官方目录有任一失败，候选不会激活。若采集成功但解析或生成失败，可修正规则后使用同一份响应，不必再次下载：
 
 ```sh
-npm run build -- --snapshot .cache/candidate-<时间戳>
-npm run check -- --snapshot .cache/candidate-<时间戳>
-node src/cli.mjs activate --snapshot .cache/candidate-<时间戳>
+mise exec -- npm run build -- --snapshot .cache/candidate-<时间戳>
+mise exec -- npm run check -- --snapshot .cache/candidate-<时间戳>
+mise exec -- node src/cli.mjs activate --snapshot .cache/candidate-<时间戳>
 ```
 
 激活只接受仓库 `.cache` 内已经生成并通过校验的候选。`data/CURRENT` 在完整校验成功后才原子切换。
@@ -179,7 +179,7 @@ curated_sha256: 人工模板输入的 SHA-256
 | `curation/overrides.json` | 对现有交易词条明确指定高优先级修正 |
 | `curation/curated.json` | 维护交易目录之外的文本、已审核多参数或字符串模板，以及稀有名组成词补丁 |
 
-修改 `curation/curated.json` 后运行 `npm run build`、`npm run check`；生成、校验和激活均包含编号模板导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
+修改 `curation/curated.json` 后运行 `mise exec -- npm run build`、`mise run check`；生成、校验和激活均包含编号模板导出及人工输入副本。模板的中英文参数编号集合与格式必须一致，编号从 0 连续排列；允许有证据的参数重排。人工模板支持 `{0}` 字符串／嵌套捕获和 `{0:d}` 数值捕获，不接受未经定义的格式。
 
 消费方接入这份导出时的建议：
 
@@ -217,7 +217,7 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 ### 持续补译表
 
-**[`curation/translations.json`](../curation/translations.json)** 是日常维护入口。首次生成已将当前全部 265 条缺口放入表中，后续数量以 `npm run report` 为准。它不是每次清空的临时报表；已解决项会保留下来，便于核对人工内容与新来源的差异。
+**[`curation/translations.json`](../curation/translations.json)** 是日常维护入口。首次生成已将当前全部 265 条缺口放入表中，后续数量以 `mise run report` 为准。它不是每次清空的临时报表；已解决项会保留下来，便于核对人工内容与新来源的差异。
 
 只编辑这三个字段，不要改 `id`／`english` 来迁移译文：
 
@@ -227,7 +227,7 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 `status`、`chinese`、`method`、`reason`、`manual_differs` 和 `evidence` 都由生成器重算。`chinese` 是最终采用的译文，**不是输入栏**；手工补译请填写 `manual_chinese`。
 
-例如，找到对应行后填写如下内容，再运行 `npm run build` 和 `npm run check`。这是人工填写格式示例，不代表已经收入或认定为官方译文：
+例如，找到对应行后填写如下内容，再运行 `mise exec -- npm run build` 和 `mise run check`。这是人工填写格式示例，不代表已经收入或认定为官方译文：
 
 ```json
 {
@@ -249,7 +249,7 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 更新行为：
 
-- 每次 `npm run refresh` 自动重新对照来源：新缺口入表、已有缺口更新状态。现有 CI 只校验，不定时抓取网站。
+- 每次 `mise exec -- npm run refresh` 自动重新对照来源：新缺口入表、已有缺口更新状态。现有 CI 只校验，不定时抓取网站。
 - 新来源译文优先于人工补缺；若与人工内容不同，`manual_differs` 为 `true`，并写入 `conflicts.json`，人工原文和备注不会被抹掉。
 - 来源再次缺失时，可重新使用仍匹配同一 ID＋英文的人工补缺；没有人工内容则回到 `pending`。上一次自动译文不会偷偷充当离线兜底。
 - ID 相同但英文变化时，旧行变为 `retired`；新英文仍缺译文则新增 `pending` 行，不自动套用旧翻译。原英文之后重新出现，才可重新使用对应人工记录。
@@ -262,8 +262,8 @@ PoE2DB 候选只在规范化空白后的英文**完全一致**、中文候选唯
 
 先查看 `unresolved.json`、`conflicts.json` 与 `source-issues.json`，避免把交易类别缺失、重复分支和真正没有译文混为一谈。
 
-- **增加补充页面**：编辑 `curation/trade-sources.json` 的 `poe2db.pages`。每个 slug 对应 `/us/<slug>` 和 `/cn/<slug>`；使用已确认存在的公开页面。然后运行 `npm run refresh`，已有工作表自动对照这些新候选。
-- **明确覆盖官方或补充来源**：这与普通缺口补译不同。在 `curation/overrides.json` 添加如下格式，再运行 `npm run build` 和 `npm run check`。示例只说明格式，不会自动加入数据。
+- **增加补充页面**：编辑 `curation/trade-sources.json` 的 `poe2db.pages`。每个 slug 对应 `/us/<slug>` 和 `/cn/<slug>`；使用已确认存在的公开页面。然后运行 `mise exec -- npm run refresh`，已有工作表自动对照这些新候选。
+- **明确覆盖官方或补充来源**：这与普通缺口补译不同。在 `curation/overrides.json` 添加如下格式，再运行 `mise exec -- npm run build` 和 `mise run check`。示例只说明格式，不会自动加入数据。
 
 ```json
 [

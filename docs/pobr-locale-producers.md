@@ -1,9 +1,7 @@
 # PoBR 语言文件生产者
 
-PoBR 只消费本库发布的固定语言文件，不再生成语言数据。下面三个入口把本库的
-配对结果投影成 PoBR 现有的运行时文件格式，原样移自 PoBR `7cb90dce` 的
-`pipeline/native/`（PoBR #237 删除了它们）。投影规则没有改变；改动只有路径：
-直接执行本库 `src/` 的模块，默认投影声明放在本库，输出目录换成本库的 `.cache/`。
+PoBR 只消费本仓库发布的语言包，自己不生成语言数据。下面三个入口把本仓库的配对结果投影成
+PoBR 读取的运行时文件格式。
 
 | 输出（PoBR 路径） | 入口 | mise task |
 |---|---|---|
@@ -13,15 +11,13 @@ PoBR 只消费本库发布的固定语言文件，不再生成语言数据。下
 
 三个入口都只写入一个新的 `.cache/` 子目录（父目录必须已存在且不含符号链接），
 产出对应文件和 `receipt.json`。`receipt.json` 记录输入摘要、所执行实现的 SHA-256
-和逐条取舍，`adoption` 固定为 `not-adopted`。交付给 PoBR 时把审核过的产物放进新的源
-发布目录（`manifest.json` 固定字节数和 SHA-256），由 `release/<patch>.json` 指向它，再按
-[RELEASING.md](../RELEASING.md) 发布 `locale/<patch>-<n>` Release，PoBR 用 `data:bump` 采用。
-生成本身不修改任何已发布目录。
+和逐条取舍，`adoption` 固定为 `not-adopted`。生成本身不修改任何已发布目录；产物要进入语言包，
+按 [RELEASING.md](../RELEASING.md#新补丁) 放进新的源目录并发布。
 
 ## 显示文本：`display_texts.json`
 
 ```sh
-mise run pobr:display-texts --request /absolute/request.json --out .cache/fresh-display
+mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fresh-display
 ```
 
 请求 schema 为 `pobr-native-display-texts-request/v1`，包含 `game_patch`、`realm`、
@@ -30,7 +26,7 @@ mise run pobr:display-texts --request /absolute/request.json --out .cache/fresh-
 执行的模块与默认投影文件都先校验摘要，生成后再复核一次。输入没有固定字节上限，
 但声明的字节数、实际大小和 SHA-256 必须一致。
 
-- `library: {root, files}` 只有 v3 可以省略。省略时执行本 checkout 的六个模块
+- `library: {root, files}` 只有 v3 可以省略。省略时执行本 checkout `src/` 下的六个模块
   （`native-catalog`、`native-names`、`strict-json`、`native-catalog-binding`、
   `native-localization`、`native-catalog-fk-binding`），以它们的实际 SHA-256 作为
   闭包，并且 manifest 的 `producer` 必须等于这组摘要；catalog 若由其他版本的模块
@@ -70,7 +66,7 @@ mise run pobr:display-texts --request /absolute/request.json --out .cache/fresh-
 ## 繁中名称：zh-TW 三个 ID 文件
 
 ```sh
-mise run pobr:names --request /absolute/name-request.json --out .cache/fresh-names
+mise run pobr:names -- --request /absolute/name-request.json --out .cache/fresh-names
 ```
 
 请求 schema 为 `pobr-native-name-request/v1`：`version`、`locale: "zh-TW"`、
@@ -82,12 +78,14 @@ mise run pobr:names --request /absolute/name-request.json --out .cache/fresh-nam
 对当前来源里的 ID，有译文就覆盖旧值；来源缺失、为空或未翻译时删除旧值，回退
 英文。新清单里完全不存在的 ID 保留旧值，并逐条列入 receipt 的
 `historical_compatibility`。表行覆盖和重复都会检查；同英文多译只在 ID 不同时
-允许，因为 PoBR 按表与 ID 精确读取。简中词缀文件按英文为键，不经过这个入口；繁中 `mods.json` 由本入口按 mod ID 写出，下一个语言包（`release/0.5.5.5-2.json`）再按 receipt 的配对记录改成英文键，见 [RELEASING.md](../RELEASING.md#下一个语言包release0555-2json)。
+允许，因为 PoBR 按表与 ID 精确读取。简中词缀文件按英文为键，不经过这个入口。繁中 `mods.json` 由本入口按
+mod ID 写出；PoBR 按英文词缀名查，所以 `release/0.5.5.5-2.json` 用 `rekey-by-english` transform 按 receipt
+的配对记录把它改成英文键（见[语言包配置参考](release-config.md#v2poe2-locale-release-configv2)）。
 
 ## 词条译文：`stat_lines.json`
 
 ```sh
-mise run pobr:stat-lines --selection <receipt.json> --selection-sha256 <sha> \
+mise run pobr:stat-lines -- --selection <receipt.json> --selection-sha256 <sha> \
   --native <candidate.json> --native-sha256 <sha> \
   --legacy <stat_lines.json> --legacy-sha256 <sha> --out .cache/fresh-stat-lines
 ```
@@ -101,24 +99,11 @@ mise run pobr:stat-lines --selection <receipt.json> --selection-sha256 <sha> \
 只追加按实际 CSD 分支选取、且英文和中文都无歧义的整行译文；已有模板保持不变。
 receipt 的 `implementation` 固定本入口和 `native-selected-translations.mjs` 两个文件。
 
-## 验证记录（2026-11-02）
+## 重放
 
-用固定输入重放，结果与 `handoff/locale-retained-20261101`（`a4bd9b5b`）已发布的字节一致：
-
-- 显示文本：catalog 为 `e61f1332` 的 `handoff/windows-fk-20261101/catalog.zip`
-  （SHA-256 `f4bbbd01…`），补译为 `5d019466` 的
-  `handoff/reviewed-supplements-20261101/runtime.zip`（`989293a6…`），workbench
-  模块为 `0e7778c4` 的版本，其余模块用本 checkout，与该 catalog 的 producer 闭包
-  一致；请求不含 `library`，使用默认的六模块闭包。产出 `display_texts.json`
-  1649082 字节，SHA-256 `381d827a…`，58588 条决定、415 个冲突。
-- 繁中名称：`legacy` 为 PoBR `7942e6db` 的 `data/0.5.5.4.2/i18n/zh-TW/*`，
-  `native` 为 `names.json`（`0b2ff2e2…`）；三个文件分别为 `67c3db66…`、`af64e24e…`、
-  `c0212690…`，receipt 的 records、sources 与 files 与已发布的
-  `evidence/zh-TW-receipt.json` 相同。这份 `names.json` 目前只在本地缓存中，
-  未进入 Git。
-- `stat_lines.json` 未重放：当时的选取收据只存在于已清理的 PoBR 缓存。命令行入口由
-  合成测试覆盖，配对核心沿用本库已有的 `native-selected-translations.mjs` 及其测试。
-
-显示文本和简中词典的重放现在由 `release:regenerate`（`release/regenerate/0.5.5.5.json`）在 CI
-里每次执行，见 [RELEASING.md](../RELEASING.md#从固定输入重新生成)；繁中名称和
-`stat_lines.json` 的两层原生选取仍按上面的原因冻结。
+0.5.5.5 的 `display_texts.json` 由 `release/regenerate/0.5.5.5.json` 的 `zh-cn-display-texts` 任务在 CI 里每次
+重新生成并逐字节比较：catalog 是 `e61f1332` 的 `handoff/windows-fk-20261101/catalog.zip`，补译是
+`5d019466` 的 `handoff/reviewed-supplements-20261101/runtime.zip`，workbench 模块是 `0e7778c4` 的版本，
+其余模块用本 checkout 的（与该 catalog 的 producer 闭包相同，所以这六个模块和
+`src/translation-workbench.mjs` 不能改字节或移动）。繁中三个文件和 `stat_lines.json` 的两层原生选取暂时
+无法重放，原因与退出条件写在配方的 `frozen`／`composed_evidence` 里。

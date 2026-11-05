@@ -7,10 +7,10 @@
 
 ```sh
 mkdir -p .cache/native
-node src/cli.mjs native \
+mise run native:candidate -- \
   --facts /path/to/repoe-description-package \
   --expected-manifest-sha256 <trusted-manifest-sha256> > .cache/native/candidate.json
-node src/cli.mjs native-check \
+mise run native:check -- \
   --facts /path/to/repoe-description-package \
   --expected-manifest-sha256 <same-trusted-manifest-sha256> \
   --candidate .cache/native/candidate.json
@@ -48,7 +48,7 @@ ASCII `+`／`-` 和数学负号 `−` 都保留在显式符号比较中；不会
   双方的文件／记录／语言组／分支位置及原始 UTF-16 字节范围。
 - `excluded`：未安全配对的来源位置、原因和相关分支；不生成猜译、默认品质或补造参数。
 - `input`：精确输入 manifest 摘要、来源与上游 producer 指纹；数值补丁和服别不由语言推断。
-- `consumer`：本仓库 source／依赖 manifest 指纹及 Node 版本，便于固定脚本后离线重放。
+- `consumer`：`src/` 根下各模块（命令入口和原生目录库）与 `package.json`、`package-lock.json` 的指纹及 Node 版本，便于固定脚本后离线重放。
 
 隐式默认语言保留为隐式默认。把它理解为英文是项目约定，不伪称客户端有显式
 `lang "English"`。国际客户端的简中组仍是国际服文本证据，不证明国服数值、补丁或面板相同。

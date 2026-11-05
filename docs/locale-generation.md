@@ -1,110 +1,58 @@
-# Offline Simplified Chinese generation
+# 简中词典生成（`locale-producer`）
 
-`src/pobr/locale-producer.mjs` projects a caller-supplied community dictionary and
-independent translation template bundle into the legacy Simplified Chinese
-sidecars. This is actual generation from input tables and templates. It does
-not acquire network data, mutate PoBR snapshots, or decide source acceptance.
-The retained publication exporter is a separate byte replay operation.
+`src/pobr/locale-producer.mjs` 把一份固定的社区词典和本仓库的模板包投影成 PoBR 的简中词典文件
+（`i18n/zh-CN/` 下的 `base_items`、`classes`、`mods`、`passive_names`、`rare_words`、`skills`、
+`stat_lines`、`words` 和 `_meta.json`）。它只做离线投影：不联网、不修改交易快照或任何已发布目录，
+也不决定来源是否被接受。依赖只有 `src/pobr/legacy-translation-merge.mjs`、`src/strict-json.mjs` 和
+Node 内置模块。
 
-The fixed historical composition is specified by
-[`input-manifest.json`](https://github.com/ackness/poe2-zh-cn-stats/blob/629be2d902a886dd1ad0961b5ac704c1909ce4f9/handoff/locale-generation-20261101/input-manifest.json)
-(tag `handoff/locale-generation-20261101`, commit `629be2d9`; the directory is no
-longer in the current tree, so check that commit out, for example with
-`git worktree add --detach`, to replay it). Pin that manifest by SHA-256 and its producer Git commit independently. Every
-`inputs` key is a path **under a caller-created input directory**, not a path
-relative to this manifest. Fetch each entry from its `source.url`, or from its
-`source.repository` and `source.path` at the separately pinned producer commit
-when `source.revision` is `producer-commit`. Check every byte length and
-SHA-256. The ten community files and template bundle are in their original
-independent repositories at the full commit IDs embedded in the URLs; no HEAD
-lookup is involved. Four small selected-layer and metadata inputs come from the
-producer commit. A consumer may materialize them however it wishes.
+## 0.5.5.5 的固定生成
+
+`release/regenerate/0.5.5.5.json` 的 `zh-cn-dictionary` 任务固定了 0.5.5.5 用的生成清单
+（`9aba3687` 的 `handoff/locale-generation-shaman-mantle-20261103/input-manifest.json`），CI 每次都用它重新
+生成这 9 个文件并与 `inputs/locale-0.5.5.5/` 逐字节比较。要在本地看到具体输入：
 
 ```sh
-node src/pobr/locale-producer.mjs \
-  --manifest <checkout-of-629be2d9>/handoff/locale-generation-20261101/input-manifest.json \
-  --manifest-sha256 <pinned-manifest-sha256> \
-  --input-dir <materialized-input-directory> --out <new-output-directory>
+mise run release:regenerate -- --fetch --keep-work
 ```
 
-All flags are required; output must not exist and its parent must exist. The
-producer checks the manifest, exact input inventory, all input pins, source
-identity, projection, layering and any `expected_files` pins before creating
-output. A failed write removes its newly created output directory. The nine
-`i18n/zh-CN/*.json` members and `generated/translation-audit.json` have exact
-pins in `receipt.json.files`; the receipt includes schema, target, profile,
-manifest digest, input pins, source identity and layer counts. Its own bytes are
-not self-pinned. Paths and timestamps from the host are not included. Consumers
-must independently verify the receipt against the pinned manifest and outputs.
-The producer closure is `src/pobr/locale-producer.mjs`,
-`src/pobr/legacy-translation-merge.mjs`, and `src/strict-json.mjs`; Node's built-in
-modules are its only runtime dependencies.
+`--keep-work` 保留 `.cache/regenerate/<target>/work/zh-cn-dictionary/`：其中有清单、按清单取到的全部输入和
+生成结果。
 
-Two explicit profiles are supported:
+## 直接运行
 
-* `legacy` requires only `dictionary/<file>` for the ten named dictionary
-  members and `templates.json`. It builds new metadata with the supplied
-  dictionary and translation identities. This is the reusable generation API
-  for another explicitly pinned source bundle; it does not imply the result is
-  accepted for any game patch.
-* `retained-selected` additionally requires the four fixed evidence inputs. It
-  checks generated legacy counts and identity against separately pinned old
-  metadata, verifies the 140-pair delta's input and intermediate byte pins,
-  then applies the selected literal layer and verifies its exact output pin.
-  Original metadata and the original three selection blocks are retained, not
-  relabelled as current. The selected-literal evidence is an excerpt of the
-  pinned original receipt: it retains the two additions, their provenance,
-  exclusion counts and original receipt pin, not the full exclusion list.
-  `native-140-pairs.json` records the whole-pair delta; it does not reconstruct
-  per-row provenance joins. The exact historical order is preserved by the
-  original `(src, en)` UTF-16 ordering. Its checked fixture is 27,896 + 140 +
-  2 = 28,038 pairs. Neither selected layer constitutes full client acceptance.
+```sh
+mise exec -- node src/pobr/locale-producer.mjs \
+  --manifest <input-manifest.json> --manifest-sha256 <清单的 SHA-256> \
+  --input-dir <输入目录> --out <新的输出目录>
+```
 
-`src/pobr/native-selected-translations.mjs` separately exports
-`nativeSelectedTranslations(legacy, selection, candidate)` to generate new
-context-bound literal selections from the pinned ordinary-producer receipt and
-native candidate. It returns `{pairs, report}` including full additions,
-provenance and exclusions. The caller must pin and persist these inputs and
-report; feeding an old selected receipt back into the fixed historical profile
-is composition, not fresh selection. It imports only Node built-ins (currently
-none). `projectLegacy`, `layerSelectedPairs`, and `produceLocale` are also
-exported for callers. Skeleton collisions, unreviewed or missing translations,
-client strings and unsupported scope remain excluded or diagnosed.
+四个参数都必填；输出目录不能已存在，父目录必须存在。
 
-Traditional Chinese sidecars and `display_texts.json` are outside this
-producer. Compose them through their existing independently pinned native
-projection or retained-publication contracts, with catalog and reviewed bundle
-checks where required. The original SC client patch and realm remain unknown;
-no new client authenticity, quality or gameplay claim follows from byte equality.
+清单 `poe2-locale-generation-input/v1` 写 `profile`、`target`、`identity`（社区词典与模板包的仓库和提交）、
+`inputs`，可选 `expected_files`。`inputs` 的键是**输入目录下**的路径，不是相对清单的路径；每项带 `bytes`、
+`sha256` 和 `source`：
 
-## Reviewed single-line aliases over the retained production inputs
+- `source.url`：从该 URL 下载（URL 里含完整提交，不查 HEAD）；
+- `source.repository` + `source.path`，`source.revision` 为 `producer-commit`：取自另行固定的生产提交。
 
-Shaman Mantle's four flask aliases are explicit `curated.json` records copied
-verbatim from the retained four-line block. Rebuild and verify a new trade
-snapshot first; preserve both the old snapshot and the new snapshot's curated
-input and complete template export. No producer splits multi-line templates.
+调用方自行把每个输入放到输入目录并核对字节数和 SHA-256。生产者再核对清单、完整输入清单、每个输入的 pin、
+来源身份、投影和分层，以及 `expected_files`（有的话），全部通过才写输出；写入失败会删掉新建的输出目录。
 
-For this bounded addition, reproduce the historical `retained-selected` output
-from its pinned inputs before creating a new composition. Keep the ten community
-files, historical template bundle, 140-pair delta and both historical metadata
-files at their original pins. In a **new** selected-literal input, preserve the
-two original selected rows and their provenance, then append only the four
-reviewed aliases from the freshly generated template export. Keep the original
-28,036-pair baseline pin; compute a new final output pin and preserve the old
-selection receipt under a separate historical provenance field. This is an
-explicit composition, not a new native selection or translation invention.
+两种 `profile`：
 
-The new input manifest keeps profile `retained-selected` and pins the new
-selected-literal file and expected output. The producer checks all intermediate
-pins and reports 27,896 legacy + 140 native + 6 selected = 28,042 final pairs.
-The historical `_meta.json` and translation audit retain their historical
-meaning and bytes; the fresh generation receipt and composition evidence record
-the four new aliases. Save per-file production provenance, and prove that every
-other locale file is byte-identical and the stat pair delta is exactly those
-four additions, with no removals and the original block intact.
+- `legacy`：只需 `dictionary/<file>`（十个词典文件）和 `templates.json`，按传入的词典和模板身份写新的
+  `_meta.json`。这是对另一份固定来源可复用的生成方式，不代表结果已被任何补丁接受。
+- `retained-selected`：另需四个固定证据输入。它用另行固定的旧元数据核对生成的计数和身份，核对 140 条原生
+  配对增量的输入与中间 pin，再叠加选中的字面译文层并核对最终 pin。原元数据和原有的三个选取块原样保留，
+  不重标为当前生成。0.5.5.5 的清单用这个 profile：27896 条历史配对、140 条原生配对和 6 条选中字面译文
+  （两条原有的，加四条来自 `curation/curated.json` 的 Shaman Mantle 别名），共 28042 条。
 
-Keep research and candidate directories under `.cache`. Copy verified files
-into a new source publication directory, retaining all original evidence files,
-and point a `release/<patch>.json` at its manifest; publishing it as a
-`locale/<patch>-<n>` GitHub Release and PoBR's `data:bump` are separate steps
-(see [RELEASING.md](../RELEASING.md)).
+输出的 9 个 `i18n/zh-CN/*.json` 和 `generated/translation-audit.json` 的 pin 写在 `receipt.json` 的 `files`；
+回执还记录 schema、`target`、`profile`、清单摘要、输入 pin、来源身份和各层条数，不含主机路径和时间。
+
+`projectLegacy`、`layerSelectedPairs`、`produceLocale` 也作为函数导出。按实际 CSD 分支选取新的原生译文
+是另一个入口（`pobr:stat-lines`，见 [PoBR 语言文件生产者](pobr-locale-producers.md#词条译文stat_linesjson)）；
+把旧的选取收据喂回这个固定 profile 只是组合，不是重新选取。繁中文件和 `display_texts.json` 不由这里生成。
+
+生成的文件要进入语言包，按 [RELEASING.md](../RELEASING.md#新补丁) 放进新的源目录并发布。
