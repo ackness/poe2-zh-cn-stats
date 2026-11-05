@@ -192,12 +192,16 @@ export function statTemplates(descriptions) {
 // --- official names ----------------------------------------------------------------------------
 
 // A RePoE-decoded MonsterVarieties.Name table of one client (the shape RePoE's monster-names
-// research files use): {format, localized: {language, game_patch, realm, …} | locale, client identity
+// files use): {format, localized: {language, game_patch, realm, …} | locale + realm, client identity
 // (index_identity or observed_client with at least one SHA-256), names: {<variety id>: {english,
-// <zh_cn|zh_tw>}}}. The text field is the locale with '-' -> '_', lowercased. Returns the parts the
-// projection uses; throws unless the file is for `target` (locale, game_patch when declared).
+// <zh_cn|zh_tw>}}}. The text field is the locale with '-' -> '_', lowercased. Throws unless the file
+// is for `target` (locale, game_patch when declared) and its client is right for the locale:
+// - zh-CN is China-client text only: its client index SHA-256 equals the catalog's
+//   observed_client.index_sha256, or it declares realm china (a declaration, recorded as such);
+//   an international-client zh-CN table never ships as official zh-CN;
+// - zh-TW declares realm international.
 const LANGUAGES = { 'Simplified Chinese': 'zh-CN', 'Traditional Chinese': 'zh-TW' };
-export function validateOfficialNames(doc, target) {
+export function validateOfficialNames(doc, target, catalogIndexSha256 = null) {
   require(object(doc) && nonempty(doc.format) && object(doc.names), 'official names: expected {format, names, …}');
   const locale = doc.locale ?? LANGUAGES[doc.localized?.language];
   require(locale === target.locale, `official names: locale ${locale} differs from ${target.locale}`);
@@ -206,6 +210,17 @@ export function validateOfficialNames(doc, target) {
   const client = doc.index_identity ?? doc.observed_client;
   const hashes = object(client) ? Object.entries(client).filter(([key, value]) => /sha256$/u.test(key) && HEX64.test(value ?? '')) : [];
   require(hashes.length, 'official names: the client identity (index_identity or observed_client with a SHA-256) is required');
+  const realm = doc.realm ?? doc.localized?.realm ?? null;
+  const sameClient = HEX64.test(catalogIndexSha256 ?? '') && hashes.some(([, value]) => value === catalogIndexSha256);
+  let acceptedBy;
+  if (locale === 'zh-CN') {
+    require(sameClient || realm === 'china', 'official names: zh-CN must come from the China client (its client index SHA-256 '
+      + 'equals the catalog\'s observed_client.index_sha256, or it declares realm china)');
+    acceptedBy = sameClient ? 'catalog-client-index' : 'declared-realm-china';
+  } else {
+    require(locale === 'zh-TW' && realm === 'international', 'official names: zh-TW must declare realm international');
+    acceptedBy = 'declared-realm-international';
+  }
   const field = locale.toLowerCase().replace('-', '_');
   const names = new Map();
   for (const [id, row] of Object.entries(doc.names)) {
@@ -214,6 +229,21 @@ export function validateOfficialNames(doc, target) {
       `official names[${id}]: english is text, ${field} is text or null`);
     names.set(id, { english: row.english, text: row[field] });
   }
-  return { format: doc.format, locale, game_patch: patch ?? null, realm: doc.realm ?? doc.localized?.realm ?? null,
-    client: Object.fromEntries(hashes), names };
+  return { format: doc.format, locale, game_patch: patch ?? null, client: Object.fromEntries(hashes), names,
+    provenance: { accepted_by: acceptedBy, declared_realm: realm, realm_basis: realm === null ? null : 'declared',
+      catalog_client_index_sha256: catalogIndexSha256 ?? null, same_client_as_catalog: sameClient } };
+}
+
+// The target English of each MonsterVarieties id in a game package: overlay/minions.json (by
+// monster_variety_id) and overlay/spectres.json (the id is the variety id). An id named twice with
+// different English maps to null (ambiguous: nothing is decided for it).
+export function monsterTargets(minions, spectres) {
+  const targets = new Map();
+  const add = (id, english) => {
+    if (!nonempty(id) || !nonempty(english)) return;
+    targets.set(id, targets.has(id) && targets.get(id) !== english ? null : english);
+  };
+  for (const row of minions?.minions ?? []) add(row.monster_variety_id, row.name);
+  for (const row of spectres?.minions ?? []) add(row.id, row.name);
+  return targets;
 }

@@ -57,17 +57,35 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   `reviewed` 怪物名（`kind: "monster-name"`）写入 `scopes["MonsterVarieties.Name"][变种 ID] = [英文, 译文]`；
   这时投影必须声明 `MonsterVarieties.Name`。同一 ID 有两条已审核名称时报错。怪物名不写入 `entries`。
 - `official_names: {file, bytes, sha256}` 可选，指向 RePoE 从客户端解出的官方 `MonsterVarieties.Name` 文件：
-  `{format, localized: {language, game_patch, realm} 或 locale, index_identity 或 observed_client（至少一个
+  `{format, localized: {language, game_patch, realm} 或 locale／realm, index_identity 或 observed_client（至少一个
   SHA-256）, names: {<变种 ID>: {english, zh_cn}}}`（文本字段是 locale 小写、`-` 换成 `_`）。文件的 locale 必须等于
-  请求的 locale，声明了 `game_patch` 时必须相同，客户端身份必须有 SHA-256；receipt 记录它，并记录是否与
-  catalog manifest 的 `observed_client.index_sha256` 相同（只记录，不强制）。
-  非空且不同于英文的官方名写入 `scopes["MonsterVarieties.Name"][ID] = [english, 官方名]`，不写 `origins`。
-  某 ID 已有我们的补译、而官方文件对该 ID 的英文与补译所针对的英文不同时，与其他 scope 一样不采用这条官方名，
-  记入 receipt 的 `names.official.not_applied["english-differs"]`；与英文相同或为空的官方名记为 `untranslated`。
+  请求的 locale，声明了 `game_patch` 时必须相同，客户端身份必须有 SHA-256。来源必须对得上 locale：
+  zh-CN 只接受国服客户端，即客户端索引 SHA-256 等于 catalog manifest 的 `observed_client.index_sha256`，
+  或文件声明 `realm: "china"`；国际服客户端的简体表不是官方 zh-CN，直接报错。zh-TW 必须声明
+  `realm: "international"`。receipt 的 `names.official.provenance` 记录 `accepted_by`
+  （`catalog-client-index`、`declared-realm-china` 或 `declared-realm-international`）、`declared_realm`、
+  `realm_basis`（只凭声明时为 `declared`，例如 RePoE lock 对简体文件的 `declared_not_verified`）以及
+  `same_client_as_catalog`。
+- `game_package: {file, repository, tag, asset, bytes, sha256}`：给出 `names` 或 `official_names` 时必填，
+  RePoE 游戏 Release 资产 `pobr-game-<patch>.zip`。读其中 `data/<patch>/overlay/minions.json`
+  （`monster_variety_id` → `name`）和 `spectres.json`（`id` → `name`），作为每个变种 ID 的**目标英文**；
+  同一 ID 出现两个不同英文时视为不确定。
 
-  每个 ID 的优先级：catalog 自身的行，其次官方名，最后我们已审核的补译。补译只用于官方文件没有或为空的 ID；
-  被官方名或 catalog 取代的补译仍保留在 curation，receipt 记为 `superseded`（`by`、官方文本、`supplement_differs`）。
-  receipt 的 `names.counts` 为 `{official, supplemented, superseded}`（按 ID 计）。两个输入都不给时行为不变。
+  怪物名逐 ID 按目标英文决定：
+  - catalog 自身有该 ID 的行时 catalog 优先（官方名记 `catalog-row`，补译记 `superseded`，`by: "catalog"`）。
+  - 官方名的英文等于目标英文、且非空、不同于英文：写入 `[english, 官方名]`，不写 `origins`；
+    我们对该 ID 的补译记 `superseded`（`by: "official-names"`、官方文本、`supplement_differs`），
+    补译所针对的英文与目标英文不同时则记 `retired`。
+  - 官方名的英文与目标英文不同：不采用，记入 `names.official.not_applied["english-differs"]`
+    （`official_english`、`target_english`）；该 ID 不在游戏包里只计数（`not-in-game`），目标不确定记
+    `ambiguous-target`，空或与英文相同记 `untranslated`。
+  - 没有采用官方名时，我们的补译只在其英文等于目标英文时出货（`supplemented`，写 `origins`）；否则记
+    `retired`（`reason` 为 `english-differs`、`not-in-game` 或 `ambiguous-target`，并写 `target_english`），
+    记录仍保留在 curation。
+  - 补译的 `based_on.game_package.sha256` 与固定的游戏包不同时标 `needs_review`。
+
+  receipt 的 `names.counts` 为 `{official, supplemented, superseded, retired}`（按 ID 计），并记录游戏包 SHA-256。
+  两个输入都不给时行为不变，也不需要游戏包。
 
 输出有两种视图：
 
@@ -166,10 +184,12 @@ mise run pobr:supplement-lines -- --request /absolute/request.json --out .cache/
 
 1. `corrections`：只应用 `reviewed` 且 locale 相同的修正组。每行 `{from, to}` 的 `from` 必须是底里完全相同的
    `{src, en}`，它被替换成 `to` 并加上该组的 `origin`。底里已经是 `to` 时记 `already-in-base`；`from` 的英文
-   还在但译文已变，记 `superseded`（底优先）；英文已不在，记 `retired`。
+   还在但译文已变，记 `superseded`（底优先）；英文已不在，记 `retired`。修正改了英文（`to.en` 不同于 `from.en`）
+   而底里已有 `to.en` 的行时，也记 `superseded`：底优先，同一英文永远不出现第二行。
 2. `entries`：只看 `kind: "stat-line"`。英文必须是游戏包里的当前模板且 stat ID 与 `identity.stats` 相同，
    否则 `retired`；草稿与已拒绝的记录不出货；底里已有同一 `en` 的行时底优先（`official`，并记
-   `supplement_differs`）；其余 `reviewed` 记录追加为 `{src, en, origin}`（`supplemented`）。`based_on` 与固定
+   `supplement_differs`）；英文只由我们修正过的行提供时记 `covered-by-correction`（记 `supplement_differs`
+   与修正后的译文），不另加一行；其余 `reviewed` 记录追加为 `{src, en, origin}`（`supplemented`）。`based_on` 与固定
    的游戏包不同时只标 `needs_review`。
 3. 输出按 `(src, en)` 排序，序列化方式与底相同（两空格缩进、末尾换行）。没有可应用记录时输出与底逐字节相同。
 
