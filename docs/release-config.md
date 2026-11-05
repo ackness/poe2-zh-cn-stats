@@ -21,7 +21,7 @@
 | `source.origin` | 该源目录首次提交的位置：`repository`（本仓库）、`revision`（完整 40 位提交）、`tag`、可选 `path` |
 | `published` | 发布后补写的 Release pin：`tag`、`asset`、`bytes`、`sha256` |
 | `hold` | 可选，一句原因。有它时 `release:publish` 拒绝发布、它也不作默认配置；点名构建与核对照常 |
-| `support_display` | 可选，随 Release 发布的简中辅助宝石说明，见下文 |
+| `support_display` | 已停用于新配置：只有已发布的配置（-2、-3）保留，见下文 |
 
 `source.origin`：
 
@@ -61,7 +61,15 @@ v2 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`me
 
 ## 辅助宝石说明：`support_display`
 
-PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的两个额外附件发布，不进 zip：
+**新配置不再声明 `support_display`。** 宝石说明改由 `display_texts.json` 的 `GemEffects.SupportText`、
+`ActiveSkills.Description` 两个 scope 提供（官方客户端表，见
+[PoBR 语言文件生产者](pobr-locale-producers.md#显示文本display_textsjson)的 `official_tables`），英文来自 RePoE
+游戏包的 `overlay/gem_descriptions.json`。旧附件的 534 条与国服官方 `GemEffects.SupportText`（按英文比较，去掉标记后）
+逐条相同，所以不会丢失内容。已发布的 `release/0.5.5.5-2.json`、`release/0.5.5.5-3.json` 仍然声明它，CI 每次都要
+重建它们，所以下面的构建路径（`src/release/support-display.mjs`、`support-description-projection.mjs`）保留不动。
+测试 `support_display is retired for new configs` 要求每个声明它的配置都已有 `published`。
+
+以下说明只适用于这些已发布的配置。PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的两个额外附件发布，不进 zip：
 
 - `supportDescriptions.zh-CN.json`：`{_meta, entries, untranslated}`，按辅助宝石 `skill_id` 记英文原文和
   简中译文；没有译文的 ID 在 `untranslated`。
@@ -137,7 +145,12 @@ PoBR Web 在辅助宝石上显示的简中说明，作为同一个 Release 的�
   每个输入按它的来源取：URL（本仓库的 `raw.githubusercontent.com` 地址改从 Git 读），或 `producer_commit`
   里的路径。
 - `display-texts`：`src/pobr/display-texts.mjs` 跑固定的 `catalog` 与审核补译 `supplement`（都是本仓库
-  某个提交里的 zip）。库模块用本 checkout 的，v3 catalog 的 producer 闭包必须等于它们；
+  某个提交里的 zip）。可选 `official_tables`（zh-CN 或 zh-TW）是官方客户端表来源数组，新的在前，每项正好是
+  `{repository, tag, asset, bytes, sha256, default, default_manifest_sha256, localized, localized_manifest_sha256, scopes}`：
+  RePoE 输入 Release 资产（例如 `inputs/0.5.5.5-1` 的 `repoe-input-china_text-0.5.5.5.zip`，`default` 为
+  `display-tables/default/`，`localized` 为 `display-tables/simplified-chinese/`），`--fetch` 下载到
+  `.cache/regenerate/inputs/<sha256>`，此时 `game_package` 必填；任务摘要的 `official_tables` 记各 scope 采用与缺少的条数。
+  没有 catalog 的 locale（zh-TW）可以不写 `catalog`、`supplement`、`supplement_module`，但必须有 `official_tables`。库模块用本 checkout 的，v3 catalog 的 producer 闭包必须等于它们；
   `supplement_module` 必须等于它在固定提交里的字节。`projection`（`{scopes, literals}`，只有这两个字段）
   必填，作为请求的 `projection` 传入：任务不读 `src/pobr/display-projection.json`，所以给默认投影加
   scope 不会改变已发布成员的重新生成结果；要发布新 scope，就在新配置的配方里写新的 `projection`。

@@ -23,7 +23,7 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
 
 请求 schema 为 `pobr-native-display-texts-request/v1`，包含 `game_patch`、`realm`、
 `locale`，以及 `catalog: {manifest, sha256[, bytes]}`，指向
-`poe2-native-catalog/v1`、`/v2` 或 `/v3` 的 manifest。catalog 的全部 payload、
+`poe2-native-catalog/v1`、`/v2` 或 `/v3` 的 manifest（没有 catalog 的 locale 见下面的 `official_tables`）。catalog 的全部 payload、
 执行的模块与默认投影文件都先校验摘要，生成后再复核一次。输入没有固定字节上限，
 但声明的字节数、实际大小和 SHA-256 必须一致。
 
@@ -72,6 +72,31 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   RePoE 游戏 Release 资产 `pobr-game-<patch>.zip`（文件名必须是这个）。读其中 `data/<patch>/overlay/minions.json`
   （`monster_variety_id` → `name`）和 `spectres.json`（`id` → `name`），作为每个变种 ID 的**目标英文**；
   同一 ID 出现两个不同英文时视为不确定。
+- `official_tables` 可选：官方客户端表来源数组，**新的在前**。每项
+  `{file, bytes, sha256, repository, tag, asset, default, default_manifest_sha256, localized, localized_manifest_sha256, scopes}`：
+  RePoE 输入 Release 资产（`repoe-release-input/v1` zip）里的一对表包，`default` 目录是英文
+  `repoe-native-tables/v1`，`localized` 目录是 `repoe-localized-tables/v1`，各自只含 `manifest.json` 和它固定的文件，
+  每个文件都等于根 manifest 的 pin，两个 `manifest.json` 等于各自的 SHA-256。`scopes` 取自
+  `GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`，并且必须在 `projection.scopes` 里。
+  服别跟着 locale：zh-CN 的表包必须是 `Simplified Chinese`、realm `china`；zh-TW 必须是 `Traditional Chinese`、
+  realm `international`；英文表包与它同 realm。两个表包出自同一次客户端采集：`game_patch` 与 `source_lock_sha256`
+  必须相同（根 manifest 的 `target.game_patch` 也要一致），且 `game_patch` 等于请求的 `game_patch`。按表的 `Id` 列把同一包里的本地化行和英文行配对，只有同时满足以下
+  条件才采用：该包的英文与**目标英文**逐字节相同（宝石说明取 `game_package` 的
+  `data/<patch>/overlay/gem_descriptions.json`（`repoe-gem-descriptions/v1`，两个宝石 scope 都必须存在），怪物名取 `minions.json`、
+  `spectres.json`）；译文非空、不同于英文、含汉字。写入 `scopes[scope][id] = [目标英文, 译文]`，标记
+  （`[A|B]`、`[A]`、末尾空格、偶尔的 `\r\n`）原样保留，由使用方渲染；`[`、`]` 不成对（或嵌套）时整次报错，
+  新的标记形式不会悄悄出货。不满足的 ID **省略，不写 `null`**：PoBR 把 `null` 当作“显示英文”，会挡住 zh-TW
+  回退到转换后的 zh-CN。每个 ID 由第一个采用它的来源决定。receipt 的 `official_tables` 按来源、按 scope 记
+  `adopted`、`shadowed`、`not-in-game`、`ambiguous-target`、`ambiguous-id`、`no-default-row`、`english-differs`、
+  `untranslated`、`no-han`，以及每个 scope 采用数与缺少的目标 ID 数；某个 scope 一行都没采用时整次报错（否则
+  catalog 里该 scope 的行会被悄悄丢掉）。官方表持有的 scope 归它：catalog
+  里该 scope 的行仍参与 literal 与 decision，但不写逐 ID 行（计 `owned_catalog_rows`）；采用的表行与 catalog 官方值
+  一样算“官方文本已有”：我们的 catalog 补译遇到同一英文时跳过（`skipped`，`source: "official-tables"`）；`MonsterVarieties.Name`
+  的表行按官方名处理，我们同 ID 的补译记 `superseded`，与 `official_names` 不能同时给出。
+  **没有 catalog 时**（zh-TW）省略 `catalog`，此时不能有 `supplement`、`library`：`entries` 为空，逐 ID scope 只来自
+  `official_tables`，`catalog_sha256` 是最新来源的本地化表 `manifest.json` 的 SHA-256（PoBR 只检查形状）。
+  例：国服 `inputs/0.5.5.5-1` 对 `game/0.5.5.5-3` 采用 `GemEffects.SupportText` 612 条、`ActiveSkills.Description`
+  440 条、`MonsterVarieties.Name` 648 条（`Wolf Companion` → 恶狼同伴；国际服繁中为 狼盟友）。
 - `package_texts: {stat_lines, passive_names}`（各为 `{file, bytes, sha256}`）：同一语言包里的官方文本，
   `stat_lines` 用作底的 `stat_lines.json`（只取不带 `origin` 的行），`passive_names` 用 `passive_names.json`。
   有已审核的怪物名要决定时，或 catalog 查询返回我们的补译（reviewed supplement）时必填（重新生成配方给出

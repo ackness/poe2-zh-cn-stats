@@ -228,3 +228,14 @@ test('the committed 0.5.5.5-2 config ships the retained display of handoff/suppo
   assert.equal(strictJson(built.display.assetRaw)._meta.source_commit,
     strictJson(readFileSync(path.join(ROOT, 'inputs/locale-0.5.5.5/i18n/zh-CN/_meta.json'))).source_commit);
 });
+
+test('support_display is retired for new configs: only an already published config declares one', () => {
+  // Gem descriptions now ship as display_texts.json scopes (GemEffects.SupportText,
+  // ActiveSkills.Description) from official client tables. The published -2 and -3 configs keep their
+  // support display and still rebuild through src/release/support-display.mjs.
+  const configs = readdirSync(path.join(ROOT, 'release')).filter(name => name.endsWith('.json')).sort();
+  const declared = configs.map(name => [name, strictJson(readFileSync(path.join(ROOT, 'release', name)))])
+    .filter(([, config]) => config.support_display !== undefined);
+  assert.ok(declared.length > 0);
+  for (const [name, config] of declared) assert.ok(config.published, `${name} declares support_display but is not published`);
+});

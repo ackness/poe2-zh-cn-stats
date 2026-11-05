@@ -43,3 +43,37 @@ export function chinaPackage({ realm = 'china', files = {}, extra = {}, root = p
   return { zip, spec: { repository: 'ackness/repoe', tag, asset: 'repoe-input-china_text-9.9.zip', ...pin(zip), member: MEMBER,
     manifest_sha256: sha(native['manifest.json'] ?? Buffer.alloc(0)) } };
 }
+
+// A synthetic input package of display tables: `tables` is {Table: {Id: [english, localized]}} (a
+// localized value of undefined leaves the row out of the localized package). `language` and `realm`
+// go into the localized source identity; `defaultRealm` into the default one. `localizedIdentity`
+// overrides fields of the localized source identity (e.g. another game_patch).
+export function tablePackage({ tables, language = 'Simplified Chinese', realm = 'china', defaultRealm = realm,
+  localizedDir = 'display-tables/simplified-chinese/', extra = {}, tag = 'inputs/9.9-1', scopes, localizedIdentity = {}, gamePatch = '9.9' } = {}) {
+  const side = localized => {
+    const doc = Object.fromEntries(Object.entries(tables).map(([table, rows]) => {
+      const field = table === 'GemEffects' ? 'SupportText' : table === 'ActiveSkills' ? 'Description' : 'Name';
+      return [table, { table, rows: Object.entries(rows).filter(([, pair]) => !localized || pair[1] !== undefined)
+        .map(([id, pair], index) => ({ _row: index, values: { Id: id, [field]: pair[localized ? 1 : 0] } })) }];
+    }));
+    const tablesRaw = Buffer.from(JSON.stringify(doc)), lockRaw = Buffer.from('{"schema_version":1}');
+    const manifest = Buffer.from(JSON.stringify({ format: localized ? 'repoe-localized-tables/v1' : 'repoe-native-tables/v1',
+      files: { 'source-lock.json': pin(lockRaw), 'tables.json': pin(tablesRaw) },
+      source_identity: { game: 'poe2', game_patch: gamePatch, realm: localized ? realm : defaultRealm, source: localized ? 'localized' : 'default',
+        source_lock_sha256: sha(lockRaw), acquisition: { status: 'unreviewed-acquisition-draft', evidence: [] },
+        ...(localized ? { language, ...localizedIdentity } : {}) } }));
+    return { manifest, files: { 'manifest.json': manifest, 'source-lock.json': lockRaw, 'tables.json': tablesRaw } };
+  };
+  const english = side(false), localized = side(true);
+  const members = { ...extra };
+  for (const [name, raw] of Object.entries(english.files)) members[`display-tables/default/${name}`] = raw;
+  for (const [name, raw] of Object.entries(localized.files)) members[localizedDir + name] = raw;
+  const root = Buffer.from(JSON.stringify({ schema: 'repoe-release-input/v1', name: 'text', target: { game: 'poe2', game_patch: gamePatch, realm },
+    files: Object.fromEntries(Object.entries(members).map(([name, raw]) => [name, pin(raw)])) }));
+  const zip = storedZip({ 'manifest.json': root, ...members });
+  const tableScopes = { GemEffects: 'GemEffects.SupportText', ActiveSkills: 'ActiveSkills.Description', MonsterVarieties: 'MonsterVarieties.Name' };
+  return { zip, spec: { repository: 'ackness/repoe', tag, asset: 'repoe-input-text-9.9.zip', ...pin(zip),
+    default: 'display-tables/default/', default_manifest_sha256: sha(english.manifest),
+    localized: localizedDir, localized_manifest_sha256: sha(localized.manifest),
+    scopes: scopes ?? Object.keys(tables).map(table => tableScopes[table]) } };
+}
