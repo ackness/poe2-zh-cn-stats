@@ -75,7 +75,7 @@ test('build: members are the source i18n bytes and the manifest pins them in ord
   assert.deepEqual({ ...receipt.producer, code: undefined, config: undefined },
     { repository: 'ackness/poe2-zh-cn-stats', commit, dirty: false, dirty_paths: [], code: undefined, config: undefined });
   assert.deepEqual(receipt.producer.config, { 'release/9.9.json': pin(readFileSync(path.join(repo, 'release/9.9.json'))) });
-  assert.deepEqual(Object.keys(receipt.producer.code), ['src/locale-release.mjs', 'src/stored-zip.mjs', 'src/strict-json.mjs', 'mise.lock']);
+  assert.deepEqual(Object.keys(receipt.producer.code), ['src/locale-release.mjs', 'src/locale-package.mjs', 'src/stored-zip.mjs', 'src/strict-json.mjs', 'mise.lock']);
   assert.deepEqual(receipt.source.manifest, { path: `${SOURCE_DIR}/manifest.json`, ...pin(manifestRaw), schema: 'poe2-retained-locale-publication/v1' });
   assert.deepEqual(receipt.source.files, Object.fromEntries(Object.entries(SOURCE_FILES).sort(([a], [b]) => (a < b ? -1 : 1))
     .map(([name, raw]) => [`${SOURCE_DIR}/${name}`, pin(raw)])));
@@ -83,6 +83,11 @@ test('build: members are the source i18n bytes and the manifest pins them in ord
     asset: 'pobr-locale-9.9.zip', ...pin(zip), expanded_bytes: [...read.values()].reduce((n, e) => n + e.raw.length, 0),
     manifest: pin(read.get('manifest.json').raw),
     members: Object.fromEntries(expected.map(([n]) => [`data/9.9/${n}`, `${SOURCE_DIR}/${n}`]).sort(([a], [b]) => (a < b ? -1 : 1))),
+    // The language index rides in the receipt, not the zip.
+    index: { languages: {
+      'zh-CN': { fallback: [], tables: { 'stat_lines.json': { entries: 1 } } },
+      'zh-TW': { fallback: [], tables: { 'mods.json': { entries: 1 } } },
+    } },
   });
   const receiptRaw = readFileSync(path.join(built.out, 'receipt.json'));
   assert.equal(readFileSync(path.join(built.out, 'SHA256SUMS'), 'utf8'),

@@ -301,3 +301,19 @@ test('the package must be built from HEAD and not already published under anothe
   result = publish(repo, [], runner(repo));
   assert.match(result.output, /differs from the published locale\/9\.9-1 the config declares/u);
 });
+
+test('a config on hold or named for another sequence is not published', t => {
+  const { repo, manifestRaw } = setup(t);
+  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { hold: 'PoBR cannot adopt it yet' })));
+  commitAll(repo, 'a held candidate for locale/9.9-2');
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  const refused = /release\/9\.9-2\.json is on hold: PoBR cannot adopt it yet\n {2}- release\/9\.9-2\.json is meant for locale\/9\.9-2, but the next free tag is locale\/9\.9-1/u;
+  assert.throws(() => publish(repo, ['--yes'], runner(repo)), refused);
+  const { status, output } = publish(repo, [], runner(repo));
+  assert.equal(status, 1);
+  assert.match(output, /publish refused:/u);
+  assert.ok(existsSync(path.join(repo, '.cache/release/publish/poe2-international-9.9-2/release-notes.md')));
+  // The plain config of the same patch still publishes as locale/9.9-1.
+  const plain = publish(repo, ['--config', path.join(repo, 'release/9.9.json')], runner(repo));
+  assert.equal(plain.status, 0, plain.output);
+});

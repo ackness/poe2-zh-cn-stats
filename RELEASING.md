@@ -16,22 +16,41 @@ mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>
 
 `release/<patch>.json`（`poe2-locale-release-config/v1`）声明：
 
-- `target`：`game`、`game_patch`、`realm`；文件名必须是 `<game_patch>.json`。不带
-  `--config` 时用最高 patch。
+- `target`：`game`、`game_patch`、`realm`；文件名是 `<game_patch>.json`，或
+  `<game_patch>-<n>.json`（专为 `locale/<patch>-<n>` 准备的包，发布时下一个序号必须正是 `<n>`）。
+  不带 `--config` 时用最高 patch，同 patch 取最大的 `<n>`（无 `-<n>` 的排最前）。
 - `source.manifest`：仓库内源发布清单（`poe2-retained-locale-publication/v1`）的路径、
   字节数和 SHA-256。
 - `source.origin`：该目录最初所在的提交（`revision`，完整 40 位）和名字（`tag`）；目录在
   那之后被移动过时，`path` 写该提交里清单的原路径（tree 必须不变）。包内 `manifest.json`
   记录的是这个原路径，所以移动目录不改变包的字节。
 - `published`：发布之后补上的 Release 附件 pin（`tag`、`asset`、`bytes`、`sha256`）。
+- `hold`（可选）：一句原因；有它时 `release:publish` 拒绝发布，构建和核对照常。
+
+`poe2-locale-release-config/v2` 不指向源目录，而是在一个 v1 配置的包上做声明过的改动：
+
+- `base: {config}`：`release/` 下的 v1 配置；它的源目录、origin 核对照旧。
+- `transforms`：按顺序执行，每个改一个成员。`rekey-by-english` 把按稳定 ID 存的名称表
+  改成按英文存（`records` 是源目录 `evidence/` 里配对这些字节的 `pobr-native-name-receipt/v1`，
+  它必须 pin 住该成员；同一英文有多个译法时取出现最多的、并列取英文行号最小的，
+  `conflicts` 固定写 `most-common-then-first-row`，每个取舍记进回执）；`json` 新增一个成员，
+  内容是 `value`。其余成员按基础包原字节复制。
+- `expect.package`：期望的 zip `bytes`／`sha256`，`--check` 核对。
+- 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`member`）；回执的
+  `source` 是 `{base, transforms}`，每个 transform 记录输入、输出 pin 和报告。
+
+两种配置的回执都在 `package.index` 写语言索引：每种语言的表和条数、`_meta.json` 声明的
+`fallback`，以及对回退语言同名表的键覆盖（`fallback_keys_covered`／`fallback_entries`）。
+索引不进 zip：PoBR 要求 `data/<patch>/i18n/*` 正好是游戏包快照清单列出的文件，多一个
+成员就拒绝导入。
 
 构建只读源目录：清单之外只允许 `README.md`，每个文件按清单核对字节；`i18n/*` 原样
 映射成 `data/<patch>/i18n/*`，加一个新的 `manifest.json`，写成固定时间、STORED 的
 zip。zip 只取决于源字节和目标；`receipt.json` 记录生产提交，每次都不同。
-输出在 `.cache/release/<game>-<realm>-<patch>/`。
+输出在 `.cache/release/<game>-<realm>-<配置名>/`（如 `poe2-international-0.5.5.5`）。
 
-- `--check`：检出干净、源目录在 HEAD 的 tree 与 `origin.revision` 上原路径的 tree 相同、
-  zip 等于 `published`（有的话）。
+- `--check`：检出干净、源目录（v2 为基础配置的源目录）在 HEAD 的 tree 与 `origin.revision`
+  上原路径的 tree 相同、zip 等于 `expect.package` 和 `published`（有的话）。
 - `--fetch`：本地没有 `origin.revision` 时从 origin 取（只走 Git）。
 - `--check-release`：下载 `published` 的 Release，要求与重建结果逐字节相同。
 
