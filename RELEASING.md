@@ -70,6 +70,10 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 示例（0.5.5.5）：`locale/0.5.5.5-3` 给 `display_texts.json` 加 `PassiveSkills.Name` scope。它是 v1 配置
 `release/0.5.5.5-3.json`，源目录 `inputs/locale-0.5.5.5-3/` 复制 `locale/0.5.5.5-2` 的 12 个其他成员（包括按英文为键
 的繁中 `mods.json`），辅助宝石说明与 -2 相同；`release/regenerate/0.5.5.5-3.json` 重新生成全部简中成员。
+`locale/0.5.5.5-4` 换掉三个简中成员（`stat_lines.json`、`_meta.json`、`display_texts.json`）并新增繁中
+`display_texts.json`：国服官方词条（RePoE `inputs/0.5.5.5-1`）先于补译，宝石说明和召唤物名来自官方客户端表
+（国服 `inputs/0.5.5.5-1`、国际服繁中 `inputs/0.5.5.5-2`），英文来自 `game/0.5.5.5-3`；不再声明 `support_display`。
+源目录 `inputs/locale-0.5.5.5-4/` 的其余成员与 -3 相同。
 
 ## 新的辅助宝石说明
 
