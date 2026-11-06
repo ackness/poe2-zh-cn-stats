@@ -236,7 +236,7 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 
 | 事件 | stat-line（`pobr:supplement-lines`） | monster-name（`pobr:display-texts` 的 `names`） | 修正 |
 | --- | --- | --- | --- |
-| 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 有该 ID，或官方名文件（`official_names`）的英文等于游戏包目标英文：官方优先，补译记 `superseded`（补译英文已过时则 `retired`） | 底已是 `to`：`already-in-base`；改英文的修正遇到底已有 `to.en`：`superseded` |
+| 官方文本后来出现 | 底已有同一英文的行：底优先，记 `official` | catalog 有该 ID，或官方名文件（`official_names`）／官方表（`official_tables`）的英文等于游戏包目标英文：官方优先，补译记 `superseded`（补译英文已过时则 `retired`） | 底已是 `to`：`already-in-base`；改英文的修正遇到底已有 `to.en`：`superseded` |
 | 我们的修正已提供该英文 | `covered-by-correction`，不另加一行 | — | — |
 | 同一语言包别处已有该英文的官方译文 | 底已有同一英文：`official` | `stat_lines`、`passive_names`、catalog 官方值或其他 ID 的官方名有该英文：`official-elsewhere`，不出货 | — |
 | 官方文本再次消失 | 补译重新出货 | 补译重新出货 | 再次应用 |
@@ -247,8 +247,10 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 
 语言包里的标记见 [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)：
 `stat_lines.json` 的补译与修正行带 `origin`，`display_texts.json` 有可选的 `origins`，`_meta.json` 有
-`supplements` 块。没有 `origin` 的行或条目不是本仓库补的：底的来源见各成员的证据（例如 vagrant-soul/poe2-en-cn-dict 是 WeGame 国服客户端的解包，其行除非另有证据都按国服客户端文本看待）。zh-TW 在 PoBR 里由简中经 OpenCC
-转换得到，转换后的补译仍是补译；本仓库不产出 zh-TW 补译行。
+`supplements` 块。没有 `origin` 的行或条目不是本仓库补的：底的来源见各成员的证据（例如 vagrant-soul/poe2-en-cn-dict 是 WeGame 国服客户端的解包，其行除非另有证据都按国服客户端文本看待）。zh-TW 的 `display_texts.json`
+（`GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`）自 `locale/0.5.5.5-4` 起来自
+国际服繁中官方表；其余 zh-TW 文本和缺省的 ID 在 PoBR 里由简中经 OpenCC 转换得到，转换后的补译仍是补译。本仓库
+不产出 zh-TW 补译行。
 
 交易 ID 的缺口仍在 `curation/translations.json`（见
 [交易词典维护](trade-dictionary.md#持续补译表)），它用同一套 `origin`／`status`／`review` 字段，字段名带

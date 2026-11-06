@@ -11,9 +11,10 @@ document.
 - **Languages:** English (`en`), Simplified Chinese (`zh-CN`) and Traditional Chinese (`zh-TW`), no
   others. Simplified Chinese is the focus and needs its own handling: its official text belongs to
   Tencent's China realm (the `poe.game.qq.com` trade API), so zh-CN data is assembled from Tencent's
-  trade catalog, the pinned client tables and reviewed curation, and realm is always recorded
-  separately from language. English and Traditional Chinese come from the international client and
-  GGG's trade API. International-client Simplified Chinese text never proves China-realm values.
+  trade catalog, the China client's official text (pinned RePoE input Releases), the pinned client
+  tables and reviewed curation, and realm is always recorded separately from language. English and
+  Traditional Chinese come from the international client and GGG's trade API. International-client
+  Simplified Chinese text never proves China-realm values.
 - **No new features.** The structure may stay ready for more languages, but do not add functionality
   beyond this purpose: no further languages, runtime services, calculation rules or PoBR wiring.
   Removing dead code is fine; removing a path that a pin, a Release or another repository (e.g. `ackness/pobr`) still uses is not.
@@ -24,7 +25,8 @@ The split is maintained once, in
 [PoBR's data architecture](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md).
 
 - **RePoE** (`ackness/repoe`) decodes client resources, keeps the raw-material ledger and publishes the
-  game package `game/<patch>-<n>`, including the trade catalog that the support display is bound to.
+  game package `game/<patch>-<n>`, including the trade catalog that the retained support display of
+  `locale/0.5.5.5-2` and `-3` is bound to.
   Decoding bugs and missing facts go there.
 - **PoBR** (`ackness/pobr`) consumes Releases only: `mise run data:bump` writes repository, tag, asset and
   SHA-256 into its `pipeline/data.lock.json`. Stat meaning, modifier rules, the engine and display
@@ -46,7 +48,7 @@ The split is maintained once, in
 | `data/CURRENT`, `data/snapshots/` | Trade dictionary snapshots; other tools read them by commit | generated (`refresh`/`build`) |
 | `reports/` | Readable workbench queues | generated (`workbench`), committed |
 | `release/<patch>[-<n>].json` | Language package configs | editable until `published` is written, then frozen |
-| `release/regenerate/<patch>.json` | Regeneration recipes | editable; frozen entries only decrease |
+| `release/regenerate/<patch>[-<n>].json` | Regeneration recipes | editable; frozen entries only decrease |
 | `inputs/` | Source bytes that configs pin | **frozen** |
 | `sources/` | Locale provenance ledger; `sources.lock.json` is a verbatim copy | frozen record |
 | `docs/` | Contracts and guides (PoBR links the directory) | editable |
@@ -69,13 +71,16 @@ Why the frozen parts stay as they are:
 
 - Never move or delete a `locale/*` tag or a `handoff/*` tag. PoBR's lock, this repository's configs and
   its recipes read them by tag and commit.
-- Example (0.5.5.5): these handoff tags are the only refs that keep pinned commits alive (the commits
-  are not on `main`):
+- Example (0.5.5.5): these tags are the refs that keep pinned commits alive (the commits are not on
+  `main`):
   `handoff/shaman-mantle-20261103` (`9aba3687`: the 0.5.5.5 source origin, the recipe's generation
   manifest and producer commit), `handoff/windows-sc-20261101` (`e61f1332`: the recipe's native catalog),
   `handoff/reviewed-supplements-20261101` (`5d019466`: the recipe's reviewed supplement) and
   `handoff/rollback-0.5.5.4.2-20261101` (`93d9e164`). The other `handoff/*` tags point at `main` commits
   and are still cited, e.g. `handoff/support-display-20261101` by `release/0.5.5.5-2.json`.
+  `release/0.5.5.5-3.json` names `main` as its origin tag, but `main` was rewritten once and no longer
+  contains its origin revision `27213865`; `locale/0.5.5.5-3` is the only tag or branch that keeps it, so that tag
+  must never move.
 - Only maintainers publish (`mise run release:publish -- --yes`). A `locale/*` tag that an interrupted
   publish left without a Release is never deleted or moved: rerun `mise run release:publish -- --yes` on the
   same commit to finish the interrupted publish.
@@ -130,8 +135,8 @@ CI runs all of this anyway; run locally what your change can break.
 - Branch from `main`. Commit subjects follow `type(scope): imperative lowercase` (`feat`, `fix`,
   `refactor`, `chore`, `docs`, `test`; scopes such as `release`, `trade`, `pobr`, `native`); the body
   says why. Code and comments are in English; documents are in Chinese, except `README.md` (English, with
-  `README.zh-CN.md`), `AGENTS.md` and `CONTRIBUTING.md`. `README.md` (English, the default) and
-  `README.zh-CN.md` must stay in sync: change both in the same PR.
+  `README.zh-CN.md`), `AGENTS.md`, `CONTRIBUTING.md` and `sources/README.md`. `README.md` (English,
+  the default) and `README.zh-CN.md` must stay in sync: change both in the same PR.
 - Merge with a merge commit, never squash or rebase: `source.origin.revision` can be a commit on the PR
   branch, and only a merge commit keeps it in `main`'s history. A new `inputs/` directory, its config
   and its recipe go in one PR (see [RELEASING.md](RELEASING.md#新补丁)).

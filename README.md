@@ -12,8 +12,8 @@ recorded separately for maintainers to review.
 
 **Language scope:** English (`en`), Simplified Chinese (`zh-CN`) and Traditional Chinese (`zh-TW`) only.
 Simplified Chinese is the focus and needs its own handling: its official text belongs to Tencent's China
-realm, so zh-CN data is built from Tencent's trade catalog, pinned client language tables and reviewed
-manual translations, with realm recorded separately from language. English and Traditional Chinese come
+realm, so zh-CN data is built from Tencent's trade catalog, the China client's official text (pinned RePoE
+input Releases), pinned client language tables and reviewed manual translations, with realm recorded separately from language. English and Traditional Chinese come
 from the international client and GGG's trade catalog. Simplified Chinese text in the international
 client does not prove that China-realm values are the same.
 
@@ -46,8 +46,8 @@ open cross-repository gaps are in [PoBR's data status](https://github.com/acknes
 | Trade modifiers | GGG and Tencent trade catalogs, fractured-modifier reuse, PoE2DB gap filling; `dictionary.json`, `pairs.json` under `data/snapshots/<id>/generated/` | Keyed by the full trade ID **plus the English branch** |
 | Numbered templates | Conservative conversion of the trade dictionary plus `curation/curated.json`; `templates.json` | Automatic conversion only for zero or one numeric slot; multi-slot templates are reviewed by hand |
 | Native descriptions and names | Pinned RePoE client facts, CSD descriptions and explicit language tables | Keeps stat IDs, table identities, conditions and branches; queried by exact context |
-| PoBR language package | Names, display texts, selected descriptions, the pinned historical zh-CN dictionary and the zh-CN support-gem display | Published as `locale/<patch>-<n>`; PoBR pins its assets by SHA-256 |
-| Manual translations | Worklists and review records under `curation/` | Drafts never reach reviewed output; a source change requires review again |
+| PoBR language package | Names, display texts (including gem descriptions and monster names), stat lines with the China client's official text applied over the pinned historical zh-CN dictionary, and zh-CN and zh-TW display-text tables | Published as `locale/<patch>-<n>`; PoBR pins its assets by SHA-256. Since `locale/0.5.5.5-4` no separate support-gem display is published (-2 and -3 keep theirs) |
+| Manual translations | Worklists and review records under `curation/` | Drafts never reach reviewed output; a source change requires review again; official text always wins over a supplement, and shipped supplement rows carry `origin` (`agent` or `human`) |
 
 Trade IDs, game stat IDs and display text serve different purposes and do not substitute for each other.
 Trade coverage is not full localization or calculation coverage. The historical compatibility dictionary
