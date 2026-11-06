@@ -1,0 +1,225 @@
+{
+  "schema": "poe2-retained-locale-publication/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "observed_sc_client": {
+    "patch": null,
+    "realm": null
+  },
+  "catalog_sha256": "2da387f47bb91633761bc49dd64684966877dc255709e1e06b6be3f89683bec4",
+  "reviewed_supplement": {
+    "revision": "5d019466678522e1ff3535b27951ad8056498ff8",
+    "path": "handoff/reviewed-supplements-20261101/runtime.zip",
+    "bytes": 1585,
+    "sha256": "989293a62f212f56c2f8e2b26aec6439709d55600f5cb8360d6c9ab5ccc968a8",
+    "records": 0
+  },
+  "based_on": {
+    "tag": "locale/0.5.5.5-3",
+    "asset": "pobr-locale-0.5.5.5.zip",
+    "bytes": 7492433,
+    "sha256": "dc3a809805bf415e05b9f097f38a43cf5afe65c1799d7b7ecb459bf4a3543f16",
+    "changed": [
+      "i18n/zh-CN/_meta.json",
+      "i18n/zh-CN/display_texts.json",
+      "i18n/zh-CN/stat_lines.json"
+    ],
+    "added": [
+      "i18n/zh-TW/display_texts.json"
+    ]
+  },
+  "display_projection": {
+    "zh-CN": {
+      "scopes": [
+        "BaseItemTypes.Name",
+        "Characters.Name",
+        "Ascendancy.Name",
+        "PassiveSkills.Name",
+        "GemEffects.SupportText",
+        "ActiveSkills.Description",
+        "MonsterVarieties.Name"
+      ],
+      "literals": "all-catalog-conflict-participants"
+    },
+    "zh-TW": {
+      "scopes": [
+        "GemEffects.SupportText",
+        "ActiveSkills.Description",
+        "MonsterVarieties.Name"
+      ],
+      "literals": "all-catalog-conflict-participants"
+    }
+  },
+  "display_supplements": {
+    "revision": "752eba990c40068d5763d0b16c652ec0441e3587",
+    "path": "curation/display-supplements.json",
+    "bytes": 112054,
+    "sha256": "8c13a3ed51b5e06ef388d87448e67ff903e398bd705de4b92cef688f13f9de23"
+  },
+  "official": {
+    "zh-CN": [
+      {
+        "realm": "china",
+        "repository": "ackness/repoe",
+        "tag": "inputs/0.5.5.5-1",
+        "asset": "repoe-input-china_text-0.5.5.5.zip",
+        "bytes": 20301700,
+        "sha256": "56dd27a77fad3c505188f7f696db7763ca28436725db454a4360cdbd4e1ce234",
+        "member": "stat-descriptions/china/",
+        "manifest_sha256": "ff6e603d5c123854cf3d3f7c897a812e65e7a53a9e493bdcdc855a8e60cc0b8a"
+      }
+    ]
+  },
+  "official_tables": {
+    "zh-CN": [
+      {
+        "realm": "china",
+        "repository": "ackness/repoe",
+        "tag": "inputs/0.5.5.5-1",
+        "asset": "repoe-input-china_text-0.5.5.5.zip",
+        "bytes": 20301700,
+        "sha256": "56dd27a77fad3c505188f7f696db7763ca28436725db454a4360cdbd4e1ce234",
+        "default": "display-tables/default/",
+        "default_manifest_sha256": "6976b497a09c8522d98b5b39f87cbefd5970ff0196794024b180c1731509b9bb",
+        "localized": "display-tables/simplified-chinese/",
+        "localized_manifest_sha256": "bc03863215ca86e0b475b132d982ab6e3a0bd7768e92deced9843aad1a37bb7b",
+        "scopes": [
+          "GemEffects.SupportText",
+          "ActiveSkills.Description",
+          "MonsterVarieties.Name"
+        ]
+      }
+    ],
+    "zh-TW": [
+      {
+        "realm": "international",
+        "repository": "ackness/repoe",
+        "tag": "inputs/0.5.5.5-2",
+        "asset": "repoe-input-intl_text-0.5.5.5.zip",
+        "bytes": 926093,
+        "sha256": "8ef802ff76a449329908c7ab8af6f7957d818887550c479db5586c4d65afd95b",
+        "default": "display-tables/default/",
+        "default_manifest_sha256": "62cae19763732a3f3cd590caf9b2475a762d56bbe18af201b973d5463ceddabb",
+        "localized": "display-tables/traditional-chinese/",
+        "localized_manifest_sha256": "3684d6f5ef2b67d3c10b8584b1a62ffc16a9be1b2b939bd68cbcaf789fbe1628",
+        "scopes": [
+          "GemEffects.SupportText",
+          "ActiveSkills.Description",
+          "MonsterVarieties.Name"
+        ]
+      }
+    ]
+  },
+  "game_package": {
+    "repository": "ackness/repoe",
+    "tag": "game/0.5.5.5-3",
+    "asset": "pobr-game-0.5.5.5.zip",
+    "bytes": 4611967,
+    "sha256": "7f8d343b53bbbffa221b750c42fa71da4eda6fde909426c130a07d5b4dd4a7c9"
+  },
+  "files": {
+    "evidence/historical-generation-receipt.json": {
+      "bytes": 7550,
+      "sha256": "4a3167441da6e04642c25ee6f00104e087c0ccd28d50854ed278a06fac02293c"
+    },
+    "evidence/locale-0.5.5.5-2-receipt.json": {
+      "bytes": 52428,
+      "sha256": "7edcfdb3918b5de04f67871412dbf0b4d30c5e31f8f828fbe93158c22322366f"
+    },
+    "evidence/locale-decision.json": {
+      "bytes": 28528,
+      "sha256": "878b6f49df4460e49aeee960bdbd85e62d81ff64c5a75b1675b32c864c71fef7"
+    },
+    "evidence/native-140-pairs.json": {
+      "bytes": 20049,
+      "sha256": "6dd206dd75f651e4fde326228815882243b0af0a74645e46565a729308056306"
+    },
+    "evidence/production-snapshots.json": {
+      "bytes": 10267,
+      "sha256": "8b3c39de9bddd56116908f468cbd64bd8fcbc5e49fb81576ace6ac5e39883122"
+    },
+    "evidence/shaman-mantle-alias-review.json": {
+      "bytes": 5494,
+      "sha256": "e589ed5360c2725e59f4ff409aed50c7600262e0e9170c1eee8a2622df59a07c"
+    },
+    "evidence/shaman-mantle-generation-receipt.json": {
+      "bytes": 7564,
+      "sha256": "9b47d8a506896b62c2c75b59ebc9e4ae3093be95776c9565a757769e5f96667b"
+    },
+    "evidence/shaman-mantle-selected-literals.json": {
+      "bytes": 9435,
+      "sha256": "274d7c3001af16b9ca52c4a826d698349109ea4a905203b07378af776ba5ac88"
+    },
+    "evidence/zh-CN-original-meta.json": {
+      "bytes": 901,
+      "sha256": "14e0ff55f8dcfab5e91868dc2db56e65fc75551a64c59579d6a75469c98bb68f"
+    },
+    "evidence/zh-CN-original-stat-lines.json": {
+      "bytes": 3857237,
+      "sha256": "28da2be7c44a4d872a94ad653d0002ff798f02de7a2b503d020d318cd170275e"
+    },
+    "evidence/zh-TW-receipt.json": {
+      "bytes": 7699503,
+      "sha256": "50a90defb34a9af67f424367f696179bf9d10d0e0079920aff74cc8a3820b7cb"
+    },
+    "i18n/zh-CN/_meta.json": {
+      "bytes": 7250,
+      "sha256": "3fa08ab3e383c82ce09e8dd067ff7098f2034b2817892f342c26f3c775ed00cb"
+    },
+    "i18n/zh-CN/base_items.json": {
+      "bytes": 370795,
+      "sha256": "910c5ebb7af9efe976f01414dfae4bda22132c23c5138eb0cbadaeb5e86e4d53"
+    },
+    "i18n/zh-CN/classes.json": {
+      "bytes": 1128,
+      "sha256": "6944676a4fd017fde321ee2758992ee4b18a835ce59ed45e6c9708b01a275bed"
+    },
+    "i18n/zh-CN/display_texts.json": {
+      "bytes": 2703982,
+      "sha256": "867b78f772daf668bd8f839d489e842d75147576e4d73e1e4a1bd19cc4a8236a"
+    },
+    "i18n/zh-CN/mods.json": {
+      "bytes": 93053,
+      "sha256": "8d62bf95d9a54650fff127815580e169f7e83983235a56dc3ed295c9d1a1a76d"
+    },
+    "i18n/zh-CN/passive_names.json": {
+      "bytes": 134582,
+      "sha256": "6becc784be1f24e4b3dbc4ed8a16335c2602b1c90b4e3f73a5c23e5879af26dd"
+    },
+    "i18n/zh-CN/rare_words.json": {
+      "bytes": 124951,
+      "sha256": "ab23836d0f2034914bf799777134cf51482708425c909f7bf713400c67105915"
+    },
+    "i18n/zh-CN/skills.json": {
+      "bytes": 33008,
+      "sha256": "16eb4a451e3472c0b06fd36f21c6f308b2ebca24287d5c240a1345491c91eb77"
+    },
+    "i18n/zh-CN/stat_lines.json": {
+      "bytes": 3879754,
+      "sha256": "d732c516187f8aa2fac4bd8e45c1cf323407eea693ae2706e72592fadf26a7bd"
+    },
+    "i18n/zh-CN/words.json": {
+      "bytes": 132463,
+      "sha256": "7ba0c43e90c3909c725f8a563ab169ccfcbcf3b53c05a2748d17d7508cce58cc"
+    },
+    "i18n/zh-TW/base_items.json": {
+      "bytes": 375343,
+      "sha256": "67c3db66b47c39e4148eaa365eec8a0050b6eee2a84032fd579d70f5395025aa"
+    },
+    "i18n/zh-TW/display_texts.json": {
+      "bytes": 490210,
+      "sha256": "8abe8dcab35c6568dc47ffe97dfbb7c06e207c88e7e09db57b6108dbe7ee98ef"
+    },
+    "i18n/zh-TW/mods.json": {
+      "bytes": 94179,
+      "sha256": "0de2188d6d86d253ced23aa4edb6d090513c9e9831b6abeccaad2e4e4bba317d"
+    },
+    "i18n/zh-TW/skills.json": {
+      "bytes": 34080,
+      "sha256": "af64e24e26657e9b5bfa11fb186e145c8ff5fbbabf7a80af6b47e681bd0d02bb"
+    }
+  }
+}

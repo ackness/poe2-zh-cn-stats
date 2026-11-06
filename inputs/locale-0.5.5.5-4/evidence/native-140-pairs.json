@@ -1,0 +1,582 @@
+{
+  "schema": "pobr-native-selected-pair-delta/v1",
+  "input_pins": [
+    {
+      "path": "data/0.5.5.4.2/i18n/zh-CN/stat_lines.json",
+      "bytes": 3857237,
+      "sha256": "28da2be7c44a4d872a94ad653d0002ff798f02de7a2b503d020d318cd170275e"
+    },
+    {
+      "path": ".cache/builddata-migration-stage/remaining-stat-descriptions/integration/runtime-bundle/data/0.5.5.5/i18n/zh-CN/stat_lines.json",
+      "bytes": 3875309,
+      "sha256": "76d4af1898a92963e205534f5020c8bf48477c3c844d59e263c53f1bc5e8fb83"
+    }
+  ],
+  "old_pairs": 27896,
+  "baseline_pairs": 28036,
+  "added_pairs": [
+    {
+      "en": "40% increased Critical Hit Chance after 7 metres",
+      "src": "7 米后暴击几率最多提高 40%"
+    },
+    {
+      "en": "75% of Damage Converted to Fire Damage",
+      "src": "75% 的伤害转化为火焰伤害"
+    },
+    {
+      "en": "Bonded: Buffs on you expire 10% slower",
+      "src": "Bonded: 你受到的增益消减速度减慢 10%"
+    },
+    {
+      "en": "Bonded: 20% reduced Slowing Potency of Debuffs on You",
+      "src": "Bonded: 你受到的异常状态的减速强度降低 20%"
+    },
+    {
+      "en": "Bonded: 50% reduced Slowing Potency of Debuffs on You",
+      "src": "Bonded: 你受到的异常状态的减速强度降低 50%"
+    },
+    {
+      "en": "Bonded: 25% reduced Effect of Non-Damaging Ailments on you",
+      "src": "Bonded: 你受到的非伤害性异常状态的效果降低 25%"
+    },
+    {
+      "en": "Bonded: 15% chance that when Volatility on you explodes, you regain an equivalent amount of Volatility",
+      "src": "Bonded: 你的无常被引爆时，你有 15% 的几率重新获得等量的无常"
+    },
+    {
+      "en": "Bonded: 25% reduced Magnitude of Bleeding on You",
+      "src": "Bonded: 你身上的流血强度降低 25%"
+    },
+    {
+      "en": "Bonded: 10% increased Magnitude of Bleeding you inflict",
+      "src": "Bonded: 你造成的流血强度提高 10%"
+    },
+    {
+      "en": "Bonded: your Runic Ward has been damaged Recently",
+      "src": "Bonded: 则击中你的敌人造成的伤害为不幸"
+    },
+    {
+      "en": "Bonded: 25% reduced Reservation Efficiency of Minion Skills",
+      "src": "Bonded: 召唤生物技能的保留效能降低 25%"
+    },
+    {
+      "en": "Bonded: 12% increased Skill Speed while on Low Mana",
+      "src": "Bonded: 处于低魔时，技能速度提高 12%"
+    },
+    {
+      "en": "Bonded: 100% increased Block chance against Projectiles",
+      "src": "Bonded: 对投射物的格挡几率提高 100%"
+    },
+    {
+      "en": "Bonded: Warcry Skills have 20% increased Area of Effect",
+      "src": "Bonded: 战吼技能的效果范围提高 20%"
+    },
+    {
+      "en": "Bonded: 5% increased Spirit Reservation Efficiency of Skills",
+      "src": "Bonded: 技能的精魂保留效能提高 5%"
+    },
+    {
+      "en": "Bonded: 50% increased Parry Damage",
+      "src": "Bonded: 招架伤害提高 50%"
+    },
+    {
+      "en": "Bonded: 12% chance when collecting an Elemental Infusion to gain an",
+      "src": "Bonded: 收集元素灌注时有 12% 的几率"
+    },
+    {
+      "en": "Bonded: 25% reduced Life Regeneration rate",
+      "src": "Bonded: 生命再生率降低 25%"
+    },
+    {
+      "en": "Bonded: 10% reduced Runic Ward Cost Efficiency",
+      "src": "Bonded: 符文结界消耗效能降低 10%"
+    },
+    {
+      "en": "Bonded: Damage of Enemies Hitting you is Unlucky if",
+      "src": "Bonded: 若你的符文结界近期受到伤害，"
+    },
+    {
+      "en": "Bonded: 20% of damage Blocked is Recouped as Mana",
+      "src": "Bonded: 被格挡伤害的 20% 吸纳为魔力"
+    },
+    {
+      "en": "Bonded: Triggered Spells deal 20% increased Spell Damage",
+      "src": "Bonded: 被触发法术的法术伤害提高 20%"
+    },
+    {
+      "en": "Bonded: Meta Skills have 25% reduced Reservation Efficiency",
+      "src": "Bonded: 非凡技能的保留效能降低 25%"
+    },
+    {
+      "en": "Bonded: additional Elemental Infusion of the same type",
+      "src": "Bonded: 额外获得一个同类型的元素灌注"
+    },
+    {
+      "en": "Bonded: 30% reduced Mana Cost Efficiency",
+      "src": "Bonded: 魔力消耗效能降低 30%"
+    },
+    {
+      "en": "• 1 Helmet socket",
+      "src": "• 1 个头盔插槽"
+    },
+    {
+      "en": "• 1 Gloves socket",
+      "src": "• 1 个手套插槽"
+    },
+    {
+      "en": "• 1 Boots socket",
+      "src": "• 1 个鞋子插槽"
+    },
+    {
+      "en": "• 2 Body Armour sockets",
+      "src": "• 2 个胸甲插槽"
+    },
+    {
+      "en": "• Base Unarmed Physical damage replaced with damage based on their Skill Level",
+      "src": "• 基础徒手物理伤害改为根据技能等级计算伤害"
+    },
+    {
+      "en": "• +0.1% to Critical Hit Chance per 10 Item Energy Shield on Equipped Armour Items",
+      "src": "• 已装备护甲物品每有 10 点物品能量护盾，暴击率 +0.1%"
+    },
+    {
+      "en": "• 1% more Attack Speed per 75 Item Evasion on Equipped Armour Items",
+      "src": "• 已装备护甲物品每有 75 点物品闪避，攻击速度总增 1%"
+    },
+    {
+      "en": "• have 75% less duration",
+      "src": "• 持续时间总降 75%"
+    },
+    {
+      "en": "• cost 50% less",
+      "src": "• 消耗总降 50%"
+    },
+    {
+      "en": "•Red: Hits against you have no Critical Damage Bonus",
+      "src": "•红色：对你的击中没有暴击伤害加成"
+    },
+    {
+      "en": "•Green: 40% less Movement Speed Penalty from using Skills while Moving",
+      "src": "•绿色：移动中使用技能的移动速度惩罚总降 40%"
+    },
+    {
+      "en": "•Blue: Skills have 30% less cost",
+      "src": "•蓝色：技能消耗总降 30%"
+    },
+    {
+      "en": "• deal 50% more damage",
+      "src": "•造成的伤害总增 50%"
+    },
+    {
+      "en": "being Shapeshifted for at least 8 seconds",
+      "src": "人类形态时，获得秘术增强"
+    },
+    {
+      "en": "additional Rune-only sockets:",
+      "src": "仅限符文的插槽："
+    },
+    {
+      "en": "30% more Reservation Efficiency of Companion Skills",
+      "src": "伙伴技能的保留效能总增 30%"
+    },
+    {
+      "en": "Unarmed Attacks that would use an Equipped Quarterstaff's damage have:",
+      "src": "会使用已装备节杖伤害的徒手攻击获得以下效果："
+    },
+    {
+      "en": "30% more Critical Damage Bonus when on Low Life",
+      "src": "低血时暴击伤害加成总增 30%"
+    },
+    {
+      "en": "You have no Mana",
+      "src": "你不具有魔力"
+    },
+    {
+      "en": "10% chance for Enemies you Kill to Explode, dealing 100%",
+      "src": "你击败敌人时有 10% 的几率使其爆炸，"
+    },
+    {
+      "en": "All Damage from you and Allies in your Presence",
+      "src": "你和在场范围内友军的所有伤害作用于"
+    },
+    {
+      "en": "60% of your current Energy Shield is added to your Armour for",
+      "src": "你当前能量护盾的 60% 会计入你的护甲，用于"
+    },
+    {
+      "en": "to 25% of your main hand Weapon's damage",
+      "src": "你的主手武器伤害 25% 的伤害"
+    },
+    {
+      "en": "Your Totem Limit is doubled",
+      "src": "你的图腾上限翻倍"
+    },
+    {
+      "en": "Gloves you equip have their Base Type transformed to Fists of Stone while equipped, and",
+      "src": "你装备的手套会在已装备期间将其基础种类转化为石拳，并"
+    },
+    {
+      "en": "50% more Magnitude of Bleeding you inflict",
+      "src": "你造成的流血强度总增 50%"
+    },
+    {
+      "en": "Attacks using your Weapons have Added Physical Damage equal",
+      "src": "使用你的武器的攻击附加相当于武器"
+    },
+    {
+      "en": "Deflected no Hits Recently",
+      "src": "偏转击中伤害"
+    },
+    {
+      "en": "Leech Life 67% less quickly",
+      "src": "偷取生命速度降低 67%"
+    },
+    {
+      "en": "Immune to Chaos Damage and Bleeding",
+      "src": "免疫混沌伤害和流血"
+    },
+    {
+      "en": "Other Modifiers to Movement Speed except for Sprinting do not apply",
+      "src": "其他除冲刺外的移动速度词缀无法生效"
+    },
+    {
+      "en": "Excess Life Recovery from Regeneration is applied to Energy Shield",
+      "src": "再生的溢出生命回复会作用于能量护盾。"
+    },
+    {
+      "en": "On Hitting an enemy, gains maximum added Lightning damage equal to",
+      "src": "击中敌人时，获得相当于敌人威力值的"
+    },
+    {
+      "en": "25% more Skill Speed while Off Hand is empty and you have",
+      "src": "副手为空，且主手装备一把单手战斗武器时"
+    },
+    {
+      "en": "Inherent Life granted by Strength is halved",
+      "src": "力量赋予的固有生命减半"
+    },
+    {
+      "en": "Damage taken is Reserved from Darkness before being taken from Life or Energy Shield",
+      "src": "受到伤害在扣除生命或能量护盾前改为保留黑暗"
+    },
+    {
+      "en": "Take 20% less Damage from Hits",
+      "src": "受到的击中伤害总降 20%"
+    },
+    {
+      "en": "All Damage is taken from Mana before Life",
+      "src": "受到的所有伤害在扣除生命前优先从魔力扣除"
+    },
+    {
+      "en": "Take 20% less Damage over time",
+      "src": "受到的持续伤害总降 20%"
+    },
+    {
+      "en": "Gain Arcane Surge when you Shapeshift to Human form after",
+      "src": "变形至少 8 秒后变形成"
+    },
+    {
+      "en": "Can tattoo Runes onto your body, gaining",
+      "src": "可将符文文身于身体上，获得额外的"
+    },
+    {
+      "en": "to 25% of the Accuracy Rating on the Weapon",
+      "src": "命中值 25% 的物理伤害"
+    },
+    {
+      "en": "Invocation Skills cannot gain Energy while Triggering Spells",
+      "src": "咒祈技能在触发法术时无法获得能量"
+    },
+    {
+      "en": "Invoked Spells consume 50% less Energy",
+      "src": "咒祈法术消耗的能量总降 50%"
+    },
+    {
+      "en": "You cannot Recover Energy Shield to above Armour",
+      "src": "回复的能量护盾不能高于护甲值"
+    },
+    {
+      "en": "Allies in your Presence gain added Attack Damage equal",
+      "src": "在场的友军的攻击附加相当于"
+    },
+    {
+      "en": "Base Bleeding Duration is 1 second",
+      "src": "基础流血持续时间为 1 秒"
+    },
+    {
+      "en": "Base Maximum Darkness is 100",
+      "src": "基础黑暗上限为 100"
+    },
+    {
+      "en": "Chance is doubled against Undead and Demons",
+      "src": "对恶魔和亡灵的几率翻倍"
+    },
+    {
+      "en": "their Explicit Modifiers are transformed into more powerful related Modifiers",
+      "src": "将其外延词缀转化为更强力的相关词缀。"
+    },
+    {
+      "en": "Convert 100% of maximum Energy Shield to maximum Mana",
+      "src": "将能量护盾上限的 100% 转化为魔力上限"
+    },
+    {
+      "en": "Attribute Passive Skills can instead grant 5% increased Damage",
+      "src": "属性天赋技能改为使伤害提高 5%"
+    },
+    {
+      "en": "Attribute Passive Skills can instead grant 5% increased Armour, Evasion and Energy Shield",
+      "src": "属性天赋技能改为使护甲，闪避与能量护盾提高 5%"
+    },
+    {
+      "en": "Attribute Passive Skills can instead grant 5% increased Cost Efficiency",
+      "src": "属性天赋技能改为使消耗效能提高 5%"
+    },
+    {
+      "en": "Can Attack as though using a Quarterstaff while both of your hand slots are empty",
+      "src": "当你的手部栏位为空时，可视为使用节杖攻击"
+    },
+    {
+      "en": "On Hitting an Enemy while a Life Flask is at full Charges, 40% of its Charges are consumed",
+      "src": "当生命药剂处于满充能时，击中敌人消耗其 40% 的充能"
+    },
+    {
+      "en": "100% more Maximum Rage",
+      "src": "怒火上限总增 100%"
+    },
+    {
+      "en": "Triple Attribute requirements of Martial Weapons",
+      "src": "战斗武器的属性需求变为三倍"
+    },
+    {
+      "en": "Gain Infernal Flame instead of spending Mana for Skill costs",
+      "src": "技能不再消耗魔力，改为获得地狱烈焰"
+    },
+    {
+      "en": "a One-Handed Martial Weapon equipped in your Main Hand",
+      "src": "技能速度总增 25%。"
+    },
+    {
+      "en": "You can equip a non-Unique Sceptre while wielding a Talisman",
+      "src": "持魔符时，你可以装备一把非传奇权杖"
+    },
+    {
+      "en": "10% chance when collecting an Elemental Infusion to gain an",
+      "src": "收集元素灌注时有 10% 的几率"
+    },
+    {
+      "en": "5% chance when collecting an Elemental Infusion to gain an",
+      "src": "收集元素灌注时有 5% 的几率"
+    },
+    {
+      "en": "Chance to Hit with Attacks can exceed 100%",
+      "src": "攻击时的击中几率能溢出 100%"
+    },
+    {
+      "en": "No Charge requirement for placing Totems",
+      "src": "放置图腾无需充能"
+    },
+    {
+      "en": "No Rage effect",
+      "src": "无怒火效果"
+    },
+    {
+      "en": "Cannot use Charms",
+      "src": "无法使用咒符"
+    },
+    {
+      "en": "Cannot Dodge Roll or Sprint",
+      "src": "无法闪避翻滚或奔跑"
+    },
+    {
+      "en": "contributes to Flammability and Ignite Magnitudes",
+      "src": "易燃和点燃强度"
+    },
+    {
+      "en": "Life Flask Effects are not removed when Unreserved Life is Filled",
+      "src": "未保留的生命全满时不移除生命药剂效果"
+    },
+    {
+      "en": "For each colour of Socketed Support Gem that is most numerous, gain:",
+      "src": "根据数量最多的镶嵌辅助宝石颜色，获得："
+    },
+    {
+      "en": "1% increased Movement Speed per 15 Spirit, up to a maximum of 40%",
+      "src": "每 15 点精魂使移动速度提高 1%，最高 40%"
+    },
+    {
+      "en": "Alternating every 5 seconds:",
+      "src": "每 5 秒交替："
+    },
+    {
+      "en": "Totems reserve 75 Spirit each",
+      "src": "每个图腾保留 75 点 精魂"
+    },
+    {
+      "en": "Gain 1% of damage as Physical damage for 5 seconds per Charge consumed this way",
+      "src": "每以此方式消耗一次充能，获得相当于伤害 1% 的物理伤害，持续 5 秒"
+    },
+    {
+      "en": "5% of Physical Damage prevented Recouped as Energy Shield per enemy Power",
+      "src": "每点敌人威力值使被阻挡的物理伤害的 5% 吸纳为能量护盾"
+    },
+    {
+      "en": "30% less Critical Damage Bonus when on Full Life",
+      "src": "满血时暴击伤害加成总降 30%"
+    },
+    {
+      "en": "Fire Spells Convert 100% of Fire Damage to Chaos Damage",
+      "src": "火焰法术将 100% 的火焰伤害转化为混沌伤害"
+    },
+    {
+      "en": "Ignite inflicted with Fire Spells deals Chaos Damage instead of Fire Damage",
+      "src": "火焰法术施加的点燃造成混沌伤害而非火焰伤害"
+    },
+    {
+      "en": "Chaos Damage from Fire Spells Contributes to Flammability and Ignite Magnitudes",
+      "src": "火焰法术的混沌伤害作用于易燃和点燃强度"
+    },
+    {
+      "en": "Maximum Life is 1",
+      "src": "生命上限变成 1"
+    },
+    {
+      "en": "50% more amount of Life Leeched",
+      "src": "生命偷取量总增 50%"
+    },
+    {
+      "en": "Life Flasks also recover Mana",
+      "src": "生命药剂也会回复魔力"
+    },
+    {
+      "en": "Life Flask Effects do not Queue",
+      "src": "生命药剂效果不能堆叠"
+    },
+    {
+      "en": "Create Cold Infusion Remnants instead of Lightning",
+      "src": "生成冰霜而非闪电灌注残片"
+    },
+    {
+      "en": "Create Fire Infusion Remnants instead of Cold",
+      "src": "生成火焰而非冰霜灌注残片"
+    },
+    {
+      "en": "Create Lightning Infusion Remnants instead of Fire",
+      "src": "生成闪电而非火焰灌注残片"
+    },
+    {
+      "en": "Invocation Skills instead Trigger Spells every 2 seconds",
+      "src": "祈求技能改为每 2 秒触发法术"
+    },
+    {
+      "en": "Arrows gain Critical Hit Chance as they travel farther, up to",
+      "src": "箭矢的暴击几率随穿越的距离而提高，"
+    },
+    {
+      "en": "You cannot Recover Energy Shield from Regeneration",
+      "src": "能量护盾不能通过再生回复"
+    },
+    {
+      "en": "Life Recharges instead of Energy Shield",
+      "src": "能量护盾充能改为生命充能"
+    },
+    {
+      "en": "Bolts fired by Crossbow Attacks have 30% chance to not",
+      "src": "若你近期内装填过弹药则获得"
+    },
+    {
+      "en": "Prevent +5% of Damage from Deflected Hits if you've",
+      "src": "若你近期没有偏转击中，避免 +5% 的"
+    },
+    {
+      "en": "Take 50% less Damage over Time if you've started taking Damage over Time in the past second",
+      "src": "若过去一秒内开始受到持续伤害，受到的持续伤害总降 50%"
+    },
+    {
+      "en": "Take 50% more Damage over Time if you haven't started taking Damage over Time in the past second",
+      "src": "若过去一秒内未开始受到持续伤害，受到的持续伤害总增 50%"
+    },
+    {
+      "en": "Gain Endurance Charges instead of Power Charges",
+      "src": "获得暴击球时改为获得耐力球"
+    },
+    {
+      "en": "Gain Power Charges instead of Frenzy Charges",
+      "src": "获得狂怒球时改为获得暴击球"
+    },
+    {
+      "en": "Gain additional Critical Hit Chance equal to 25% of excess chance to Hit with Attacks",
+      "src": "获得等同于攻击击中溢出几率 25% 的额外暴击几率"
+    },
+    {
+      "en": "Gain Frenzy Charges instead of Endurance Charges",
+      "src": "获得耐力球时改为获得狂怒球"
+    },
+    {
+      "en": "determining your Physical Damage Reduction from Armour",
+      "src": "计算护甲提供的物理伤害减免"
+    },
+    {
+      "en": "Double Activation Delay of Curses",
+      "src": "诅咒的激活延迟翻倍"
+    },
+    {
+      "en": "Regenerate 1 Rage per second per 4 Rage spent Recently",
+      "src": "近期每消耗 4 点怒火，则每秒再生 1 点怒火"
+    },
+    {
+      "en": "of their maximum Life as Physical Damage",
+      "src": "造成其生命上限 100% 的物理伤害"
+    },
+    {
+      "en": "Chance to Evade is Unlucky",
+      "src": "闪避几率特别不幸"
+    },
+    {
+      "en": "Dodge Roll cannot Avoid Damage",
+      "src": "闪避翻滚无法避免伤害"
+    },
+    {
+      "en": "Take 30% less Damage from Hits while Dodge Rolling",
+      "src": "闪避翻滚时受到的击中伤害总降 30%"
+    },
+    {
+      "en": "Cannot Recover Life other than from Leech",
+      "src": "除偷取之外无法回复生命"
+    },
+    {
+      "en": "20% less Reservation Efficiency of non-Companion Skills",
+      "src": "非伙伴技能的保留效能总降 20%"
+    },
+    {
+      "en": "Non-Minion Skills have 50% less Reservation Efficiency",
+      "src": "非召唤生物技能的保留效能总降 50%"
+    },
+    {
+      "en": "additional Elemental Infusion of the same type",
+      "src": "额外获得一个同类型的元素灌注"
+    },
+    {
+      "en": "the enemy's Power for 20 seconds, up to a total of 120",
+      "src": "额外闪电伤害上限，最多 120，持续 20 秒"
+    },
+    {
+      "en": "Storm and Plant Spells:",
+      "src": "风暴和植物法术："
+    },
+    {
+      "en": "Maximum Mana is replaced by twice as much Maximum Infernal Flame",
+      "src": "魔力上限被替换为两倍的地狱烈焰上限"
+    },
+    {
+      "en": "Mana Costs are Doubled",
+      "src": "魔力消耗翻倍"
+    },
+    {
+      "en": "Mana Flasks also recover Life",
+      "src": "魔力药剂也会回复生命"
+    }
+  ],
+  "added_count": 140,
+  "removed_count": 0,
+  "scope": "Exact whole-pair list and full retained subset equality. Existing native selection receipt hashes remain provenance; this does not newly join each pair to individual raw CSD rows or certify language quality."
+}
