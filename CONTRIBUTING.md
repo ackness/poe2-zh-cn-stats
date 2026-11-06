@@ -20,7 +20,7 @@ commands, validation and conventions, and [docs/](docs/README.md) indexes the gu
    `mise run check` is the minimum.
 3. Keep one problem per pull request. Say why in the description and list what you ran.
 
-Frozen files (`inputs/`, configs with `published`, the native library modules at the top of `src/`) are
+Frozen files (`inputs/`, configs with `published` (except the follow-up PR that writes it), the native library modules at the top of `src/`) are
 never edited; a change to published data is a new config and directory, published as a new
 `locale/<patch>-<n>` Release by a maintainer ([RELEASING.md](RELEASING.md)).
 

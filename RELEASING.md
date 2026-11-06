@@ -1,8 +1,8 @@
 # 发布 PoBR 语言包
 
 PoBR 的语言包是本仓库的 GitHub Release `locale/<patch>-<n>`。附件：`pobr-locale-<patch>.zip`、
-`receipt.json`、`SHA256SUMS`；配置声明了 `support_display` 时再加简中辅助宝石说明
-`support-display.zh-CN.json` 和 `supportDescriptions.zh-CN.json`。PoBR 用 `data:bump` 把这个 Release
+`receipt.json`、`SHA256SUMS`（只有已发布的 -2、-3 配置声明了 `support_display`，它们另带简中辅助宝石说明
+`support-display.zh-CN.json` 和 `supportDescriptions.zh-CN.json`；新配置不再声明）。PoBR 用 `data:bump` 把这个 Release
 （仓库、tag、附件和 SHA-256）写进它的 `pipeline/data.lock.json`；三个仓库的分工和 PoBR 的核对方式见
 [PoBR 数据架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md)。
 
@@ -16,23 +16,23 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 ```
 
 `--config release/<patch>[-<n>].json` 指定配置（默认取没有 `hold` 的最高 patch、最大 `<n>`）；
-`--recipe release/regenerate/<patch>.json` 指定配方（默认全部）。
+`--recipe release/regenerate/<patch>[-<n>].json` 指定配方（默认全部）。
 
 ## 什么时候需要新的 Release
 
 - 新的游戏补丁：新的源目录、v1 配置和重新生成配方，见[新补丁](#新补丁)。
 - 换掉已发布包里的文件：新的源目录和配置，见[换掉已发布的文件](#换掉已发布的文件)。
 - 在已发布的包上做声明过的改动（例如把一张表改成按英文为键）：新的 v2 配置，`base` 指向已发布的 v1 配置。
-- RePoE 重新发布游戏包（`game/<patch>-<n+1>`）且交易目录变了：辅助宝石说明绑定交易目录的 SHA-256，
-  所以要发布新的 `locale/<patch>-<n+1>`，见[新的辅助宝石说明](#新的辅助宝石说明)。目录没变时旧的语言
-  Release 继续可用。
+- RePoE 重新发布游戏包（`game/<patch>-<n+1>`）且宝石说明、召唤物名的目标英文变了：这些行只在英文逐字节
+  相同时才采用，所以按[换掉已发布的文件](#换掉已发布的文件)新建源目录和配置。
 
-**带 `published` 的配置一律不改**：CI 靠它持续证明已发布的字节可以重现。改动总是新建配置。
+**带 `published` 的配置一律不改**：CI 靠它持续证明已发布的字节可以重现。改动总是新建配置。（唯一的例外是
+发布后补写 `published` 的那个 PR，见[新补丁](#新补丁)第 9 步。）
 
 ## 新补丁
 
 1. **生成文件**：用[PoBR 语言文件生产者](docs/pobr-locale-producers.md)（`pobr:display-texts`、
-   `pobr:names`、`pobr:stat-lines`）或[简中词典生成](docs/locale-generation.md)把文件生成到 `.cache/`，
+   `pobr:names`、`pobr:stat-lines`、`pobr:supplement-lines`）或[简中词典生成](docs/locale-generation.md)把文件生成到 `.cache/`，
    核对 `receipt.json`。
 2. **源目录（第一个提交）**：新建 `inputs/locale-<patch>/`，放 `i18n/<lang>/*.json`、`evidence/*.json`
    和 `manifest.json`（`poe2-retained-locale-publication/v1`，`target` 与配置相同，`files` 写每个文件的
@@ -42,8 +42,10 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
    不写 `published`。它自动成为默认配置，旧配置继续由 CI 核对。
 4. **重新生成配方（同一分支）**：新建 `release/regenerate/<patch>.json`，`reproduces` 指向第 3 步的配置，
    每个 `i18n/*` 成员要么由一个任务重新生成，要么写进 `frozen`（原因和退出条件）。
-5. **辅助宝石说明**：等 RePoE 发布了这个补丁的 `game/<patch>-<n>`，在配置里加 `support_display`（通常是
-   `regenerate`，`catalog` 指向该游戏 Release）。PoBR 换补丁时必须同时采用新的说明，所以没有它不要发布。
+5. **官方文本与宝石说明**：新配置不再声明 `support_display`。宝石说明、召唤物名和国服词条随
+   `display_texts.json`、`stat_lines.json` 发布：等 RePoE 发布了这个补丁的游戏包 `game/<patch>-<n>` 和官方
+   文本输入 Release（`inputs/<patch>-<k>`），再在配方里固定它们（`official_tables`、`official`，见
+   [语言包配置参考](docs/release-config.md#重新生成配方releaseregeneratepatchjson)）。
 6. **核对**：`mise run release:build -- --fetch --check`、`mise run release:regenerate -- --fetch`，
    检查回执里的成员、来源和语言索引。
 7. **合并**：源目录、配置和配方在同一个 PR 里，用合并提交合并（不要 squash 或 rebase），这样第 2 步的提交
@@ -75,12 +77,6 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 （国服 `inputs/0.5.5.5-1`、国际服繁中 `inputs/0.5.5.5-2`），英文来自 `game/0.5.5.5-3`；不再声明 `support_display`。
 源目录 `inputs/locale-0.5.5.5-4/` 的其余成员与 -3 相同。
 
-## 新的辅助宝石说明
-
-已发布的 zip 要配新的辅助宝石说明时，新建 `release/<patch>-<n+1>.json`，不改已发布的配置：v2 配置写相同的
-`base`、`transforms` 和 `expect`，v1 配置写相同的 `source`，再加上新的 `support_display`。zip 不变，
-`release:publish` 把它发布为 `locale/<patch>-<n+1>`：同样的 zip 配上新的或改动过的辅助宝石说明算新内容。
-
 ## CI 核对什么
 
 `.github/workflows/verify.yml` 在每次推送和 PR 上：
@@ -104,14 +100,13 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 | --- | --- |
 | `these exact bytes are already published as …` | 同样的内容已经发布过，PoBR 直接固定那个 Release |
 | `the package differs from the published …` | 配置的 `published` 与新包不符；已发布的配置不改，改动放进新配置 |
-| `the zip is already published as …; a new display needs release/<patch>-<n+1>.json` | 按[新的辅助宝石说明](#新的辅助宝石说明)新建配置 |
 | `… is published, but no release config pins it` | 合并发布后的 PR（[新补丁](#新补丁)第 9 步）；tag 是中途失败留下的、没有 Release 时，见下表重跑发布 |
 | `… is pinned by …, but the remote has no such tag` | `published.tag` 写错了，或检出的远端不是本仓库 |
 | `was not built from this checkout; rerun without --reuse` | 去掉 `--reuse` 重新构建 |
 | `origin … is not present locally (pass --fetch)` | 加 `--fetch` |
 | `… is not cached under .cache/release/inputs (run release:build with --fetch)` | 先 `mise run release:build -- --fetch` |
-| `Pin mismatch: …` | 辅助宝石说明与配置的 pin 不符；有意的新内容就按信息里的实际值写新配置 |
-| `Catalog mismatch: …` | 辅助宝石说明绑定的交易目录与配置或游戏包不符；为新目录重新生成 |
+| `Pin mismatch: …` | 辅助宝石说明与配置的 pin 不符；有意的新内容就按信息里的实际值写新配置（仅带 `support_display` 的已发布配置） |
+| `Catalog mismatch: …` | 辅助宝石说明绑定的交易目录与配置或游戏包不符；为新目录重新生成（仅带 `support_display` 的已发布配置） |
 | `Provenance mismatch: …` | `_meta` 与清单 `provenance`（或简中 `_meta.json` 的 `source_commit`）不一致 |
 
 **中途失败后重跑 `mise run release:publish -- --yes` 即可继续**，同一提交不会得到第二个序号：

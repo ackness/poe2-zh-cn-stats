@@ -5,7 +5,7 @@ PoBR 读取的运行时文件格式。
 
 | 输出（PoBR 路径） | 入口 | mise task |
 |---|---|---|
-| `i18n/zh-CN/display_texts.json` | `src/pobr/display-texts.mjs` | `mise run pobr:display-texts` |
+| `i18n/{zh-CN,zh-TW}/display_texts.json` | `src/pobr/display-texts.mjs` | `mise run pobr:display-texts` |
 | `i18n/zh-TW/{base_items,skills,mods}.json` | `src/pobr/name-sidecars.mjs` | `mise run pobr:names` |
 | `i18n/zh-CN/stat_lines.json` | `src/pobr/stat-lines.mjs` | `mise run pobr:stat-lines` |
 | `i18n/zh-CN/stat_lines.json`（官方层、补译与修正）、`_meta.json` | `src/pobr/supplement-lines.mjs`（官方层在 `src/pobr/official-lines.mjs`） | `mise run pobr:supplement-lines` |
