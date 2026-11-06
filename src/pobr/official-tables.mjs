@@ -30,14 +30,26 @@ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const han = text => /\p{Script=Han}/u.test(text);
-// Brackets of the [A|B] / [A] markup must pair up; a new form fails loudly instead of shipping.
+// Brackets of the [A|B] / [A] markup must pair up: a new form in the English fails loudly instead of
+// shipping, a localized value that breaks them is not adopted.
+// Contract 1.3 allows exactly [A] and [A|B] with a non-empty key A, so [A|B|C], [] and [|B] are
+// problems too (the consumer would show "B|C").
 export function markupProblem(text) {
-  let open = false;
-  for (const character of text) {
-    if (character === '[') { if (open) return 'nested-bracket'; open = true; }
-    else if (character === ']') { if (!open) return 'unmatched-bracket'; open = false; }
+  let open = -1;
+  for (let index = 0; index < text.length; index++) {
+    const character = text[index];
+    if (character === '[') {
+      if (open >= 0) return 'nested-bracket';
+      open = index;
+    } else if (character === ']') {
+      if (open < 0) return 'unmatched-bracket';
+      const parts = text.slice(open + 1, index).split('|');
+      if (parts.length > 2) return 'extra-separator';
+      if (!parts[0]) return 'empty-key';
+      open = -1;
+    }
   }
-  return open ? 'unmatched-bracket' : null;
+  return open >= 0 ? 'unmatched-bracket' : null;
 }
 
 /**
@@ -152,13 +164,14 @@ export function gemTargets(doc, gamePatch) {
 }
 
 const emptyCounts = () => ({ adopted: 0, shadowed: 0, 'not-in-game': 0, 'ambiguous-target': 0, 'ambiguous-id': 0, 'no-default-row': 0,
-  'english-differs': 0, untranslated: 0, 'no-han': 0 });
+  'english-differs': 0, untranslated: 0, 'no-han': 0, 'broken-markup': 0 });
 
 /**
  * Pure core. sources: readOfficialTables() results, newest first; targets: Map scope -> Map id ->
  * target English (null when ambiguous). Returns {scopes: Map scope -> Map id -> [english, localized]},
  * per-source counts per scope, the target ids no source adopted, and the decided source of each id.
- * Throws on unpaired markup in an adopted value.
+ * Throws on unpaired markup in the target English of a row it would adopt; a localized value with
+ * unpaired markup is omitted ('broken-markup').
  */
 export function pairOfficialTables(sources, targets) {
   const scopes = new Map(), counts = sources.map(() => ({})), missing = {};
@@ -181,12 +194,17 @@ export function pairOfficialTables(sources, targets) {
         else if (typeof text !== 'string' || !text.trim() || text === english) reason = 'untranslated';
         else if (!han(text)) reason = 'no-han';
         else {
-          for (const value of [english, text]) {
-            const problem = markupProblem(value);
-            require(!problem, `official_tables: ${scope} ${id} has ${problem} markup: ${JSON.stringify(value)}`);
+          // Broken markup in the target English is a new form or a producer bug: fail loudly. A
+          // localized value with broken markup (client typos such as the zh-TW herald_of_blood
+          // "[BloodLoss|失血影響。" and frost_darts "[Projectile|Projectiles|投射物]") is omitted like
+          // any other unusable row.
+          const problem = markupProblem(english);
+          require(!problem, `official_tables: ${scope} ${id} has ${problem} markup in its English: ${JSON.stringify(english)}`);
+          if (markupProblem(text)) reason = 'broken-markup';
+          else {
+            rows.set(id, [english, text]);
+            reason = 'adopted';
           }
-          rows.set(id, [english, text]);
-          reason = 'adopted';
         }
         tally[reason]++;
       }
