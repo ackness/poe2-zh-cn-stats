@@ -16,5 +16,11 @@
       "tag": "main",
       "revision": "332950b7d647c018512488713fe18d955f71f562"
     }
+  },
+  "published": {
+    "tag": "locale/0.5.5.5-4",
+    "asset": "pobr-locale-0.5.5.5.zip",
+    "bytes": 8479677,
+    "sha256": "d0d7419903ab22bcc3040881ebf668e44cd20accf40fb711b1a61672f1635cbf"
   }
 }
