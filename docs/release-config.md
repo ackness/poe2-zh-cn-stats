@@ -196,7 +196,12 @@ v2 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`me
 `_meta.json` 是 passthrough；`display_texts.json` 来自 `display-texts`，`projection` 固定发布时的三个
 scope），繁中 3 个冻结，冻结原因与退出条件写在配方里。`release/regenerate/0.5.5.5-3.json` 复现
 `release/0.5.5.5-3.json`：任务与 0.5.5.5 相同，只是 `projection` 多了 `PassiveSkills.Name`；繁中
-`mods.json` 冻结为 `locale/0.5.5.5-2` 里按英文为键的字节。
+`mods.json` 冻结为 `locale/0.5.5.5-2` 里按英文为键的字节。`release/regenerate/0.5.5.5-4.json` 在此之上把
+`stat_lines.json` 与 `_meta.json` 交给 `supplement-lines` 任务（底是 -3 的成员，`official` 为国服 `inputs/0.5.5.5-1`，
+`locale-producer` 用 `replaced_by` 让出这两个成员）；简中 `display-texts` 任务的 `projection` 多了
+`GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`，三者由 `official_tables`（`inputs/0.5.5.5-1`）
+持有，并固定 `names`、`package_texts`（本包自己的 `stat_lines.json`、`passive_names.json`）和 `game/0.5.5.5-3`；
+新的 `zh-tw-display-texts` 任务没有 catalog，只用 `official_tables`（国际服繁中 `inputs/0.5.5.5-2`）。
 
 ## 冻结的输入
 
