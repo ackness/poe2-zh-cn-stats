@@ -21,7 +21,7 @@ const TABLES = {
 };
 const targets = () => new Map([...gemTargets(GEMS, '9.9')]);
 const counts = values => ({ adopted: 0, shadowed: 0, 'not-in-game': 0, 'ambiguous-target': 0, 'ambiguous-id': 0, 'no-default-row': 0,
-  'english-differs': 0, untranslated: 0, 'no-han': 0, ...values });
+  'english-differs': 0, untranslated: 0, 'no-han': 0, 'broken-markup': 0, ...values });
 
 test('official tables: only the localized row whose English is the game English ships, raw and never as null', () => {
   const { zip, spec } = tablePackage({ tables: TABLES });
@@ -43,13 +43,35 @@ test('official tables: only the localized row whose English is the game English 
   assert.deepEqual(Object.fromEntries(both.scopes.get('GemEffects.SupportText')),
     { A: ['Supports [Fire|fire] Skills ', '辅助[Fire|火焰]技能 '], E: ['New English', '新文'] });
   assert.deepEqual(both.counts[1]['GemEffects.SupportText'], counts({ adopted: 1, shadowed: 1 }));
-  // A new markup form fails loudly instead of shipping.
+  // A new markup form in the English fails loudly instead of shipping.
   assert.equal(markupProblem('a [b|c] [d]'), null);
   assert.equal(markupProblem('a [b|c'), 'unmatched-bracket');
   assert.equal(markupProblem('a ]b['), 'unmatched-bracket');
   assert.equal(markupProblem('[a [b]]'), 'nested-bracket');
+  // Only [A] and [A|B] with a non-empty key: a third part, [] and [|B] are broken too.
+  assert.equal(markupProblem('[Projectile|Projectiles|投射物]'), 'extra-separator');
+  assert.equal(markupProblem('a [] b'), 'empty-key');
+  assert.equal(markupProblem('a [|b] c'), 'empty-key');
+  assert.equal(markupProblem('[Flask|]'), null);
+  const brokenEnglish = tablePackage({ tables: { GemEffects: { A: ['Supports [Fire|fire Skills ', '辅助[Fire|火焰]技能'] } } });
+  assert.throws(() => pairOfficialTables([readOfficialTables(brokenEnglish.zip, brokenEnglish.spec, 'zh-CN')],
+    new Map([['GemEffects.SupportText', new Map([['A', 'Supports [Fire|fire Skills ']])]])), /A has unmatched-bracket markup in its English/u);
+  // A localized value that breaks the markup (a client typo) is omitted, not shipped, and an older
+  // source may still fill the id.
   const broken = tablePackage({ tables: { GemEffects: { A: ['Supports [Fire|fire] Skills ', '辅助[Fire|火焰技能'] } } });
-  assert.throws(() => pairOfficialTables([readOfficialTables(broken.zip, broken.spec, 'zh-CN')], targets()), /A has unmatched-bracket markup/u);
+  const omitted = pairOfficialTables([readOfficialTables(broken.zip, broken.spec, 'zh-CN'), readOfficialTables(older.zip, older.spec, 'zh-CN')], targets());
+  assert.deepEqual(omitted.counts[0]['GemEffects.SupportText'], counts({ 'broken-markup': 1 }));
+  assert.deepEqual(Object.fromEntries(omitted.scopes.get('GemEffects.SupportText')),
+    { A: ['Supports [Fire|fire] Skills ', '旧辅助'], E: ['New English', '新文'] });
+  // The three-part form of the zh-TW frost_darts text is omitted the same way; in the English it throws.
+  const threePart = tablePackage({ tables: { GemEffects: { A: ['Supports [Fire|fire] Skills ', '[Projectile|Projectiles|投射物]辅助'],
+    E: ['New English', '新文'] } } });
+  const dropped = pairOfficialTables([readOfficialTables(threePart.zip, threePart.spec, 'zh-CN')], targets());
+  assert.deepEqual(dropped.counts[0]['GemEffects.SupportText'], counts({ adopted: 1, 'broken-markup': 1 }));
+  assert.deepEqual(Object.fromEntries(dropped.scopes.get('GemEffects.SupportText')), { E: ['New English', '新文'] });
+  const threeEnglish = tablePackage({ tables: { GemEffects: { A: ['Supports [Fire|fire|blaze] Skills ', '辅助[Fire|火焰]技能'] } } });
+  assert.throws(() => pairOfficialTables([readOfficialTables(threeEnglish.zip, threeEnglish.spec, 'zh-CN')],
+    new Map([['GemEffects.SupportText', new Map([['A', 'Supports [Fire|fire|blaze] Skills ']])]])), /A has extra-separator markup in its English/u);
   // A scope with no target English cannot be decided.
   assert.throws(() => pairOfficialTables([source], new Map()), /no target English for GemEffects\.SupportText/u);
   // A localized row with no default row, and an Id the default table repeats.

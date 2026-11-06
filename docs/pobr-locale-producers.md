@@ -84,11 +84,13 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   条件才采用：该包的英文与**目标英文**逐字节相同（宝石说明取 `game_package` 的
   `data/<patch>/overlay/gem_descriptions.json`（`repoe-gem-descriptions/v1`，两个宝石 scope 都必须存在），怪物名取 `minions.json`、
   `spectres.json`）；译文非空、不同于英文、含汉字。写入 `scopes[scope][id] = [目标英文, 译文]`，标记
-  （`[A|B]`、`[A]`、末尾空格、偶尔的 `\r\n`）原样保留，由使用方渲染；`[`、`]` 不成对（或嵌套）时整次报错，
-  新的标记形式不会悄悄出货。不满足的 ID **省略，不写 `null`**：PoBR 把 `null` 当作“显示英文”，会挡住 zh-TW
+  （`[A|B]`、`[A]`、末尾空格、偶尔的 `\r\n`）原样保留，由使用方渲染。标记只允许 `[A]` 与 `[A|B]`（`A` 非空）：目标英文的 `[`、`]` 不成对、嵌套、
+  含两个以上 `|`（`[A|B|C]`）或键为空（`[]`、`[|B]`）时整次报错，新的标记形式不会悄悄出货；只有译文这样（客户端笔误，
+  例如国际服繁中 `herald_of_blood` 的 `[BloodLoss|失血影響。`、`frost_darts` 的 `[Projectile|Projectiles|投射物]`）时
+  不采用该 ID，记 `broken-markup`。不满足的 ID **省略，不写 `null`**：PoBR 把 `null` 当作“显示英文”，会挡住 zh-TW
   回退到转换后的 zh-CN。每个 ID 由第一个采用它的来源决定。receipt 的 `official_tables` 按来源、按 scope 记
   `adopted`、`shadowed`、`not-in-game`、`ambiguous-target`、`ambiguous-id`、`no-default-row`、`english-differs`、
-  `untranslated`、`no-han`，以及每个 scope 采用数与缺少的目标 ID 数；某个 scope 一行都没采用时整次报错（否则
+  `untranslated`、`no-han`、`broken-markup`，以及每个 scope 采用数与缺少的目标 ID 数；某个 scope 一行都没采用时整次报错（否则
   catalog 里该 scope 的行会被悄悄丢掉）。官方表持有的 scope 归它：catalog
   里该 scope 的行仍参与 literal 与 decision，但不写逐 ID 行（计 `owned_catalog_rows`）；采用的表行与 catalog 官方值
   一样算“官方文本已有”：我们的 catalog 补译遇到同一英文时跳过（`skipped`，`source: "official-tables"`）；`MonsterVarieties.Name`
