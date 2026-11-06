@@ -33,7 +33,7 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 1. **生成文件**：用[PoBR 语言文件生产者](docs/pobr-locale-producers.md)（`pobr:display-texts`、
    `pobr:names`、`pobr:stat-lines`、`pobr:supplement-lines`）或[简中词典生成](docs/locale-generation.md)把文件生成到 `.cache/`，
-   核对 `receipt.json`。
+   核对 `receipt.json`。宝石说明、召唤物名和国服词条需要先有 RePoE 的游戏包和官方文本输入，见第 5 步。
 2. **源目录（第一个提交）**：新建 `inputs/locale-<patch>/`，放 `i18n/<lang>/*.json`、`evidence/*.json`
    和 `manifest.json`（`poe2-retained-locale-publication/v1`，`target` 与配置相同，`files` 写每个文件的
    `bytes`、`sha256`），可加 `README.md`。只提交这个目录；这个提交就是 `source.origin.revision`。
@@ -42,10 +42,10 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
    不写 `published`。它自动成为默认配置，旧配置继续由 CI 核对。
 4. **重新生成配方（同一分支）**：新建 `release/regenerate/<patch>.json`，`reproduces` 指向第 3 步的配置，
    每个 `i18n/*` 成员要么由一个任务重新生成，要么写进 `frozen`（原因和退出条件）。
-5. **官方文本与宝石说明**：新配置不再声明 `support_display`。宝石说明、召唤物名和国服词条随
-   `display_texts.json`、`stat_lines.json` 发布：等 RePoE 发布了这个补丁的游戏包 `game/<patch>-<n>` 和官方
-   文本输入 Release（`inputs/<patch>-<k>`），再在配方里固定它们（`official_tables`、`official`，见
-   [语言包配置参考](docs/release-config.md#重新生成配方releaseregeneratepatchjson)）。
+5. **官方文本与宝石说明（第 1 步的前提）**：新配置不再声明 `support_display`。宝石说明、召唤物名和国服词条随
+   `display_texts.json`、`stat_lines.json` 发布，生成它们（第 1 步）之前要等 RePoE 发布这个补丁的游戏包
+   `game/<patch>-<n>` 和官方文本输入 Release（`inputs/<patch>-<k>`）；配方里固定的也是它们（`official_tables`、
+   `official`、`game_package`，见[语言包配置参考](docs/release-config.md#重新生成配方releaseregeneratepatchjson)）。
 6. **核对**：`mise run release:build -- --fetch --check`、`mise run release:regenerate -- --fetch`，
    检查回执里的成员、来源和语言索引。
 7. **合并**：源目录、配置和配方在同一个 PR 里，用合并提交合并（不要 squash 或 rebase），这样第 2 步的提交
@@ -104,10 +104,10 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 | `… is pinned by …, but the remote has no such tag` | `published.tag` 写错了，或检出的远端不是本仓库 |
 | `was not built from this checkout; rerun without --reuse` | 去掉 `--reuse` 重新构建 |
 | `origin … is not present locally (pass --fetch)` | 加 `--fetch` |
-| `… is not cached under .cache/release/inputs (run release:build with --fetch)` | 先 `mise run release:build -- --fetch` |
+| `… is not cached under .cache/release/inputs (run release:build with --fetch)` | 先 `mise run release:build -- --fetch`（仅带 `support_display` 的已发布配置） |
 | `Pin mismatch: …` | 辅助宝石说明与配置的 pin 不符；有意的新内容就按信息里的实际值写新配置（仅带 `support_display` 的已发布配置） |
 | `Catalog mismatch: …` | 辅助宝石说明绑定的交易目录与配置或游戏包不符；为新目录重新生成（仅带 `support_display` 的已发布配置） |
-| `Provenance mismatch: …` | `_meta` 与清单 `provenance`（或简中 `_meta.json` 的 `source_commit`）不一致 |
+| `Provenance mismatch: …` | `_meta` 与清单 `provenance`（或简中 `_meta.json` 的 `source_commit`）不一致（仅带 `support_display` 的已发布配置） |
 
 **中途失败后重跑 `mise run release:publish -- --yes` 即可继续**，同一提交不会得到第二个序号：
 

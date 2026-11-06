@@ -79,7 +79,7 @@ Why the frozen parts stay as they are:
   `handoff/rollback-0.5.5.4.2-20261101` (`93d9e164`). The other `handoff/*` tags point at `main` commits
   and are still cited, e.g. `handoff/support-display-20261101` by `release/0.5.5.5-2.json`.
   `release/0.5.5.5-3.json` names `main` as its origin tag, but `main` was rewritten once and no longer
-  contains its origin revision `27213865`; `locale/0.5.5.5-3` is the only ref that keeps it, so that tag
+  contains its origin revision `27213865`; `locale/0.5.5.5-3` is the only tag or branch that keeps it, so that tag
   must never move.
 - Only maintainers publish (`mise run release:publish -- --yes`). A `locale/*` tag that an interrupted
   publish left without a Release is never deleted or moved: rerun `mise run release:publish -- --yes` on the
