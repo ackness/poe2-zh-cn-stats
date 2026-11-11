@@ -152,8 +152,9 @@ test('build: refuses changed, unlisted or mislabelled source bytes', t => {
 test('package members reject stale patch identities while preserving source provenance and exact bytes', () => {
   const files = new Map([
     ['i18n/zh-CN/display_texts.json', bytes({ game_patch: '9.9', carried_from: ['9.8'], entries: {}, scopes: {} })],
-    ['i18n/zh-CN/_meta.json', bytes({ game_patch: '9.9', official: { sources: [{ source_identity: { game_patch: '9.8' } }] } })],
-    ['i18n/zh-TW/other.json', bytes({ _meta: { game_patch: '9.9' }, rows: [] })],
+    ['i18n/zh-CN/_meta.json', bytes({ game_patch: '9.9', official: { sources: [{ package_target: { game_patch: '9.8' },
+      source_identity: { game_patch: '9.8' }, client: { declared: { game_patch: '9.8' } } }] } })],
+    ['i18n/zh-TW/other.json', bytes({ target: TARGET, _meta: { game_patch: '9.9', target: TARGET }, rows: [] })],
   ]);
   const source = { directory: SOURCE_DIR, files };
   const { members } = packageMembers(TARGET, source);
@@ -162,6 +163,8 @@ test('package members reject stale patch identities while preserving source prov
     ['i18n/zh-CN/display_texts.json', { game_patch: '9.8', carried_from: ['9.8'] }, 'i18n/zh-CN/display_texts.json'],
     ['i18n/zh-CN/_meta.json', { game_patch: '9.8' }, 'i18n/zh-CN/_meta.json'],
     ['i18n/zh-TW/other.json', { _meta: { game_patch: '9.8' } }, 'i18n/zh-TW/other.json._meta'],
+    ['i18n/zh-TW/other.json', { target: { ...TARGET, game_patch: '9.8' } }, 'i18n/zh-TW/other.json.target'],
+    ['i18n/zh-TW/other.json', { _meta: { target: { ...TARGET, game_patch: '9.8' } } }, 'i18n/zh-TW/other.json._meta.target'],
   ]) {
     const stale = new Map(files).set(name, bytes(value));
     assert.throws(() => packageMembers(TARGET, { ...source, files: stale }),

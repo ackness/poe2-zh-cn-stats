@@ -66,7 +66,7 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 2. 新建源目录 `inputs/locale-<patch>-<n>/`：未改动的文件按原字节复制，改动的文件换成新字节，证据放
    `evidence/`，写新的 `manifest.json`。已有的 `inputs/` 目录不改。要替换的是 v2 配置发布的包时，复制的是
    那个包的成员（transform 之后的字节），并把它的 Release `receipt.json` 放进 `evidence/` 记录 transform。
-   换游戏补丁时，含目标 `game_patch` 的成员必须重新生成或更新目标身份；打包会拒绝顶层或 `_meta` 仍写旧补丁的文件。
+   换游戏补丁时，含目标 `game_patch` 的成员必须重新生成或更新目标身份；打包会拒绝顶层、`_meta` 或二者的 `target` 仍写旧补丁的文件。
    `display_texts.json` 用新目标重新生成，来源补丁由 `carried_from` 保留；嵌套的来源记录不改成目标补丁。
 3. 新建 `release/<patch>-<n>.json`（`<n>` 是要发布的序号），之后同新补丁第 4–10 步；配方从被替换包的配方
    复制，改动的成员用新的任务参数（例如 `display-texts` 的 `projection`）重新生成。改动正好是一种已有的

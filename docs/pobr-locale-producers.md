@@ -32,7 +32,7 @@ catalog 与投影相关字段：
 - catalog 的 `realm`、`locale` 必须与请求相同，`game_patch` 可以不同；catalog 与自己的 manifest
   仍须保持同一身份。查询库按来源补丁验证 catalog，不给来源重贴目标补丁号。输出的 `game_patch`
   始终取请求的目标；catalog 的 scope 保留来源英文，使用方仍须逐 ID 比较当前英文，英文改变时不采用旧译文，
-  literal 则只按完全相同的英文查询。
+  literal 则按英文或去掉引用标记后的显示文本查询；跨补丁的显示别名保留空白，空白变化不采用旧译文。
 - `library: {root, files}` 只有 v3 可以省略。省略时执行本 checkout `src/` 下的六个模块
   （`native-catalog`、`native-names`、`strict-json`、`native-catalog-binding`、
   `native-localization`、`native-catalog-fk-binding`），以它们的实际 SHA-256 作为

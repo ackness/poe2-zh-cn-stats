@@ -7,18 +7,18 @@ import { fileURLToPath } from 'node:url';
 import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-texts.mjs';
 import { pairDisplayCatalog } from '../../src/native-catalog.mjs';
 import { entryId, monsterTargets, validateOfficialNames } from '../../src/pobr/display-supplements.mjs';
-import { storedZip } from '../../src/release/stored-zip.mjs';
+import { readZip, storedZip } from '../../src/release/stored-zip.mjs';
 
 const row = (id, english, localized, extra = {}) => ({
   table: 'BaseItemTypes', field: 'Name', id, english, localized,
   templates: { english: { syntax_valid: true, placeholders: [], hash_slots: 0 } }, ...extra,
 });
-const project = records => projectDisplayTexts({ game_patch: 'test', realm: 'international', locale: 'zh-TW', records }, query => {
+const project = (records, options) => projectDisplayTexts({ game_patch: 'test', realm: 'international', locale: 'zh-TW', records }, query => {
   const match = records.find(r => r.table === query.table && r.field === query.field && r.id === query.id);
   assert.equal(query.english, match.english ?? '');
   return { status: match.localized === null ? 'fallback' : 'translated', text: match.localized ?? query.english,
     reason: match.localized === null ? 'unchanged-text' : null, ids: [match.id] };
-}, 'a'.repeat(64));
+}, 'a'.repeat(64), undefined, options);
 
 test('preserves scoped identity while blocking conflicting and incomplete English homonyms', () => {
   const { sidecar, conflicts } = project([
@@ -40,6 +40,20 @@ test('markup aliases and different tables participate in the same unscoped ambig
   assert.equal(sidecar.entries.Same, null);
   assert.equal(sidecar.entries.Unchanged, null);
   assert.equal(sidecar.entries.Agrees, '同');
+});
+
+test('carried catalog literals preserve whitespace in markup aliases and rejected candidates', () => {
+  const records = [row('plain', 'Flask ', '药剂 '), row('markup', ' [Skill|Fire]', ' [Skill|火焰]'),
+    row('rejected', null, null, { templates: { english: null }, candidates: { english: [{ text: ' Former ' }] } })];
+  const { sidecar } = project(records, { gamePatch: '9.9' });
+  assert.deepEqual(sidecar.entries, { 'Flask ': '药剂 ', ' [Skill|Fire]': ' [Skill|火焰]', ' Fire': '火焰', ' Former ': null });
+  assert.deepEqual(sidecar.scopes['BaseItemTypes.Name'].plain, ['Flask ', '药剂 ']);
+  assert.deepEqual(sidecar.carried_from, ['test']);
+  // Historical same-patch candidates keep their trimmed aliases and bytes.
+  const same = project(records).sidecar;
+  assert.equal(same.entries.Flask, '药剂');
+  assert.equal(same.entries.Fire, '火焰');
+  assert.equal(same.entries.Former, null);
 });
 
 test('retains unrendered placeholder, empty and unknown syntax records only in their source scope', () => {
@@ -739,6 +753,22 @@ test('createDisplayTexts reads names, official names and the game package only f
   assert.equal(receipt.official_elsewhere.skipped, 1);
   assert.equal(receipt.names.official.provenance.accepted_by, 'declared-realm-china');
   for (const file of ['names.json', 'official.json', 'pobr-game-test.zip']) assert.equal(typeof receipt.inputs[path.join(input.root, file)], 'object');
+  // A carried catalog does not change the patch required of a current official names file.
+  const currentOfficial = JSON.stringify({ ...JSON.parse(official), game_patch: '9.9' });
+  const currentGame = storedZip(new Map([...readZip(zip)]
+    .map(([name, { raw }]) => [name.replace('data/test/', 'data/9.9/'), raw])));
+  const current = { ...input.request, game_patch: '9.9',
+    official_names: { file: path.join(input.root, 'current-official.json'), ...input.write('current-official.json', currentOfficial) },
+    game_package: { file: path.join(input.root, 'current-game.zip'), ...input.write('current-game.zip', currentGame), asset: 'pobr-game-9.9.zip' } };
+  const carried = await createDisplayTexts(current, input.out + '-carried');
+  const carriedSidecar = JSON.parse(fs.readFileSync(path.join(input.out + '-carried', 'display_texts.json')));
+  assert.deepEqual(carriedSidecar, { ...sidecar, game_patch: '9.9', carried_from: ['test'] });
+  assert.deepEqual(carried.names.counts, receipt.names.counts);
+  assert.equal(carried.names.official.game_patch, '9.9');
+  const staleOfficial = JSON.stringify({ ...JSON.parse(official), game_patch: 'test' });
+  await assert.rejects(createDisplayTexts({ ...current,
+    official_names: { file: path.join(input.root, 'stale-official.json'), ...input.write('stale-official.json', staleOfficial) } },
+  input.out + '-stale-official'), /official names: game_patch test differs from 9\.9/u);
   input.request.official_names.sha256 = '0'.repeat(64);
   await assert.rejects(createDisplayTexts(input.request, input.out + '-bad'), /SHA256 mismatch/);
 });

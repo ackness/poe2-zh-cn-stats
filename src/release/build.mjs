@@ -273,9 +273,10 @@ export function packageMembers(target, source) {
     if (!name.startsWith('i18n/')) continue;
     require(name.split('/').length >= 3, `Invalid language member: ${name}`);
     const value = strictJson(raw);
-    // Member identity lives at the root or in its _meta envelope. Nested source provenance keeps
+    // Check document headers and their explicit target envelopes. Nested source provenance keeps
     // the real source patch, including official text carried from an older client.
-    for (const [location, identity] of [[name, value], [`${name}._meta`, value?._meta]]) {
+    for (const [location, identity] of [[name, value], [`${name}._meta`, value?._meta],
+      [`${name}.target`, value?.target], [`${name}._meta.target`, value?._meta?.target]]) {
       if (identity && Object.hasOwn(identity, 'game_patch')) require(identity.game_patch === target.game_patch,
         `${location}: game_patch ${JSON.stringify(identity.game_patch)} differs from target ${JSON.stringify(target.game_patch)}`);
     }

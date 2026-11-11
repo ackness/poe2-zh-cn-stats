@@ -36,7 +36,7 @@
 `manifest.json`（`pobr-build-data-part/v1`）。zip 用固定时间戳、STORED 写出，只取决于源字节和
 `target`；`receipt.json` 记录生产提交，每个提交都不同。
 
-打包时检查每个 `i18n/*` 成员顶层及其 `_meta` 对象中的 `game_patch`（包括 `_meta.json` 自身顶层）：
+打包时检查每个 `i18n/*` 成员顶层、`_meta` 及二者的 `target` 对象中的 `game_patch`（包括 `_meta.json` 自身顶层）：
 存在时必须等于配置的 `target.game_patch`。v2 transform 新增的成员也经过这项检查；失败信息包含成员路径、
 实际值和目标值。嵌套的来源记录（例如 `official.sources[].source_identity.game_patch`）保留实际来源补丁，
 不作为成员的目标身份。`display_texts.json` 沿用旧文本时应由生产者重新生成，写目标 `game_patch`，另记

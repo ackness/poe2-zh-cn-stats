@@ -44,8 +44,10 @@ export function validateProjection(projection) {
 // manifests record no producer to compare, so they must name their library.
 const localLibrary = () => ({ root: REPO_ROOT, files: Object.fromEntries(FK_LIBRARY_FILES.map(file =>
   [file, digest(fs.readFileSync(path.join(REPO_ROOT, file)))])) });
-const strip = text => text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu,
-  (_, key, label) => label ?? key).trim();
+const strip = (text, trim) => {
+  const display = text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu, (_, key, label) => label ?? key);
+  return trim ? display.trim() : display;
+};
 
 // The origin of a shown value: the reviewed-supplement lookup returns official | agent | human;
 // the plain catalog lookup returns none, which is official.
@@ -64,6 +66,8 @@ const ours = origin => origin !== null && origin !== 'official';
 export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection(),
   { gamePatch = catalog.game_patch, names = null, official = null, game = null, catalogIndexSha256 = null, packageTexts = null, tables = null } = {}) {
   validateProjection(projection);
+  // Preserve old same-patch bytes; carried text must not match a whitespace-only English change.
+  const englishAlias = text => strip(text, gamePatch === catalog.game_patch);
   const runtimeScopes = new Set(projection.scopes);
   const owned = new Set(tables?.scopes.keys() ?? []);
   for (const scope of owned) requireValue(runtimeScopes.has(scope), `official_tables: ${scope} is not in projection.scopes`);
@@ -136,7 +140,7 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     for (const english of new Set((row.candidates?.english ?? []).map(candidate => candidate.text))) {
       if (typeof english !== 'string' || !english.trim() || english === row.english) continue;
       add(english, null, identity);
-      const alias = strip(english);
+      const alias = englishAlias(english);
       if (alias && alias !== english) add(alias, null, identity);
     }
     if (!row.english?.trim()) continue;
@@ -148,8 +152,8 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     // The ordinary Web display removes reference markup. Preserve the raw key
     // too, and consider collisions introduced by stripping rather than choosing
     // a row, a table, or the last translation.
-    const english = strip(row.english);
-    if (english && english !== row.english) add(english, localized === null ? null : strip(localized), identity, origin);
+    const english = englishAlias(row.english);
+    if (english && english !== row.english) add(english, localized === null ? null : strip(localized, true), identity, origin);
   }
   const conflicts = [], entries = new Map(), originEntries = new Map();
   for (const [english, rows] of literalRows) {
@@ -166,12 +170,12 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     if (!scopes.has(scope)) scopes.set(scope, new Map());
     for (const [id, row] of tables.scopes.get(scope)) scopes.get(scope).set(id, row);
   }
-  const tableNames = owned.has(NAME_SCOPE) ? { format: 'official-tables', locale: catalog.locale, game_patch: catalog.game_patch,
+  const tableNames = owned.has(NAME_SCOPE) ? { format: 'official-tables', locale: catalog.locale, game_patch: gamePatch,
     client: {}, provenance: { accepted_by: 'official-tables' },
     names: new Map([...tables.scopes.get(NAME_SCOPE)].map(([id, [english, text]]) => [id, { english, text }])) } : null;
   const nameDecisions = names || official || tableNames
     ? projectNames({ names, official, tableNames, game, catalogIndexSha256, packageTexts, officialElsewhere, skipped },
-      catalog, runtimeScopes, identities, scopes, markScope) : null;
+      { game_patch: gamePatch, realm: catalog.realm, locale: catalog.locale }, runtimeScopes, identities, scopes, markScope) : null;
   const sidecar = { schema: 'pobr-native-display-texts/v1', game_patch: gamePatch,
     realm: catalog.realm, locale: catalog.locale, catalog_sha256: catalogSha256,
     entries: sorted(entries), scopes: sorted([...scopes].map(([key, rows]) => [key, sorted(rows)])) };
@@ -199,18 +203,18 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
 //   or the id is not in the game package, and `official-elsewhere` (skipped) when the package already
 //   has official text for its English (stat_lines, passive_names, a catalog value or an official name).
 function projectNames({ names, official, tableNames = null, game, catalogIndexSha256, packageTexts, officialElsewhere, skipped },
-  catalog, runtimeScopes, identities, scopes, markScope) {
+  target, runtimeScopes, identities, scopes, markScope) {
   requireValue(game?.targets instanceof Map, 'Monster names need the pinned game package (target English)');
   if (names) validateSupplements(names);
   // Official table names were already paired against the same target English (official-tables.mjs).
-  const officialNames = official ? validateOfficialNames(official, catalog, catalogIndexSha256) : tableNames;
+  const officialNames = official ? validateOfficialNames(official, target, catalogIndexSha256) : tableNames;
   const reviewed = new Map(), entries = [];
   for (const entry of names?.entries ?? []) {
     const { identity } = entry;
     if (identity.kind !== 'monster-name') continue;
     const decision = { entry_id: entry.entry_id, english: identity.english, origin: entry.origin };
     entries.push(decision);
-    if (identity.realm !== catalog.realm || identity.locale !== catalog.locale) { decision.lifecycle = 'other-target'; continue; }
+    if (identity.realm !== target.realm || identity.locale !== target.locale) { decision.lifecycle = 'other-target'; continue; }
     if (entry.status !== 'reviewed') { decision.lifecycle = entry.status; continue; }
     if (entry.based_on.game_package.sha256 !== game.sha256) decision.needs_review = 'based_on differs from the pinned game package';
     decision.ids = entry.ids.map(id => {
