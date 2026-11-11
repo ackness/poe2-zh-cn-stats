@@ -114,6 +114,12 @@ test('v2 build: the base package with its transforms applied; check pins the exp
   assert.deepEqual(build({ repo }).zip, built.zip);
 });
 
+test('v2 build rejects a stale game_patch introduced by a json transform', t => {
+  const { repo } = v2Fixture(t, { transforms: [{ ...TRANSFORMS[1], value: { game_patch: '9.8', fallback: ['zh-CN'] } }] });
+  assert.throws(() => build({ repo }),
+    { message: 'i18n/zh-TW/_meta.json: game_patch "9.8" differs from target "9.9"' });
+});
+
 test('v2 config: refuses unknown fields, bad transforms and a published tag for another sequence', t => {
   const { repo } = v2Fixture(t);
   const file = path.join(repo, 'release/9.9-2.json');

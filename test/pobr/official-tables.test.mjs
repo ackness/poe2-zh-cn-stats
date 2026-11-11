@@ -131,6 +131,10 @@ test('a scope official tables hold is theirs: catalog rows keep literals but no 
   const names = { schema: 'poe2-display-supplements/v1', corrections: [], entries: [ours('Wolf', ['Metadata/Wolf', 'Metadata/Wolf2'])] };
   const result = projectDisplayTexts({ game_patch: '9.9', realm: 'international', locale: 'zh-CN', records }, lookup, 'a'.repeat(64),
     projection, { tables, names, game, packageTexts: new Map() });
+  const carried = projectDisplayTexts({ game_patch: '9.8', realm: 'international', locale: 'zh-CN', records }, lookup, 'a'.repeat(64),
+    projection, { gamePatch: '9.9', tables, names, game, packageTexts: new Map() });
+  assert.deepEqual(carried.sidecar, { ...result.sidecar, carried_from: ['9.8'] });
+  assert.equal(carried.names.official.game_patch, '9.9');
   assert.deepEqual(result.sidecar.scopes, {
     'ActiveSkills.Description': { Bolt: ['Fires a [Bolt]', '发射一道[Bolt|闪电]'] },
     'MonsterVarieties.Name': { 'Metadata/Wolf': ['Wolf', '恶狼'] },
@@ -209,13 +213,55 @@ test('createDisplayTexts without a catalog (zh-TW): scopes only from official ta
     path.join(dir, 'out-pin')), /SHA256 mismatch/u);
   await assert.rejects(createDisplayTexts({ ...request, locale: 'zh-CN' }, path.join(dir, 'out-cn')), /is Traditional Chinese, not Simplified Chinese/u);
   await assert.rejects(createDisplayTexts({ ...request, game_package: undefined }, path.join(dir, 'out-game')), /need game_package/u);
-  // A table package of another patch than the request.
-  const old = tablePackage({ realm: 'international', language: 'Traditional Chinese', localizedDir: 'display-tables/traditional-chinese/',
-    tables: TABLES, gamePatch: '9.8' });
-  await assert.rejects(createDisplayTexts({ ...request, official_tables: [{ ...write('old.zip', old.zip), ...old.spec }] },
-    path.join(dir, 'out-patch')), /is game_patch 9\.8, not 9\.9/u);
   await assert.rejects(createDisplayTexts({ ...request, official_tables: [{ ...request.official_tables[0], scopes: ['Mods.Name'] }] },
     path.join(dir, 'out-scope')), /scopes lists distinct scopes of/u);
+});
+
+test('cross-patch official tables adopt only unchanged English and record every adopted source patch', async t => {
+  const { dir, write } = cache(t);
+  const scope = 'GemEffects.SupportText';
+  const game = storedZip({ 'data/9.9/overlay/gem_descriptions.json': Buffer.from(JSON.stringify(GEMS)) });
+  const sources = [
+    { tables: { GemEffects: { A: TABLES.GemEffects.A } } },
+    { gamePatch: '9.8', tag: 'inputs/9.8-1', tables: { GemEffects: {
+      A: ['Supports [Fire|fire] Skills ', '旧辅助'], B: ['English B', '乙'], E: ['Old English', '旧文'],
+      C: ['English C ', '末尾空格已变'],
+    } } },
+    { gamePatch: '9.7', tag: 'inputs/9.7-1', tables: { GemEffects: { D: ['English D', '丁'] } } },
+    { gamePatch: '9.8', tag: 'inputs/9.8-2', tables: { GemEffects: { G: ['Never localized', '已有译文'] } } },
+  ];
+  for (const locale of ['zh-CN', 'zh-TW']) {
+    const language = locale === 'zh-TW'
+      ? { realm: 'international', language: 'Traditional Chinese', localizedDir: 'display-tables/traditional-chinese/' } : {};
+    const official = sources.map((source, index) => {
+      const pkg = tablePackage({ ...source, ...language });
+      return { ...write(`${locale}-${index}.zip`, pkg.zip), ...pkg.spec };
+    });
+    const request = { schema: 'pobr-native-display-texts-request/v1', game_patch: '9.9', realm: 'international', locale,
+      projection: { scopes: [scope], literals: 'all-catalog-conflict-participants' },
+      game_package: { ...write(`game-${locale}.zip`, game), asset: 'pobr-game-9.9.zip' }, official_tables: official };
+    const out = path.join(dir, `out-${locale}`);
+    const receipt = await createDisplayTexts(request, out);
+    const sidecar = JSON.parse(fs.readFileSync(path.join(out, 'display_texts.json')));
+    assert.equal(sidecar.game_patch, '9.9');
+    assert.deepEqual(sidecar.carried_from, ['9.7', '9.8']);
+    assert.deepEqual(receipt.carried_from, sidecar.carried_from);
+    assert.deepEqual(sidecar.scopes[scope], { A: TABLES.GemEffects.A, B: ['English B', '乙'], D: ['English D', '丁'],
+      G: ['Never localized', '已有译文'] });
+    assert.deepEqual(receipt.official_tables.sources[1].counts[scope], counts({ adopted: 1, shadowed: 1, 'english-differs': 2 }));
+    assert.equal(receipt.official_tables.sources[1].localized.source_identity.game_patch, '9.8');
+    // Independent sources can be reordered without changing the deduplicated patch list or member bytes.
+    const reorderedOut = path.join(dir, `out-reordered-${locale}`);
+    await createDisplayTexts({ ...request, official_tables: [official[0], official[2], official[3], official[1]] }, reorderedOut);
+    assert.deepEqual(fs.readFileSync(path.join(reorderedOut, 'display_texts.json')), fs.readFileSync(path.join(out, 'display_texts.json')));
+    // Old sources that only shadow the current one do not mark the member as carried.
+    const shadow = tablePackage({ gamePatch: '9.6', tables: { GemEffects: { A: TABLES.GemEffects.A } }, ...language });
+    const shadowedOut = path.join(dir, `out-shadowed-${locale}`);
+    const shadowed = await createDisplayTexts({ ...request,
+      official_tables: [official[0], { ...write(`${locale}-shadow.zip`, shadow.zip), ...shadow.spec }] }, shadowedOut);
+    assert.equal(Object.hasOwn(JSON.parse(fs.readFileSync(path.join(shadowedOut, 'display_texts.json'))), 'carried_from'), false);
+    assert.equal(Object.hasOwn(shadowed, 'carried_from'), false);
+  }
 });
 
 test('gem targets come from a repoe-gem-descriptions/v1 member for the same patch', () => {

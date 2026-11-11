@@ -29,6 +29,10 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
 
 catalog 与投影相关字段：
 
+- catalog 的 `realm`、`locale` 必须与请求相同，`game_patch` 可以不同；catalog 与自己的 manifest
+  仍须保持同一身份。查询库按来源补丁验证 catalog，不给来源重贴目标补丁号。输出的 `game_patch`
+  始终取请求的目标；catalog 的 scope 保留来源英文，使用方仍须逐 ID 比较当前英文，英文改变时不采用旧译文，
+  literal 则按英文或去掉引用标记后的显示文本查询；跨补丁的显示别名保留空白，空白变化不采用旧译文。
 - `library: {root, files}` 只有 v3 可以省略。省略时执行本 checkout `src/` 下的六个模块
   （`native-catalog`、`native-names`、`strict-json`、`native-catalog-binding`、
   `native-localization`、`native-catalog-fk-binding`），以它们的实际 SHA-256 作为
@@ -85,7 +89,8 @@ catalog 与投影相关字段：
   `GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`，并且必须在 `projection.scopes` 里。
   服别跟着 locale：zh-CN 的表包必须是 `Simplified Chinese`、realm `china`；zh-TW 必须是 `Traditional Chinese`、
   realm `international`；英文表包与它同 realm。两个表包出自同一次客户端采集：`game_patch` 与 `source_lock_sha256`
-  必须相同（根 manifest 的 `target.game_patch` 也要一致），且 `game_patch` 等于请求的 `game_patch`。
+  必须相同（根 manifest 的 `target.game_patch` 也要一致）。来源补丁可以不同于请求目标，逐行按下面的英文条件决定是否采用；
+  `game_package` 及其中宝石说明的 `_meta.game_patch` 仍须对应请求目标。
 
   按表的 `Id` 列把同一包里的本地化行和英文行配对，只有同时满足以下条件才采用：该包的英文与**目标英文**逐字节相同（宝石说明取 `game_package` 的
   `data/<patch>/overlay/gem_descriptions.json`（`repoe-gem-descriptions/v1`，两个宝石 scope 都必须存在），怪物名取 `minions.json`、
@@ -141,6 +146,10 @@ receipt 的 `names.counts` 为 `{official, supplemented, superseded, retired, of
 
 输出包含两种查询视图，并按需附带来源标记：
 
+- `game_patch` 是请求的目标补丁；跨补丁沿用时，`carried_from` 列出来源补丁（去重、按字符串排序），例如
+  `{"game_patch": "9.9", "carried_from": ["9.8"]}`。来源包括 catalog 和至少采用一行的官方表来源；
+  仅被遮蔽或未采用的表来源不计入。`receipt.json` 同样记录 `carried_from`，表来源的完整身份仍在
+  `official_tables.sources`。来源都与目标同补丁时，sidecar 和 receipt 均省略该字段，同补丁成员字节不变。
 - `scopes["Table.Field"][stableKey] = [currentEnglish, translatedOrNull]` 只含投影
   声明的 scope。默认投影有四个：PoBR `web/src/lib/nativeDisplayNames.ts` 读取的
   `BaseItemTypes.Name`、`Characters.Name`、`Ascendancy.Name`，以及

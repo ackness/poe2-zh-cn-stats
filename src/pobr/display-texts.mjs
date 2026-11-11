@@ -44,8 +44,10 @@ export function validateProjection(projection) {
 // manifests record no producer to compare, so they must name their library.
 const localLibrary = () => ({ root: REPO_ROOT, files: Object.fromEntries(FK_LIBRARY_FILES.map(file =>
   [file, digest(fs.readFileSync(path.join(REPO_ROOT, file)))])) });
-const strip = text => text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu,
-  (_, key, label) => label ?? key).trim();
+const strip = (text, trim) => {
+  const display = text.replace(/\[([^\[\]|]+)(?:\|([^\[\]]*))?\]/gu, (_, key, label) => label ?? key);
+  return trim ? display.trim() : display;
+};
 
 // The origin of a shown value: the reviewed-supplement lookup returns official | agent | human;
 // the plain catalog lookup returns none, which is official.
@@ -62,8 +64,10 @@ const ours = origin => origin !== null && origin !== 'official';
 //   [english, text]}; each scope it holds is owned by it: catalog rows of that scope still give literals
 //   and decisions but no per-ID row. MonsterVarieties.Name rows are official names (as `official`).
 export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection(),
-  { names = null, official = null, game = null, catalogIndexSha256 = null, packageTexts = null, tables = null } = {}) {
+  { gamePatch = catalog.game_patch, names = null, official = null, game = null, catalogIndexSha256 = null, packageTexts = null, tables = null } = {}) {
   validateProjection(projection);
+  // Preserve old same-patch bytes; carried text must not match a whitespace-only English change.
+  const englishAlias = text => strip(text, gamePatch === catalog.game_patch);
   const runtimeScopes = new Set(projection.scopes);
   const owned = new Set(tables?.scopes.keys() ?? []);
   for (const scope of owned) requireValue(runtimeScopes.has(scope), `official_tables: ${scope} is not in projection.scopes`);
@@ -136,7 +140,7 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     for (const english of new Set((row.candidates?.english ?? []).map(candidate => candidate.text))) {
       if (typeof english !== 'string' || !english.trim() || english === row.english) continue;
       add(english, null, identity);
-      const alias = strip(english);
+      const alias = englishAlias(english);
       if (alias && alias !== english) add(alias, null, identity);
     }
     if (!row.english?.trim()) continue;
@@ -148,8 +152,8 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     // The ordinary Web display removes reference markup. Preserve the raw key
     // too, and consider collisions introduced by stripping rather than choosing
     // a row, a table, or the last translation.
-    const english = strip(row.english);
-    if (english && english !== row.english) add(english, localized === null ? null : strip(localized), identity, origin);
+    const english = englishAlias(row.english);
+    if (english && english !== row.english) add(english, localized === null ? null : strip(localized, true), identity, origin);
   }
   const conflicts = [], entries = new Map(), originEntries = new Map();
   for (const [english, rows] of literalRows) {
@@ -166,15 +170,21 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     if (!scopes.has(scope)) scopes.set(scope, new Map());
     for (const [id, row] of tables.scopes.get(scope)) scopes.get(scope).set(id, row);
   }
-  const tableNames = owned.has(NAME_SCOPE) ? { format: 'official-tables', locale: catalog.locale, game_patch: catalog.game_patch,
+  const tableNames = owned.has(NAME_SCOPE) ? { format: 'official-tables', locale: catalog.locale, game_patch: gamePatch,
     client: {}, provenance: { accepted_by: 'official-tables' },
     names: new Map([...tables.scopes.get(NAME_SCOPE)].map(([id, [english, text]]) => [id, { english, text }])) } : null;
   const nameDecisions = names || official || tableNames
     ? projectNames({ names, official, tableNames, game, catalogIndexSha256, packageTexts, officialElsewhere, skipped },
-      catalog, runtimeScopes, identities, scopes, markScope) : null;
-  const sidecar = { schema: 'pobr-native-display-texts/v1', game_patch: catalog.game_patch,
+      { game_patch: gamePatch, realm: catalog.realm, locale: catalog.locale }, runtimeScopes, identities, scopes, markScope) : null;
+  const sidecar = { schema: 'pobr-native-display-texts/v1', game_patch: gamePatch,
     realm: catalog.realm, locale: catalog.locale, catalog_sha256: catalogSha256,
     entries: sorted(entries), scopes: sorted([...scopes].map(([key, rows]) => [key, sorted(rows)])) };
+  // The catalog retains its source identity; scoped consumers still compare its English with the
+  // current English. Official table rows have already passed that comparison against game_package.
+  const carriedFrom = [...new Set([catalog.game_patch, ...(tables?.receipt?.sources ?? [])
+    .filter(source => Object.values(source.counts).some(counts => counts.adopted > 0))
+    .map(source => source.localized.source_identity.game_patch)])].filter(patch => patch !== gamePatch).sort();
+  if (carriedFrom.length) sidecar.carried_from = carriedFrom;
   if (originEntries.size || originScopes.size) {
     sidecar.origins = { entries: sorted(originEntries),
       scopes: sorted([...originScopes].map(([key, rows]) => [key, sorted(rows)])) };
@@ -193,18 +203,18 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
 //   or the id is not in the game package, and `official-elsewhere` (skipped) when the package already
 //   has official text for its English (stat_lines, passive_names, a catalog value or an official name).
 function projectNames({ names, official, tableNames = null, game, catalogIndexSha256, packageTexts, officialElsewhere, skipped },
-  catalog, runtimeScopes, identities, scopes, markScope) {
+  target, runtimeScopes, identities, scopes, markScope) {
   requireValue(game?.targets instanceof Map, 'Monster names need the pinned game package (target English)');
   if (names) validateSupplements(names);
   // Official table names were already paired against the same target English (official-tables.mjs).
-  const officialNames = official ? validateOfficialNames(official, catalog, catalogIndexSha256) : tableNames;
+  const officialNames = official ? validateOfficialNames(official, target, catalogIndexSha256) : tableNames;
   const reviewed = new Map(), entries = [];
   for (const entry of names?.entries ?? []) {
     const { identity } = entry;
     if (identity.kind !== 'monster-name') continue;
     const decision = { entry_id: entry.entry_id, english: identity.english, origin: entry.origin };
     entries.push(decision);
-    if (identity.realm !== catalog.realm || identity.locale !== catalog.locale) { decision.lifecycle = 'other-target'; continue; }
+    if (identity.realm !== target.realm || identity.locale !== target.locale) { decision.lifecycle = 'other-target'; continue; }
     if (entry.status !== 'reviewed') { decision.lifecycle = entry.status; continue; }
     if (entry.based_on.game_package.sha256 !== game.sha256) decision.needs_review = 'based_on differs from the pinned game package';
     decision.ids = entry.ids.map(id => {
@@ -298,7 +308,7 @@ async function readCatalog(request, reads) {
   ]).get(manifest.schema);
   requireValue(version && manifest.status === 'candidate'
     && manifest.production_ready === false && manifest.game === 'poe2', 'Invalid catalog manifest');
-  for (const field of ['game_patch', 'realm', 'locale']) requireValue(manifest[field] === request[field], `Catalog ${field} mismatch`);
+  for (const field of ['realm', 'locale']) requireValue(manifest[field] === request[field], `Catalog ${field} mismatch`);
   const fk = version === 'poe2-native-catalog/v3';
   requireValue(request.library || fk, 'v1/v2 catalogs require an explicit library closure');
   const library = request.library ?? localLibrary();
@@ -352,6 +362,7 @@ async function readCatalog(request, reads) {
   const { strictJson } = await import(pathToFileURL(path.join(library.root, 'src/strict-json.mjs')));
   const catalog = strictJson(bytes);
   requireValue(catalog.schema === version, 'Catalog schema differs from manifest');
+  for (const field of ['game_patch', 'realm', 'locale']) requireValue(catalog[field] === manifest[field], `Catalog ${field} differs from manifest`);
   if (fk) requireValue(catalog.fk_verification?.file === 'verification.json'
     && catalog.fk_verification.bytes === manifest.files['verification.json'].bytes
     && catalog.fk_verification.sha256 === manifest.files['verification.json'].sha256,
@@ -363,7 +374,7 @@ async function readCatalog(request, reads) {
       [{ bytes, sha256: manifest.files['catalog.json'].sha256, verification }],
       { bytes: reviewed.runtimeBytes, sha256: reviewed.runtimeSha256 })
     : (await import(pathToFileURL(path.join(library.root, 'src/native-catalog.mjs')))).createCatalogLookup(
-      catalog, { ...request, verification });
+      catalog, { ...request, game_patch: manifest.game_patch, verification });
   if (reviewed) {
     const runtime = strictJson(reviewed.runtimeBytes);
     requireValue(runtime.schema === 'poe2-reviewed-native-supplements/v1' && runtime.status === 'candidate'
@@ -377,6 +388,7 @@ async function readCatalog(request, reads) {
 
 export async function createDisplayTexts(request, out) {
   requireValue(request.schema === 'pobr-native-display-texts-request/v1', 'Invalid display request');
+  for (const field of ['game_patch', 'realm', 'locale']) requireValue(typeof request[field] === 'string' && request[field], `Invalid request ${field}`);
   const reads = new Map();
   // Official client-table sources (official-tables.mjs), newest first.
   const tableSpecs = request.official_tables;
@@ -392,7 +404,6 @@ export async function createDisplayTexts(request, out) {
   if (catalogLess) {
     requireValue(tableSpecs && request.supplement === undefined && request.library === undefined,
       'A display request without a catalog needs official_tables and takes no supplement or library');
-    for (const field of ['game_patch', 'realm', 'locale']) requireValue(typeof request[field] === 'string' && request[field], `Invalid request ${field}`);
     ({ strictJson } = await import('../strict-json.mjs'));
     catalog = { game_patch: request.game_patch, realm: request.realm, locale: request.locale, records: [] };
     lookup = () => { throw new Error('No catalog lookup without a catalog'); };
@@ -445,9 +456,8 @@ export async function createDisplayTexts(request, out) {
       return readOfficialTables(readPinned(spec.file, spec, reads), spec, request.locale);
     });
     // The sidecar realm is the package target (international for the zh-CN package too); the text's
-    // realm is checked per source (readOfficialTables). Each source must be of the target patch.
-    for (const source of sources) requireValue(source.source.localized.source_identity.game_patch === request.game_patch,
-      `official_tables: ${source.source.asset} is game_patch ${source.source.localized.source_identity.game_patch}, not ${request.game_patch}`);
+    // realm is checked per source (readOfficialTables). Source patches may differ: adoption depends
+    // on each row's English matching the target English, not on the source's patch label.
     const paired = pairOfficialTables(sources, targets);
     tables = { scopes: paired.scopes, receipt: { sources: sources.map((source, index) => ({ ...source.source, counts: paired.counts[index] })),
       adopted: Object.fromEntries([...paired.scopes].map(([scope, rows]) => [scope, rows.size])), missing: paired.missing } };
@@ -475,7 +485,7 @@ export async function createDisplayTexts(request, out) {
   }
   const catalogSha256 = catalogLess ? tableSpecs[0].localized_manifest_sha256 : manifest.files['catalog.json'].sha256;
   const projected = projectDisplayTexts(catalog, lookup, catalogSha256, projection,
-    { names, official, game, catalogIndexSha256: manifest?.observed_client?.index_sha256 ?? null, packageTexts, tables });
+    { gamePatch: request.game_patch, names, official, game, catalogIndexSha256: manifest?.observed_client?.index_sha256 ?? null, packageTexts, tables });
   for (const [file, pin] of [...reads]) readPinned(file, pin, reads);
   const output = path.resolve(out), cache = path.join(REPO_ROOT, '.cache');
   requireValue(output.startsWith(cache + path.sep) && !fs.existsSync(output), 'Output must be a fresh repository cache candidate');
@@ -484,6 +494,7 @@ export async function createDisplayTexts(request, out) {
   const raw = JSON.stringify(projected.sidecar) + '\n';
   fs.writeFileSync(path.join(output, 'display_texts.json'), raw, { flag: 'wx' });
   const receipt = { schema: 'pobr-native-display-texts-receipt/v1', adoption: 'not-adopted', request, library,
+    ...(projected.sidecar.carried_from ? { carried_from: projected.sidecar.carried_from } : {}),
     inputs: Object.fromEntries(reads), files: { 'display_texts.json': { bytes: Buffer.byteLength(raw), sha256: digest(raw) } },
     implementation_sha256: digest(fs.readFileSync(fileURLToPath(import.meta.url))),
     decisions: projected.decisions, conflicts: projected.conflicts,

@@ -272,6 +272,14 @@ export function packageMembers(target, source) {
   for (const [name, raw] of [...source.files].sort(([a], [b]) => (a < b ? -1 : 1))) {
     if (!name.startsWith('i18n/')) continue;
     require(name.split('/').length >= 3, `Invalid language member: ${name}`);
+    const value = strictJson(raw);
+    // Check document headers and their explicit target envelopes. Nested source provenance keeps
+    // the real source patch, including official text carried from an older client.
+    for (const [location, identity] of [[name, value], [`${name}._meta`, value?._meta],
+      [`${name}.target`, value?.target], [`${name}._meta.target`, value?._meta?.target]]) {
+      if (identity && Object.hasOwn(identity, 'game_patch')) require(identity.game_patch === target.game_patch,
+        `${location}: game_patch ${JSON.stringify(identity.game_patch)} differs from target ${JSON.stringify(target.game_patch)}`);
+    }
     const member = `data/${target.game_patch}/${name}`;
     members.set(member, raw);
     origins[member] = `${source.directory}/${name}`;
@@ -321,8 +329,7 @@ export function packageOf(repo, loaded) {
   const i18n = new Map([...base.members].map(([name, raw]) => [name.slice(prefix.length), raw]));
   const evidence = new Map([...base.source.files].filter(([name]) => name.startsWith('evidence/')));
   const { members: transformed, reports } = applyTransforms(config.transforms, i18n, evidence);
-  const members = new Map([...transformed].sort(([a], [b]) => (a < b ? -1 : 1)).map(([name, raw]) => [prefix + name, raw]));
-  const origins = Object.fromEntries([...members.keys()].map(name => [name, base.origins[name]]));
+  const { members, origins } = packageMembers(target, { ...base.source, files: transformed });
   for (const transform of config.transforms) origins[prefix + transform.member] = `transform:${transform.id}`;
   return {
     members, origins, source: base.source,

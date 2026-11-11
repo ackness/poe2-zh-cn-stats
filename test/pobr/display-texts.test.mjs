@@ -5,19 +5,20 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-texts.mjs';
+import { pairDisplayCatalog } from '../../src/native-catalog.mjs';
 import { entryId, monsterTargets, validateOfficialNames } from '../../src/pobr/display-supplements.mjs';
-import { storedZip } from '../../src/release/stored-zip.mjs';
+import { readZip, storedZip } from '../../src/release/stored-zip.mjs';
 
 const row = (id, english, localized, extra = {}) => ({
   table: 'BaseItemTypes', field: 'Name', id, english, localized,
   templates: { english: { syntax_valid: true, placeholders: [], hash_slots: 0 } }, ...extra,
 });
-const project = records => projectDisplayTexts({ game_patch: 'test', realm: 'international', locale: 'zh-TW', records }, query => {
+const project = (records, options) => projectDisplayTexts({ game_patch: 'test', realm: 'international', locale: 'zh-TW', records }, query => {
   const match = records.find(r => r.table === query.table && r.field === query.field && r.id === query.id);
   assert.equal(query.english, match.english ?? '');
   return { status: match.localized === null ? 'fallback' : 'translated', text: match.localized ?? query.english,
     reason: match.localized === null ? 'unchanged-text' : null, ids: [match.id] };
-}, 'a'.repeat(64));
+}, 'a'.repeat(64), undefined, options);
 
 test('preserves scoped identity while blocking conflicting and incomplete English homonyms', () => {
   const { sidecar, conflicts } = project([
@@ -39,6 +40,20 @@ test('markup aliases and different tables participate in the same unscoped ambig
   assert.equal(sidecar.entries.Same, null);
   assert.equal(sidecar.entries.Unchanged, null);
   assert.equal(sidecar.entries.Agrees, '同');
+});
+
+test('carried catalog literals preserve whitespace in markup aliases and rejected candidates', () => {
+  const records = [row('plain', 'Flask ', '药剂 '), row('markup', ' [Skill|Fire]', ' [Skill|火焰]'),
+    row('rejected', null, null, { templates: { english: null }, candidates: { english: [{ text: ' Former ' }] } })];
+  const { sidecar } = project(records, { gamePatch: '9.9' });
+  assert.deepEqual(sidecar.entries, { 'Flask ': '药剂 ', ' [Skill|Fire]': ' [Skill|火焰]', ' Fire': '火焰', ' Former ': null });
+  assert.deepEqual(sidecar.scopes['BaseItemTypes.Name'].plain, ['Flask ', '药剂 ']);
+  assert.deepEqual(sidecar.carried_from, ['test']);
+  // Historical same-patch candidates keep their trimmed aliases and bytes.
+  const same = project(records).sidecar;
+  assert.equal(same.entries.Flask, '药剂');
+  assert.equal(same.entries.Fire, '火焰');
+  assert.equal(same.entries.Former, null);
 });
 
 test('retains unrendered placeholder, empty and unknown syntax records only in their source scope', () => {
@@ -228,6 +243,45 @@ test('pinned catalog versions admit their complete library closures without chan
     assert.equal(receipt.decisions.length, 0);
     assert.equal(JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json'))).locale, 'zh-CN');
   }
+});
+
+test('a carried catalog keeps its pinned source identity and writes the requested target patch', async t => {
+  const input = fixture(t, 1, 6);
+  const tables = (Name, Inflection) => ({ BaseItemTypes: { table: 'BaseItemTypes',
+    rows: [{ _row: 0, values: { Id: 'flask', Name, Inflection, ItemClass: 'Flask' } }] } });
+  Object.assign(input.catalog, { game: 'poe2', status: 'candidate', production_ready: false,
+    language: 'Simplified Chinese', game_patch: '9.8',
+    ...pairDisplayCatalog(tables('Flask', 'Flask'), tables('药剂', '药剂'), 'Simplified Chinese', ['BaseItemTypes']) });
+  input.manifest.game_patch = input.catalog.game_patch;
+  input.manifest.files['catalog.json'] = input.write('catalog.json', JSON.stringify(input.catalog));
+  Object.assign(input.request.catalog, input.write('manifest.json', JSON.stringify(input.manifest)));
+  // Run the real frozen lookup: initializing it with the new target patch would reject this catalog.
+  input.request.library = { root: fileURLToPath(new URL('../..', import.meta.url)),
+    files: Object.fromEntries(Object.keys(input.library.files).map(file => [file,
+      input.pin(fs.readFileSync(new URL(`../../${file}`, import.meta.url))).sha256])) };
+  const read = out => fs.readFileSync(path.join(out, 'display_texts.json'), 'utf8');
+  const same = await createDisplayTexts({ ...input.request, game_patch: '9.8' }, input.out);
+  const original = read(input.out), sidecar = JSON.parse(original);
+  assert.equal(sidecar.game_patch, '9.8');
+  assert.equal(Object.hasOwn(sidecar, 'carried_from'), false);
+  assert.equal(Object.hasOwn(same, 'carried_from'), false);
+  assert.deepEqual(sidecar.scopes['BaseItemTypes.Name'].flask, ['Flask', '药剂']);
+
+  const carried = await createDisplayTexts({ ...input.request, game_patch: '9.9' }, input.out + '-new');
+  assert.deepEqual(JSON.parse(read(input.out + '-new')), { ...sidecar, game_patch: '9.9', carried_from: ['9.8'] });
+  assert.deepEqual(carried.carried_from, ['9.8']);
+  assert.deepEqual(carried.decisions, same.decisions);
+  // A later same-patch request retains the old bytes: there is no shared mutable target state.
+  await createDisplayTexts({ ...input.request, game_patch: '9.8' }, input.out + '-same');
+  assert.equal(read(input.out + '-same'), original);
+  for (const [field, value] of [['realm', 'china'], ['locale', 'zh-TW']]) {
+    await assert.rejects(createDisplayTexts({ ...input.request, game_patch: '9.9', [field]: value }, input.out + '-bad'),
+      new RegExp(`Catalog ${field} mismatch`, 'u'));
+  }
+  input.manifest.game_patch = '9.7';
+  Object.assign(input.request.catalog, input.write('manifest.json', JSON.stringify(input.manifest)));
+  await assert.rejects(createDisplayTexts({ ...input.request, game_patch: '9.9' }, input.out + '-manifest'),
+    /Catalog game_patch differs from manifest/u);
 });
 
 test('v3 requires the original pinned verification buffer and complete six-module closure', async t => {
@@ -699,6 +753,22 @@ test('createDisplayTexts reads names, official names and the game package only f
   assert.equal(receipt.official_elsewhere.skipped, 1);
   assert.equal(receipt.names.official.provenance.accepted_by, 'declared-realm-china');
   for (const file of ['names.json', 'official.json', 'pobr-game-test.zip']) assert.equal(typeof receipt.inputs[path.join(input.root, file)], 'object');
+  // A carried catalog does not change the patch required of a current official names file.
+  const currentOfficial = JSON.stringify({ ...JSON.parse(official), game_patch: '9.9' });
+  const currentGame = storedZip(new Map([...readZip(zip)]
+    .map(([name, { raw }]) => [name.replace('data/test/', 'data/9.9/'), raw])));
+  const current = { ...input.request, game_patch: '9.9',
+    official_names: { file: path.join(input.root, 'current-official.json'), ...input.write('current-official.json', currentOfficial) },
+    game_package: { file: path.join(input.root, 'current-game.zip'), ...input.write('current-game.zip', currentGame), asset: 'pobr-game-9.9.zip' } };
+  const carried = await createDisplayTexts(current, input.out + '-carried');
+  const carriedSidecar = JSON.parse(fs.readFileSync(path.join(input.out + '-carried', 'display_texts.json')));
+  assert.deepEqual(carriedSidecar, { ...sidecar, game_patch: '9.9', carried_from: ['test'] });
+  assert.deepEqual(carried.names.counts, receipt.names.counts);
+  assert.equal(carried.names.official.game_patch, '9.9');
+  const staleOfficial = JSON.stringify({ ...JSON.parse(official), game_patch: 'test' });
+  await assert.rejects(createDisplayTexts({ ...current,
+    official_names: { file: path.join(input.root, 'stale-official.json'), ...input.write('stale-official.json', staleOfficial) } },
+  input.out + '-stale-official'), /official names: game_patch test differs from 9\.9/u);
   input.request.official_names.sha256 = '0'.repeat(64);
   await assert.rejects(createDisplayTexts(input.request, input.out + '-bad'), /SHA256 mismatch/);
 });
