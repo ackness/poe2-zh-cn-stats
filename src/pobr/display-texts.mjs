@@ -62,7 +62,7 @@ const ours = origin => origin !== null && origin !== 'official';
 //   [english, text]}; each scope it holds is owned by it: catalog rows of that scope still give literals
 //   and decisions but no per-ID row. MonsterVarieties.Name rows are official names (as `official`).
 export function projectDisplayTexts(catalog, lookup, catalogSha256, projection = defaultProjection(),
-  { names = null, official = null, game = null, catalogIndexSha256 = null, packageTexts = null, tables = null } = {}) {
+  { gamePatch = catalog.game_patch, names = null, official = null, game = null, catalogIndexSha256 = null, packageTexts = null, tables = null } = {}) {
   validateProjection(projection);
   const runtimeScopes = new Set(projection.scopes);
   const owned = new Set(tables?.scopes.keys() ?? []);
@@ -172,9 +172,15 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
   const nameDecisions = names || official || tableNames
     ? projectNames({ names, official, tableNames, game, catalogIndexSha256, packageTexts, officialElsewhere, skipped },
       catalog, runtimeScopes, identities, scopes, markScope) : null;
-  const sidecar = { schema: 'pobr-native-display-texts/v1', game_patch: catalog.game_patch,
+  const sidecar = { schema: 'pobr-native-display-texts/v1', game_patch: gamePatch,
     realm: catalog.realm, locale: catalog.locale, catalog_sha256: catalogSha256,
     entries: sorted(entries), scopes: sorted([...scopes].map(([key, rows]) => [key, sorted(rows)])) };
+  // The catalog retains its source identity; scoped consumers still compare its English with the
+  // current English. Official table rows have already passed that comparison against game_package.
+  const carriedFrom = [...new Set([catalog.game_patch, ...(tables?.receipt?.sources ?? [])
+    .filter(source => Object.values(source.counts).some(counts => counts.adopted > 0))
+    .map(source => source.localized.source_identity.game_patch)])].filter(patch => patch !== gamePatch).sort();
+  if (carriedFrom.length) sidecar.carried_from = carriedFrom;
   if (originEntries.size || originScopes.size) {
     sidecar.origins = { entries: sorted(originEntries),
       scopes: sorted([...originScopes].map(([key, rows]) => [key, sorted(rows)])) };
@@ -298,7 +304,7 @@ async function readCatalog(request, reads) {
   ]).get(manifest.schema);
   requireValue(version && manifest.status === 'candidate'
     && manifest.production_ready === false && manifest.game === 'poe2', 'Invalid catalog manifest');
-  for (const field of ['game_patch', 'realm', 'locale']) requireValue(manifest[field] === request[field], `Catalog ${field} mismatch`);
+  for (const field of ['realm', 'locale']) requireValue(manifest[field] === request[field], `Catalog ${field} mismatch`);
   const fk = version === 'poe2-native-catalog/v3';
   requireValue(request.library || fk, 'v1/v2 catalogs require an explicit library closure');
   const library = request.library ?? localLibrary();
@@ -352,6 +358,7 @@ async function readCatalog(request, reads) {
   const { strictJson } = await import(pathToFileURL(path.join(library.root, 'src/strict-json.mjs')));
   const catalog = strictJson(bytes);
   requireValue(catalog.schema === version, 'Catalog schema differs from manifest');
+  for (const field of ['game_patch', 'realm', 'locale']) requireValue(catalog[field] === manifest[field], `Catalog ${field} differs from manifest`);
   if (fk) requireValue(catalog.fk_verification?.file === 'verification.json'
     && catalog.fk_verification.bytes === manifest.files['verification.json'].bytes
     && catalog.fk_verification.sha256 === manifest.files['verification.json'].sha256,
@@ -363,7 +370,7 @@ async function readCatalog(request, reads) {
       [{ bytes, sha256: manifest.files['catalog.json'].sha256, verification }],
       { bytes: reviewed.runtimeBytes, sha256: reviewed.runtimeSha256 })
     : (await import(pathToFileURL(path.join(library.root, 'src/native-catalog.mjs')))).createCatalogLookup(
-      catalog, { ...request, verification });
+      catalog, { ...request, game_patch: manifest.game_patch, verification });
   if (reviewed) {
     const runtime = strictJson(reviewed.runtimeBytes);
     requireValue(runtime.schema === 'poe2-reviewed-native-supplements/v1' && runtime.status === 'candidate'
@@ -377,6 +384,7 @@ async function readCatalog(request, reads) {
 
 export async function createDisplayTexts(request, out) {
   requireValue(request.schema === 'pobr-native-display-texts-request/v1', 'Invalid display request');
+  for (const field of ['game_patch', 'realm', 'locale']) requireValue(typeof request[field] === 'string' && request[field], `Invalid request ${field}`);
   const reads = new Map();
   // Official client-table sources (official-tables.mjs), newest first.
   const tableSpecs = request.official_tables;
@@ -392,7 +400,6 @@ export async function createDisplayTexts(request, out) {
   if (catalogLess) {
     requireValue(tableSpecs && request.supplement === undefined && request.library === undefined,
       'A display request without a catalog needs official_tables and takes no supplement or library');
-    for (const field of ['game_patch', 'realm', 'locale']) requireValue(typeof request[field] === 'string' && request[field], `Invalid request ${field}`);
     ({ strictJson } = await import('../strict-json.mjs'));
     catalog = { game_patch: request.game_patch, realm: request.realm, locale: request.locale, records: [] };
     lookup = () => { throw new Error('No catalog lookup without a catalog'); };
@@ -445,9 +452,8 @@ export async function createDisplayTexts(request, out) {
       return readOfficialTables(readPinned(spec.file, spec, reads), spec, request.locale);
     });
     // The sidecar realm is the package target (international for the zh-CN package too); the text's
-    // realm is checked per source (readOfficialTables). Each source must be of the target patch.
-    for (const source of sources) requireValue(source.source.localized.source_identity.game_patch === request.game_patch,
-      `official_tables: ${source.source.asset} is game_patch ${source.source.localized.source_identity.game_patch}, not ${request.game_patch}`);
+    // realm is checked per source (readOfficialTables). Source patches may differ: adoption depends
+    // on each row's English matching the target English, not on the source's patch label.
     const paired = pairOfficialTables(sources, targets);
     tables = { scopes: paired.scopes, receipt: { sources: sources.map((source, index) => ({ ...source.source, counts: paired.counts[index] })),
       adopted: Object.fromEntries([...paired.scopes].map(([scope, rows]) => [scope, rows.size])), missing: paired.missing } };
@@ -475,7 +481,7 @@ export async function createDisplayTexts(request, out) {
   }
   const catalogSha256 = catalogLess ? tableSpecs[0].localized_manifest_sha256 : manifest.files['catalog.json'].sha256;
   const projected = projectDisplayTexts(catalog, lookup, catalogSha256, projection,
-    { names, official, game, catalogIndexSha256: manifest?.observed_client?.index_sha256 ?? null, packageTexts, tables });
+    { gamePatch: request.game_patch, names, official, game, catalogIndexSha256: manifest?.observed_client?.index_sha256 ?? null, packageTexts, tables });
   for (const [file, pin] of [...reads]) readPinned(file, pin, reads);
   const output = path.resolve(out), cache = path.join(REPO_ROOT, '.cache');
   requireValue(output.startsWith(cache + path.sep) && !fs.existsSync(output), 'Output must be a fresh repository cache candidate');
@@ -484,6 +490,7 @@ export async function createDisplayTexts(request, out) {
   const raw = JSON.stringify(projected.sidecar) + '\n';
   fs.writeFileSync(path.join(output, 'display_texts.json'), raw, { flag: 'wx' });
   const receipt = { schema: 'pobr-native-display-texts-receipt/v1', adoption: 'not-adopted', request, library,
+    ...(projected.sidecar.carried_from ? { carried_from: projected.sidecar.carried_from } : {}),
     inputs: Object.fromEntries(reads), files: { 'display_texts.json': { bytes: Buffer.byteLength(raw), sha256: digest(raw) } },
     implementation_sha256: digest(fs.readFileSync(fileURLToPath(import.meta.url))),
     decisions: projected.decisions, conflicts: projected.conflicts,

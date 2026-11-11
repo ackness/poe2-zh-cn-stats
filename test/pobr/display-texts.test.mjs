@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-texts.mjs';
+import { pairDisplayCatalog } from '../../src/native-catalog.mjs';
 import { entryId, monsterTargets, validateOfficialNames } from '../../src/pobr/display-supplements.mjs';
 import { storedZip } from '../../src/release/stored-zip.mjs';
 
@@ -228,6 +229,45 @@ test('pinned catalog versions admit their complete library closures without chan
     assert.equal(receipt.decisions.length, 0);
     assert.equal(JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json'))).locale, 'zh-CN');
   }
+});
+
+test('a carried catalog keeps its pinned source identity and writes the requested target patch', async t => {
+  const input = fixture(t, 1, 6);
+  const tables = (Name, Inflection) => ({ BaseItemTypes: { table: 'BaseItemTypes',
+    rows: [{ _row: 0, values: { Id: 'flask', Name, Inflection, ItemClass: 'Flask' } }] } });
+  Object.assign(input.catalog, { game: 'poe2', status: 'candidate', production_ready: false,
+    language: 'Simplified Chinese', game_patch: '9.8',
+    ...pairDisplayCatalog(tables('Flask', 'Flask'), tables('药剂', '药剂'), 'Simplified Chinese', ['BaseItemTypes']) });
+  input.manifest.game_patch = input.catalog.game_patch;
+  input.manifest.files['catalog.json'] = input.write('catalog.json', JSON.stringify(input.catalog));
+  Object.assign(input.request.catalog, input.write('manifest.json', JSON.stringify(input.manifest)));
+  // Run the real frozen lookup: initializing it with the new target patch would reject this catalog.
+  input.request.library = { root: fileURLToPath(new URL('../..', import.meta.url)),
+    files: Object.fromEntries(Object.keys(input.library.files).map(file => [file,
+      input.pin(fs.readFileSync(new URL(`../../${file}`, import.meta.url))).sha256])) };
+  const read = out => fs.readFileSync(path.join(out, 'display_texts.json'), 'utf8');
+  const same = await createDisplayTexts({ ...input.request, game_patch: '9.8' }, input.out);
+  const original = read(input.out), sidecar = JSON.parse(original);
+  assert.equal(sidecar.game_patch, '9.8');
+  assert.equal(Object.hasOwn(sidecar, 'carried_from'), false);
+  assert.equal(Object.hasOwn(same, 'carried_from'), false);
+  assert.deepEqual(sidecar.scopes['BaseItemTypes.Name'].flask, ['Flask', '药剂']);
+
+  const carried = await createDisplayTexts({ ...input.request, game_patch: '9.9' }, input.out + '-new');
+  assert.deepEqual(JSON.parse(read(input.out + '-new')), { ...sidecar, game_patch: '9.9', carried_from: ['9.8'] });
+  assert.deepEqual(carried.carried_from, ['9.8']);
+  assert.deepEqual(carried.decisions, same.decisions);
+  // A later same-patch request retains the old bytes: there is no shared mutable target state.
+  await createDisplayTexts({ ...input.request, game_patch: '9.8' }, input.out + '-same');
+  assert.equal(read(input.out + '-same'), original);
+  for (const [field, value] of [['realm', 'china'], ['locale', 'zh-TW']]) {
+    await assert.rejects(createDisplayTexts({ ...input.request, game_patch: '9.9', [field]: value }, input.out + '-bad'),
+      new RegExp(`Catalog ${field} mismatch`, 'u'));
+  }
+  input.manifest.game_patch = '9.7';
+  Object.assign(input.request.catalog, input.write('manifest.json', JSON.stringify(input.manifest)));
+  await assert.rejects(createDisplayTexts({ ...input.request, game_patch: '9.9' }, input.out + '-manifest'),
+    /Catalog game_patch differs from manifest/u);
 });
 
 test('v3 requires the original pinned verification buffer and complete six-module closure', async t => {

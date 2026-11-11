@@ -6,7 +6,7 @@ import path from 'node:path';
 import { strictJson } from '../../src/strict-json.mjs';
 import { crc32, readZip, storedZip } from '../../src/release/stored-zip.mjs';
 import {
-  ROOT, build, check, checkRelease, defaultConfig, download, loadConfig, pin, releaseUrl, remoteLocaleTags, sha256, unpinnedTags,
+  ROOT, build, check, checkRelease, defaultConfig, download, loadConfig, packageMembers, pin, releaseUrl, remoteLocaleTags, sha256, unpinnedTags,
 } from '../../src/release/build.mjs';
 import { SOURCE_DIR, SOURCE_FILES, TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
@@ -147,6 +147,26 @@ test('build: refuses changed, unlisted or mislabelled source bytes', t => {
   assert.throws(() => build({ repo, out: path.join(repo, 'release') }), /Output must be under \.cache/u);
   write(repo, '.cache/occupied/file', 'x');
   assert.throws(() => build({ repo, out: path.join(repo, '.cache/occupied') }), /non-release directory/u);
+});
+
+test('package members reject stale patch identities while preserving source provenance and exact bytes', () => {
+  const files = new Map([
+    ['i18n/zh-CN/display_texts.json', bytes({ game_patch: '9.9', carried_from: ['9.8'], entries: {}, scopes: {} })],
+    ['i18n/zh-CN/_meta.json', bytes({ game_patch: '9.9', official: { sources: [{ source_identity: { game_patch: '9.8' } }] } })],
+    ['i18n/zh-TW/other.json', bytes({ _meta: { game_patch: '9.9' }, rows: [] })],
+  ]);
+  const source = { directory: SOURCE_DIR, files };
+  const { members } = packageMembers(TARGET, source);
+  for (const [name, raw] of files) assert.equal(members.get(`data/9.9/${name}`), raw);
+  for (const [name, value, location] of [
+    ['i18n/zh-CN/display_texts.json', { game_patch: '9.8', carried_from: ['9.8'] }, 'i18n/zh-CN/display_texts.json'],
+    ['i18n/zh-CN/_meta.json', { game_patch: '9.8' }, 'i18n/zh-CN/_meta.json'],
+    ['i18n/zh-TW/other.json', { _meta: { game_patch: '9.8' } }, 'i18n/zh-TW/other.json._meta'],
+  ]) {
+    const stale = new Map(files).set(name, bytes(value));
+    assert.throws(() => packageMembers(TARGET, { ...source, files: stale }),
+      { message: `${location}: game_patch "9.8" differs from target "9.9"` });
+  }
 });
 
 test('check: clean, origin tree and published pin', async t => {
