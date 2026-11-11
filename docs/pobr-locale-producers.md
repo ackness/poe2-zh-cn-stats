@@ -27,6 +27,8 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
 执行的模块与默认投影文件都先校验摘要，生成后再复核一次。输入没有固定字节上限，
 但声明的字节数、实际大小和 SHA-256 必须一致。
 
+catalog 与投影相关字段：
+
 - `library: {root, files}` 只有 v3 可以省略。省略时执行本 checkout `src/` 下的六个模块
   （`native-catalog`、`native-names`、`strict-json`、`native-catalog-binding`、
   `native-localization`、`native-catalog-fk-binding`），以它们的实际 SHA-256 作为
@@ -51,6 +53,9 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   （见[语言包配置参考](release-config.md#重新生成配方releaseregeneratepatchjson)）。
   唯一支持的 literal 策略是 `all-catalog-conflict-participants`：选择 scope 不会
   把未解决或冲突的记录移出 literal 歧义检查。
+
+名称与官方客户端表相关字段：
+
 - `names: {file, bytes, sha256}` 可选，指向固定的
   [`curation/display-supplements.json`](../curation/display-supplements.json)（见
   [显示补译与来源标记](translation-workbench.md#显示补译与来源标记)）。其中与请求同 realm、locale 的
@@ -80,25 +85,29 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   `GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`，并且必须在 `projection.scopes` 里。
   服别跟着 locale：zh-CN 的表包必须是 `Simplified Chinese`、realm `china`；zh-TW 必须是 `Traditional Chinese`、
   realm `international`；英文表包与它同 realm。两个表包出自同一次客户端采集：`game_patch` 与 `source_lock_sha256`
-  必须相同（根 manifest 的 `target.game_patch` 也要一致），且 `game_patch` 等于请求的 `game_patch`。按表的 `Id` 列把同一包里的本地化行和英文行配对，只有同时满足以下
-  条件才采用：该包的英文与**目标英文**逐字节相同（宝石说明取 `game_package` 的
+  必须相同（根 manifest 的 `target.game_patch` 也要一致），且 `game_patch` 等于请求的 `game_patch`。
+
+  按表的 `Id` 列把同一包里的本地化行和英文行配对，只有同时满足以下条件才采用：该包的英文与**目标英文**逐字节相同（宝石说明取 `game_package` 的
   `data/<patch>/overlay/gem_descriptions.json`（`repoe-gem-descriptions/v1`，两个宝石 scope 都必须存在），怪物名取 `minions.json`、
   `spectres.json`）；译文非空、不同于英文、含汉字。写入 `scopes[scope][id] = [目标英文, 译文]`，标记
   （`[A|B]`、`[A]`、末尾空格、偶尔的 `\r\n`）原样保留，由使用方渲染。标记只允许 `[A]` 与 `[A|B]`（`A` 非空）：目标英文的 `[`、`]` 不成对、嵌套、
   含两个以上 `|`（`[A|B|C]`）或键为空（`[]`、`[|B]`）时整次报错，新的标记形式不会悄悄出货；只有译文这样（客户端笔误，
   例如国际服繁中 `herald_of_blood` 的 `[BloodLoss|失血影響。`、`frost_darts` 的 `[Projectile|Projectiles|投射物]`）时
   不采用该 ID，记 `broken-markup`。不满足的 ID **省略，不写 `null`**：PoBR 把 `null` 当作“显示英文”，会挡住 zh-TW
-  回退到转换后的 zh-CN。每个 ID 由第一个采用它的来源决定。receipt 的 `official_tables` 按来源、按 scope 记
+  回退到转换后的 zh-CN。每个 ID 由第一个采用它的来源决定。
+
+  receipt 的 `official_tables` 按来源、按 scope 记
   `adopted`、`shadowed`、`not-in-game`、`ambiguous-target`、`ambiguous-id`、`no-default-row`、`english-differs`、
   `untranslated`、`no-han`、`broken-markup`，以及每个 scope 采用数与缺少的目标 ID 数；某个 scope 一行都没采用时整次报错（否则
-  catalog 里该 scope 的行会被悄悄丢掉）。官方表持有的 scope 归它：catalog
+  catalog 里该 scope 的行会被悄悄丢掉）。
+
+  官方表持有的 scope 归它：catalog
   里该 scope 的行仍参与 literal 与 decision，但不写逐 ID 行（计 `owned_catalog_rows`）；采用的表行与 catalog 官方值
   一样算“官方文本已有”：我们的 catalog 补译遇到同一英文时跳过（`skipped`，`source: "official-tables"`）；`MonsterVarieties.Name`
   的表行按官方名处理，我们同 ID 的补译记 `superseded`，与 `official_names` 不能同时给出。
+
   **没有 catalog 时**（zh-TW）省略 `catalog`，此时不能有 `supplement`、`library`：`entries` 为空，逐 ID scope 只来自
   `official_tables`，`catalog_sha256` 是最新来源的本地化表 `manifest.json` 的 SHA-256（PoBR 只检查形状）。
-  例：国服 `inputs/0.5.5.5-1` 对 `game/0.5.5.5-3` 采用 `GemEffects.SupportText` 612 条、`ActiveSkills.Description`
-  440 条、`MonsterVarieties.Name` 648 条（`Wolf Companion` → 恶狼同伴；国际服繁中为 狼盟友）。
 - `package_texts: {stat_lines, passive_names}`（各为 `{file, bytes, sha256}`）：同一语言包里的官方文本，
   `stat_lines` 用作底的 `stat_lines.json`（只取不带 `origin` 的行），`passive_names` 用 `passive_names.json`。
   有已审核的怪物名要决定时，或 catalog 查询返回我们的补译（reviewed supplement）时必填（重新生成配方给出
@@ -111,25 +120,26 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   （`kind`、`identity`、`english`、`origin`、我们的 `text`、`official`、`source`）。例：-3 的 `display_texts.json`
   里 `Bulwark` 为 `null`，而 `stat_lines.json` 有官方 `壁垒`，补译不能填它。
 
-  怪物名逐 ID 按目标英文决定：
-  - catalog 自身有该 ID 的行时 catalog 优先（官方名记 `catalog-row`，补译记 `superseded`，`by: "catalog"`）。
-  - 补译所针对的英文与目标英文不同时记 `retired`（即使该 ID 有官方名出货）。
-  - 官方名的英文等于目标英文、且非空、不同于英文：写入 `[english, 官方名]`，不写 `origins`；
-    我们对该 ID 的补译记 `superseded`（`by: "official-names"`、官方文本、`supplement_differs`）。
-  - 同一英文已有官方译文（见上面 `package_texts`，含其他 ID 已采用的官方名）：`official-elsewhere`，不出货。
-  - 官方名的英文与目标英文不同：不采用，记入 `names.official.not_applied["english-differs"]`
-    （`official_english`、`target_english`）；该 ID 不在游戏包里只计数（`not-in-game`），目标不确定记
-    `ambiguous-target`，空或与英文相同记 `untranslated`。
-  - 没有采用官方名时，我们的补译只在其英文等于目标英文时出货（`supplemented`，写 `origins`）；否则记
-    `retired`（`reason` 为 `english-differs`、`not-in-game` 或 `ambiguous-target`，并写 `target_english`），
-    记录仍保留在 curation。
-  - 补译的 `based_on.game_package.sha256` 与固定的游戏包不同时标 `needs_review`。
+怪物名逐 ID 按目标英文决定：
 
-  receipt 的 `names.counts` 为 `{official, supplemented, superseded, retired, official-elsewhere}`（按 ID 计），
-  并记录游戏包 SHA-256。`not_applied["not-in-game"]` 是计数，其余键是 ID 列表。
-  两个输入都不给时行为不变，也不需要游戏包。
+- catalog 自身有该 ID 的行时 catalog 优先（官方名记 `catalog-row`，补译记 `superseded`，`by: "catalog"`）。
+- 补译所针对的英文与目标英文不同时记 `retired`（即使该 ID 有官方名出货）。
+- 官方名的英文等于目标英文、且非空、不同于英文：写入 `[english, 官方名]`，不写 `origins`；
+  我们对该 ID 的补译记 `superseded`（`by: "official-names"`、官方文本、`supplement_differs`）。
+- 同一英文已有官方译文（见上面 `package_texts`，含其他 ID 已采用的官方名）：`official-elsewhere`，不出货。
+- 官方名的英文与目标英文不同：不采用，记入 `names.official.not_applied["english-differs"]`
+  （`official_english`、`target_english`）；该 ID 不在游戏包里只计数（`not-in-game`），目标不确定记
+  `ambiguous-target`，空或与英文相同记 `untranslated`。
+- 没有采用官方名时，我们的补译只在其英文等于目标英文时出货（`supplemented`，写 `origins`）；否则记
+  `retired`（`reason` 为 `english-differs`、`not-in-game` 或 `ambiguous-target`，并写 `target_english`），
+  记录仍保留在 curation。
+- 补译的 `based_on.game_package.sha256` 与固定的游戏包不同时标 `needs_review`。
 
-输出有两种视图：
+receipt 的 `names.counts` 为 `{official, supplemented, superseded, retired, official-elsewhere}`（按 ID 计），
+并记录游戏包 SHA-256。`not_applied["not-in-game"]` 是计数，其余键是 ID 列表。
+两个输入都不给时行为不变，也不需要游戏包。
+
+输出包含两种查询视图，并按需附带来源标记：
 
 - `scopes["Table.Field"][stableKey] = [currentEnglish, translatedOrNull]` 只含投影
   声明的 scope。默认投影有四个：PoBR `web/src/lib/nativeDisplayNames.ts` 读取的
@@ -140,11 +150,6 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
   `entries` 里这个英文是 null，按 ID 查 scope 才能拿到各自的译文。PoBR 应当只在
   scope 里该 ID 的英文等于当前英文时采用译文。PoBR 实现新的精确 ID 调用方时再增加
   scope；其余字段留在本库，不增大玩家下载。
-  示例（0.5.5.5）：`PassiveSkills.Name` 有 9731 个 ID，8424 个有译文、1307 个为 null；
-  `display_texts.json` 因此从 1649082 字节增至 2215826 字节（gzip 后约增加 94 KB）。
-  其中只有 1567 个 ID 的英文在 `entries` 里为 null 或不在 `entries` 中（260 个有译文）；
-  只保留这些 ID 只增加 gzip 约 9.7 KB，但增量不大，所以默认投影保留完整 scope，PoBR
-  可以对每个天赋节点只查 scope。
 - `entries[currentLiteral] = translatedOrNull` 供 PoBR 的 `translateLines` 使用。
   所有表中同一英文的记录必须一致，去掉引用标记后的别名也参与同一检查。未解决或
   冲突的记录写 null，不取第一行。被拒绝的 v2 组即使英文字段为 null，它的每个候选
@@ -169,6 +174,15 @@ mise run pobr:display-texts -- --request /absolute/request.json --out .cache/fre
 （请求原样记在回执的 `request` 里），或 `{source: "file", file, bytes, sha256}`（默认文件，
 其字节同时记在 `inputs`），再加实际使用的 `scopes`、`literals`。
 本入口不读客户端数据，不推断 patch／realm，不做简繁转换，也不改写数值。
+
+示例（0.5.5.5）：`PassiveSkills.Name` 有 9731 个 ID，8424 个有译文、1307 个为 null；
+`display_texts.json` 因此从 1649082 字节增至 2215826 字节（gzip 后约增加 94 KB）。
+其中只有 1567 个 ID 的英文在 `entries` 里为 null 或不在 `entries` 中（260 个有译文）；
+只保留这些 ID 只增加 gzip 约 9.7 KB，但增量不大，所以默认投影保留完整 scope，PoBR
+可以对每个天赋节点只查 scope。
+
+例：国服 `inputs/0.5.5.5-1` 对 `game/0.5.5.5-3` 采用 `GemEffects.SupportText` 612 条、`ActiveSkills.Description`
+440 条、`MonsterVarieties.Name` 648 条（`Wolf Companion` → 恶狼同伴；国际服繁中为 狼盟友）。
 
 ## 繁中名称：zh-TW 三个 ID 文件
 

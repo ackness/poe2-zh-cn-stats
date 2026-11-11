@@ -47,7 +47,8 @@ test('placeholder contract: explicit indices reset the next automatic index, inc
     ['{1} then {} then {0} then {}', '甲 {1} 乙 {0} 丙 {2} 丁 {1}', 3],
   ]) assert.equal(buildNativeLocalization(fixture(left, right, arity).input).pairs.length, 1, left);
   const bad = buildNativeLocalization(fixture('{1} then {}', '先 {0} 后 {1}', 3).input);
-  assert.equal(bad.pairs.length, 0); assert.ok(bad.excluded.every(r => r.reason === 'unmatched-branch-signature'));
+  assert.equal(bad.pairs.length, 0);
+  assert.deepEqual(bad.excluded.map(r => r.reason), ['unmatched-branch-signature', 'unmatched-branch-signature']);
 });
 
 test('placeholder contract: raw default-negative and explicit-positive formats and external signs remain distinct', () => {
@@ -81,7 +82,7 @@ test('placeholder contract: source escaped-brace diagnostics remain exclusions w
   input.diagnostics = [{ code: 'unresolved_placeholder_syntax', raw: en.template_syntax_diagnostics }];
   const before = canonical(input), result = buildNativeLocalization(input);
   assert.equal(result.pairs.length, 0);
-  assert.ok(result.excluded.every(r => r.reason === 'unresolved-template-syntax'));
+  assert.deepEqual(result.excluded.map(r => r.reason), ['unresolved-template-syntax']);
   assert.deepEqual(result.source_diagnostics, input.diagnostics); assert.equal(canonical(input), before);
 });
 

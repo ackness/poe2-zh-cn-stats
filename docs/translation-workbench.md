@@ -197,9 +197,10 @@ edits SHA 和全部七个 producer 模块 SHA。导出忽略 `previous`，因为
 - 没有原件表的名称（`kind: "monster-name"`）：召唤生物、幽魂、同伴的 `MonsterVarieties.Name`；
 - `corrections`：对作为底的 `stat_lines.json` 的逐行修正，例如 RePoE 硬编码留在 src 里的英文前缀，或官方文本里本该是换行的字面反斜杠。
 
-规则：官方文本永远优先，本项目的文本只是补充；每条都写 `origin`（`agent` 或 `human`），即使逐字照抄或
-拼接官方措辞，“这样配对”也是本项目做的，所以不会写 `official`。官方文本出现后补译不再出货，但记录保留、
-不改标记；上游删除英文后记录变为 `retired`，同样保留。只有 `reviewed` 的记录进入语言包。
+官方文本始终优先于本项目的补译。每条补译都要写 `origin`（`agent` 或 `human`）；即使逐字照抄或
+拼接官方措辞，配对仍由本项目完成，因此不能标为 `official`。只有 `reviewed` 的记录进入语言包。
+
+官方文本出现后，补译不再出货，但记录及原有标记保留。上游删除英文后，记录变为 `retired`，同样保留。
 
 `entries` 的每条记录：
 
@@ -247,10 +248,12 @@ confidence: 可选，high | medium | low（译者自评，仅供参考）
 
 语言包里的标记见 [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)：
 `stat_lines.json` 的补译与修正行带 `origin`，`display_texts.json` 有可选的 `origins`，`_meta.json` 有
-`supplements` 块。没有 `origin` 的行或条目不是本仓库补的：底的来源见各成员的证据（例如 vagrant-soul/poe2-en-cn-dict 是 WeGame 国服客户端的解包，其行除非另有证据都按国服客户端文本看待）。zh-TW 的 `display_texts.json`
-（`GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`）自 `locale/0.5.5.5-4` 起来自
-国际服繁中官方表；其余 zh-TW 文本和缺省的 ID 在 PoBR 里由简中经 OpenCC 转换得到，转换后的补译仍是补译。本仓库
-不产出 zh-TW 补译行。
+`supplements` 块。没有 `origin` 的行或条目不是本仓库补的，底的来源见各成员的证据。例如，
+vagrant-soul/poe2-en-cn-dict 是 WeGame 国服客户端的解包，其行除非另有证据，都按国服客户端文本看待。
+
+zh-TW 的 `display_texts.json`（`GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`）
+自 `locale/0.5.5.5-4` 起来自国际服繁中官方表。其余 zh-TW 文本和缺省的 ID 在 PoBR 里由简中经 OpenCC 转换得到；
+转换后的补译仍是补译。本仓库不产出 zh-TW 补译行。
 
 交易 ID 的缺口仍在 `curation/translations.json`（见
 [交易词典维护](trade-dictionary.md#持续补译表)），它用同一套 `origin`／`status`／`review` 字段，字段名带

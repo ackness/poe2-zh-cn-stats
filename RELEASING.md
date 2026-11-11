@@ -31,24 +31,24 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 ## 新补丁
 
-1. **生成文件**：用[PoBR 语言文件生产者](docs/pobr-locale-producers.md)（`pobr:display-texts`、
-   `pobr:names`、`pobr:stat-lines`、`pobr:supplement-lines`）或[简中词典生成](docs/locale-generation.md)把文件生成到 `.cache/`，
-   核对 `receipt.json`。宝石说明、召唤物名和国服词条需要先有 RePoE 的游戏包和官方文本输入，见第 5 步。
-2. **源目录（第一个提交）**：新建 `inputs/locale-<patch>/`，放 `i18n/<lang>/*.json`、`evidence/*.json`
-   和 `manifest.json`（`poe2-retained-locale-publication/v1`，`target` 与配置相同，`files` 写每个文件的
-   `bytes`、`sha256`），可加 `README.md`。只提交这个目录；这个提交就是 `source.origin.revision`。
-3. **配置（第二个提交，同一分支）**：新建 `release/<patch>.json`（v1）。`source.manifest` 写清单的路径和
-   pin；`source.origin` 写本仓库、第 2 步提交的完整 hash，`tag` 写 `main`（合并后由 `main` 保留这个提交）。
-   不写 `published`。它自动成为默认配置，旧配置继续由 CI 核对。
-4. **重新生成配方（同一分支）**：新建 `release/regenerate/<patch>.json`，`reproduces` 指向第 3 步的配置，
-   每个 `i18n/*` 成员要么由一个任务重新生成，要么写进 `frozen`（原因和退出条件）。
-5. **官方文本与宝石说明（第 1 步的前提）**：新配置不再声明 `support_display`。宝石说明、召唤物名和国服词条随
-   `display_texts.json`、`stat_lines.json` 发布，生成它们（第 1 步）之前要等 RePoE 发布这个补丁的游戏包
+1. **准备官方输入**：新配置不再声明 `support_display`。宝石说明、召唤物名和国服词条随
+   `display_texts.json`、`stat_lines.json` 发布。生成前要等 RePoE 发布这个补丁的游戏包
    `game/<patch>-<n>` 和官方文本输入 Release（`inputs/<patch>-<k>`）；配方里固定的也是它们（`official_tables`、
    `official`、`game_package`，见[语言包配置参考](docs/release-config.md#重新生成配方releaseregeneratepatchjson)）。
+2. **生成文件**：用[PoBR 语言文件生产者](docs/pobr-locale-producers.md)（`pobr:display-texts`、
+   `pobr:names`、`pobr:stat-lines`、`pobr:supplement-lines`）或[简中词典生成](docs/locale-generation.md)把文件生成到 `.cache/`，
+   核对 `receipt.json`。
+3. **源目录（第一个提交）**：新建 `inputs/locale-<patch>/`，放 `i18n/<lang>/*.json`、`evidence/*.json`
+   和 `manifest.json`（`poe2-retained-locale-publication/v1`，`target` 与配置相同，`files` 写每个文件的
+   `bytes`、`sha256`），可加 `README.md`。只提交这个目录；这个提交就是 `source.origin.revision`。
+4. **配置（第二个提交，同一分支）**：新建 `release/<patch>.json`（v1）。`source.manifest` 写清单的路径和
+   pin；`source.origin` 写本仓库、第 3 步提交的完整 hash，`tag` 写 `main`（合并后由 `main` 保留这个提交）。
+   不写 `published`。它自动成为默认配置，旧配置继续由 CI 核对。
+5. **重新生成配方（同一分支）**：新建 `release/regenerate/<patch>.json`，`reproduces` 指向第 4 步的配置，
+   每个 `i18n/*` 成员要么由一个任务重新生成，要么写进 `frozen`（原因和退出条件）。
 6. **核对**：`mise run release:build -- --fetch --check`、`mise run release:regenerate -- --fetch`，
    检查回执里的成员、来源和语言索引。
-7. **合并**：源目录、配置和配方在同一个 PR 里，用合并提交合并（不要 squash 或 rebase），这样第 2 步的提交
+7. **合并**：源目录、配置和配方在同一个 PR 里，用合并提交合并（不要 squash 或 rebase），这样第 3 步的提交
    原样留在 `main` 的历史里，`origin.revision` 一直可取。
 8. **发布**：在 `main` 的合并提交上运行 `mise run release:publish`，确认 dry run 的计划（tag、附件、
    SHA-256），再 `mise run release:publish -- --yes`。发布只由维护者执行。
@@ -60,11 +60,11 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 ## 换掉已发布的文件
 
-1. 按[新补丁](#新补丁)第 1 步生成新文件。
+1. 按[新补丁](#新补丁)第 1–2 步准备输入并生成新文件。
 2. 新建源目录 `inputs/locale-<patch>-<n>/`：未改动的文件按原字节复制，改动的文件换成新字节，证据放
    `evidence/`，写新的 `manifest.json`。已有的 `inputs/` 目录不改。要替换的是 v2 配置发布的包时，复制的是
    那个包的成员（transform 之后的字节），并把它的 Release `receipt.json` 放进 `evidence/` 记录 transform。
-3. 新建 `release/<patch>-<n>.json`（`<n>` 是要发布的序号），之后同新补丁第 3–10 步；配方从被替换包的配方
+3. 新建 `release/<patch>-<n>.json`（`<n>` 是要发布的序号），之后同新补丁第 4–10 步；配方从被替换包的配方
    复制，改动的成员用新的任务参数（例如 `display-texts` 的 `projection`）重新生成。改动正好是一种已有的
    transform（按英文重写一张表、新增一个 JSON 成员）时，也可以写 v2 配置，在已发布配置的包上声明 transform，
    并在 `expect.package` 写新的 zip pin；transform 不能换入新生成的字节，配方也只复现 v1 配置。

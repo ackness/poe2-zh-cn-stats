@@ -7,7 +7,7 @@
 
 | 想做什么 | 入口 |
 | --- | --- |
-| 发布新补丁的语言包、换掉已发布的文件 | [RELEASING.md](../RELEASING.md) |
+| 发布新补丁的语言包，或用新 Release 替换现有语言包 | [RELEASING.md](../RELEASING.md) |
 | 查配置、重新生成配方和回执的字段 | [语言包配置参考](release-config.md) |
 | 生成 PoBR 的显示文本、繁中名称、词条译文及补译 | [PoBR 语言文件生产者](pobr-locale-producers.md) |
 | 补交易目录以外的词条与怪物名、修正已发布词条行 | [显示补译与来源标记](translation-workbench.md#显示补译与来源标记) |
