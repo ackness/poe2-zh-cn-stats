@@ -26,8 +26,8 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 - RePoE 重新发布游戏包（`game/<patch>-<n+1>`）且宝石说明、召唤物名的目标英文变了：这些行只在英文逐字节
   相同时才采用，所以按[换掉已发布的文件](#换掉已发布的文件)新建源目录和配置。
 
-**带 `published` 的配置一律不改**：CI 靠它持续证明已发布的字节可以重现。改动总是新建配置。（唯一的例外是
-发布后补写 `published` 的那个 PR，见[新补丁](#新补丁)第 9 步。）
+**已发布的配置一律不改**，包括带 `published` 的旧配置和只带 `expect.package` 的新配置：CI 靠它持续证明已发布的字节可以重现。
+改动总是新建配置；发布前在配置 PR 里固定 `expect.package`，发布后不再补写 `published`。
 
 ## 新补丁
 
@@ -43,10 +43,12 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 3. **源目录（第一个提交）**：新建 `inputs/locale-<patch>/`，放 `i18n/<lang>/*.json`、`evidence/*.json`
    和 `manifest.json`（`poe2-retained-locale-publication/v1`，`target` 与配置相同，`files` 写每个文件的
    `bytes`、`sha256`），可加 `README.md`。只提交这个目录；这个提交就是 `source.origin.revision`。
-4. **配置（第二个提交，同一分支）**：新建 `release/<patch>.json`（v1）。`source.manifest` 写清单的路径和
+4. **配置（第二个提交，同一分支）**：新建 `release/<patch>-<n>.json`（v1，首次发布 `<n>` 为 1）。`source.manifest` 写清单的路径和
    pin；`source.origin` 写本仓库、第 3 步提交的完整 hash，`tag` 写 `main`（合并后由 `main` 保留这个提交）。
-   不写 `published`。它自动成为默认配置，旧配置继续由 CI 核对。
-5. **重新生成配方（同一分支）**：新建 `release/regenerate/<patch>.json`，`reproduces` 指向第 4 步的配置，
+   先运行 `mise run release:build -- --config release/<patch>-<n>.json`，把输出回执的 `package.bytes`、`package.sha256`
+   复制到配置的 `expect.package`，再构建一次核对；配置 PR 就包含这个 pin，不写 `published`。v2 同样先构建并从回执取 pin，
+   已有的临时 pin 不符时构建会失败，但仍写出回执并在错误中列出期望值和实际值。它自动成为默认配置，旧配置继续由 CI 核对。
+5. **重新生成配方（同一分支）**：新建 `release/regenerate/<patch>-<n>.json`，`reproduces` 指向第 4 步的配置，
    每个 `i18n/*` 成员要么由一个任务重新生成，要么写进 `frozen`（原因和退出条件）。
 6. **核对**：`mise run release:build -- --fetch --check`、`mise run release:regenerate -- --fetch`，
    检查回执里的成员、来源和语言索引。
@@ -54,10 +56,7 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
    原样留在 `main` 的历史里，`origin.revision` 一直可取。
 8. **发布**：在 `main` 的合并提交上运行 `mise run release:publish`，确认 dry run 的计划（tag、附件、
    SHA-256），再 `mise run release:publish -- --yes`。发布只由维护者执行。
-9. **发布后的 PR**：把 `published`（`tag`、`asset`，以及 zip 的 `bytes`、`sha256`，即 Release 里
-   `receipt.json` 的 `package.bytes`、`package.sha256`）写进配置，另开 PR 合并。合并之前，CI 的 `--check-release` 会因为这个 tag 没有被任何配置固定而失败；
-   合并之后 CI 每次下载该 Release 并逐字节比较。
-10. **PoBR**：在 PoBR 仓库运行 `mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>`，按 PoBR
+9. **PoBR**：在 PoBR 仓库运行 `mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>`，按 PoBR
     的流程提交。
 
 ## 换掉已发布的文件
@@ -68,7 +67,7 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
    那个包的成员（transform 之后的字节），并把它的 Release `receipt.json` 放进 `evidence/` 记录 transform。
    换游戏补丁时，含目标 `game_patch` 的成员必须重新生成或更新目标身份；打包会拒绝顶层、`_meta` 或二者的 `target` 仍写旧补丁的文件。
    `display_texts.json` 用新目标重新生成，来源补丁由 `carried_from` 保留；嵌套的来源记录不改成目标补丁。
-3. 新建 `release/<patch>-<n>.json`（`<n>` 是要发布的序号），之后同新补丁第 4–10 步；配方从被替换包的配方
+3. 新建 `release/<patch>-<n>.json`（`<n>` 是要发布的序号），之后同新补丁第 4–9 步，在配置 PR 里写 `expect.package`；配方从被替换包的配方
    复制，改动的成员用新的任务参数（例如 `display-texts` 的 `projection`）重新生成。改动正好是一种已有的
    transform（按英文重写一张表、新增一个 JSON 成员）时，也可以写 v2 配置，在已发布配置的包上声明 transform，
    并在 `expect.package` 写新的 zip pin；transform 不能换入新生成的字节，配方也只复现 v1 配置。
@@ -88,8 +87,10 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 - 对每个 `release/*.json` 跑 `release:build -- --fetch --check --check-release`，再构建一次并比较 zip 和回执。
   `--check`：检出干净；源目录（v2 为基础配置的）tree 等于 `origin.revision` 上的；zip 等于 `expect.package`
   和 `published`；保留的辅助宝石说明等于它的 origin tree，声明了输入时还要能重新算出。`--check-release`：
-  下载 `published` 的 Release 逐字节比较；并且 origin 上每个 `locale/*` tag 都正好由一个配置的 `published`
-  固定，每个被固定的 tag 也都在 origin 上。
+  对 origin 上每个 `locale/<patch>-<n>` tag，下载 Release 的 zip 和 `SHA256SUMS`，与 `release/<patch>-<n>.json`
+  的 `published`（有它时优先）或 `expect.package` 比较；唯一旧名是 `locale/0.5.5.5-1` 对应 `release/0.5.5.5.json`。
+  当前构建已发布时还与重建的 zip 逐字节比较。每个 tag 必须有对应配置，`published.tag` 必须符合文件名且在 origin 上；
+  只有 `expect.package`、还没有 tag 和 Release 的配置正常通过。
 - 对每个 `release/regenerate/*.json` 跑 `release:regenerate -- --fetch`。
 
 `release:publish` 只构建、不跑这些核对，所以发布前先在同一提交上看到 CI 通过。
@@ -98,13 +99,16 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 `release:publish` 不带 `--yes` 时只暂存到 `.cache/release/publish/<target>/` 并打印命令；有问题时列出来并以 1
 退出。`--yes` 在以下情况拒绝：工作区不干净、HEAD 不在 `origin/main`、列不出远端 `locale/*` tag、`gh` 没有
-登录、本地有远端没有的 `locale/<patch>-<n>` tag。
+登录、本地有远端没有的 `locale/<patch>-<n>` tag、配置既无 `published` 又无 `expect.package`，或 zip 与 `expect.package` 不符（`--reuse` 也核对）。
 
 | 信息 | 处理 |
 | --- | --- |
 | `these exact bytes are already published as …` | 同样的内容已经发布过，PoBR 直接固定那个 Release |
 | `the package differs from the published …` | 配置的 `published` 与新包不符；已发布的配置不改，改动放进新配置 |
-| `… is published, but no release config pins it` | 合并发布后的 PR（[新补丁](#新补丁)第 9 步）；tag 是中途失败留下的、没有 Release 时，见下表重跑发布 |
+| `the package differs from expect.package …` | 未发布配置有意改变时，从回执复制实际 zip pin 到配置 PR；已发布的配置不改 |
+| `publish requires expect.package …` | 在配置 PR 里先固定回执的 `package.bytes`、`package.sha256` |
+| `… has no mapped config …` | 检查检出版本和远端；每个 tag 必须保留对应配置，不能用补写 `published` 代替 |
+| `published.tag … maps to …` | `published.tag` 与配置文件名不符；不要移动或删除已有 tag |
 | `… is pinned by …, but the remote has no such tag` | `published.tag` 写错了，或检出的远端不是本仓库 |
 | `was not built from this checkout; rerun without --reuse` | 去掉 `--reuse` 重新构建 |
 | `origin … is not present locally (pass --fetch)` | 加 `--fetch` |

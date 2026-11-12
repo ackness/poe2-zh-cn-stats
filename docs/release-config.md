@@ -7,7 +7,8 @@
 ## 配置文件名与默认配置
 
 `release/<patch>.json` 或 `release/<patch>-<n>.json`。`<patch>` 必须等于 `target.game_patch`；
-带 `-<n>` 的配置只能发布为 `locale/<patch>-<n>`（发布时下一个空闲序号必须正是 `<n>`）。
+发布 tag `locale/<patch>-<n>` 对应 `release/<patch>-<n>.json`（发布时下一个空闲序号必须正是 `<n>`）。
+唯一旧名是 `locale/0.5.5.5-1` 对应 `release/0.5.5.5.json`；其他不带序号的配置可以构建，不能发布。
 
 不带 `--config` 时，构建和发布取没有 `hold` 的配置中 patch 最高的一个，同 patch 取最大的
 `<n>`（无 `-<n>` 的排在最前）。
@@ -19,7 +20,8 @@
 | `target` | `game`（`poe2`）、`game_patch`、`realm`（`international` 或 `china`） |
 | `source.manifest` | 仓库内源发布清单（`poe2-retained-locale-publication/v1`）的 `path`、`bytes`、`sha256` |
 | `source.origin` | 该源目录首次提交的位置：`repository`（本仓库）、`revision`（完整 40 位提交）、`tag`、可选 `path` |
-| `published` | 发布后补写的 Release pin：`tag`、`asset`、`bytes`、`sha256` |
+| `expect.package` | 可选的 zip `bytes`、`sha256`；新发布前必须在配置 PR 里写好，构建不符就失败并列出期望和实际 pin |
+| `published` | 旧配置保留的 Release pin：`tag`、`asset`、`bytes`、`sha256`；`tag` 必须符合文件名对应关系，新配置不再补写 |
 | `hold` | 可选，一句原因。有它时 `release:publish` 拒绝发布、它也不作默认配置；点名构建与核对照常 |
 | `support_display` | 已停用于新配置：只有已发布的配置（-2、-3）保留，见下文 |
 
@@ -35,6 +37,12 @@
 每个文件按清单核对字节。`i18n/*` 原样映射为包成员 `data/<patch>/i18n/*`，再加一个新的
 `manifest.json`（`pobr-build-data-part/v1`）。zip 用固定时间戳、STORED 写出，只取决于源字节和
 `target`；`receipt.json` 记录生产提交，每个提交都不同。
+
+取 zip pin：先运行 `mise run release:build -- --config release/<patch>-<n>.json`，把回执的 `package.bytes`、
+`package.sha256` 复制到 `expect.package`，再构建核对。v2 必填该字段，初次可先放临时 pin；不符时构建仍写出
+回执，便于取实际值。没有 `published` 的配置必须有匹配的 `expect.package` 才能发布，`--reuse` 也检查。
+发布后配置冻结，无需再开 PR 写 `published`。`--check-release` 按 tag 找对应配置，下载 Release 资产并优先比较
+`published`，否则比较 `expect.package`；尚未有 tag 的 expect-only 配置可以通过，已有 tag 缺少 Release 则失败。
 
 打包时检查每个 `i18n/*` 成员顶层、`_meta` 及二者的 `target` 对象中的 `game_patch`（包括 `_meta.json` 自身顶层）：
 存在时必须等于配置的 `target.game_patch`。v2 transform 新增的成员也经过这项检查；失败信息包含成员路径、

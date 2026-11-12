@@ -110,6 +110,19 @@ export function configSequence(loaded) {
   return match?.[2] ? Number(match[2]) : null;
 }
 
+// Every locale tag has one config name; the first retained publication predates numbered configs.
+export function configForTag(tag) {
+  require(/^locale\/[0-9]+(?:\.[0-9]+)+-[1-9][0-9]*$/u.test(tag), `Invalid locale tag: ${tag}`);
+  return tag === 'locale/0.5.5.5-1' ? 'release/0.5.5.5.json' : `release/${tag.slice('locale/'.length)}.json`;
+}
+
+const pinFields = ({ bytes, sha256 }) => ({ bytes, sha256 });
+
+export function assertExpectedPackage(config, actual) {
+  if (config.expect) require(samePin(actual, config.expect.package),
+    `the package differs from expect.package: expected ${JSON.stringify(config.expect.package)}; built ${JSON.stringify(pinFields(actual))}`);
+}
+
 // The build directory name: <game>-<realm>-<config name> under release/, else <game>-<realm>-<patch>.
 export function buildName(loaded) {
   const { target } = loaded.config;
@@ -129,14 +142,17 @@ export function loadConfig(file, repo = ROOT) {
   const name = CONFIG_NAME.exec(path.basename(file, '.json'));
   require(!underRelease || (path.basename(file).endsWith('.json') && name?.[1] === target.game_patch),
     `${path.basename(file)} declares game patch ${target.game_patch}`);
-  const sequence = underRelease && name[2] ? Number(name[2]) : null;
   require(published === undefined || (typeof published.tag === 'string'
     && published.tag.startsWith(`locale/${target.game_patch}-`) && /^[1-9][0-9]*$/u.test(published.tag.slice(`locale/${target.game_patch}-`.length))
-    && (sequence === null || published.tag === `locale/${target.game_patch}-${sequence}`)
     && published.asset === assetName(target.game_patch) && isPin(published)), 'Invalid published package pin');
   require(config.hold === undefined || (typeof config.hold === 'string' && config.hold.trim()), 'hold must be a reason');
   const relative = path.relative(repo, file);
   const loaded = { file, raw, config, underRelease, display: relative.startsWith('..') ? file : relative.split(path.sep).join('/') };
+  if (published && underRelease) {
+    const mapped = configForTag(published.tag);
+    require(loaded.display === mapped, `${loaded.display}: published.tag ${published.tag} maps to ${mapped}`);
+  }
+  if (config.expect !== undefined) require(isPin(config.expect?.package), 'expect.package must pin {bytes, sha256}');
   // The support display is the config's own; a v2 config does not inherit its base's.
   if (config.support_display !== undefined) {
     validateSupportDisplay(config.support_display, target);
@@ -156,7 +172,7 @@ export function loadConfig(file, repo = ROOT) {
     require(isPin(config.expect?.package), 'A v2 config pins its intended package in expect.package {bytes, sha256}');
     return { ...loaded, base };
   }
-  const keys = ['schema', 'target', 'source', 'hold', 'published', 'support_display'];
+  const keys = ['schema', 'target', 'source', 'expect', 'hold', 'published', 'support_display'];
   require(Object.keys(config).every(key => keys.includes(key)), `${file}: unknown fields (v1 allows ${keys})`);
   const { source } = config;
   safeRelative(source?.manifest?.path);
@@ -382,6 +398,8 @@ export function build({ repo = ROOT, config: configFile, out, cache } = {}) {
     Object.assign(digests, { [MANIFEST_ASSET]: sha256(display.manifestRaw), [DISPLAY_ASSET]: sha256(display.assetRaw) });
   }
   writeFileSync(path.join(out, 'SHA256SUMS'), sha256sums(digests));
+  // Keep the receipt available to copy the actual pin even when an expectation is stale.
+  assertExpectedPackage(config, receipt.package);
   return { out, loaded, receipt, receiptRaw, zip, asset, display };
 }
 
@@ -401,9 +419,6 @@ export function check(repo, built, { cache } = {}) {
   if (receipt.producer.dirty) problems.push(`the checkout is dirty: ${receipt.producer.dirty_paths.slice(0, 5)}`);
   problems.push(...sourceProblems(repo, built.loaded.base ?? built.loaded));
   problems.push(...displayProblems(repo, built.loaded, { cache }));
-  if (config.expect && !samePin(receipt.package, config.expect.package)) {
-    problems.push(`the package differs from the expected ${config.expect.package.sha256}`);
-  }
   if (config.published && !samePin(receipt.package, config.published)) {
     problems.push(`the package differs from the published ${config.published.tag} (${config.published.sha256})`);
   }
@@ -445,21 +460,42 @@ export async function download(url, { fetchImpl = fetch, attempts = 3, backoff =
   }
 }
 
-// The declared published Release must serve exactly the rebuilt zip.
-export async function checkRelease(built, fetcher = download) {
-  const { published } = built.loaded.config;
-  require(published, 'The release config declares no published package');
-  const sums = (await fetcher(releaseUrl(REPOSITORY, published.tag, 'SHA256SUMS'))).toString('utf8');
-  require(sums.split('\n').includes(`${published.sha256}  ${published.asset}`),
-    `${published.tag} SHA256SUMS does not list ${published.asset} ${published.sha256}`);
-  const zip = await fetcher(releaseUrl(REPOSITORY, published.tag, published.asset));
-  require(zip.equals(built.zip), `${published.tag} ${published.asset} differs from the rebuilt package`);
+// Verify a Release against its config pin; when rebuilt here, also compare the zip and support display.
+async function checkReleaseAsset(loaded, built, tag, fetcher) {
+  const { published, expect, target } = loaded.config;
+  const expected = published ?? expect?.package;
+  require(isPin(expected), `${loaded.display}: Release ${tag} requires published or expect.package`);
+  const asset = assetName(target.game_patch);
+  const sums = (await fetcher(releaseUrl(REPOSITORY, tag, 'SHA256SUMS'))).toString('utf8');
+  require(sums.split('\n').includes(`${expected.sha256}  ${asset}`),
+    `${tag} SHA256SUMS does not list ${asset} ${expected.sha256}`);
+  const zip = await fetcher(releaseUrl(REPOSITORY, tag, asset));
+  require(samePin(pin(zip), expected), `${tag} ${asset} differs from its ${published ? 'published' : 'expect.package'} pin: `
+    + `expected ${JSON.stringify(pinFields(expected))}; downloaded ${JSON.stringify(pin(zip))}`);
+  if (!built) return;
+  require(zip.equals(built.zip), `${tag} ${asset} differs from the rebuilt package`);
   // A declared support display must be the Release's, as SHA256SUMS lists it; an undeclared one must not be listed.
   for (const [name, raw] of built.display ? [[MANIFEST_ASSET, built.display.manifestRaw], [DISPLAY_ASSET, built.display.assetRaw]] : []) {
-    require(sums.split('\n').includes(`${sha256(raw)}  ${name}`), `${published.tag} SHA256SUMS does not list the rebuilt ${name} ${sha256(raw)}`);
+    require(sums.split('\n').includes(`${sha256(raw)}  ${name}`), `${tag} SHA256SUMS does not list the rebuilt ${name} ${sha256(raw)}`);
   }
   const listed = [MANIFEST_ASSET, DISPLAY_ASSET].filter(name => sums.split('\n').some(line => line.endsWith(`  ${name}`)));
-  require(built.display || !listed.length, `${published.tag} SHA256SUMS lists ${listed}, but the config declares no support display`);
+  require(built.display || !listed.length, `${tag} SHA256SUMS lists ${listed}, but the config declares no support display`);
+}
+
+export async function checkRelease(built, fetcher = download) {
+  const tag = built.loaded.config.published?.tag ?? `locale/${path.basename(built.loaded.file, '.json')}`;
+  await checkReleaseAsset(built.loaded, built, tag, fetcher);
+}
+
+export async function checkReleases(repo, built, tags, fetcher = download) {
+  const problems = unpinnedTags(repo, tags);
+  require(!problems.length, `check-release failed:\n${problems.map(p => `  - ${p}`).join('\n')}`);
+  for (const tag of tags) {
+    const file = path.join(repo, configForTag(tag));
+    const loaded = path.resolve(built.loaded.file) === file ? built.loaded : loadConfig(file, repo);
+    await checkReleaseAsset(loaded, loaded === built.loaded ? built : null, tag, fetcher);
+  }
+  return tags;
 }
 
 // The names of a remote's locale/* tags (`git ls-remote`, so it needs the network).
@@ -474,26 +510,23 @@ export function remoteLocaleTags(repo, remote = 'origin') {
   return result.stdout.split('\n').filter(Boolean).map(line => line.split('\t')[1].replace(/^refs\/tags\//u, '')).sort();
 }
 
-// Every published locale/<patch>-<n> tag must be the `published.tag` of exactly one release config,
-// so that --check-release keeps proving its bytes; the post-publish PR writes it. Every pinned tag must
-// also be on the remote, so a tagless mirror or stale fork cannot pass by listing nothing. Returns the failures.
+// Tags map to config filenames. Legacy published pins must agree with that mapping and exist remotely;
+// an expect-only config without a tag is an unpublished candidate. Returns the failures.
 export function unpinnedTags(repo, tags) {
-  const pinnedBy = {};
+  const problems = [];
   for (const name of readdirSync(path.join(repo, 'release')).filter(file => file.endsWith('.json')).sort()) {
     const { published } = strictJson(readFileSync(path.join(repo, 'release', name)));
-    if (published) (pinnedBy[published.tag] ??= []).push(`release/${name}`);
+    if (!published) continue;
+    const file = `release/${name}`;
+    const mapped = configForTag(published.tag);
+    if (file !== mapped) problems.push(`${file}: published.tag ${published.tag} maps to ${mapped}`);
+    if (!tags.includes(published.tag)) problems.push(`${published.tag} is pinned by ${file}, but the remote has no such tag`);
   }
-  const missing = Object.keys(pinnedBy).sort().filter(tag => !tags.includes(tag))
-    .map(tag => `${tag} is pinned by ${pinnedBy[tag].join(', ')}, but the remote has no such tag`);
-  return missing.concat(tags.flatMap(tag => {
-    const configs = pinnedBy[tag] ?? [];
-    if (configs.length > 1) return [`${tag} is pinned by several release configs: ${configs.join(', ')}`];
-    if (configs.length) return [];
-    const [, patch, sequence] = /^locale\/(.+)-([1-9][0-9]*)$/u.exec(tag) ?? [];
-    const expected = patch ? `release/${patch}-${sequence}.json${sequence === '1' ? ` or release/${patch}.json` : ''}` : 'a release config';
-    return [`${tag} is published, but no release config pins it: write "published" into ${expected} `
-      + '(or, if its publish stopped before creating the Release, finish it with release:publish -- --yes)'];
-  }));
+  for (const tag of tags) {
+    const file = configForTag(tag);
+    if (!existsSync(path.join(repo, file))) problems.push(`${tag} has no mapped config ${file}`);
+  }
+  return problems;
 }
 
 function displayReport(shown) {
@@ -538,8 +571,8 @@ export async function main(argv = process.argv.slice(2)) {
       + '  --check          exit 1 unless the build is clean, the source equals its origin tag tree and\n'
       + '                   the zip equals the config\'s expected and published pins (when declared); a retained\n'
       + '                   support display must equal its origin tree and regenerate from its declared inputs\n'
-      + '  --check-release  download the config\'s published Release (when declared) and compare it byte for byte,\n'
-      + '                   and fail unless every locale/* tag on origin is pinned by one release config\'s published');
+      + '  --check-release  verify every locale/* Release against its mapped config\'s published or expect.package pin;\n'
+      + '                   compare this build byte for byte when released, and require every published tag on origin');
     return;
   }
   if (values.fetch) {
@@ -563,16 +596,9 @@ export async function main(argv = process.argv.slice(2)) {
       + (shown?.mode === 'retained' && shown.dictionary ? ' and its entries regenerate from its declared inputs' : ''));
   }
   if (values['check-release']) {
-    const { published } = built.loaded.config;
-    if (!published) console.log('check-release: the release config declares no published package yet');
-    else {
-      await checkRelease(built);
-      console.log(`check-release: ${published.tag} serves the rebuilt zip byte for byte`);
-    }
     const tags = remoteLocaleTags(ROOT);
-    const unpinned = unpinnedTags(ROOT, tags);
-    require(!unpinned.length, `check-release failed:\n${unpinned.map(p => `  - ${p}`).join('\n')}`);
-    console.log(`check-release: each of origin's ${tags.length} locale/* tags is pinned by one release config's published, and every pin is on origin`);
+    await checkReleases(ROOT, built, tags);
+    console.log(`check-release: origin's ${tags.length} locale/* Releases match their mapped configs' pins; every published pin is on origin`);
   }
 }
 

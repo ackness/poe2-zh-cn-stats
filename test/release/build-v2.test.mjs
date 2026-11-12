@@ -4,7 +4,7 @@ import { readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { strictJson } from '../../src/strict-json.mjs';
 import { readZip } from '../../src/release/stored-zip.mjs';
-import { build, check, defaultConfig, loadConfig, pin } from '../../src/release/build.mjs';
+import { build, check, defaultConfig, loadConfig, packageArchive, packageOf, pin } from '../../src/release/build.mjs';
 import { localeIndex, rekeyByEnglish } from '../../src/release/package.mjs';
 import { TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
@@ -49,7 +49,11 @@ function v2Fixture(t, extra = {}) {
   const declared = config(manifestRaw);
   write(repo, 'release/9.9.json', bytes({ ...declared, source: { ...declared.source,
     origin: { ...declared.source.origin, revision: commit } } }));
-  write(repo, 'release/9.9-2.json', bytes(v2(extra)));
+  const file = path.join(repo, 'release/9.9-2.json');
+  write(repo, 'release/9.9-2.json', bytes(v2()));
+  const { partSource, members } = packageOf(repo, loadConfig(file, repo));
+  const expected = pin(packageArchive(TARGET, partSource, members).zip);
+  write(repo, 'release/9.9-2.json', bytes(v2({ expect: { package: expected }, ...extra })));
   commitAll(repo, 'v2 config');
   return { ...made, manifestRaw };
 }
@@ -107,11 +111,14 @@ test('v2 build: the base package with its transforms applied; check pins the exp
   assert.equal(receipt.package.members['data/9.9/i18n/zh-CN/mods.json'], 'inputs/locale-test/i18n/zh-CN/mods.json');
   assert.deepEqual(receipt.package.index.languages['zh-TW'].tables['mods.json'],
     { entries: 3, fallback_keys_covered: 2, fallback_entries: 3 });
-  assert.deepEqual(check(repo, built), [`the package differs from the expected ${'0'.repeat(64)}`]);
-  write(repo, 'release/9.9-2.json', bytes(v2({ expect: { package: pin(built.zip) } })));
-  commitAll(repo, 'expectation');
-  assert.deepEqual(check(repo, build({ repo })), []);
+  assert.deepEqual(check(repo, built), []);
   assert.deepEqual(build({ repo }).zip, built.zip);
+});
+
+test('v2 build: mismatched expect.package fails without --check', t => {
+  const { repo } = v2Fixture(t);
+  write(repo, 'release/9.9-2.json', bytes(v2()));
+  assert.throws(() => build({ repo }), /differs from expect\.package: expected .*built/u);
 });
 
 test('v2 build rejects a stale game_patch introduced by a json transform', t => {
@@ -135,7 +142,7 @@ test('v2 config: refuses unknown fields, bad transforms and a published tag for 
   refuse(v2({ transforms: [{ ...TRANSFORMS[0], conflicts: 'first' }] }), /invalid records\/table\/conflicts/u);
   refuse(v2({ transforms: [{ ...TRANSFORMS[1], kind: 'rename' }] }), /unknown transform kind/u);
   refuse(v2({ published: { tag: 'locale/9.9-3', asset: 'pobr-locale-9.9.zip', bytes: 1, sha256: '0'.repeat(64) } }),
-    /Invalid published package pin/u);
+    /published\.tag locale\/9\.9-3 maps to release\/9\.9-3\.json/u);
   refuse(v2({ hold: ' ' }), /hold must be a reason/u);
   write(repo, 'release/9.9-2.json', bytes(v2({ transforms: [{ ...TRANSFORMS[1], member: 'i18n/zh-CN/mods.json' }] })));
   assert.throws(() => build({ repo }), /already exists; a json transform only adds a member/u);

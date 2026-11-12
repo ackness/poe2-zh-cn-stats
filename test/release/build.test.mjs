@@ -8,6 +8,7 @@ import { crc32, readZip, storedZip } from '../../src/release/stored-zip.mjs';
 import {
   ROOT, build, check, checkRelease, defaultConfig, download, loadConfig, packageMembers, pin, releaseUrl, remoteLocaleTags, sha256, unpinnedTags,
 } from '../../src/release/build.mjs';
+import * as releases from '../../src/release/build.mjs';
 import { SOURCE_DIR, SOURCE_FILES, TARGET, bytes, commitAll, config, fixture, gitIn, sourceManifest, write } from './fixture.mjs';
 
 const members = () => new Map([['b.json', Buffer.from('{"b":1}\n')], ['a/x.json', Buffer.from('[]')], ['manifest.json', Buffer.from('{}\n')]]);
@@ -113,6 +114,35 @@ test('build: reproducible, and the zip does not depend on the producer commit', 
   assert.deepEqual({ ...later.receipt, producer: null }, { ...first.receipt, producer: null });
 });
 
+test('v1 build: expect.package accepts the receipt pin without changing the zip', async t => {
+  const { root, repo, manifestRaw } = fixture();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const before = build({ repo });
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { expect: { package: pin(before.zip) } })));
+  const built = build({ repo });
+  assert.deepEqual(built.zip, before.zip);
+  const calls = [];
+  await checkRelease(built, async url => {
+    calls.push(url);
+    return url.endsWith('/SHA256SUMS') ? Buffer.from(`${pin(before.zip).sha256}  ${built.asset}\n`) : before.zip;
+  });
+  assert.equal(calls.length, 2);
+  assert.ok(calls.every(url => url.includes('/download/locale/9.9-1/')));
+});
+
+test('v1 build: expect.package mismatch fails without --check and names both pins', t => {
+  const { root, repo, manifestRaw } = fixture();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const actual = pin(build({ repo }).zip);
+  for (const expected of [{ ...actual, bytes: actual.bytes + 1 }, { ...actual, sha256: '0'.repeat(64) }]) {
+    write(repo, 'release/9.9.json', bytes(config(manifestRaw, { expect: { package: expected } })));
+    assert.throws(() => build({ repo }), {
+      message: `the package differs from expect.package: expected ${JSON.stringify(expected)}; built ${JSON.stringify(actual)}`,
+    });
+    assert.deepEqual(pin(readFileSync(path.join(repo, '.cache/release/poe2-international-9.9/pobr-locale-9.9.zip'))), actual);
+  }
+});
+
 test('build: records a dirty producer on tracked changes and untracked inputs only', t => {
   const { root, repo } = fixture();
   t.after(() => rmSync(root, { recursive: true, force: true }));
@@ -181,7 +211,7 @@ test('check: clean, origin tree and published pin', async t => {
   const published = { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...pin(built.zip) };
   const declare = extra => {
     const declared = config(manifestRaw, extra);
-    write(repo, 'release/9.9.json', bytes({ ...declared, source: { ...declared.source, origin } }));
+    write(repo, 'release/9.9-1.json', bytes({ ...declared, source: { ...declared.source, origin } }));
   };
   declare({ published });
   commitAll(repo, 'declare origin and published');
@@ -189,7 +219,7 @@ test('check: clean, origin tree and published pin', async t => {
   assert.deepEqual(check(repo, built), []);
   declare({ published: { ...published, sha256: '0'.repeat(64) } });
   built = build({ repo });
-  assert.deepEqual(check(repo, built), ['the checkout is dirty: release/9.9.json',
+  assert.deepEqual(check(repo, built), ['the checkout is dirty: release/9.9-1.json',
     `the package differs from the published locale/9.9-1 (${'0'.repeat(64)})`]);
   // The published Release must serve the rebuilt zip and list it in SHA256SUMS.
   declare({ published });
@@ -200,7 +230,7 @@ test('check: clean, origin tree and published pin', async t => {
   ]);
   await checkRelease(built, async url => served.get(url));
   served.set([...served.keys()][1], Buffer.from('other'));
-  await assert.rejects(checkRelease(built, async url => served.get(url)), /differs from the rebuilt package/u);
+  await assert.rejects(checkRelease(built, async url => served.get(url)), /differs from its published pin/u);
   assert.equal(releaseUrl('o/r', 'locale/9.9-1', 'a.zip', 'http://127.0.0.1:1/'), 'http://127.0.0.1:1/o/r/releases/download/locale/9.9-1/a.zip');
 });
 
@@ -254,7 +284,7 @@ test('the committed release configs build their pinned publications and expected
   }
 });
 
-test('check-release: every locale/* tag on origin is pinned by exactly one release config', t => {
+test('check-release: tags map to numbered config names, with only the 0.5.5.5-1 legacy alias', t => {
   const { root, repo, manifestRaw } = fixture();
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const published = tag => ({ tag, asset: 'pobr-locale-9.9.zip', bytes: 1, sha256: '0'.repeat(64) });
@@ -264,25 +294,27 @@ test('check-release: every locale/* tag on origin is pinned by exactly one relea
   };
   tagged('handoff/other');
   assert.deepEqual(remoteLocaleTags(repo), []);
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { expect: { package: pin(build({ repo }).zip) } })));
   tagged('locale/9.9-1');
   assert.deepEqual(remoteLocaleTags(repo), ['locale/9.9-1']);
-  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), ['locale/9.9-1 is published, but no release config pins it: '
-    + 'write "published" into release/9.9-1.json or release/9.9.json' + ' (or, if its publish stopped before creating the Release, finish it with release:publish -- --yes)']);
-  write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published: published('locale/9.9-1') })));
   assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), []);
-  // Published, but its config's post-publish PR has not landed.
-  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw)));
-  tagged('locale/9.9-2');
-  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), ['locale/9.9-2 is published, but no release config pins it: '
-    + 'write "published" into release/9.9-2.json' + ' (or, if its publish stopped before creating the Release, finish it with release:publish -- --yes)']);
-  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { published: published('locale/9.9-2') })));
-  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { published: published('locale/9.9-1') })));
-  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)),
-    ['locale/9.9-1 is pinned by several release configs: release/9.9-1.json, release/9.9.json']);
-  // A pin whose tag the remote lacks (a tagless mirror or stale fork) fails instead of passing on an empty list.
   rmSync(path.join(repo, 'release/9.9-1.json'));
+  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), ['locale/9.9-1 has no mapped config release/9.9-1.json']);
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { published: published('locale/9.9-1') })));
+  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { expect: { package: { bytes: 1, sha256: '0'.repeat(64) } } })));
+  tagged('locale/9.9-2');
+  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), []);
+  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { published: published('locale/9.9-2') })));
+  write(repo, 'release/0.5.5.5.json', bytes({ published: { ...published('locale/0.5.5.5-1'), asset: 'pobr-locale-0.5.5.5.zip' } }));
+  tagged('locale/0.5.5.5-1');
+  assert.deepEqual(unpinnedTags(repo, remoteLocaleTags(repo)), []);
+  write(repo, 'release/0.5.5.5-1.json', bytes({ published: { ...published('locale/0.5.5.5-1'), asset: 'pobr-locale-0.5.5.5.zip' } }));
+  assert.match(unpinnedTags(repo, remoteLocaleTags(repo)).join('\n'), /release\/0\.5\.5\.5-1\.json.*maps to release\/0\.5\.5\.5\.json/u);
+  rmSync(path.join(repo, 'release/0.5.5.5-1.json'));
+  // A pin whose tag the remote lacks (a tagless mirror or stale fork) fails instead of passing on an empty list.
   assert.deepEqual(unpinnedTags(repo, []), [
-    'locale/9.9-1 is pinned by release/9.9.json, but the remote has no such tag',
+    'locale/0.5.5.5-1 is pinned by release/0.5.5.5.json, but the remote has no such tag',
+    'locale/9.9-1 is pinned by release/9.9-1.json, but the remote has no such tag',
     'locale/9.9-2 is pinned by release/9.9-2.json, but the remote has no such tag',
   ]);
   assert.throws(() => remoteLocaleTags(repo, 'no-such-remote'), /Cannot list no-such-remote's locale\/\* tags/u);
@@ -298,8 +330,35 @@ test('config: a published tag must name the config patch', t => {
     assert.throws(() => loadConfig(file, repo), /Invalid published package pin/u, tag);
   }
   write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published: published('locale/9.9-12') })));
-  assert.equal(loadConfig(file, repo).config.published.tag, 'locale/9.9-12');
+  assert.throws(() => loadConfig(file, repo), /published\.tag locale\/9\.9-12 maps to release\/9\.9-12\.json/u);
 });
+
+for (const state of ['published', 'expect only', 'no Release yet']) {
+  test(`check-release: all remote tags are verified with ${state}`, async t => {
+    const { root, repo, manifestRaw } = fixture();
+    t.after(() => rmSync(root, { recursive: true, force: true }));
+    const built = build({ repo });
+    const expected = pin(built.zip), tag = 'locale/9.9-2';
+    const extra = state === 'published' ? { published: { tag, asset: built.asset, ...expected },
+      expect: { package: { bytes: 1, sha256: '0'.repeat(64) } } }
+      : { expect: { package: expected } };
+    write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, extra)));
+    const calls = [];
+    const fetcher = async url => {
+      calls.push(url);
+      assert.ok(url.includes(`/download/${tag}/`), url);
+      return url.endsWith('/SHA256SUMS') ? Buffer.from(`${expected.sha256}  ${built.asset}\n`) : built.zip;
+    };
+    const tags = state === 'no Release yet' ? [] : [tag];
+    assert.deepEqual(await releases.checkReleases(repo, built, tags, fetcher), tags);
+    assert.equal(calls.length, tags.length * 2);
+    if (tags.length) {
+      await assert.rejects(releases.checkReleases(repo, built, tags, async url => url.endsWith('/SHA256SUMS')
+        ? Buffer.from(`${expected.sha256}  ${built.asset}\n`) : Buffer.from('tampered')), /differs from.*pin/u);
+      await assert.rejects(releases.checkReleases(repo, built, tags, async () => { throw new Error('HTTP 404'); }), /HTTP 404/u);
+    }
+  });
+}
 
 test('download retries network errors, 429 and 5xx, never other HTTP errors', async () => {
   const response = (status, body = '') => ({ ok: status === 200, status, arrayBuffer: async () => Buffer.from(body) });
