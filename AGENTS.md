@@ -47,7 +47,7 @@ The split is maintained once, in
 | `test/<domain>/`, `test/fixtures/` | Offline tests grouped like `src/`; `test/native/` covers the frozen library | editable |
 | `data/CURRENT`, `data/snapshots/` | Trade dictionary snapshots; other tools read them by commit | generated (`refresh`/`build`) |
 | `reports/` | Readable workbench queues | generated (`workbench`), committed |
-| `release/<patch>[-<n>].json` | Language package configs | editable until `published` is written, then frozen |
+| `release/<patch>[-<n>].json` | Language package configs | pin `expect.package` before publishing; frozen once published |
 | `release/regenerate/<patch>[-<n>].json` | Regeneration recipes | editable; frozen entries only decrease |
 | `inputs/` | Source bytes that configs pin | **frozen** |
 | `sources/` | Locale provenance ledger; `sources.lock.json` is a verbatim copy | frozen record |
@@ -127,7 +127,9 @@ CI runs all of this anyway; run locally what your change can break.
 - `verify`: `mise run setup` and `mise run check`.
 - `release`: for every `release/*.json`, `release:build -- --fetch --check --check-release`, then a second
   build whose zip and receipt must match. `--check-release` also fails unless every `locale/*` tag on
-  origin is the `published.tag` of exactly one config and every pinned tag exists.
+  origin maps to `release/<patch>-<n>.json` (only `locale/0.5.5.5-1` uses `release/0.5.5.5.json`). Each Release
+  must match that config's `published` pin when present, otherwise `expect.package`; every `published.tag`
+  must agree with the filename and exist on origin. An expect-only config without a Release yet is fine.
 - `regenerate`: `release:regenerate -- --fetch` for every `release/regenerate/*.json`.
 
 ## Pull requests
@@ -140,7 +142,8 @@ CI runs all of this anyway; run locally what your change can break.
 - Merge with a merge commit, never squash or rebase: `source.origin.revision` can be a commit on the PR
   branch, and only a merge commit keeps it in `main`'s history. A new `inputs/` directory, its config
   and its recipe go in one PR (see [RELEASING.md](RELEASING.md#新补丁)).
-- Never edit a config that has `published` or anything under `inputs/`; add a new config and directory.
-  The one allowed edit is the post-publish PR that writes the `published` block (next item).
-- After every publish, a follow-up PR writes `published` into the config. Until it merges, CI's
-  `--check-release` fails on purpose.
+- Never edit a published config (including legacy configs with `published`) or anything under `inputs/`;
+  add a new config and directory.
+- In the config PR, run `release:build` and copy the receipt's `package.bytes` and `package.sha256` into
+  `expect.package` (v1 and v2). Publishing requires a matching pin, or a legacy `published` pin;
+  `--reuse` checks it too. No post-publish config PR is needed.

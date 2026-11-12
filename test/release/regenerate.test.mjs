@@ -27,7 +27,7 @@ const ZH_TW = bytes({ 'Metadata/Items/b': '基底' });
 const ZH_CN = ['_meta.json', 'base_items.json', 'classes.json', 'mods.json', 'passive_names.json', 'rare_words.json', 'skills.json',
   'stat_lines.json', 'words.json'].map(file => `i18n/zh-CN/${file}`);
 
-// A checkout whose release/9.9.json publication is what the legacy producer writes (plus a frozen zh-TW
+// A checkout whose release/9.9-1.json publication is what the legacy producer writes (plus a frozen zh-TW
 // file), with the producer manifest and template bundle committed, and its recipe.
 // With `supplement`, stat_lines.json and _meta.json of the publication come from pobr:supplement-lines
 // over the producer's own members (committed as a base), a game package and a correction.
@@ -121,9 +121,9 @@ async function setup(t, { edit, supplement, official, tables } = {}) {
   const origin = { ...declared.source.origin, revision: commit };
   write(repo, 'release/9.9.json', bytes({ ...declared, source: { ...declared.source, origin } }));
   const published = { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...pin(build({ repo }).zip) };
-  write(repo, 'release/9.9.json', bytes({ ...declared, source: { ...declared.source, origin }, published }));
+  write(repo, 'release/9.9-1.json', bytes({ ...declared, source: { ...declared.source, origin }, published }));
   const recipe = {
-    schema: 'poe2-locale-regeneration/v1', reproduces: 'release/9.9.json',
+    schema: 'poe2-locale-regeneration/v1', reproduces: 'release/9.9-1.json',
     categories: { 'unpinned-input': 'An input was never committed.' },
     jobs: [{ id: 'zh-cn-dictionary', kind: 'locale-producer',
       manifest: { revision: commit, path: 'generation/input-manifest.json', ...pin(manifestRaw) }, producer_commit: commit, members: ZH_CN }],
@@ -135,7 +135,7 @@ async function setup(t, { edit, supplement, official, tables } = {}) {
     recipe.jobs = [{ ...recipe.jobs[0], members: ZH_CN.filter(member => !replaced.includes(member)),
       replaced_by: Object.fromEntries(replaced.map(member => [member, supplementJob.id])) }, supplementJob, ...recipe.jobs.slice(1)];
   }
-  write(repo, 'release/regenerate/9.9.json', bytes(recipe));
+  write(repo, 'release/regenerate/9.9-1.json', bytes(recipe));
   commitAll(repo, 'recipe');
   const served = [];
   const fetcher = async address => {
@@ -148,7 +148,7 @@ async function setup(t, { edit, supplement, official, tables } = {}) {
     assert.ok(file, `unexpected download ${address}`);
     return bytes(DICTIONARY[file]);
   };
-  return { ...made, recipe, served, fetcher, published, recipeFile: path.join(repo, 'release/regenerate/9.9.json') };
+  return { ...made, recipe, served, fetcher, published, recipeFile: path.join(repo, 'release/regenerate/9.9-1.json') };
 }
 
 test('regenerate: rebuilds every member from pinned inputs and the published zip byte for byte', async t => {
@@ -157,7 +157,7 @@ test('regenerate: rebuilds every member from pinned inputs and the published zip
   await assert.rejects(regenerate({ repo, recipe: recipeFile, fetcher }), /lookup\/stat_lines\.json is not cached \(pass --fetch\)/u);
   const done = await regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
   assert.equal(served.length, DICTIONARY_FILES.length);
-  assert.equal(done.out, path.join(repo, '.cache/regenerate/poe2-international-9.9'));
+  assert.equal(done.out, path.join(repo, '.cache/regenerate/poe2-international-9.9-1'));
   assert.deepEqual(problems(done), []);
   const { result } = done;
   assert.deepEqual(result.summary, { 'generated-identical': 9, frozen: 1 });
@@ -188,7 +188,7 @@ test('regenerate: a source member that its producer does not reproduce is report
 test('recipe: covers the source exactly once, pins frozen bytes and checks declared passthrough', async t => {
   const { repo, recipe, recipeFile, fetcher } = await setup(t);
   const attempt = async value => {
-    write(repo, 'release/regenerate/9.9.json', bytes(value));
+    write(repo, 'release/regenerate/9.9-1.json', bytes(value));
     return regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
   };
   const [job] = recipe.jobs;
@@ -243,10 +243,10 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
     /asset pobr-game-9\.9\.zip/u);
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names, game_package: { ...GAME, tag: '' } }] }),
     /display: game_package needs repository/u);
-  write(repo, 'release/regenerate/9.9.json', bytes(recipe));
+  write(repo, 'release/regenerate/9.9-1.json', bytes(recipe));
   mkdirSync(path.join(repo, 'release/regenerate/other'), { recursive: true });
   write(repo, 'release/regenerate/9.8.json', bytes(recipe));
-  assert.throws(() => loadRecipe(path.join(repo, 'release/regenerate/9.8.json'), repo), /9\.8\.json must be named like release\/9\.9\.json/u);
+  assert.throws(() => loadRecipe(path.join(repo, 'release/regenerate/9.8.json'), repo), /9\.8\.json must be named like release\/9\.9-1\.json/u);
 });
 
 test('the committed recipes cover their configs and name a reason and an exit for every frozen member', () => {
@@ -274,7 +274,7 @@ test('regenerate: a supplement-lines job owns stat_lines.json and _meta.json ove
   assert.deepEqual(lines.filter(row => row.origin), [{ src: '生命值', en: 'Life', origin: 'agent' }]);
   assert.equal(result.jobs[1].summary.counts.corrections.applied, 1);
   const attempt = async value => {
-    write(repo, 'release/regenerate/9.9.json', bytes(value));
+    write(repo, 'release/regenerate/9.9-1.json', bytes(value));
     return regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
   };
   const [producer, job] = recipe.jobs;
@@ -302,7 +302,7 @@ test('regenerate: a supplement-lines job reads its official sources from pinned 
   const meta = strictJson(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/_meta.json')));
   assert.equal(meta.official.sources[0].tag, CHINA.spec.tag);
   const attempt = async value => {
-    write(repo, 'release/regenerate/9.9.json', bytes(value));
+    write(repo, 'release/regenerate/9.9-1.json', bytes(value));
     return regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
   };
   const [producer, job] = recipe.jobs;
@@ -320,17 +320,17 @@ test('regenerate: a supplement-lines job reads its official sources from pinned 
     names: job.edits, game_package: GAME, members: ['i18n/zh-CN/display_texts.json'] };
   const passive = { revision: job.base.revision, path: 'inputs/locale-test/i18n/zh-CN/passive_names.json',
     ...pin(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/passive_names.json'))) };
-  write(repo, 'release/regenerate/9.9.json', bytes({ ...recipe, jobs: [producer, job, { ...display, package_texts: { stat_lines: job.base, passive_names: passive } }] }));
-  assert.throws(() => loadRecipe(path.join(repo, 'release/regenerate/9.9.json'), repo),
+  write(repo, 'release/regenerate/9.9-1.json', bytes({ ...recipe, jobs: [producer, job, { ...display, package_texts: { stat_lines: job.base, passive_names: passive } }] }));
+  assert.throws(() => loadRecipe(path.join(repo, 'release/regenerate/9.9-1.json'), repo),
     /package_texts\.stat_lines is not this package's i18n\/zh-CN\/stat_lines\.json$/u);
   const own = { ...passive, path: 'inputs/locale-test/i18n/zh-CN/stat_lines.json',
     ...pin(readFileSync(path.join(repo, 'inputs/locale-test/i18n/zh-CN/stat_lines.json'))) };
-  write(repo, 'release/regenerate/9.9.json', bytes({ ...recipe, jobs: [producer, job, { ...display, package_texts: { stat_lines: own, passive_names: passive } }] }));
-  assert.doesNotThrow(() => loadRecipe(path.join(repo, 'release/regenerate/9.9.json'), repo));
+  write(repo, 'release/regenerate/9.9-1.json', bytes({ ...recipe, jobs: [producer, job, { ...display, package_texts: { stat_lines: own, passive_names: passive } }] }));
+  assert.doesNotThrow(() => loadRecipe(path.join(repo, 'release/regenerate/9.9-1.json'), repo));
   // Without an official layer the supplement-lines base is still accepted (the older recipe shape).
   const { official: _, ...plainJob } = job;
-  write(repo, 'release/regenerate/9.9.json', bytes({ ...recipe, jobs: [producer, plainJob, { ...display, package_texts: { stat_lines: job.base, passive_names: passive } }] }));
-  assert.doesNotThrow(() => loadRecipe(path.join(repo, 'release/regenerate/9.9.json'), repo));
+  write(repo, 'release/regenerate/9.9-1.json', bytes({ ...recipe, jobs: [producer, plainJob, { ...display, package_texts: { stat_lines: job.base, passive_names: passive } }] }));
+  assert.doesNotThrow(() => loadRecipe(path.join(repo, 'release/regenerate/9.9-1.json'), repo));
 });
 
 test('regenerate: a display-texts job without a catalog rebuilds zh-TW from official tables only', async t => {
@@ -345,7 +345,7 @@ test('regenerate: a display-texts job without a catalog rebuilds zh-TW from offi
   assert.deepEqual(sidecar.entries, {});
   assert.equal(sidecar.catalog_sha256, TC.spec.localized_manifest_sha256);
   const attempt = async value => {
-    write(repo, 'release/regenerate/9.9.json', bytes(value));
+    write(repo, 'release/regenerate/9.9-1.json', bytes(value));
     return regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
   };
   const jobs = recipe.jobs.slice(0, -1), job = recipe.jobs.at(-1);

@@ -18,8 +18,8 @@ import { parseArgs } from 'node:util';
 import { strictJson } from '../strict-json.mjs';
 import { readZip } from './stored-zip.mjs';
 import {
-  REPOSITORY, RECEIPT_SCHEMA, ROOT, assetName, build, buildName, configSequence, defaultConfig, git, loadConfig, log, pin,
-  producerIdentity, require, samePin, sha256sums,
+  REPOSITORY, RECEIPT_SCHEMA, ROOT, assertExpectedPackage, assetName, build, buildName, configForTag, configSequence,
+  defaultConfig, git, loadConfig, log, pin, producerIdentity, require, samePin, sha256sums,
 } from './build.mjs';
 import { DISPLAY_ASSET, MANIFEST_ASSET } from './support-display.mjs';
 
@@ -326,10 +326,15 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
   const patch = config.target.game_patch;
   const decision = plan(repo, patch, commit, listRemoteTags(repo));
   problems.push(...decision.problems);
+  if (!config.published && !config.expect?.package) problems.push(`${loaded.display}: publish requires expect.package {bytes, sha256}`);
   if (config.hold) problems.push(`${loaded.display} is on hold: ${config.hold}`);
   const declared = configSequence(loaded);
   if (declared !== null && decision.action === 'new' && decision.sequence !== declared) {
     problems.push(`${loaded.display} is meant for ${tagName(patch, declared)}, but the next free tag is ${tagName(patch, decision.sequence)}`);
+  }
+  if (decision.sequence !== null) {
+    const mapped = configForTag(tagName(patch, decision.sequence));
+    if (!loaded.underRelease || loaded.display !== mapped) problems.push(`${tagName(patch, decision.sequence)} requires config ${mapped}, got ${loaded.display}`);
   }
   // Read-only in a dry run too: existing Releases are only visible through gh.
   const ghIssue = ghProblem(run);
@@ -339,11 +344,12 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
   }
   // The build and what it says about HEAD.
   const staged = stage(built(repo, configFile, values.reuse), path.join(repo, '.cache/release/publish', buildName(loaded)));
+  assertExpectedPackage(config, staged.assets[staged.asset]);
   const { producer } = staged.receipt;
   if (producer.commit !== commit || producer.dirty) problems.push('the package was not built from a clean HEAD');
   const { action, sequence } = decision;
   if (config.published && !samePin(staged.assets[staged.asset], config.published)) {
-    problems.push(`the package differs from the published ${config.published.tag} the config declares; update or drop "published"`);
+    problems.push(`the package differs from the published ${config.published.tag} the config declares; use a new release config`);
   } else if (config.published && action === 'new') {
     // The config already names its Release; a display it does not carry needs a new config.
     const sums = staged.receipt.support_display && !ghIssue ? releaseSums(run, config.published.tag) : null;

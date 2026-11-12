@@ -67,7 +67,7 @@ test('retained: pin, catalog and provenance mismatches are refused', t => {
   refuses({ ...spec, extra: 1 }, /unknown fields/u, 'unknown field');
   refuses({ ...spec, dictionary: dictionary() }, /declare dictionary and catalog together/u, 'half the inputs');
   write(repo, 'release/9.9.json', bytes({ ...strictJson(releaseConfig(repo, manifestRaw, { support_display: spec })), display: spec }));
-  assert.throws(() => build({ repo }), /unknown fields \(v1 allows schema,target,source,hold,published,support_display\)/u, 'v1 top-level field');
+  assert.throws(() => build({ repo }), /unknown fields \(v1 allows schema,target,source,expect,hold,published,support_display\)/u, 'v1 top-level field');
   // Inconsistent files, each with matching pins.
   const variant = (changed, pattern, label) => {
     write(repo, `${DISPLAY_DIR}/manifest.json`, changed.manifestRaw);
@@ -198,7 +198,7 @@ test('check-release: the published SHA256SUMS must list the rebuilt display', as
   const { repo, manifestRaw, spec } = retainedFixture(t);
   const plain = build({ repo });
   writeConfig(repo, manifestRaw, spec);
-  write(repo, 'release/9.9.json', releaseConfig(repo, manifestRaw, { support_display: spec,
+  write(repo, 'release/9.9-1.json', releaseConfig(repo, manifestRaw, { support_display: spec,
     published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...pin(plain.zip) } }));
   const built = build({ repo });
   const url = name => releaseUrl('ackness/poe2-zh-cn-stats', 'locale/9.9-1', name);
@@ -208,7 +208,7 @@ test('check-release: the published SHA256SUMS must list the rebuilt display', as
   const listing = readFileSync(path.join(built.out, 'SHA256SUMS'));
   await checkRelease(built, served([[url('SHA256SUMS'), listing], [url('pobr-locale-9.9.zip'), built.zip]]));
   // A Release that carries a display the config does not declare.
-  write(repo, 'release/9.9.json', releaseConfig(repo, manifestRaw, { published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...pin(plain.zip) } }));
+  write(repo, 'release/9.9-1.json', releaseConfig(repo, manifestRaw, { published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...pin(plain.zip) } }));
   await assert.rejects(checkRelease(build({ repo }), served([[url('SHA256SUMS'), listing], [url('pobr-locale-9.9.zip'), built.zip]])),
     /SHA256SUMS lists support-display\.zh-CN\.json,supportDescriptions\.zh-CN\.json, but the config declares no support display/u);
 });

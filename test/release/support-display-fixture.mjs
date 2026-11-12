@@ -47,14 +47,16 @@ export function writeConfig(repo, manifestRaw, display) {
   write(repo, 'release/9.9.json', releaseConfig(repo, manifestRaw, display ? { support_display: display } : {}));
 }
 
-// Commit a retained display into the fixture checkout and declare it in release/9.9.json.
-export function addRetainedDisplay({ repo, manifestRaw }, { files = retained(), extra = {}, published } = {}) {
+// Commit a retained display into the fixture checkout and declare it in the chosen config.
+export function addRetainedDisplay({ repo, manifestRaw }, { files = retained(), extra = {}, published, expect,
+  configFile = 'release/9.9.json' } = {}) {
   write(repo, `${DISPLAY_DIR}/manifest.json`, files.manifestRaw);
   write(repo, `${DISPLAY_DIR}/${DISPLAY_ASSET}`, files.assetRaw);
   write(repo, `${DISPLAY_DIR}/README.md`, 'retained\n');
   const origin = commitAll(repo, 'retained display');
   const spec = retainedSpec(files, origin, extra);
-  write(repo, 'release/9.9.json', releaseConfig(repo, manifestRaw, { support_display: spec, ...(published ? { published } : {}) }));
+  write(repo, configFile, releaseConfig(repo, manifestRaw, { support_display: spec, ...(published ? { published } : {}),
+    ...(expect ? { expect } : {}) }));
   commitAll(repo, 'declare the display');
   return { files, spec, origin };
 }

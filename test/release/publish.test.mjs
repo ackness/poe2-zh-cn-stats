@@ -2,18 +2,26 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { build, pin, sha256 } from '../../src/release/build.mjs';
+import { build, loadConfig, packageArchive, packageOf, pin, sha256 } from '../../src/release/build.mjs';
 import {
   commands, main, nextSequence, plan, preflight, remoteTags, sequences, stage, tagName,
 } from '../../src/release/publish.mjs';
 import { bytes, commitAll, config, fixture, gitIn, write } from './fixture.mjs';
 import { addRetainedDisplay, retained } from './support-display-fixture.mjs';
 
-const STAGE = 'publish/poe2-international-9.9';
+const STAGE = 'publish/poe2-international-9.9-1';
 
-function setup(t) {
+function setup(t, { expected = true } = {}) {
   const context = fixture('locale-publish');
   t.after(() => rmSync(context.root, { recursive: true, force: true }));
+  const { repo, manifestRaw } = context;
+  gitIn(repo, 'mv', 'release/9.9.json', 'release/9.9-1.json');
+  const loaded = loadConfig(path.join(repo, 'release/9.9-1.json'), repo);
+  const { partSource, members } = packageOf(repo, loaded);
+  context.expect = { package: pin(packageArchive(loaded.config.target, partSource, members).zip) };
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, expected ? { expect: context.expect } : {})));
+  context.commit = commitAll(repo, 'pin the intended numbered package');
+  gitIn(repo, 'push', '-q', 'origin', 'main');
   return context;
 }
 
@@ -109,7 +117,7 @@ test('stage: the three assets under their release names, GNU SHA256SUMS sorted b
   assert.deepEqual(release.slice(0, 8), ['gh', 'release', 'create', 'locale/9.9-1', '--repo', 'ackness/poe2-zh-cn-stats', '--verify-tag', '--title']);
   assert.deepEqual(release.slice(-3).map(f => path.basename(f)), ['SHA256SUMS', 'pobr-locale-9.9.zip', 'receipt.json']);
   // A build whose zip no longer matches its receipt is not staged.
-  write(repo, '.cache/release/poe2-international-9.9/pobr-locale-9.9.zip', Buffer.concat([built.zip, Buffer.from('x')]));
+  write(repo, '.cache/release/poe2-international-9.9-1/pobr-locale-9.9.zip', Buffer.concat([built.zip, Buffer.from('x')]));
   assert.throws(() => stage(built.out, path.join(repo, '.cache/stage')), /differs from its pin in receipt\.json/u);
   assert.throws(() => stage(built.out, path.join(repo, 'release')), /differs|non-publish/u);
 });
@@ -162,6 +170,43 @@ test('dry run (the default): stages and prints the plan, runs nothing', t => {
   const notes = readFileSync(path.join(repo, '.cache/release', STAGE, 'release-notes.md'), 'utf8');
   assert.match(notes, /mise run data:bump ackness\/poe2-zh-cn-stats locale\/9\.9-1/u);
   assert.throws(() => publish(repo, ['--dry-run', '--yes'], runner(repo)), /mutually exclusive/u);
+});
+
+test('publish refuses a config without published or expect.package', t => {
+  const { repo, origin } = setup(t, { expected: false });
+  const gh = runner(repo);
+  const dry = publish(repo, [], gh);
+  assert.equal(dry.status, 1);
+  assert.match(dry.output, /publish requires expect\.package/u);
+  assert.throws(() => publish(repo, ['--yes'], gh), /publish requires expect\.package/u);
+  assert.deepEqual(remoteTagsOf(origin), []);
+  assert.ok(!verbs(gh).some(verb => verb.startsWith('git ') || verb === 'gh release create'));
+});
+
+test('publish refuses mismatched expect.package even with --reuse', t => {
+  const { repo, origin, manifestRaw } = setup(t);
+  const actual = pin(build({ repo }).zip), expected = { ...actual, sha256: '0'.repeat(64) };
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { expect: { package: expected } })));
+  commitAll(repo, 'declare a wrong expectation');
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  // A mismatched build still emits its receipt, so reuse must enforce the pin too.
+  assert.throws(() => build({ repo }), /differs from expect\.package/u);
+  for (const argv of [[], ['--yes'], ['--reuse'], ['--yes', '--reuse']]) {
+    const gh = runner(repo);
+    assert.throws(() => publish(repo, argv, gh), /differs from expect\.package/u);
+    assert.deepEqual(remoteTagsOf(origin), []);
+    assert.ok(!verbs(gh).some(verb => verb.startsWith('git ') || verb === 'gh release create'));
+  }
+});
+
+test('publish refuses a config whose filename does not map to its planned tag', t => {
+  const { repo } = setup(t);
+  gitIn(repo, 'mv', 'release/9.9-1.json', 'release/9.9.json');
+  commitAll(repo, 'a nonlegacy unnumbered config');
+  gitIn(repo, 'push', '-q', 'origin', 'main');
+  const gh = runner(repo);
+  assert.throws(() => publish(repo, ['--yes'], gh), /locale\/9\.9-1 requires config release\/9\.9-1\.json/u);
+  assert.deepEqual(verbs(gh), ['gh auth status']);
 });
 
 test('--yes tags, pushes and creates the Release; rerunning only verifies it', t => {
@@ -223,6 +268,7 @@ test('the same bytes never get a second number from a later commit', t => {
   const releases = {};
   assert.equal(publish(repo, ['--yes'], runner(repo, { releases })).status, 0);
   write(repo, 'docs.md', 'unrelated\n');
+  write(repo, 'release/9.9-2.json', readFileSync(path.join(repo, 'release/9.9-1.json')));
   commitAll(repo, 'unrelated');
   gitIn(repo, 'push', '-q', 'origin', 'main');
   const result = publish(repo, [], runner(repo, { releases }));
@@ -290,13 +336,13 @@ test('the package must be built from HEAD and not already published under anothe
   // The config declares these bytes as published already.
   const built = build({ repo });
   const published = { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...pin(built.zip) };
-  write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published })));
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { published })));
   commitAll(repo, 'declare published');
   gitIn(repo, 'push', '-q', 'origin', 'main');
   result = publish(repo, [], runner(repo));
   assert.equal(result.status, 1);
   assert.match(result.output, /already published as locale\/9\.9-1; nothing new to publish/u);
-  write(repo, 'release/9.9.json', bytes(config(manifestRaw, { published: { ...published, sha256: '0'.repeat(64) } })));
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { published: { ...published, sha256: '0'.repeat(64) } })));
   commitAll(repo, 'declare other bytes');
   gitIn(repo, 'push', '-q', 'origin', 'main');
   result = publish(repo, [], runner(repo));
@@ -304,8 +350,8 @@ test('the package must be built from HEAD and not already published under anothe
 });
 
 test('a config on hold or named for another sequence is not published', t => {
-  const { repo, manifestRaw } = setup(t);
-  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { hold: 'PoBR cannot adopt it yet' })));
+  const { repo, manifestRaw, expect } = setup(t);
+  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { expect, hold: 'PoBR cannot adopt it yet' })));
   commitAll(repo, 'a held candidate for locale/9.9-2');
   gitIn(repo, 'push', '-q', 'origin', 'main');
   const refused = /release\/9\.9-2\.json is on hold: PoBR cannot adopt it yet\n {2}- release\/9\.9-2\.json is meant for locale\/9\.9-2, but the next free tag is locale\/9\.9-1/u;
@@ -315,14 +361,14 @@ test('a config on hold or named for another sequence is not published', t => {
   assert.equal(status, 1);
   assert.match(output, /publish refused:/u);
   assert.ok(existsSync(path.join(repo, '.cache/release/publish/poe2-international-9.9-2/release-notes.md')));
-  // The held config is not the default: the plain config of the same patch publishes as locale/9.9-1.
+  // The held config is not the default: the first numbered config publishes as locale/9.9-1.
   const plain = publish(repo, [], runner(repo));
   assert.equal(plain.status, 0, plain.output);
 });
 
 test('a Release with a support display: published, verified on rerun, and a duplicate only without new display bytes', t => {
   const context = setup(t), { repo } = context;
-  addRetainedDisplay(context);
+  addRetainedDisplay(context, { configFile: 'release/9.9-1.json', expect: context.expect });
   gitIn(repo, 'push', '-q', 'origin', 'main');
   const display = ['support-display.zh-CN.json', 'supportDescriptions.zh-CN.json'];
   // An interrupted upload: the draft lacks the display files, so it is not finished as it is.
@@ -343,6 +389,8 @@ test('a Release with a support display: published, verified on rerun, and a dupl
   releases['locale/9.9-1'].assets['supportDescriptions.zh-CN.json'] = readFileSync(path.join(repo, 'inputs/support-display-test/supportDescriptions.zh-CN.json'));
   // A later commit with the same zip and display is a duplicate.
   write(repo, 'docs.md', 'unrelated\n');
+  // Keep the old published declaration and prepare the next numbered candidate.
+  write(repo, 'release/9.9-2.json', readFileSync(path.join(repo, 'release/9.9-1.json')));
   commitAll(repo, 'unrelated');
   gitIn(repo, 'push', '-q', 'origin', 'main');
   const duplicate = publish(repo, [], runner(repo, { releases }));
@@ -352,14 +400,16 @@ test('a Release with a support display: published, verified on rerun, and a dupl
   const zip = pin(releases['locale/9.9-1'].assets['pobr-locale-9.9.zip']);
   const other = retained({ entries: { SupportA: { en: 'Supports Attacks.', zh_cn: '辅助攻击！' } } });
   rmSync(path.join(repo, 'inputs/support-display-test'), { recursive: true });
-  addRetainedDisplay(context, { files: other });
+  addRetainedDisplay(context, { files: other, configFile: 'release/9.9-2.json', expect: context.expect });
   gitIn(repo, 'push', '-q', 'origin', 'main');
   const fresh = publish(repo, [], runner(repo, { releases }));
   assert.equal(fresh.status, 0, fresh.output);
   assert.match(fresh.output, /tag: locale\/9\.9-2/u);
   // ... but not by editing a config that already declares its Release.
   rmSync(path.join(repo, 'inputs/support-display-test'), { recursive: true });
-  addRetainedDisplay(context, { files: other, published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...zip } });
+  rmSync(path.join(repo, 'release/9.9-2.json'));
+  addRetainedDisplay(context, { files: other, configFile: 'release/9.9-1.json',
+    published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...zip } });
   gitIn(repo, 'push', '-q', 'origin', 'main');
   const edited = publish(repo, [], runner(repo, { releases }));
   assert.equal(edited.status, 1);
