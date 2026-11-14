@@ -1,0 +1,26 @@
+{
+  "schema": "poe2-locale-release-config/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.8",
+    "realm": "international"
+  },
+  "source": {
+    "manifest": {
+      "path": "inputs/locale-0.5.5.8/manifest.json",
+      "bytes": 8671,
+      "sha256": "e7faa2662db551cf05b67ce4eb6f235beb48ccb2806f3558f92e7c9969929d0f"
+    },
+    "origin": {
+      "repository": "ackness/poe2-zh-cn-stats",
+      "tag": "main",
+      "revision": "d6990a04872dec548bb045365d7a94a681105709"
+    }
+  },
+  "expect": {
+    "package": {
+      "bytes": 8469320,
+      "sha256": "60981676e1b04263ae667a0dc627d6f85fff5f168447597c7a6a8c02c52ed475"
+    }
+  }
+}
