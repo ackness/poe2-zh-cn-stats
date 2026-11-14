@@ -49,13 +49,15 @@ export function chinaPackage({ realm = 'china', files = {}, extra = {}, root = p
 // go into the localized source identity; `defaultRealm` into the default one. `localizedIdentity`
 // overrides fields of the localized source identity (e.g. another game_patch).
 export function tablePackage({ tables, language = 'Simplified Chinese', realm = 'china', defaultRealm = realm,
-  localizedDir = 'display-tables/simplified-chinese/', extra = {}, tag = 'inputs/9.9-1', scopes, localizedIdentity = {}, gamePatch = '9.9' } = {}) {
+  localizedDir = 'display-tables/simplified-chinese/', extra = {}, tag = 'inputs/9.9-1', scopes, localizedIdentity = {}, gamePatch = '9.9',
+  editTables = () => {} } = {}) {
   const side = localized => {
     const doc = Object.fromEntries(Object.entries(tables).map(([table, rows]) => {
       const field = table === 'GemEffects' ? 'SupportText' : table === 'ActiveSkills' ? 'Description' : 'Name';
       return [table, { table, rows: Object.entries(rows).filter(([, pair]) => !localized || pair[1] !== undefined)
         .map(([id, pair], index) => ({ _row: index, values: { Id: id, [field]: pair[localized ? 1 : 0] } })) }];
     }));
+    editTables(doc, localized);
     const tablesRaw = Buffer.from(JSON.stringify(doc)), lockRaw = Buffer.from('{"schema_version":1}');
     const manifest = Buffer.from(JSON.stringify({ format: localized ? 'repoe-localized-tables/v1' : 'repoe-native-tables/v1',
       files: { 'source-lock.json': pin(lockRaw), 'tables.json': pin(tablesRaw) },
@@ -71,7 +73,8 @@ export function tablePackage({ tables, language = 'Simplified Chinese', realm = 
   const root = Buffer.from(JSON.stringify({ schema: 'repoe-release-input/v1', name: 'text', target: { game: 'poe2', game_patch: gamePatch, realm },
     files: Object.fromEntries(Object.entries(members).map(([name, raw]) => [name, pin(raw)])) }));
   const zip = storedZip({ 'manifest.json': root, ...members });
-  const tableScopes = { GemEffects: 'GemEffects.SupportText', ActiveSkills: 'ActiveSkills.Description', MonsterVarieties: 'MonsterVarieties.Name' };
+  const tableScopes = { GemEffects: 'GemEffects.SupportText', ActiveSkills: 'ActiveSkills.Description',
+    MonsterVarieties: 'MonsterVarieties.Name', ItemClasses: 'ItemClasses.Name' };
   return { zip, spec: { repository: 'ackness/repoe', tag, asset: 'repoe-input-text-9.9.zip', ...pin(zip),
     default: 'display-tables/default/', default_manifest_sha256: sha(english.manifest),
     localized: localizedDir, localized_manifest_sha256: sha(localized.manifest),

@@ -8,7 +8,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { NAME_SCOPE, monsterTargets, validateOfficialNames, validateSupplements } from './display-supplements.mjs';
 import { readZip } from '../release/stored-zip.mjs';
-import { GEM_SCOPES, NAME_SCOPE as TABLE_NAME_SCOPE, gemTargets, pairOfficialTables, readOfficialTables, validateTableSpec } from './official-tables.mjs';
+import { GEM_SCOPES, ITEM_CLASS_SCOPE, NAME_SCOPE as TABLE_NAME_SCOPE, gemTargets, itemClassTargets, pairOfficialTables, readOfficialTables, validateTableSpec } from './official-tables.mjs';
 
 const requireValue = (value, message) => { if (!value) throw new Error(message); };
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -447,6 +447,8 @@ export async function createDisplayTexts(request, out) {
     game = { sha256: spec.sha256, targets: monsters ?? new Map() };
     targets = new Map([...(GEM_SCOPES.some(scope => tableScopes.has(scope)) ? gemTargets(member('gem_descriptions.json'), request.game_patch) : []),
       ...(monsters ? [[TABLE_NAME_SCOPE, monsters]] : [])]);
+    if (tableScopes.has(ITEM_CLASS_SCOPE)) targets.set(ITEM_CLASS_SCOPE,
+      itemClassTargets(archive, { game: 'poe2', game_patch: request.game_patch, realm: request.realm }));
   }
   // Official table rows, paired against those targets; each source is a pinned RePoE input zip.
   let tables = null;

@@ -6,8 +6,8 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-texts.mjs';
 import { entryId, monsterTargets } from '../../src/pobr/display-supplements.mjs';
-import { gemTargets, markupProblem, pairOfficialTables, readOfficialTables } from '../../src/pobr/official-tables.mjs';
-import { storedZip } from '../../src/release/stored-zip.mjs';
+import { ITEM_CLASS_SCOPE, gemTargets, itemClassTargets, markupProblem, pairOfficialTables, readOfficialTables } from '../../src/pobr/official-tables.mjs';
+import { readZip, storedZip } from '../../src/release/stored-zip.mjs';
 import { tablePackage } from './official-fixture.mjs';
 
 const GEMS = { _meta: { schema: 'repoe-gem-descriptions/v1', game_patch: '9.9' }, scopes: {
@@ -22,6 +22,109 @@ const TABLES = {
 const targets = () => new Map([...gemTargets(GEMS, '9.9')]);
 const counts = values => ({ adopted: 0, shadowed: 0, 'not-in-game': 0, 'ambiguous-target': 0, 'ambiguous-id': 0, 'no-default-row': 0,
   'english-differs': 0, untranslated: 0, 'no-han': 0, 'broken-markup': 0, ...values });
+const CLASS_TARGET = { game: 'poe2', game_patch: '9.9', realm: 'international' };
+const CLASSES = { _meta: { schema: 'repoe-item-class-names/v1', ...CLASS_TARGET },
+  scopes: { [ITEM_CLASS_SCOPE]: { A: 'Names \r\n', Twin1: 'Same', Twin2: 'Same', Changed: 'Current',
+    Empty: 'Empty', Blank: 'Blank', Duplicate: 'Duplicate', NoDefault: 'No default', AbsentSource: 'Never sourced' } } };
+const TW = { realm: 'international', language: 'Traditional Chinese', localizedDir: 'display-tables/traditional-chinese/' };
+
+// One complete game envelope, with edits at each declaration layer for refusal cases.
+function classGame({ document = CLASSES, raw = Buffer.from(JSON.stringify(document)),
+  editSnapshot = () => {}, editRoot = () => {} } = {}) {
+  const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+  const name = 'overlay/item_class_names.json', prefix = 'data/9.9/';
+  const snapshot = { schema_version: 3, poe_version: '9.9', contract_version: 1,
+    domains: { base: [], overlay: ['item_class_names'], generated: [] }, files: { [name]: sha(raw) } };
+  editSnapshot(snapshot);
+  const members = { [prefix + name]: raw, [prefix + 'manifest.json']: Buffer.from(JSON.stringify(snapshot)) };
+  const root = { schema: 'pobr-build-data-part/v1', kind: 'game', target: CLASS_TARGET,
+    files: Object.fromEntries(Object.entries(members).map(([key, value]) => [key, { bytes: value.length, sha256: sha(value) }])) };
+  editRoot(root, members);
+  return storedZip({ ...members, 'manifest.json': Buffer.from(JSON.stringify(root)) });
+}
+
+test('item class targets require exact metadata, one scope and nonblank Id/Name strings', () => {
+  assert.deepEqual(Object.fromEntries(itemClassTargets(readZip(classGame()), CLASS_TARGET)), CLASSES.scopes[ITEM_CLASS_SCOPE]);
+  for (const edit of [
+    doc => { doc._meta.schema = 'other'; },
+    ...['game', 'game_patch', 'realm'].map(key => doc => { doc._meta[key] = 'other'; }),
+    doc => { doc.scopes.Other = {}; },
+    doc => { doc.scopes = {}; },
+    doc => { doc.scopes[ITEM_CLASS_SCOPE] = []; },
+    ...[null, 1, '', ' \t'].map(value => doc => { doc.scopes[ITEM_CLASS_SCOPE].A = value; }),
+    doc => { doc.scopes[ITEM_CLASS_SCOPE][' \t'] = 'Name'; },
+  ]) {
+    const document = structuredClone(CLASSES); edit(document);
+    assert.throws(() => itemClassTargets(readZip(classGame({ document })), CLASS_TARGET),
+      /schema or target differs|exactly the ItemClasses.Name scope|nonblank/u);
+  }
+  const duplicate = Buffer.from('{"_meta":' + JSON.stringify(CLASSES._meta)
+    + ',"scopes":{"ItemClasses.Name":{"A":"Same","A":"Same"}}}');
+  assert.throws(() => itemClassTargets(readZip(classGame({ raw: duplicate })), CLASS_TARGET), /Duplicate JSON key/u);
+});
+
+test('item class targets verify the game target and both manifest declarations and byte pins', () => {
+  assert.throws(() => itemClassTargets(readZip(storedZip({})), CLASS_TARGET), /missing root manifest/u);
+  for (const [options, message] of [
+    [{ editRoot: root => { root.kind = 'language'; } }, /invalid game manifest/u],
+    ...['game', 'game_patch', 'realm'].map(key => [
+      { editRoot: root => { root.target = { ...root.target, [key]: 'other' }; } }, /game target differs/u]),
+    [{ editRoot: root => { delete root.files['data/9.9/overlay/item_class_names.json']; } }, /root manifest pin/u],
+    [{ editRoot: root => { root.files['data/9.9/overlay/item_class_names.json'].sha256 = '0'.repeat(64); } }, /root manifest pin/u],
+    [{ editRoot: root => { delete root.files['data/9.9/manifest.json']; } }, /root manifest pin/u],
+    [{ editRoot: (root, members) => { delete members['data/9.9/overlay/item_class_names.json']; } }, /root manifest pin/u],
+    [{ editSnapshot: snapshot => { snapshot.files['overlay/item_class_names.json'] = '0'.repeat(64); } }, /snapshot manifest pin/u],
+    [{ editSnapshot: snapshot => { snapshot.domains.overlay = []; } }, /snapshot does not declare/u],
+    [{ editSnapshot: snapshot => { snapshot.poe_version = '9.8'; } }, /snapshot does not declare/u],
+  ]) assert.throws(() => itemClassTargets(readZip(classGame(options)), CLASS_TARGET), message);
+});
+
+test('ItemClasses.Name keeps same-name ids and existing exact-English and source refusal counts', () => {
+  const pkg = tablePackage({ ...TW, gamePatch: '9.8', tables: { ItemClasses: {
+    A: ['Names \r\n', '名稱 \r\n'], Twin1: ['Same', '甲類'], Twin2: ['Same', '乙類'],
+    Changed: ['Old', '更改'], Empty: ['Empty', ''], Blank: ['Blank', ' \t'],
+    Removed: ['Gone', '移除'], EmptyName: ['', '空名'], Duplicate: ['Duplicate', '重複'], NoDefault: ['No default', '無預設'],
+  } }, editTables: (doc, localized) => {
+    if (localized) doc.ItemClasses.rows.push(doc.ItemClasses.rows.find(row => row.values.Id === 'Duplicate'));
+    else doc.ItemClasses.rows = doc.ItemClasses.rows.filter(row => row.values.Id !== 'NoDefault');
+  } });
+  const targets = new Map([[ITEM_CLASS_SCOPE, itemClassTargets(readZip(classGame()), CLASS_TARGET)]]);
+  const source = readOfficialTables(pkg.zip, pkg.spec, 'zh-TW');
+  const paired = pairOfficialTables([source], targets);
+  assert.deepEqual(Object.fromEntries(paired.scopes.get(ITEM_CLASS_SCOPE)),
+    { A: ['Names \r\n', '名稱 \r\n'], Twin1: ['Same', '甲類'], Twin2: ['Same', '乙類'] });
+  assert.deepEqual(paired.counts[0][ITEM_CLASS_SCOPE],
+    counts({ adopted: 3, 'english-differs': 1, untranslated: 2, 'not-in-game': 2, 'ambiguous-id': 1, 'no-default-row': 1 }));
+  assert.equal(paired.missing[ITEM_CLASS_SCOPE], 6);
+  assert.equal(source.source.localized.source_identity.game_patch, '9.8');
+  for (const localizedIdentity of [{ game_patch: '9.7' }, { source_lock_sha256: 'f'.repeat(64) }, { realm: 'china' }]) {
+    const invalid = tablePackage({ ...TW, tables: { ItemClasses: { A: ['Names \r\n', '名稱'] } }, localizedIdentity });
+    assert.throws(() => readOfficialTables(invalid.zip, invalid.spec, 'zh-TW'), /must share|is realm china/u);
+  }
+});
+
+test('createDisplayTexts opts into class names from a pinned member and keeps old scopes optional', async t => {
+  const { dir, write } = cache(t);
+  const source = tablePackage({ ...TW, gamePatch: '9.8', tables: { ItemClasses: { A: ['Names \r\n', '名稱 \r\n'] } } });
+  const request = { schema: 'pobr-native-display-texts-request/v1', game_patch: '9.9', realm: 'international', locale: 'zh-TW',
+    projection: { scopes: [ITEM_CLASS_SCOPE], literals: 'all-catalog-conflict-participants' },
+    game_package: { ...write('classes-game.zip', classGame()), asset: 'pobr-game-9.9.zip' },
+    official_tables: [{ ...write('classes-source.zip', source.zip), ...source.spec }] };
+  const out = path.join(dir, 'classes-out'), receipt = await createDisplayTexts(request, out);
+  const raw = fs.readFileSync(path.join(out, 'display_texts.json'));
+  assert.deepEqual(JSON.parse(raw).scopes, { [ITEM_CLASS_SCOPE]: { A: ['Names \r\n', '名稱 \r\n'] } });
+  assert.deepEqual(JSON.parse(raw).carried_from, ['9.8']);
+  assert.equal(raw.includes(Buffer.from('null')), false);
+  assert.equal(receipt.official_tables.adopted[ITEM_CLASS_SCOPE], 1);
+  const repeat = path.join(dir, 'classes-repeat');
+  await createDisplayTexts(request, repeat);
+  assert.deepEqual(fs.readFileSync(path.join(repeat, 'display_texts.json')), raw);
+  await assert.rejects(createDisplayTexts({ ...request,
+    game_package: { ...write('classes-old-game.zip', storedZip({})), asset: 'pobr-game-9.9.zip' } },
+  path.join(dir, 'classes-missing')), /missing root manifest/u);
+  await assert.rejects(createDisplayTexts({ ...request,
+    game_package: { ...request.game_package, sha256: '0'.repeat(64) } }, path.join(dir, 'classes-pin')), /SHA256 mismatch/u);
+});
 
 test('official tables: only the localized row whose English is the game English ships, raw and never as null', () => {
   const { zip, spec } = tablePackage({ tables: TABLES });
