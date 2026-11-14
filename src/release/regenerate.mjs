@@ -19,7 +19,7 @@ import { readZip } from './stored-zip.mjs';
 import { produceLocale } from '../pobr/locale-producer.mjs';
 import { validateProjection } from '../pobr/display-texts.mjs';
 import { OFFICIAL_REALMS, validateOfficialSpec } from '../pobr/official-lines.mjs';
-import { TABLE_REALMS, validateTableSpec } from '../pobr/official-tables.mjs';
+import { ITEM_CLASS_SCOPE, TABLE_REALMS, validateTableSpec } from '../pobr/official-tables.mjs';
 import {
   REPOSITORY, ROOT, assetName, download, encoded, fetchOrigin, loadConfig, log, originManifestPath, packageArchive, packageMembers,
   pin, producerIdentity, publicationSource, readSource, releaseUrl, require, samePin, sha256,
@@ -127,6 +127,7 @@ function validateJob(job, members, patch) {
     try { validateProjection(job.projection); } catch {
       throw new Error(`${job.id}: pin the projection {scopes, literals} that produced the member`);
     }
+    if (job.projection.scopes.includes(ITEM_CLASS_SCOPE)) validateGamePackage(job, patch);
     require(typeof job.locale === 'string' && job.members.length === 1 && job.members[0] === `i18n/${job.locale}/display_texts.json`,
       `${job.id}: one member, i18n/<locale>/display_texts.json`);
   } else throw new Error(`${job.id}: unknown job kind ${job.kind}`);
@@ -323,7 +324,7 @@ async function displayTexts(job, inputs, work, repo) {
       request.package_texts[key] = { file: path.join(work, `package-${key}.json`), ...pin(raw) };
     }
   }
-  if (job.names || job.official_names || job.official_tables) {
+  if (job.names || job.official_names || job.official_tables || job.projection.scopes.includes(ITEM_CLASS_SCOPE)) {
     const { repository, tag, asset } = job.game_package;
     const zip = await inputs.url(releaseUrl(repository, tag, asset), job.game_package, `${job.id}:game_package`);
     writeFileSync(path.join(work, asset), zip);

@@ -8,6 +8,7 @@ import { createDisplayTexts, projectDisplayTexts } from '../../src/pobr/display-
 import { pairDisplayCatalog } from '../../src/native-catalog.mjs';
 import { entryId, monsterTargets, validateOfficialNames } from '../../src/pobr/display-supplements.mjs';
 import { readZip, storedZip } from '../../src/release/stored-zip.mjs';
+import { ITEM_CLASS_SCOPE } from '../../src/pobr/official-tables.mjs';
 
 const row = (id, english, localized, extra = {}) => ({
   table: 'BaseItemTypes', field: 'Name', id, english, localized,
@@ -74,6 +75,36 @@ test('Words retain numeric decision identities and prototype-like literals witho
   assert.equal(sidecar.entries.__proto__, '詞');
   assert.equal(sidecar.scopes['Words.Text2'], undefined);
   assert.deepEqual(decisions[0].identity, ['Words', 'Text2', 123]);
+});
+
+test('catalog item classes require target IDs and exact English without changing literals or other scopes', () => {
+  const records = [
+    row('base', 'Same', '基底'),
+    row('Amulet', 'Amulets', '项链', { table: 'ItemClasses' }),
+    row('Twin1', 'Same', '甲类', { table: 'ItemClasses' }),
+    row('Twin2', 'Same', '乙类', { table: 'ItemClasses' }),
+    row('Changed', 'Old English', '旧名', { table: 'ItemClasses' }),
+    row('Whitespace', 'Names', '名字', { table: 'ItemClasses' }),
+    row('Empty', '', null, { table: 'ItemClasses' }),
+    row('Gone', 'Removed', '移除', { table: 'ItemClasses' }),
+  ];
+  const lookup = query => {
+    const match = records.find(record => record.table === query.table && record.id === query.id);
+    return { status: match.localized === null ? 'fallback' : 'translated', text: match.localized ?? query.english };
+  };
+  const catalog = { game_patch: 'test', realm: 'international', locale: 'zh-CN', records };
+  const projection = { scopes: ['BaseItemTypes.Name'], literals: 'all-catalog-conflict-participants' };
+  const previous = projectDisplayTexts(catalog, lookup, 'a'.repeat(64), projection);
+  const classes = new Map([['Amulet', 'Amulets'], ['Twin1', 'Same'], ['Twin2', 'Same'],
+    ['Changed', 'New English'], ['Whitespace', 'Names ']]);
+  const next = projectDisplayTexts(catalog, lookup, 'a'.repeat(64),
+    { ...projection, scopes: [...projection.scopes, ITEM_CLASS_SCOPE] }, { game: { itemClasses: classes } });
+  assert.deepEqual(next.sidecar.scopes[ITEM_CLASS_SCOPE],
+    { Amulet: ['Amulets', '项链'], Twin1: ['Same', '甲类'], Twin2: ['Same', '乙类'] });
+  delete next.sidecar.scopes[ITEM_CLASS_SCOPE];
+  assert.deepEqual(next, previous);
+  assert.throws(() => projectDisplayTexts(catalog, lookup, 'a'.repeat(64),
+    { ...projection, scopes: [ITEM_CLASS_SCOPE] }), /pinned game package's item class targets/u);
 });
 
 test('duplicate source identities are rejected instead of last-write winning', () => {
@@ -181,6 +212,40 @@ function fixture(t, version, modules, options = {}) {
     passive_names: { file: path.join(root, 'passive_names.json'), ...write('passive_names.json', JSON.stringify(passives)) } };
   return output;
 }
+
+test('catalog-only ItemClasses projection reads the pinned game member and rejects missing targets', async t => {
+  const input = fixture(t, 3, 6, { records: [
+    row('Amulet', 'Amulets', null, { table: 'ItemClasses' }),
+    row('Changed', 'Old English', null, { table: 'ItemClasses' }),
+    row('Empty', '', null, { table: 'ItemClasses' }),
+  ] });
+  const target = { game: 'poe2', game_patch: 'test', realm: 'international' };
+  const member = 'data/test/overlay/item_class_names.json';
+  const encode = value => Buffer.from(JSON.stringify(value));
+  const classes = encode({ _meta: { schema: 'repoe-item-class-names/v1', ...target },
+    scopes: { [ITEM_CLASS_SCOPE]: { Amulet: 'Amulets', Changed: 'New English' } } });
+  const snapshot = encode({ schema_version: 3, poe_version: 'test', domains: { overlay: ['item_class_names'] },
+    files: { 'overlay/item_class_names.json': input.pin(classes).sha256 } });
+  const members = { 'data/test/manifest.json': snapshot, [member]: classes };
+  const gameZip = values => storedZip({ ...values, 'manifest.json': encode({
+    schema: 'pobr-build-data-part/v1', kind: 'game', target,
+    files: Object.fromEntries(Object.entries(values).map(([name, raw]) => [name, input.pin(raw)])),
+  }) });
+  const game = (name, raw) => ({ file: path.join(input.root, name), ...input.write(name, raw), asset: 'pobr-game-test.zip' });
+  const request = { ...input.request,
+    projection: { scopes: [ITEM_CLASS_SCOPE], literals: 'all-catalog-conflict-participants' } };
+  await assert.rejects(createDisplayTexts(request, input.out), /need game_package/u);
+  await assert.rejects(createDisplayTexts({ ...request,
+    game_package: game('missing.zip', gameZip({ 'data/test/manifest.json': snapshot })) }, input.out), /root manifest pin/u);
+  await assert.rejects(createDisplayTexts({ ...request,
+    game_package: game('undeclared.zip', gameZip({ ...members, 'data/test/manifest.json': encode({
+      schema_version: 3, poe_version: 'test', domains: { overlay: [] }, files: {},
+    }) })) }, input.out), /snapshot does not declare/u);
+  const receipt = await createDisplayTexts({ ...request, game_package: game('game.zip', gameZip(members)) }, input.out);
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(input.out, 'display_texts.json'))).scopes,
+    { [ITEM_CLASS_SCOPE]: { Amulet: ['Amulets', null] } });
+  assert.deepEqual(receipt.inputs[path.join(input.root, 'game.zip')], input.pin(gameZip(members)));
+});
 
 // A closed stub of the library's reviewed-supplement module: it accepts only the
 // original verification Buffer, the catalog pin and the externally pinned runtime,
