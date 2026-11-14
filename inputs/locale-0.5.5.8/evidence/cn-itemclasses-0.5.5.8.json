@@ -1,0 +1,697 @@
+{
+  "schema": "poe2-locale-item-classes-correction/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.8",
+    "realm": "international"
+  },
+  "supersedes_candidate": {
+    "source_commit": "d6990a04872dec548bb045365d7a94a681105709",
+    "config_commit": "43f1d72cd847246db7252569eb81755180708223",
+    "package": {
+      "bytes": 8469320,
+      "sha256": "60981676e1b04263ae667a0dc627d6f85fff5f168447597c7a6a8c02c52ed475"
+    },
+    "reason": "The game target enabled strict native item-class IDs while the Simplified Chinese scope was absent."
+  },
+  "source": {
+    "catalog_archive": {
+      "revision": "e61f1332e22dcbd199c3265b61b4e597b7da7b37",
+      "path": "handoff/windows-fk-20261101/catalog.zip",
+      "bytes": 17177228,
+      "sha256": "f4bbbd01c5aeea8f8a19b99c7cea67f38550949d5ef8c62e1245304013d129ef"
+    },
+    "catalog_manifest": {
+      "bytes": 4744,
+      "sha256": "0ef819f9628ae6341ce4f940ede093cdfaf6921b4b647c13d38912c1456e6a4e"
+    },
+    "catalog": {
+      "bytes": 56845333,
+      "sha256": "2da387f47bb91633761bc49dd64684966877dc255709e1e06b6be3f89683bec4"
+    },
+    "identity": {
+      "schema": "poe2-native-catalog/v3",
+      "game_patch": "0.5.5.5",
+      "realm": "international",
+      "locale": "zh-CN"
+    },
+    "adoption": "Already pinned by locale/0.5.5.5-4. No new source, script conversion or literal-to-ID inference."
+  },
+  "producer": {
+    "commit": "95a46884596a9f98e6b6fe34f73f9c4740650dd6",
+    "display_texts_sha256": "20a4dee33d62d3fc6cd3f02f74c518b017c63909469512d98118d6b5014e5d39",
+    "original_execution_receipt": {
+      "bytes": 17750325,
+      "sha256": "677a025c853e946e1f6b4eb9b27ccc8bd3c34e9f26778681c43be407569a4599"
+    }
+  },
+  "game_package": {
+    "repository": "ackness/repoe",
+    "tag": "game/0.5.5.8-1",
+    "asset": "pobr-game-0.5.5.8.zip",
+    "bytes": 4614107,
+    "sha256": "7dcb18ec41dff4deadfb3d9c9acfd128122c748ad1309d75bc301ccfecf0574a"
+  },
+  "counts": {
+    "source": 118,
+    "target": 93,
+    "projected": 93,
+    "not_in_game": 25,
+    "english_differs": 0,
+    "missing": 0
+  },
+  "adopted": [
+    {
+      "id": "AbyssJewel",
+      "english": "Abyss Jewels",
+      "text": "深渊珠宝"
+    },
+    {
+      "id": "Active Skill Gem",
+      "english": "Skill Gems",
+      "text": "技能宝石"
+    },
+    {
+      "id": "Amulet",
+      "english": "Amulets",
+      "text": "项链"
+    },
+    {
+      "id": "ArchnemesisMod",
+      "english": "Archnemesis Mods",
+      "text": "罪恶枷锁词缀"
+    },
+    {
+      "id": "AtlasCurrency",
+      "english": "Map Fragments",
+      "text": "地图碎片"
+    },
+    {
+      "id": "AtlasUpgradeItem",
+      "english": "Atlas Upgrade Items",
+      "text": "异界升级物品"
+    },
+    {
+      "id": "Belt",
+      "english": "Belts",
+      "text": "腰带"
+    },
+    {
+      "id": "Body Armour",
+      "english": "Body Armours",
+      "text": "护甲"
+    },
+    {
+      "id": "Boots",
+      "english": "Boots",
+      "text": "鞋子"
+    },
+    {
+      "id": "Bow",
+      "english": "Bows",
+      "text": "弓类"
+    },
+    {
+      "id": "Breachstone",
+      "english": "Breachstones",
+      "text": "裂隙石"
+    },
+    {
+      "id": "BrequelFruit",
+      "english": "Wombgifts",
+      "text": "孕育赠礼"
+    },
+    {
+      "id": "Buckler",
+      "english": "Bucklers",
+      "text": "轻盾"
+    },
+    {
+      "id": "Claw",
+      "english": "Claws",
+      "text": "爪类"
+    },
+    {
+      "id": "Crossbow",
+      "english": "Crossbows",
+      "text": "战弩"
+    },
+    {
+      "id": "Currency",
+      "english": "Currency",
+      "text": "通货"
+    },
+    {
+      "id": "Dagger",
+      "english": "Daggers",
+      "text": "匕首"
+    },
+    {
+      "id": "DelveSocketableCurrency",
+      "english": "Delve Socketable Currency",
+      "text": "地心探索：可镶嵌的通货"
+    },
+    {
+      "id": "DelveStackableSocketableCurrency",
+      "english": "Delve Stackable Socketable Currency",
+      "text": "地心探索可堆叠可插入通货"
+    },
+    {
+      "id": "DivinationCard",
+      "english": "Divination Cards",
+      "text": "命运卡"
+    },
+    {
+      "id": "Expedition2Logbooks",
+      "english": "Expedition Logbook",
+      "text": "先祖秘藏日志"
+    },
+    {
+      "id": "ExpeditionLogbook",
+      "english": "Expedition Logbooks",
+      "text": "先祖秘藏日志"
+    },
+    {
+      "id": "FishingRod",
+      "english": "Fishing Rods",
+      "text": "鱼竿"
+    },
+    {
+      "id": "Flail",
+      "english": "Flails",
+      "text": "连枷"
+    },
+    {
+      "id": "Focus",
+      "english": "Foci",
+      "text": "法器"
+    },
+    {
+      "id": "Gloves",
+      "english": "Gloves",
+      "text": "手套"
+    },
+    {
+      "id": "HeistBlueprint",
+      "english": "Blueprints",
+      "text": "蓝图"
+    },
+    {
+      "id": "HeistContract",
+      "english": "Contracts",
+      "text": "契约"
+    },
+    {
+      "id": "HeistEquipmentReward",
+      "english": "Heist Brooches",
+      "text": "赏金猎人胸针"
+    },
+    {
+      "id": "HeistEquipmentTool",
+      "english": "Heist Tools",
+      "text": "赏金猎人工具"
+    },
+    {
+      "id": "HeistEquipmentUtility",
+      "english": "Heist Cloaks",
+      "text": "赏金猎人披风"
+    },
+    {
+      "id": "HeistEquipmentWeapon",
+      "english": "Heist Gear",
+      "text": "赏金猎人装备"
+    },
+    {
+      "id": "HeistObjective",
+      "english": "Heist Targets",
+      "text": "赏金目标"
+    },
+    {
+      "id": "Helmet",
+      "english": "Helmets",
+      "text": "头盔"
+    },
+    {
+      "id": "HiddenItem",
+      "english": "Hidden Items",
+      "text": "隐藏物品"
+    },
+    {
+      "id": "HideoutDoodad",
+      "english": "Hideout Doodads",
+      "text": "藏身处装饰"
+    },
+    {
+      "id": "Incubator",
+      "english": "Incubators",
+      "text": "孕育石"
+    },
+    {
+      "id": "IncubatorStackable",
+      "english": "Incubators",
+      "text": "孕育石"
+    },
+    {
+      "id": "IncursionArm",
+      "english": "Transcendent Arm",
+      "text": "超凡之臂"
+    },
+    {
+      "id": "IncursionItem",
+      "english": "Incursion Items",
+      "text": "穿越物品"
+    },
+    {
+      "id": "IncursionLeg",
+      "english": "Transcendent Leg",
+      "text": "超凡之腿"
+    },
+    {
+      "id": "InstanceLocalItem",
+      "english": "Instance Local Items",
+      "text": "副本本地物品"
+    },
+    {
+      "id": "ItemisedSanctum",
+      "english": "Trial Coins",
+      "text": "试炼硬币"
+    },
+    {
+      "id": "Jewel",
+      "english": "Jewels",
+      "text": "珠宝"
+    },
+    {
+      "id": "LargeRelic",
+      "english": "Large Relics",
+      "text": "大型圣物"
+    },
+    {
+      "id": "Leaguestone",
+      "english": "Leaguestones",
+      "text": "赛季石"
+    },
+    {
+      "id": "LifeFlask",
+      "english": "Life Flasks",
+      "text": "生命药剂"
+    },
+    {
+      "id": "ManaFlask",
+      "english": "Mana Flasks",
+      "text": "魔力药剂"
+    },
+    {
+      "id": "Map",
+      "english": "Waystones",
+      "text": "引路石"
+    },
+    {
+      "id": "MapFragment",
+      "english": "Map Fragments",
+      "text": "地图碎片"
+    },
+    {
+      "id": "MediumRelic",
+      "english": "Medium Relics",
+      "text": "中型圣物"
+    },
+    {
+      "id": "MemoryLine",
+      "english": "Memories",
+      "text": "回忆"
+    },
+    {
+      "id": "Microtransaction",
+      "english": "Microtransactions",
+      "text": "商城物品"
+    },
+    {
+      "id": "MiscMapItem",
+      "english": "Misc Map Items",
+      "text": "裂隙之石"
+    },
+    {
+      "id": "Omen",
+      "english": "Omen",
+      "text": "预兆"
+    },
+    {
+      "id": "One Hand Axe",
+      "english": "One Hand Axes",
+      "text": "单手斧"
+    },
+    {
+      "id": "One Hand Mace",
+      "english": "One Hand Maces",
+      "text": "单手锤"
+    },
+    {
+      "id": "One Hand Sword",
+      "english": "One Hand Swords",
+      "text": "单手剑"
+    },
+    {
+      "id": "PantheonSoul",
+      "english": "Pantheon Souls",
+      "text": "万神殿之魂"
+    },
+    {
+      "id": "PinnacleKeyStackable",
+      "english": "Pinnacle Keys",
+      "text": "巅峰钥匙"
+    },
+    {
+      "id": "QuestItem",
+      "english": "Quest Items",
+      "text": "任务物品"
+    },
+    {
+      "id": "Quiver",
+      "english": "Quivers",
+      "text": "箭袋"
+    },
+    {
+      "id": "Relic",
+      "english": "Relics",
+      "text": "遗物"
+    },
+    {
+      "id": "Ring",
+      "english": "Rings",
+      "text": "戒指"
+    },
+    {
+      "id": "SanctumSpecialRelic",
+      "english": "Sanctified Relics",
+      "text": "圣洁遗物"
+    },
+    {
+      "id": "Sceptre",
+      "english": "Sceptres",
+      "text": "权杖"
+    },
+    {
+      "id": "SentinelDrone",
+      "english": "Sentinels",
+      "text": "近卫"
+    },
+    {
+      "id": "Shield",
+      "english": "Shields",
+      "text": "盾牌"
+    },
+    {
+      "id": "SkillGemToken",
+      "english": "Currency",
+      "text": "通货"
+    },
+    {
+      "id": "SmallRelic",
+      "english": "Small Relics",
+      "text": "小型圣物"
+    },
+    {
+      "id": "SoulCore",
+      "english": "Augment",
+      "text": "增幅器"
+    },
+    {
+      "id": "Spear",
+      "english": "Spears",
+      "text": "战矛"
+    },
+    {
+      "id": "StackableCurrency",
+      "english": "Stackable Currency",
+      "text": "可堆叠通货"
+    },
+    {
+      "id": "Staff",
+      "english": "Staves",
+      "text": "长杖"
+    },
+    {
+      "id": "Support Skill Gem",
+      "english": "Support Gems",
+      "text": "辅助宝石"
+    },
+    {
+      "id": "Talisman",
+      "english": "Talismans",
+      "text": "魔符"
+    },
+    {
+      "id": "TowerAugmentation",
+      "english": "Tablet",
+      "text": "石板"
+    },
+    {
+      "id": "TrapTool",
+      "english": "Traps",
+      "text": "陷阱"
+    },
+    {
+      "id": "Trinket",
+      "english": "Trinkets",
+      "text": "饰品"
+    },
+    {
+      "id": "Two Hand Axe",
+      "english": "Two Hand Axes",
+      "text": "双手斧"
+    },
+    {
+      "id": "Two Hand Mace",
+      "english": "Two Hand Maces",
+      "text": "双手锤"
+    },
+    {
+      "id": "Two Hand Sword",
+      "english": "Two Hand Swords",
+      "text": "双手剑"
+    },
+    {
+      "id": "UltimatumKey",
+      "english": "Inscribed Ultimatum",
+      "text": "贪婪战书"
+    },
+    {
+      "id": "UncutReservationGemStackable",
+      "english": "Uncut Spirit Gems",
+      "text": "未切割的精魂宝石"
+    },
+    {
+      "id": "UncutSkillGemStackable",
+      "english": "Uncut Skill Gems",
+      "text": "未切割的技能宝石"
+    },
+    {
+      "id": "UncutSupportGemStackable",
+      "english": "Uncut Support Gems",
+      "text": "未切割的辅助宝石"
+    },
+    {
+      "id": "UniqueFragment",
+      "english": "Pieces",
+      "text": "片段"
+    },
+    {
+      "id": "UniqueShard",
+      "english": "Shards",
+      "text": "碎片"
+    },
+    {
+      "id": "UniqueShardBase",
+      "english": "Shard Hearts",
+      "text": "破碎之心"
+    },
+    {
+      "id": "UtilityFlask",
+      "english": "Charms",
+      "text": "咒符"
+    },
+    {
+      "id": "VaultKey",
+      "english": "Vault Keys",
+      "text": "宝库钥匙"
+    },
+    {
+      "id": "Wand",
+      "english": "Wands",
+      "text": "法杖"
+    },
+    {
+      "id": "Warstaff",
+      "english": "Quarterstaves",
+      "text": "节杖"
+    }
+  ],
+  "excluded": [
+    {
+      "id": "ConventionTreasure",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "Crossbow Attachment REMOVE",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE1",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE10",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE11",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE12",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE2",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE3",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE4",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE5",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE6",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE7",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE8",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "DONOTUSE9",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "GiftBox",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "Meta Skill Gem",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "Nothing",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "PinnacleKey_OLD",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "Thrown One Hand Axe",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "Thrown Shield",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "Thrown Two Hand Axe",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "Unarmed",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "UncutReservationGem_OLD",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "UncutSkillGem_OLD",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    },
+    {
+      "id": "UncutSupportGem_OLD",
+      "english": "",
+      "decision": "not-in-game",
+      "emitted": false
+    }
+  ],
+  "member": {
+    "previous": {
+      "bytes": 2689512,
+      "sha256": "45bb31cc6fd718372731d9e08b8c7c4bb8925b8a67864cb8030968c06157ae12"
+    },
+    "corrected": {
+      "bytes": 2693690,
+      "sha256": "71b8c353c18fd8e6720a0f3ae9746445fb6efaacc6b96501dd6e394c5690a826"
+    }
+  },
+  "unchanged": {
+    "old_scopes_and_literals": true,
+    "other_i18n_members": 13
+  },
+  "boundary": "Explicit ItemClasses projection requires the actual game member and exact target ID/English checks. The 25 empty-English source rows are omitted, not published as null placeholders. Historical source identity and carried_from are preserved."
+}

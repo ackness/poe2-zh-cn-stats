@@ -39,7 +39,8 @@
         "PassiveSkills.Name",
         "GemEffects.SupportText",
         "ActiveSkills.Description",
-        "MonsterVarieties.Name"
+        "MonsterVarieties.Name",
+        "ItemClasses.Name"
       ],
       "literals": "all-catalog-conflict-participants"
     },
@@ -136,6 +137,10 @@
     "sha256": "7dcb18ec41dff4deadfb3d9c9acfd128122c748ad1309d75bc301ccfecf0574a"
   },
   "files": {
+    "evidence/cn-itemclasses-0.5.5.8.json": {
+      "bytes": 15076,
+      "sha256": "09117f8ccda4101290a1e3be75bfda19880b2b633f1d2bf16faaebe8cef9f874"
+    },
     "evidence/historical-generation-receipt.json": {
       "bytes": 7550,
       "sha256": "4a3167441da6e04642c25ee6f00104e087c0ccd28d50854ed278a06fac02293c"
@@ -197,8 +202,8 @@
       "sha256": "6944676a4fd017fde321ee2758992ee4b18a835ce59ed45e6c9708b01a275bed"
     },
     "i18n/zh-CN/display_texts.json": {
-      "bytes": 2689512,
-      "sha256": "45bb31cc6fd718372731d9e08b8c7c4bb8925b8a67864cb8030968c06157ae12"
+      "bytes": 2693690,
+      "sha256": "71b8c353c18fd8e6720a0f3ae9746445fb6efaacc6b96501dd6e394c5690a826"
     },
     "i18n/zh-CN/mods.json": {
       "bytes": 93053,
