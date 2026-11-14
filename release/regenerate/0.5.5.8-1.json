@@ -119,7 +119,8 @@
           "PassiveSkills.Name",
           "GemEffects.SupportText",
           "ActiveSkills.Description",
-          "MonsterVarieties.Name"
+          "MonsterVarieties.Name",
+          "ItemClasses.Name"
         ],
         "literals": "all-catalog-conflict-participants"
       },
@@ -149,13 +150,13 @@
       ],
       "package_texts": {
         "stat_lines": {
-          "revision": "d6990a04872dec548bb045365d7a94a681105709",
+          "revision": "5fdd0a430c63c61c045802518ec8fcb001fb1eab",
           "path": "inputs/locale-0.5.5.8/i18n/zh-CN/stat_lines.json",
           "bytes": 3879754,
           "sha256": "d732c516187f8aa2fac4bd8e45c1cf323407eea693ae2706e72592fadf26a7bd"
         },
         "passive_names": {
-          "revision": "d6990a04872dec548bb045365d7a94a681105709",
+          "revision": "5fdd0a430c63c61c045802518ec8fcb001fb1eab",
           "path": "inputs/locale-0.5.5.8/i18n/zh-CN/passive_names.json",
           "bytes": 134582,
           "sha256": "6becc784be1f24e4b3dbc4ed8a16335c2602b1c90b4e3f73a5c23e5879af26dd"

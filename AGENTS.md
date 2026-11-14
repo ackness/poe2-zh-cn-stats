@@ -49,7 +49,7 @@ The split is maintained once, in
 | `reports/` | Readable workbench queues | generated (`workbench`), committed |
 | `release/<patch>[-<n>].json` | Language package configs | pin `expect.package` before publishing; frozen once published |
 | `release/regenerate/<patch>[-<n>].json` | Regeneration recipes | editable; frozen entries only decrease |
-| `inputs/` | Source bytes that configs pin | **frozen** |
+| `inputs/` | Source bytes that configs pin | frozen after publication, a formal tag or formal consumer adoption; new candidates follow [RELEASING.md](RELEASING.md#未发布候选的修正) |
 | `sources/` | Locale provenance ledger; `sources.lock.json` is a verbatim copy | frozen record |
 | `docs/` | Contracts and guides (PoBR links the directory) | editable |
 | `.cache/` | Local candidates, builds and downloads | ignored |
@@ -61,8 +61,9 @@ Why the frozen parts stay as they are:
   `src/<name>` keys with their hashes as its producer closure, and the modules locate the repository from
   their own path. The catalog's client inputs exist only as hashes, so it cannot be rebuilt with moved or
   edited code; any edit fails the `regenerate` CI job.
-- `inputs/` trees must equal their origin commits (`--check`). Their READMEs and evidence still cite
-  `handoff/` paths and old `src/` paths; that is part of the pinned bytes, never edit them.
+- `inputs/` trees must equal their current origin commits (`--check`). Historical and frozen inputs
+  retain their README and evidence bytes, including old paths. Only new, unpublished PR candidates
+  may be corrected through the appended commits described in [RELEASING.md](RELEASING.md#未发布候选的修正).
 - `release/`, `release/regenerate/`, `data/`, `sources/`, `docs/` and the mise task names are referenced
   by configs, recipes, published bytes (a regenerated support display records
   `mise run release:build -- --config release/<x>.json --fetch`) or other repositories. Do not rename them.
@@ -142,8 +143,9 @@ CI runs all of this anyway; run locally what your change can break.
 - Merge with a merge commit, never squash or rebase: `source.origin.revision` can be a commit on the PR
   branch, and only a merge commit keeps it in `main`'s history. A new `inputs/` directory, its config
   and its recipe go in one PR (see [RELEASING.md](RELEASING.md#新补丁)).
-- Never edit a published config (including legacy configs with `published`) or anything under `inputs/`;
-  add a new config and directory.
+- Never rewrite published, formally tagged or formally adopted inputs or configs (including legacy
+  configs with `published`); add a new config and directory. The narrow exception for a new,
+  unpublished PR candidate is defined in [RELEASING.md](RELEASING.md#未发布候选的修正).
 - In the config PR, run `release:build` and copy the receipt's `package.bytes` and `package.sha256` into
   `expect.package` (v1 and v2). Publishing requires a matching pin, or a legacy `published` pin;
   `--reuse` checks it too. No post-publish config PR is needed.
