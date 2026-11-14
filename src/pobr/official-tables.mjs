@@ -16,8 +16,9 @@ import { strictJson } from '../strict-json.mjs';
 export const INPUT_SCHEMA = 'repoe-release-input/v1';
 export const GEM_DESCRIPTIONS_SCHEMA = 'repoe-gem-descriptions/v1';
 export const NAME_SCOPE = 'MonsterVarieties.Name';
+export const ITEM_CLASS_SCOPE = 'ItemClasses.Name';
 export const GEM_SCOPES = ['GemEffects.SupportText', 'ActiveSkills.Description'];
-export const TABLE_SCOPES = [...GEM_SCOPES, NAME_SCOPE];
+export const TABLE_SCOPES = [...GEM_SCOPES, NAME_SCOPE, ITEM_CLASS_SCOPE];
 export const TABLE_REALMS = { 'zh-CN': 'china', 'zh-TW': 'international' };
 const LANGUAGES = { 'zh-CN': 'Simplified Chinese', 'zh-TW': 'Traditional Chinese' };
 const FORMATS = { default: 'repoe-native-tables/v1', localized: 'repoe-localized-tables/v1' };
@@ -161,6 +162,38 @@ export function gemTargets(doc, gamePatch) {
     targets.set(scope, new Map(Object.entries(rows)));
   }
   return targets;
+}
+
+// Only requested class names require this optional member and its root/snapshot declarations.
+export function itemClassTargets(archive, target) {
+  const rootRaw = archive.get('manifest.json')?.raw;
+  require(rootRaw, 'game_package: missing root manifest.json for ItemClasses.Name');
+  const root = strictJson(rootRaw), prefix = `data/${target.game_patch}/`;
+  const sameTarget = value => object(value) && ['game', 'game_patch', 'realm'].every(key => value[key] === target[key]);
+  require(object(root) && root.schema === 'pobr-build-data-part/v1' && root.kind === 'game' && object(root.files),
+    'game_package: invalid game manifest for ItemClasses.Name');
+  require(sameTarget(root.target), 'game_package: ItemClasses.Name game target differs from request');
+  const pinnedMember = name => {
+    const raw = archive.get(prefix + name)?.raw, expected = root.files[prefix + name];
+    require(raw && object(expected) && expected.bytes === raw.length && expected.sha256 === digest(raw),
+      `game_package: ${prefix + name} is missing or differs from its root manifest pin`);
+    return { raw, document: strictJson(raw) };
+  };
+  const snapshot = pinnedMember('manifest.json').document;
+  require(object(snapshot) && snapshot.schema_version === 3 && snapshot.poe_version === target.game_patch
+    && Array.isArray(snapshot.domains?.overlay) && snapshot.domains.overlay.includes('item_class_names'),
+  'game_package: snapshot does not declare the item_class_names overlay for the target patch');
+  const member = pinnedMember('overlay/item_class_names.json'), doc = member.document;
+  require(snapshot.files?.['overlay/item_class_names.json'] === digest(member.raw),
+    'game_package: item_class_names.json differs from its snapshot manifest pin');
+  require(object(doc) && object(doc._meta) && doc._meta.schema === 'repoe-item-class-names/v1'
+    && sameTarget(doc._meta), 'game_package: item_class_names.json schema or target differs');
+  require(object(doc.scopes) && Object.keys(doc.scopes).length === 1 && object(doc.scopes[ITEM_CLASS_SCOPE]),
+    'game_package: item_class_names.json needs exactly the ItemClasses.Name scope');
+  const entries = Object.entries(doc.scopes[ITEM_CLASS_SCOPE]);
+  require(entries.every(([id, name]) => id.trim() && typeof name === 'string' && name.trim()),
+    'game_package: ItemClasses.Name maps nonblank stable ids to nonblank English strings');
+  return new Map(entries);
 }
 
 const emptyCounts = () => ({ adopted: 0, shadowed: 0, 'not-in-game': 0, 'ambiguous-target': 0, 'ambiguous-id': 0, 'no-default-row': 0,

@@ -86,11 +86,17 @@ catalog 与投影相关字段：
   RePoE 输入 Release 资产（`repoe-release-input/v1` zip）里的一对表包，`default` 目录是英文
   `repoe-native-tables/v1`，`localized` 目录是 `repoe-localized-tables/v1`，各自只含 `manifest.json` 和它固定的文件，
   每个文件都等于根 manifest 的 pin，两个 `manifest.json` 等于各自的 SHA-256。`scopes` 取自
-  `GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`，并且必须在 `projection.scopes` 里。
+  `GemEffects.SupportText`、`ActiveSkills.Description`、`MonsterVarieties.Name`、`ItemClasses.Name`，并且必须在 `projection.scopes` 里。
   服别跟着 locale：zh-CN 的表包必须是 `Simplified Chinese`、realm `china`；zh-TW 必须是 `Traditional Chinese`、
   realm `international`；英文表包与它同 realm。两个表包出自同一次客户端采集：`game_patch` 与 `source_lock_sha256`
   必须相同（根 manifest 的 `target.game_patch` 也要一致）。来源补丁可以不同于请求目标，逐行按下面的英文条件决定是否采用；
   `game_package` 及其中宝石说明的 `_meta.game_patch` 仍须对应请求目标。
+
+  `ItemClasses.Name` 另从游戏包的可选成员 `data/<patch>/overlay/item_class_names.json` 读取目标英文；
+  文件格式与空值规则以 [PoBR 契约](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md#item-class-names) 为准。
+  显式请求时核对根 manifest、snapshot 的文件 pin 和 overlay 声明，以及成员 schema、game／game_patch／realm、
+  唯一 scope 和非空字符串映射；缺失或不符时报错。未请求时旧包可以没有该成员，默认 projection 不自动增加此 scope。
+  本地验证可使用如实标记的未发布输入和游戏候选，原 source patch／acquisition 状态保留；这不表示来源获批、语言包发布或消费者采用。
 
   按表的 `Id` 列把同一包里的本地化行和英文行配对，只有同时满足以下条件才采用：该包的英文与**目标英文**逐字节相同（宝石说明取 `game_package` 的
   `data/<patch>/overlay/gem_descriptions.json`（`repoe-gem-descriptions/v1`，两个宝石 scope 都必须存在），怪物名取 `minions.json`、
