@@ -1,0 +1,186 @@
+{
+  "schema": "poe2-locale-generation-receipt/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "manifest_sha256": "cc33dc60aa6ae2689f12f00db30efd6e92fcc84deb077651d878da9ed97f04a8",
+  "profile": "retained-selected",
+  "identity": {
+    "dictionary": {
+      "repository": "https://github.com/vagrant-soul/poe2-en-cn-dict",
+      "commit": "288d8b9d999c5ea5664149e408847156dbd83ff4"
+    },
+    "translation": {
+      "repository": "https://github.com/ackness/poe2-zh-cn-stats",
+      "commit": "d67f08f696be6470a5c3837fdd20385976068389",
+      "snapshot": "20261012T081820011Z",
+      "sha256": "5d4363ffd1233b28f52b1f338f386381ad3c63b6e5d9d396fa3d4aad5270788d",
+      "mode": "pinned"
+    }
+  },
+  "inputs": {
+    "dictionary/lookup/en_to_cn.json": {
+      "bytes": 9919799,
+      "sha256": "30abb7097eabb33e12d07cfdca6fd3f5f9813fb7be9fcb49a88f0cf031183bbc",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/lookup/en_to_cn.json"
+      }
+    },
+    "dictionary/lookup/stat_lines.json": {
+      "bytes": 6560161,
+      "sha256": "3f3a4ad360c9a611c507fc067e9d047a0e658081475238ee6cdc611d95784241",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/lookup/stat_lines.json"
+      }
+    },
+    "dictionary/meta.json": {
+      "bytes": 6409,
+      "sha256": "5b9807b6df8a6140b3f319c08210096f41344156dc6ded64fdc6b43a32a0e507",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/meta.json"
+      }
+    },
+    "dictionary/tables/ActiveSkills.json": {
+      "bytes": 684041,
+      "sha256": "0f2e8db64a3cd14c08f9bd4cdc5d44c7b8baede37982d8fe9e54732d0f80d02f",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/ActiveSkills.json"
+      }
+    },
+    "dictionary/tables/Ascendancy.json": {
+      "bytes": 10096,
+      "sha256": "a8552f273b4866a7f17ad6f226d3003b7cdf0dcffddfd48395d652073c7fc387",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/Ascendancy.json"
+      }
+    },
+    "dictionary/tables/BaseItemTypes.json": {
+      "bytes": 1253367,
+      "sha256": "79d1cb71345d0087b33b9d3528ab72ce67718c84dcfae6a4ec02071a382952a8",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/BaseItemTypes.json"
+      }
+    },
+    "dictionary/tables/Characters.json": {
+      "bytes": 11357,
+      "sha256": "29e969e18beab51bbdf1885e1cb3ae7938a86232f137f22ecc24f5ec43a49249",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/Characters.json"
+      }
+    },
+    "dictionary/tables/Mods.json": {
+      "bytes": 1457106,
+      "sha256": "2225ffc46f7a661736411c7b0a12846793d67da9a6693a05a49cc067a5e9eb7e",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/Mods.json"
+      }
+    },
+    "dictionary/tables/PassiveSkills.json": {
+      "bytes": 1894746,
+      "sha256": "843cc22df9c5e77148a8c9e2390d4483437c4c3bd26a66a0b12e81c1f5257eec",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/PassiveSkills.json"
+      }
+    },
+    "dictionary/tables/Words.json": {
+      "bytes": 669316,
+      "sha256": "d1a80bfd2fc090fd4fe7b5ba90bebba6c810a45614c3e64564579dce6b225eec",
+      "source": {
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/Words.json"
+      }
+    },
+    "evidence/native-140-pairs.json": {
+      "bytes": 20049,
+      "sha256": "6dd206dd75f651e4fde326228815882243b0af0a74645e46565a729308056306",
+      "source": {
+        "repository": "https://github.com/ackness/poe2-zh-cn-stats",
+        "revision": "producer-commit",
+        "path": "handoff/locale-retained-20261101/evidence/native-140-pairs.json"
+      }
+    },
+    "evidence/selected-literals.json": {
+      "bytes": 9435,
+      "sha256": "274d7c3001af16b9ca52c4a826d698349109ea4a905203b07378af776ba5ac88",
+      "source": {
+        "repository": "https://github.com/ackness/poe2-zh-cn-stats",
+        "revision": "producer-commit",
+        "path": "handoff/locale-generation-shaman-mantle-20261103/selected-literals.json"
+      }
+    },
+    "evidence/zh-CN-layered-meta.json": {
+      "bytes": 2312,
+      "sha256": "06b03f89d5641d818341d25fce77513216f17eb44e97f3a39dbb54b5f58c6c53",
+      "source": {
+        "repository": "https://github.com/ackness/poe2-zh-cn-stats",
+        "revision": "producer-commit",
+        "path": "handoff/locale-retained-20261101/i18n/zh-CN/_meta.json"
+      }
+    },
+    "evidence/zh-CN-original-meta.json": {
+      "bytes": 901,
+      "sha256": "14e0ff55f8dcfab5e91868dc2db56e65fc75551a64c59579d6a75469c98bb68f",
+      "source": {
+        "repository": "https://github.com/ackness/poe2-zh-cn-stats",
+        "revision": "producer-commit",
+        "path": "handoff/locale-retained-20261101/evidence/zh-CN-original-meta.json"
+      }
+    },
+    "templates.json": {
+      "bytes": 4808103,
+      "sha256": "5d4363ffd1233b28f52b1f338f386381ad3c63b6e5d9d396fa3d4aad5270788d",
+      "source": {
+        "url": "https://raw.githubusercontent.com/ackness/poe2-zh-cn-stats/d67f08f696be6470a5c3837fdd20385976068389/data/snapshots/20261012T081820011Z/generated/templates.json"
+      }
+    }
+  },
+  "layers": {
+    "legacy_pairs": 27896,
+    "native_selected_pairs": 140,
+    "selected_literal_pairs": 6,
+    "final_pairs": 28042
+  },
+  "files": {
+    "generated/translation-audit.json": {
+      "bytes": 1946541,
+      "sha256": "7cd1e787405cc9f75513b8c9adfcddfea710287513e7430d6a336be7ee184b4d"
+    },
+    "i18n/zh-CN/_meta.json": {
+      "bytes": 2312,
+      "sha256": "06b03f89d5641d818341d25fce77513216f17eb44e97f3a39dbb54b5f58c6c53"
+    },
+    "i18n/zh-CN/base_items.json": {
+      "bytes": 370795,
+      "sha256": "910c5ebb7af9efe976f01414dfae4bda22132c23c5138eb0cbadaeb5e86e4d53"
+    },
+    "i18n/zh-CN/classes.json": {
+      "bytes": 1128,
+      "sha256": "6944676a4fd017fde321ee2758992ee4b18a835ce59ed45e6c9708b01a275bed"
+    },
+    "i18n/zh-CN/mods.json": {
+      "bytes": 93053,
+      "sha256": "8d62bf95d9a54650fff127815580e169f7e83983235a56dc3ed295c9d1a1a76d"
+    },
+    "i18n/zh-CN/passive_names.json": {
+      "bytes": 134582,
+      "sha256": "6becc784be1f24e4b3dbc4ed8a16335c2602b1c90b4e3f73a5c23e5879af26dd"
+    },
+    "i18n/zh-CN/rare_words.json": {
+      "bytes": 124951,
+      "sha256": "ab23836d0f2034914bf799777134cf51482708425c909f7bf713400c67105915"
+    },
+    "i18n/zh-CN/skills.json": {
+      "bytes": 33008,
+      "sha256": "16eb4a451e3472c0b06fd36f21c6f308b2ebca24287d5c240a1345491c91eb77"
+    },
+    "i18n/zh-CN/stat_lines.json": {
+      "bytes": 3876139,
+      "sha256": "5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95"
+    },
+    "i18n/zh-CN/words.json": {
+      "bytes": 132463,
+      "sha256": "7ba0c43e90c3909c725f8a563ab169ccfcbcf3b53c05a2748d17d7508cce58cc"
+    }
+  }
+}
