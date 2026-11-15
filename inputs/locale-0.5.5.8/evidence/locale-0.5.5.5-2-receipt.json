@@ -1,0 +1,1792 @@
+{
+  "schema": "poe2-locale-release-receipt/v1",
+  "target": {
+    "game": "poe2",
+    "game_patch": "0.5.5.5",
+    "realm": "international"
+  },
+  "producer": {
+    "repository": "ackness/poe2-zh-cn-stats",
+    "commit": "b831e31ed2b6325c1aeefedb2918905486e75d6a",
+    "dirty": false,
+    "dirty_paths": [],
+    "config": {
+      "release/0.5.5.5-2.json": {
+        "bytes": 2089,
+        "sha256": "3652ab90761743b567ea68fd0245bf0061309c6898c46cd4d84c7fcc1f5c80cb"
+      },
+      "release/0.5.5.5.json": {
+        "bytes": 789,
+        "sha256": "2c551199ea3ffd6bf35e6a5f6d9ef092ba4f1e016f54e74605b3efe90f492f0c"
+      }
+    },
+    "code": {
+      "src/locale-release.mjs": {
+        "bytes": 30805,
+        "sha256": "ee1e641ad7a75c04b1e443f2b7d53198c4961da6954f4f6a1355aaab2fac3ccf"
+      },
+      "src/locale-package.mjs": {
+        "bytes": 8883,
+        "sha256": "baa4133edc8222765ac58a7803798c42bda74065e5a3b4c99dd45ffc4db63795"
+      },
+      "src/support-display.mjs": {
+        "bytes": 19223,
+        "sha256": "b6e48f87476e341158715f259d3113210c18582ade29a17d074c449ef68361a8"
+      },
+      "src/support-description-projection.mjs": {
+        "bytes": 1435,
+        "sha256": "88734115c1a7fe606cbd4d9abbe56595b75db117017c3e2c653d60fbc72052c6"
+      },
+      "src/stored-zip.mjs": {
+        "bytes": 5381,
+        "sha256": "cce0b8e6b0478b5f73102c5ab9a708140b7af256caa658898f0918d7baaefc2d"
+      },
+      "src/strict-json.mjs": {
+        "bytes": 2621,
+        "sha256": "679d91bb84e0bfa88c1e3cb25bfe11f27a1e0c17e85f11b58130a63b2aec6cdb"
+      },
+      "mise.lock": {
+        "bytes": 599,
+        "sha256": "9f4495479a908cbe7d92ea5dc7f86438b31d4cd94beb40dfabc04c9456ab5383"
+      }
+    }
+  },
+  "source": {
+    "base": {
+      "config": {
+        "path": "release/0.5.5.5.json",
+        "bytes": 789,
+        "sha256": "2c551199ea3ffd6bf35e6a5f6d9ef092ba4f1e016f54e74605b3efe90f492f0c"
+      },
+      "manifest": {
+        "path": "inputs/locale-0.5.5.5/manifest.json",
+        "bytes": 4088,
+        "sha256": "730222f0cb7a777534243f3b4aff480ae31b2756c8e4ece574b0c4f44f0693a3",
+        "schema": "poe2-retained-locale-publication/v1"
+      },
+      "origin": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "tag": "handoff/shaman-mantle-20261103",
+        "revision": "9aba3687e6366597bc69a0795c63a20090cb02f5",
+        "path": "handoff/locale-shaman-mantle-20261103/manifest.json"
+      },
+      "files": {
+        "inputs/locale-0.5.5.5/evidence/historical-generation-receipt.json": {
+          "bytes": 7550,
+          "sha256": "4a3167441da6e04642c25ee6f00104e087c0ccd28d50854ed278a06fac02293c"
+        },
+        "inputs/locale-0.5.5.5/evidence/locale-decision.json": {
+          "bytes": 28528,
+          "sha256": "878b6f49df4460e49aeee960bdbd85e62d81ff64c5a75b1675b32c864c71fef7"
+        },
+        "inputs/locale-0.5.5.5/evidence/native-140-pairs.json": {
+          "bytes": 20049,
+          "sha256": "6dd206dd75f651e4fde326228815882243b0af0a74645e46565a729308056306"
+        },
+        "inputs/locale-0.5.5.5/evidence/production-snapshots.json": {
+          "bytes": 10267,
+          "sha256": "8b3c39de9bddd56116908f468cbd64bd8fcbc5e49fb81576ace6ac5e39883122"
+        },
+        "inputs/locale-0.5.5.5/evidence/shaman-mantle-alias-review.json": {
+          "bytes": 5494,
+          "sha256": "e589ed5360c2725e59f4ff409aed50c7600262e0e9170c1eee8a2622df59a07c"
+        },
+        "inputs/locale-0.5.5.5/evidence/shaman-mantle-generation-receipt.json": {
+          "bytes": 7564,
+          "sha256": "9b47d8a506896b62c2c75b59ebc9e4ae3093be95776c9565a757769e5f96667b"
+        },
+        "inputs/locale-0.5.5.5/evidence/shaman-mantle-selected-literals.json": {
+          "bytes": 9435,
+          "sha256": "274d7c3001af16b9ca52c4a826d698349109ea4a905203b07378af776ba5ac88"
+        },
+        "inputs/locale-0.5.5.5/evidence/zh-CN-original-meta.json": {
+          "bytes": 901,
+          "sha256": "14e0ff55f8dcfab5e91868dc2db56e65fc75551a64c59579d6a75469c98bb68f"
+        },
+        "inputs/locale-0.5.5.5/evidence/zh-CN-original-stat-lines.json": {
+          "bytes": 3857237,
+          "sha256": "28da2be7c44a4d872a94ad653d0002ff798f02de7a2b503d020d318cd170275e"
+        },
+        "inputs/locale-0.5.5.5/evidence/zh-TW-receipt.json": {
+          "bytes": 7699503,
+          "sha256": "50a90defb34a9af67f424367f696179bf9d10d0e0079920aff74cc8a3820b7cb"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/_meta.json": {
+          "bytes": 2312,
+          "sha256": "06b03f89d5641d818341d25fce77513216f17eb44e97f3a39dbb54b5f58c6c53"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/base_items.json": {
+          "bytes": 370795,
+          "sha256": "910c5ebb7af9efe976f01414dfae4bda22132c23c5138eb0cbadaeb5e86e4d53"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/classes.json": {
+          "bytes": 1128,
+          "sha256": "6944676a4fd017fde321ee2758992ee4b18a835ce59ed45e6c9708b01a275bed"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/display_texts.json": {
+          "bytes": 1649082,
+          "sha256": "381d827ab1345bf746ed0da349414b5806037043e0a60540fa10f94af868f45f"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/mods.json": {
+          "bytes": 93053,
+          "sha256": "8d62bf95d9a54650fff127815580e169f7e83983235a56dc3ed295c9d1a1a76d"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/passive_names.json": {
+          "bytes": 134582,
+          "sha256": "6becc784be1f24e4b3dbc4ed8a16335c2602b1c90b4e3f73a5c23e5879af26dd"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/rare_words.json": {
+          "bytes": 124951,
+          "sha256": "ab23836d0f2034914bf799777134cf51482708425c909f7bf713400c67105915"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/skills.json": {
+          "bytes": 33008,
+          "sha256": "16eb4a451e3472c0b06fd36f21c6f308b2ebca24287d5c240a1345491c91eb77"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/stat_lines.json": {
+          "bytes": 3876139,
+          "sha256": "5c151fe654359203c350548bdc27ebe89e830918f96d9c4b18de0db5e069bf95"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-CN/words.json": {
+          "bytes": 132463,
+          "sha256": "7ba0c43e90c3909c725f8a563ab169ccfcbcf3b53c05a2748d17d7508cce58cc"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-TW/base_items.json": {
+          "bytes": 375343,
+          "sha256": "67c3db66b47c39e4148eaa365eec8a0050b6eee2a84032fd579d70f5395025aa"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-TW/mods.json": {
+          "bytes": 333567,
+          "sha256": "c0212690817a81753a26e078c59c58e71b51c51857084a964dc297ce4237b944"
+        },
+        "inputs/locale-0.5.5.5/i18n/zh-TW/skills.json": {
+          "bytes": 34080,
+          "sha256": "af64e24e26657e9b5bfa11fb186e145c8ff5fbbabf7a80af6b47e681bd0d02bb"
+        }
+      }
+    },
+    "transforms": [
+      {
+        "id": "zh-tw-mods-by-english",
+        "kind": "rekey-by-english",
+        "member": "i18n/zh-TW/mods.json",
+        "inputs": {
+          "i18n/zh-TW/mods.json": {
+            "bytes": 333567,
+            "sha256": "c0212690817a81753a26e078c59c58e71b51c51857084a964dc297ce4237b944"
+          },
+          "evidence/zh-TW-receipt.json": {
+            "bytes": 7699503,
+            "sha256": "50a90defb34a9af67f424367f696179bf9d10d0e0079920aff74cc8a3820b7cb"
+          }
+        },
+        "output": {
+          "bytes": 94179,
+          "sha256": "0de2188d6d86d253ced23aa4edb6d090513c9e9831b6abeccaad2e4e4bba317d"
+        },
+        "report": {
+          "ids": 6384,
+          "english_keys": 2557,
+          "conflicts": [
+            {
+              "english": "Abyssal",
+              "chosen": "深淵的",
+              "alternatives": {
+                "深淵的": 25,
+                "深淵": 16
+              }
+            },
+            {
+              "english": "Adamant",
+              "chosen": "堅決的",
+              "alternatives": {
+                "堅決的": 1,
+                "堅定不移": 1
+              }
+            },
+            {
+              "english": "Adept's",
+              "chosen": "嫻熟的",
+              "alternatives": {
+                "嫻熟的": 3,
+                "精通者的": 1
+              }
+            },
+            {
+              "english": "Arctic",
+              "chosen": "極地的",
+              "alternatives": {
+                "極地的": 3,
+                "冰原的": 1
+              }
+            },
+            {
+              "english": "Ascendant",
+              "chosen": "升華的",
+              "alternatives": {
+                "升華的": 1,
+                "昇華的": 1
+              }
+            },
+            {
+              "english": "Blistering",
+              "chosen": "極度的",
+              "alternatives": {
+                "極度的": 2,
+                "起泡的": 1
+              }
+            },
+            {
+              "english": "Burning",
+              "chosen": "燃燒的",
+              "alternatives": {
+                "燃燒的": 27,
+                "爆燃": 1,
+                "爆燃的": 1
+              }
+            },
+            {
+              "english": "Buzzing",
+              "chosen": "嗡嗡的",
+              "alternatives": {
+                "嗡嗡的": 8,
+                "鳴響的": 1
+              }
+            },
+            {
+              "english": "Charged",
+              "chosen": "充電的",
+              "alternatives": {
+                "充電的": 2,
+                "充能的": 1
+              }
+            },
+            {
+              "english": "Chilling",
+              "chosen": "冰緩",
+              "alternatives": {
+                "冰緩": 1,
+                "冰緩之": 1,
+                "冰冷的": 1
+              }
+            },
+            {
+              "english": "Consistent",
+              "chosen": "穩定之",
+              "alternatives": {
+                "穩定之": 3,
+                "一貫": 1
+              }
+            },
+            {
+              "english": "Darkened",
+              "chosen": "黑暗的",
+              "alternatives": {
+                "黑暗的": 8,
+                "幽暗的": 1
+              }
+            },
+            {
+              "english": "Deadly",
+              "chosen": "致命的",
+              "alternatives": {
+                "致命的": 3,
+                "致死的": 1,
+                "致命": 1
+              }
+            },
+            {
+              "english": "Deliberate",
+              "chosen": "慎重之",
+              "alternatives": {
+                "慎重之": 3,
+                "沉穩": 1
+              }
+            },
+            {
+              "english": "Destructive",
+              "chosen": "毀滅的",
+              "alternatives": {
+                "毀滅的": 4,
+                "破壞的": 3
+              }
+            },
+            {
+              "english": "Do Not Use",
+              "chosen": "不要用這個",
+              "alternatives": {
+                "不要用這個": 1,
+                "DNT": 1
+              }
+            },
+            {
+              "english": "Duelist's",
+              "chosen": "決鬥的",
+              "alternatives": {
+                "決鬥的": 2,
+                "決鬥者的": 1
+              }
+            },
+            {
+              "english": "Electrocuting",
+              "chosen": "電極的",
+              "alternatives": {
+                "電極的": 8,
+                "電刑": 1
+              }
+            },
+            {
+              "english": "Electromancer's",
+              "chosen": "電能法師的",
+              "alternatives": {
+                "電能法師的": 1,
+                "閃電術士的": 1
+              }
+            },
+            {
+              "english": "Emboldening",
+              "chosen": "壯膽的",
+              "alternatives": {
+                "壯膽的": 4,
+                "有勇氣的": 1
+              }
+            },
+            {
+              "english": "Enervating",
+              "chosen": "萎靡的",
+              "alternatives": {
+                "萎靡的": 4,
+                "衰弱的": 1
+              }
+            },
+            {
+              "english": "Ephemeral",
+              "chosen": "無常的",
+              "alternatives": {
+                "無常的": 2,
+                "短暫的": 2
+              }
+            },
+            {
+              "english": "Essences",
+              "chosen": "精髓的",
+              "alternatives": {
+                "精髓的": 71,
+                "精髓": 14
+              }
+            },
+            {
+              "english": "Ethereal",
+              "chosen": "空靈的",
+              "alternatives": {
+                "空靈的": 2,
+                "虛靈的": 2,
+                "縹緲的": 2,
+                "虛空幻影": 1,
+                "投彈手": 1,
+                "虛空": 1
+              }
+            },
+            {
+              "english": "Evanescent",
+              "chosen": "逝去的",
+              "alternatives": {
+                "逝去的": 2,
+                "轉瞬的": 2
+              }
+            },
+            {
+              "english": "FIX ME",
+              "chosen": "堅韌之",
+              "alternatives": {
+                "堅韌之": 1,
+                "結晶之": 1,
+                "火花之": 1,
+                "靜電之": 1
+              }
+            },
+            {
+              "english": "Flaming",
+              "chosen": "火焰的",
+              "alternatives": {
+                "火焰的": 5,
+                "烈火之": 4,
+                "烈火的": 4
+              }
+            },
+            {
+              "english": "Focused",
+              "chosen": "專注的",
+              "alternatives": {
+                "專注的": 3,
+                "集中的": 1
+              }
+            },
+            {
+              "english": "Freezing",
+              "chosen": "冷凍的",
+              "alternatives": {
+                "冷凍的": 15,
+                "急凍的": 11
+              }
+            },
+            {
+              "english": "Frigid",
+              "chosen": "寒風的",
+              "alternatives": {
+                "寒風的": 9,
+                "急凍的": 1
+              }
+            },
+            {
+              "english": "Frosted",
+              "chosen": "結霜的",
+              "alternatives": {
+                "結霜的": 10,
+                "埋葬的": 1
+              }
+            },
+            {
+              "english": "Girded",
+              "chosen": "圍城的",
+              "alternatives": {
+                "圍城的": 3,
+                "束帶的": 1
+              }
+            },
+            {
+              "english": "Glyphic",
+              "chosen": "雕紋的",
+              "alternatives": {
+                "雕紋的": 2,
+                "符記的": 1
+              }
+            },
+            {
+              "english": "Hailing",
+              "chosen": "喝采的",
+              "alternatives": {
+                "喝采的": 2,
+                "冰雹的": 1
+              }
+            },
+            {
+              "english": "Hale",
+              "chosen": "健壯之",
+              "alternatives": {
+                "健壯之": 1,
+                "健壯的": 1
+              }
+            },
+            {
+              "english": "Hallowed",
+              "chosen": "空洞的",
+              "alternatives": {
+                "空洞的": 24,
+                "聖潔的": 5
+              }
+            },
+            {
+              "english": "Hexfont",
+              "chosen": "邪咒之語",
+              "alternatives": {
+                "邪咒之語": 2,
+                "六芒": 1
+              }
+            },
+            {
+              "english": "Hexing",
+              "chosen": "咒術的",
+              "alternatives": {
+                "咒術的": 2,
+                "妖術的": 1
+              }
+            },
+            {
+              "english": "Honed",
+              "chosen": "砥礪的",
+              "alternatives": {
+                "砥礪的": 6,
+                "硬索之": 1,
+                "削銳的": 1
+              }
+            },
+            {
+              "english": "Humming",
+              "chosen": "低鳴的",
+              "alternatives": {
+                "低鳴的": 6,
+                "雷電之": 2,
+                "－雷": 1,
+                "嗡鳴的": 1,
+                "雷電的": 1
+              }
+            },
+            {
+              "english": "Incanter's",
+              "chosen": "魔咒師的",
+              "alternatives": {
+                "魔咒師的": 3,
+                "詠唱者的": 1
+              }
+            },
+            {
+              "english": "Incorporeal",
+              "chosen": "無質的",
+              "alternatives": {
+                "無質的": 2,
+                "無形的": 1
+              }
+            },
+            {
+              "english": "Infernal",
+              "chosen": "煉獄的",
+              "alternatives": {
+                "煉獄的": 4,
+                "獄炎的": 2,
+                "獄炎": 1
+              }
+            },
+            {
+              "english": "Lethal",
+              "chosen": "致命的",
+              "alternatives": {
+                "致命的": 2,
+                "致命之": 2,
+                "致命鋒芒": 1
+              }
+            },
+            {
+              "english": "Monk's",
+              "chosen": "僧侶之",
+              "alternatives": {
+                "僧侶之": 3,
+                "僧侶的": 2
+              }
+            },
+            {
+              "english": "Necromancer's",
+              "chosen": "死靈師的",
+              "alternatives": {
+                "死靈師的": 1,
+                "死靈法師的": 1
+              }
+            },
+            {
+              "english": "Novice's",
+              "chosen": "初學者的",
+              "alternatives": {
+                "初學者的": 8,
+                "新手的": 2
+              }
+            },
+            {
+              "english": "Occultist's",
+              "chosen": "神秘學者的",
+              "alternatives": {
+                "神秘學者的": 3,
+                "術士的": 1
+              }
+            },
+            {
+              "english": "Passionate",
+              "chosen": "熱情的",
+              "alternatives": {
+                "熱情的": 1,
+                "激昂的": 1
+              }
+            },
+            {
+              "english": "Plated",
+              "chosen": "電鍍的",
+              "alternatives": {
+                "電鍍的": 3,
+                "鍍金的": 1
+              }
+            },
+            {
+              "english": "Precise",
+              "chosen": "精確的",
+              "alternatives": {
+                "精確的": 10,
+                "技巧之": 1
+              }
+            },
+            {
+              "english": "Predator's",
+              "chosen": "迷彩的",
+              "alternatives": {
+                "迷彩的": 3,
+                "掠奪者的": 1
+              }
+            },
+            {
+              "english": "Prismatic",
+              "chosen": "三相",
+              "alternatives": {
+                "三相": 1,
+                "三相的": 1
+              }
+            },
+            {
+              "english": "Profane",
+              "chosen": "褻瀆的",
+              "alternatives": {
+                "褻瀆的": 7,
+                "粗陋的": 4
+              }
+            },
+            {
+              "english": "Punishing",
+              "chosen": "懲罰的",
+              "alternatives": {
+                "懲罰的": 11,
+                "懲戒的": 7
+              }
+            },
+            {
+              "english": "Reinforced",
+              "chosen": "增強的",
+              "alternatives": {
+                "增強的": 3,
+                "加強的": 1
+              }
+            },
+            {
+              "english": "Reliable",
+              "chosen": "可靠的",
+              "alternatives": {
+                "可靠的": 3,
+                "精確的": 1
+              }
+            },
+            {
+              "english": "Resistant",
+              "chosen": "抵抗的",
+              "alternatives": {
+                "抵抗的": 11,
+                "抗性的": 5
+              }
+            },
+            {
+              "english": "Runic",
+              "chosen": "符文",
+              "alternatives": {
+                "符文": 2,
+                "符文的": 1
+              }
+            },
+            {
+              "english": "Savage",
+              "chosen": "殘暴的",
+              "alternatives": {
+                "殘暴的": 20,
+                "蠻荒的": 1
+              }
+            },
+            {
+              "english": "Scorched",
+              "chosen": "暴炎的",
+              "alternatives": {
+                "暴炎的": 1,
+                "燒灼的": 1
+              }
+            },
+            {
+              "english": "Searing",
+              "chosen": "灼燒的",
+              "alternatives": {
+                "灼燒的": 3,
+                "燒灼的": 2
+              }
+            },
+            {
+              "english": "Shadowy",
+              "chosen": "陰影的",
+              "alternatives": {
+                "陰影的": 2,
+                "幽影的": 2
+              }
+            },
+            {
+              "english": "Shaped",
+              "chosen": "已雕塑",
+              "alternatives": {
+                "已雕塑": 5,
+                "塑者的": 1
+              }
+            },
+            {
+              "english": "Shielding",
+              "chosen": "護盾的",
+              "alternatives": {
+                "護盾的": 2,
+                "防護的": 1
+              }
+            },
+            {
+              "english": "Shocking",
+              "chosen": "導電的",
+              "alternatives": {
+                "導電的": 15,
+                "電震的": 14
+              }
+            },
+            {
+              "english": "Shrouded",
+              "chosen": "迷霧",
+              "alternatives": {
+                "迷霧": 4,
+                "壟罩的": 1
+              }
+            },
+            {
+              "english": "Sinister",
+              "chosen": "邪靈",
+              "alternatives": {
+                "邪靈": 1,
+                "不祥的": 1,
+                "惡劣的": 1
+              }
+            },
+            {
+              "english": "Sizzling",
+              "chosen": "極熱的",
+              "alternatives": {
+                "極熱的": 2,
+                "嘶嘶作響的": 1
+              }
+            },
+            {
+              "english": "Skillful",
+              "chosen": "熟練的",
+              "alternatives": {
+                "熟練的": 1,
+                "有技巧的": 1
+              }
+            },
+            {
+              "english": "Sorcerer's",
+              "chosen": "術者的",
+              "alternatives": {
+                "術者的": 1,
+                "女術者的": 1
+              }
+            },
+            {
+              "english": "Steady",
+              "chosen": "安穩的",
+              "alternatives": {
+                "安穩的": 3,
+                "安穩": 1
+              }
+            },
+            {
+              "english": "Stirring",
+              "chosen": "攪拌的",
+              "alternatives": {
+                "攪拌的": 1,
+                "萌動的": 1
+              }
+            },
+            {
+              "english": "Summoner's",
+              "chosen": "召喚者的",
+              "alternatives": {
+                "召喚者的": 1,
+                "召喚師的": 1
+              }
+            },
+            {
+              "english": "Thief's",
+              "chosen": "小偷的",
+              "alternatives": {
+                "小偷的": 1,
+                "盜賊的": 1
+              }
+            },
+            {
+              "english": "Thornflesh",
+              "chosen": "銳刺",
+              "alternatives": {
+                "銳刺": 1,
+                "棘刺": 1
+              }
+            },
+            {
+              "english": "Unassailable",
+              "chosen": "攻不可破的",
+              "alternatives": {
+                "攻不可破的": 2,
+                "堅不可摧的": 1
+              }
+            },
+            {
+              "english": "Unreal",
+              "chosen": "虛幻的",
+              "alternatives": {
+                "虛幻的": 2,
+                "非實的": 2
+              }
+            },
+            {
+              "english": "Unworldly",
+              "chosen": "脫俗的",
+              "alternatives": {
+                "脫俗的": 2,
+                "異界的": 2
+              }
+            },
+            {
+              "english": "Venerable",
+              "chosen": "德高望重的",
+              "alternatives": {
+                "德高望重的": 2,
+                "德高望重": 1
+              }
+            },
+            {
+              "english": "Venomous",
+              "chosen": "猛毒的",
+              "alternatives": {
+                "猛毒的": 4,
+                "劇毒的": 3
+              }
+            },
+            {
+              "english": "Withering",
+              "chosen": "凋零的",
+              "alternatives": {
+                "凋零的": 2,
+                "熵的": 1
+              }
+            },
+            {
+              "english": "of Acclimatisation",
+              "chosen": "馴化之",
+              "alternatives": {
+                "馴化之": 3,
+                "適應之": 1
+              }
+            },
+            {
+              "english": "of Adaptation",
+              "chosen": "適性之",
+              "alternatives": {
+                "適性之": 1,
+                "演化之": 1
+              }
+            },
+            {
+              "english": "of Alacrity",
+              "chosen": "敏捷之",
+              "alternatives": {
+                "敏捷之": 2,
+                "輕快之": 1
+              }
+            },
+            {
+              "english": "of Anarchy",
+              "chosen": "無法者之",
+              "alternatives": {
+                "無法者之": 2,
+                "混亂的": 1,
+                "混亂之": 1
+              }
+            },
+            {
+              "english": "of Anger",
+              "chosen": "憤怒之",
+              "alternatives": {
+                "憤怒之": 8,
+                "之憤怒": 1,
+                "怒火之": 1
+              }
+            },
+            {
+              "english": "of Armageddon",
+              "chosen": "末日之",
+              "alternatives": {
+                "末日之": 2,
+                "之末日": 2
+              }
+            },
+            {
+              "english": "of Bounty",
+              "chosen": "獵者之",
+              "alternatives": {
+                "獵者之": 3,
+                "之獵者": 1
+              }
+            },
+            {
+              "english": "of Brimming",
+              "chosen": "充滿之",
+              "alternatives": {
+                "充滿之": 2,
+                "滿溢之": 1
+              }
+            },
+            {
+              "english": "of Buffering",
+              "chosen": "緩衝之",
+              "alternatives": {
+                "緩衝之": 3,
+                "之緩衝": 2
+              }
+            },
+            {
+              "english": "of Calamity",
+              "chosen": "血禍之",
+              "alternatives": {
+                "血禍之": 7,
+                "厄運之": 1
+              }
+            },
+            {
+              "english": "of Chaining",
+              "chosen": "連鎖之",
+              "alternatives": {
+                "連鎖之": 2,
+                "之連鎖": 2
+              }
+            },
+            {
+              "english": "of Champions",
+              "chosen": "冠軍之",
+              "alternatives": {
+                "冠軍之": 1,
+                "勇士之": 1
+              }
+            },
+            {
+              "english": "of Chronomancy",
+              "chosen": "時空魔法之",
+              "alternatives": {
+                "時空魔法之": 10,
+                "時占之": 2
+              }
+            },
+            {
+              "english": "of Combustion",
+              "chosen": "燃燒之",
+              "alternatives": {
+                "燃燒之": 1,
+                "－灼燒": 1
+              }
+            },
+            {
+              "english": "of Congealment",
+              "chosen": "凝血之",
+              "alternatives": {
+                "凝血之": 4,
+                "之凝血": 2
+              }
+            },
+            {
+              "english": "of Cunning",
+              "chosen": "狡猾之",
+              "alternatives": {
+                "狡猾之": 9,
+                "捷思之": 1
+              }
+            },
+            {
+              "english": "of Destruction",
+              "chosen": "毀滅之",
+              "alternatives": {
+                "毀滅之": 13,
+                "破壞之": 1,
+                "壞滅之": 1
+              }
+            },
+            {
+              "english": "of Direction",
+              "chosen": "方向之",
+              "alternatives": {
+                "方向之": 1,
+                "導向之": 1
+              }
+            },
+            {
+              "english": "of Disaster",
+              "chosen": "災害之",
+              "alternatives": {
+                "災害之": 7,
+                "災難之": 1
+              }
+            },
+            {
+              "english": "of Discount",
+              "chosen": "折扣之",
+              "alternatives": {
+                "折扣之": 8,
+                "沉著之": 1
+              }
+            },
+            {
+              "english": "of Discovery",
+              "chosen": "探索之",
+              "alternatives": {
+                "探索之": 1,
+                "發現之": 1
+              }
+            },
+            {
+              "english": "of Drenching",
+              "chosen": "浸透之",
+              "alternatives": {
+                "浸透之": 2,
+                "滂沱之": 1
+              }
+            },
+            {
+              "english": "of Electricity",
+              "chosen": "電能之",
+              "alternatives": {
+                "電能之": 3,
+                "之電能": 2
+              }
+            },
+            {
+              "english": "of Endurance",
+              "chosen": "耐久之",
+              "alternatives": {
+                "耐久之": 5,
+                "耐力的": 4,
+                "之耐久": 2,
+                "耐力之": 2,
+                "之耐力": 1
+              }
+            },
+            {
+              "english": "of Exile",
+              "chosen": "之流亡",
+              "alternatives": {
+                "之流亡": 3,
+                "流亡之": 2
+              }
+            },
+            {
+              "english": "of Expertise",
+              "chosen": "有經驗之",
+              "alternatives": {
+                "有經驗之": 3,
+                "之有經驗": 1,
+                "專精之": 1
+              }
+            },
+            {
+              "english": "of Exposure",
+              "chosen": "曝露之",
+              "alternatives": {
+                "曝露之": 12,
+                "曝曬之": 5
+              }
+            },
+            {
+              "english": "of Ferocity",
+              "chosen": "狂暴之",
+              "alternatives": {
+                "狂暴之": 7,
+                "憤恨之": 1,
+                "兇殘之": 1
+              }
+            },
+            {
+              "english": "of Flames",
+              "chosen": "烈焰之",
+              "alternatives": {
+                "烈焰之": 19,
+                "之烈焰": 3,
+                "烈火之": 1
+              }
+            },
+            {
+              "english": "of Freezing",
+              "chosen": "冰凍之",
+              "alternatives": {
+                "冰凍之": 3,
+                "之冰凍": 2,
+                "急凍的": 1
+              }
+            },
+            {
+              "english": "of Frenzy",
+              "chosen": "狂怒之",
+              "alternatives": {
+                "狂怒之": 9,
+                "狂暴之": 3,
+                "之狂怒": 1,
+                "嘲弄之": 1
+              }
+            },
+            {
+              "english": "of Frost",
+              "chosen": "冰霜之",
+              "alternatives": {
+                "冰霜之": 2,
+                "之冰霜": 1
+              }
+            },
+            {
+              "english": "of Frostbite",
+              "chosen": "凍傷之",
+              "alternatives": {
+                "凍傷之": 2,
+                "之凍傷": 2
+              }
+            },
+            {
+              "english": "of Fury",
+              "chosen": "憤恨之",
+              "alternatives": {
+                "憤恨之": 7,
+                "狂怒之": 2
+              }
+            },
+            {
+              "english": "of Gathering",
+              "chosen": "採集的",
+              "alternatives": {
+                "採集的": 1,
+                "採集之": 1
+              }
+            },
+            {
+              "english": "of Giants",
+              "chosen": "巨人之",
+              "alternatives": {
+                "巨人之": 17,
+                "之巨人": 2
+              }
+            },
+            {
+              "english": "of Grasping",
+              "chosen": "緊握之",
+              "alternatives": {
+                "緊握之": 1,
+                "攫取之": 1
+              }
+            },
+            {
+              "english": "of Gripping",
+              "chosen": "抓握之",
+              "alternatives": {
+                "抓握之": 2,
+                "緊握之": 1
+              }
+            },
+            {
+              "english": "of Guidance",
+              "chosen": "指導之",
+              "alternatives": {
+                "指導之": 1,
+                "引導之": 1
+              }
+            },
+            {
+              "english": "of Hastening",
+              "chosen": "加速之",
+              "alternatives": {
+                "加速之": 2,
+                "急速之": 1
+              }
+            },
+            {
+              "english": "of Hexwarding",
+              "chosen": "禦魔之",
+              "alternatives": {
+                "禦魔之": 3,
+                "魔抗之": 2
+              }
+            },
+            {
+              "english": "of Ice",
+              "chosen": "冰之",
+              "alternatives": {
+                "冰之": 19,
+                "之冰": 2,
+                "－冰": 1
+              }
+            },
+            {
+              "english": "of Ignition",
+              "chosen": "引火之",
+              "alternatives": {
+                "引火之": 2,
+                "點燃之": 1,
+                "之引火": 1,
+                "之點燃": 1
+              }
+            },
+            {
+              "english": "of Immolation",
+              "chosen": "獻祭之",
+              "alternatives": {
+                "獻祭之": 2,
+                "焚毀之": 1
+              }
+            },
+            {
+              "english": "of Ingenuity",
+              "chosen": "獨創之",
+              "alternatives": {
+                "獨創之": 8,
+                "獨創性": 1
+              }
+            },
+            {
+              "english": "of Insulation",
+              "chosen": "隔絕之",
+              "alternatives": {
+                "隔絕之": 12,
+                "絕緣之": 1
+              }
+            },
+            {
+              "english": "of Ire",
+              "chosen": "怒火之",
+              "alternatives": {
+                "怒火之": 8,
+                "亞馬遜的": 1
+              }
+            },
+            {
+              "english": "of Legerdemain",
+              "chosen": "戲法之",
+              "alternatives": {
+                "戲法之": 2,
+                "手法之": 1
+              }
+            },
+            {
+              "english": "of Lightning",
+              "chosen": "雷之",
+              "alternatives": {
+                "雷之": 11,
+                "雷電之": 5,
+                "－雷": 1
+              }
+            },
+            {
+              "english": "of Nimbleness",
+              "chosen": "靈活應變之",
+              "alternatives": {
+                "靈活應變之": 3,
+                "敏捷之": 1
+              }
+            },
+            {
+              "english": "of Obstruction",
+              "chosen": "障礙物之",
+              "alternatives": {
+                "障礙物之": 5,
+                "之障礙物": 2
+              }
+            },
+            {
+              "english": "of Piercing",
+              "chosen": "刺穿之",
+              "alternatives": {
+                "刺穿之": 2,
+                "刺痛之": 2,
+                "穿透之": 1
+              }
+            },
+            {
+              "english": "of Plunder",
+              "chosen": "掠奪之",
+              "alternatives": {
+                "掠奪之": 1,
+                "狂暴之": 1
+              }
+            },
+            {
+              "english": "of Poisoning",
+              "chosen": "中毒之",
+              "alternatives": {
+                "中毒之": 2,
+                "－毒": 1
+              }
+            },
+            {
+              "english": "of Power",
+              "chosen": "暴擊之",
+              "alternatives": {
+                "暴擊之": 9,
+                "力量之": 1,
+                "之暴擊": 1,
+                "賦予的": 1,
+                "賦予之": 1,
+                "權力之": 1
+              }
+            },
+            {
+              "english": "of Precision",
+              "chosen": "之精密",
+              "alternatives": {
+                "之精密": 2,
+                "精確之": 1,
+                "－精準": 1
+              }
+            },
+            {
+              "english": "of Prestidigitation",
+              "chosen": "騙術之",
+              "alternatives": {
+                "騙術之": 2,
+                "戲法之": 1
+              }
+            },
+            {
+              "english": "of Puncturing",
+              "chosen": "穿孔之",
+              "alternatives": {
+                "穿孔之": 1,
+                "穿刺之": 1
+              }
+            },
+            {
+              "english": "of Radiance",
+              "chosen": "光輝之",
+              "alternatives": {
+                "光輝之": 2,
+                "光芒之": 1
+              }
+            },
+            {
+              "english": "of Rage",
+              "chosen": "狂怒之",
+              "alternatives": {
+                "狂怒之": 7,
+                "憤怒之": 1,
+                "狂暴之": 1
+              }
+            },
+            {
+              "english": "of Raiding",
+              "chosen": "掃蕩之",
+              "alternatives": {
+                "掃蕩之": 2,
+                "掃蕩的": 1
+              }
+            },
+            {
+              "english": "of Resurgence",
+              "chosen": "復興之",
+              "alternatives": {
+                "復興之": 2,
+                "之復興": 1
+              }
+            },
+            {
+              "english": "of Revelation",
+              "chosen": "－啟示",
+              "alternatives": {
+                "－啟示": 1,
+                "啟示之": 1
+              }
+            },
+            {
+              "english": "of Revival",
+              "chosen": "生長之",
+              "alternatives": {
+                "生長之": 2,
+                "之再生": 1
+              }
+            },
+            {
+              "english": "of Ruin",
+              "chosen": "滅絕之",
+              "alternatives": {
+                "滅絕之": 10,
+                "毀滅之": 1
+              }
+            },
+            {
+              "english": "of Rust",
+              "chosen": "腐鏽之",
+              "alternatives": {
+                "腐鏽之": 15,
+                "銹之": 1
+              }
+            },
+            {
+              "english": "of Sacrifice",
+              "chosen": "犧牲之",
+              "alternatives": {
+                "犧牲之": 3,
+                "奉獻之": 1
+              }
+            },
+            {
+              "english": "of Shattering",
+              "chosen": "之粉碎",
+              "alternatives": {
+                "之粉碎": 2,
+                "碎裂之": 1
+              }
+            },
+            {
+              "english": "of Shocking",
+              "chosen": "感電之",
+              "alternatives": {
+                "感電之": 2,
+                "導電之": 2,
+                "之感電": 1,
+                "之導電": 1,
+                "支電震": 1
+              }
+            },
+            {
+              "english": "of Siphoning",
+              "chosen": "虹吸之",
+              "alternatives": {
+                "虹吸之": 2,
+                "吸取之": 1
+              }
+            },
+            {
+              "english": "of Snaring",
+              "chosen": "之挖掘",
+              "alternatives": {
+                "之挖掘": 1,
+                "誘捕之": 1
+              }
+            },
+            {
+              "english": "of Sortilege",
+              "chosen": "籤卜之",
+              "alternatives": {
+                "籤卜之": 3,
+                "巫術之": 1
+              }
+            },
+            {
+              "english": "of Sparks",
+              "chosen": "火花之",
+              "alternatives": {
+                "火花之": 2,
+                "結晶之": 1
+              }
+            },
+            {
+              "english": "of Splintering",
+              "chosen": "分裂之",
+              "alternatives": {
+                "分裂之": 3,
+                "之分裂": 2
+              }
+            },
+            {
+              "english": "of Staggering",
+              "chosen": "蹣跚之",
+              "alternatives": {
+                "蹣跚之": 1,
+                "驚人之": 1
+              }
+            },
+            {
+              "english": "of Stinging",
+              "chosen": "刺痛之",
+              "alternatives": {
+                "刺痛之": 1,
+                "螫刺之": 1
+              }
+            },
+            {
+              "english": "of Stone Skin",
+              "chosen": "之石皮",
+              "alternatives": {
+                "之石皮": 4,
+                "石皮之": 1
+              }
+            },
+            {
+              "english": "of Stunning",
+              "chosen": "擊暈之",
+              "alternatives": {
+                "擊暈之": 2,
+                "暈眩之": 2
+              }
+            },
+            {
+              "english": "of Subtlety",
+              "chosen": "微妙之",
+              "alternatives": {
+                "微妙之": 8,
+                "微妙的": 1
+              }
+            },
+            {
+              "english": "of Talent",
+              "chosen": "人才之",
+              "alternatives": {
+                "人才之": 3,
+                "天賦之": 1
+              }
+            },
+            {
+              "english": "of Thunder",
+              "chosen": "雷鳴之",
+              "alternatives": {
+                "雷鳴之": 3,
+                "之雷鳴": 2
+              }
+            },
+            {
+              "english": "of Treasure",
+              "chosen": "珍寶之",
+              "alternatives": {
+                "珍寶之": 1,
+                "寶藏之": 1
+              }
+            },
+            {
+              "english": "of Treasures",
+              "chosen": "珍寶之",
+              "alternatives": {
+                "珍寶之": 1,
+                "寶藏之": 1
+              }
+            },
+            {
+              "english": "of Unmaking",
+              "chosen": "奪位之",
+              "alternatives": {
+                "奪位之": 10,
+                "瓦解之": 1
+              }
+            },
+            {
+              "english": "of Venom",
+              "chosen": "猛毒之",
+              "alternatives": {
+                "猛毒之": 9,
+                "之猛毒": 2
+              }
+            },
+            {
+              "english": "of Voltage",
+              "chosen": "伏特之",
+              "alternatives": {
+                "伏特之": 2,
+                "之伏特": 1
+              }
+            },
+            {
+              "english": "of the Brawler",
+              "chosen": "之打鬥",
+              "alternatives": {
+                "之打鬥": 2,
+                "打鬥之": 1
+              }
+            },
+            {
+              "english": "of the Essence",
+              "chosen": "精髓之",
+              "alternatives": {
+                "精髓之": 102,
+                "之精髓": 9
+              }
+            },
+            {
+              "english": "of the Horde",
+              "chosen": "部落之",
+              "alternatives": {
+                "部落之": 2,
+                "群突之": 1
+              }
+            },
+            {
+              "english": "of the Hydra",
+              "chosen": "九頭蛇之",
+              "alternatives": {
+                "九頭蛇之": 2,
+                "之九頭蛇": 2
+              }
+            },
+            {
+              "english": "of the Ice",
+              "chosen": "冰之",
+              "alternatives": {
+                "冰之": 2,
+                "之冰": 2
+              }
+            },
+            {
+              "english": "of the Lamprey",
+              "chosen": "七鰓鰻之",
+              "alternatives": {
+                "七鰓鰻之": 3,
+                "之七鰓鰻": 1
+              }
+            },
+            {
+              "english": "of the Storm",
+              "chosen": "暴風之",
+              "alternatives": {
+                "暴風之": 2,
+                "帶電之": 1
+              }
+            },
+            {
+              "english": "of the Taskmaster",
+              "chosen": "監督者之",
+              "alternatives": {
+                "監督者之": 2,
+                "監工之": 1
+              }
+            },
+            {
+              "english": "of the Tempest",
+              "chosen": "暴風雨之",
+              "alternatives": {
+                "暴風雨之": 2,
+                "之暴風雨": 2
+              }
+            },
+            {
+              "english": "of the Volcano",
+              "chosen": "火山之",
+              "alternatives": {
+                "火山之": 2,
+                "之火山": 2
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "package": {
+    "asset": "pobr-locale-0.5.5.5.zip",
+    "bytes": 6925862,
+    "sha256": "bdfb38f4f8db84f0f16544756fab3fcfc7bf6fee17fd24592f603bc87331be37",
+    "expanded_bytes": 6923790,
+    "manifest": {
+      "bytes": 2675,
+      "sha256": "362937e5f915e7cff36846b8873916329182f0005730eec13aa9e251a68e12f5"
+    },
+    "members": {
+      "data/0.5.5.5/i18n/zh-CN/_meta.json": "inputs/locale-0.5.5.5/i18n/zh-CN/_meta.json",
+      "data/0.5.5.5/i18n/zh-CN/base_items.json": "inputs/locale-0.5.5.5/i18n/zh-CN/base_items.json",
+      "data/0.5.5.5/i18n/zh-CN/classes.json": "inputs/locale-0.5.5.5/i18n/zh-CN/classes.json",
+      "data/0.5.5.5/i18n/zh-CN/display_texts.json": "inputs/locale-0.5.5.5/i18n/zh-CN/display_texts.json",
+      "data/0.5.5.5/i18n/zh-CN/mods.json": "inputs/locale-0.5.5.5/i18n/zh-CN/mods.json",
+      "data/0.5.5.5/i18n/zh-CN/passive_names.json": "inputs/locale-0.5.5.5/i18n/zh-CN/passive_names.json",
+      "data/0.5.5.5/i18n/zh-CN/rare_words.json": "inputs/locale-0.5.5.5/i18n/zh-CN/rare_words.json",
+      "data/0.5.5.5/i18n/zh-CN/skills.json": "inputs/locale-0.5.5.5/i18n/zh-CN/skills.json",
+      "data/0.5.5.5/i18n/zh-CN/stat_lines.json": "inputs/locale-0.5.5.5/i18n/zh-CN/stat_lines.json",
+      "data/0.5.5.5/i18n/zh-CN/words.json": "inputs/locale-0.5.5.5/i18n/zh-CN/words.json",
+      "data/0.5.5.5/i18n/zh-TW/base_items.json": "inputs/locale-0.5.5.5/i18n/zh-TW/base_items.json",
+      "data/0.5.5.5/i18n/zh-TW/mods.json": "transform:zh-tw-mods-by-english",
+      "data/0.5.5.5/i18n/zh-TW/skills.json": "inputs/locale-0.5.5.5/i18n/zh-TW/skills.json"
+    },
+    "index": {
+      "languages": {
+        "zh-CN": {
+          "fallback": [],
+          "tables": {
+            "base_items.json": {
+              "entries": 4902
+            },
+            "classes.json": {
+              "entries": 35
+            },
+            "display_texts.json": {
+              "entries": 15713
+            },
+            "mods.json": {
+              "entries": 2536
+            },
+            "passive_names.json": {
+              "entries": 3040
+            },
+            "rare_words.json": {
+              "entries": 4805
+            },
+            "skills.json": {
+              "entries": 854
+            },
+            "stat_lines.json": {
+              "entries": 28042
+            },
+            "words.json": {
+              "entries": 3914
+            }
+          }
+        },
+        "zh-TW": {
+          "fallback": [],
+          "tables": {
+            "base_items.json": {
+              "entries": 4986
+            },
+            "mods.json": {
+              "entries": 2557
+            },
+            "skills.json": {
+              "entries": 896
+            }
+          }
+        }
+      }
+    }
+  },
+  "support_display": {
+    "mode": "retained",
+    "locale": "zh-CN",
+    "catalog_sha256": "de57e010c8bf93f18bf557c650d6cdc06d98bc3fbde58049227b31feda9deea6",
+    "generation_data_version": "0.5.5.4.2",
+    "manifest": {
+      "asset": "support-display.zh-CN.json",
+      "bytes": 1062,
+      "sha256": "88aef08b06b2b2987dd21db5c6ac276ce0a9411830b86a548729f5f2f10fe0d7"
+    },
+    "asset": {
+      "asset": "supportDescriptions.zh-CN.json",
+      "bytes": 183816,
+      "sha256": "57602ecb59184e5ba239531b5f47faa6c0c9f836530b3f516a976ed2041e3b49"
+    },
+    "counts": {
+      "entries": 534,
+      "untranslated": 33
+    },
+    "source": {
+      "manifest": {
+        "path": "inputs/support-display-0.5.5.5/manifest.json",
+        "bytes": 1062,
+        "sha256": "88aef08b06b2b2987dd21db5c6ac276ce0a9411830b86a548729f5f2f10fe0d7"
+      },
+      "asset": {
+        "path": "inputs/support-display-0.5.5.5/supportDescriptions.zh-CN.json",
+        "bytes": 183816,
+        "sha256": "57602ecb59184e5ba239531b5f47faa6c0c9f836530b3f516a976ed2041e3b49"
+      },
+      "origin": {
+        "repository": "ackness/poe2-zh-cn-stats",
+        "tag": "handoff/support-display-20261101",
+        "revision": "5046a18af9974e8914fa1ea1b2b0db9202b2908b",
+        "path": "handoff/support-display-20261101/manifest.json"
+      },
+      "dictionary": {
+        "source": "https://github.com/vagrant-soul/poe2-en-cn-dict",
+        "source_commit": "288d8b9d999c5ea5664149e408847156dbd83ff4",
+        "source_file": "tables/GemEffects.json",
+        "url": "https://raw.githubusercontent.com/vagrant-soul/poe2-en-cn-dict/288d8b9d999c5ea5664149e408847156dbd83ff4/dictionary/tables/GemEffects.json",
+        "bytes": 323634,
+        "sha256": "1a5b039482e09193b41b1d30e68066906a174c834ffe4974d5784203494322f7"
+      },
+      "catalog": {
+        "repository": "ackness/repoe",
+        "tag": "game/0.5.5.5-1",
+        "asset": "pobr-game-0.5.5.5.zip",
+        "bytes": 4452510,
+        "sha256": "3edc9b1eb3e813781ef63dcc7db5be29cfd6a15ef29b92773eaa7fb45082df4d",
+        "member": "data/0.5.5.5/overlay/trade_catalog.json"
+      }
+    }
+  }
+}

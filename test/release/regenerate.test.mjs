@@ -226,6 +226,8 @@ test('recipe: covers the source exactly once, pins frozen bytes and checks decla
   for (const bad of [undefined, { ...projection, extra: 1 }, { ...projection, scopes: ['Characters.Name', 'Characters.Name'] }]) {
     await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, projection: bad }] }), /display: pin the projection \{scopes, literals\}/u);
   }
+  await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display,
+    projection: { ...projection, scopes: ['ItemClasses.Name'] } }] }), /display: game_package needs repository/u);
   await assert.rejects(attempt({ ...recipe, jobs: [job, display] }), /extra: i18n\/zh-CN\/display_texts\.json/u);
   // An optional names pin (curation/display-supplements.json) is a full Git pin.
   await assert.rejects(attempt({ ...recipe, jobs: [job, { ...display, names: { revision: 'f'.repeat(40), path: 'n.json' } }] }),

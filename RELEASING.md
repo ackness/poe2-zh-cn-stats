@@ -59,6 +59,20 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 9. **PoBR**：在 PoBR 仓库运行 `mise run data:bump ackness/poe2-zh-cn-stats locale/<patch>-<n>`，按 PoBR
     的流程提交。
 
+### 未发布候选的修正
+
+`source.origin.revision` 记录源目录的真实提交，供 `--check` 比较 tree；**origin 本身不构成冻结**。
+仅本 PR 新增、尚未发布、未打正式 tag、未被正式消费者固定的源目录与配置，可以在原目录上追加最小修正，
+不必复制整套源文件。历史 `inputs/` 不属于这个例外。
+
+先从真实固定输入重新生成需要修正的成员，更新该目录的证据和 manifest，追加一个只含源目录修正的提交 S2；
+再追加配置与配方提交 C2，把 `source.origin.revision` 指向 S2，更新 manifest pin、配方和实测 `expect.package`。
+重新执行构建与重新生成核对。先前提交、候选包和 receipt 全部保留；不 amend、rebase，也不覆盖已经交接的实物。
+源提交与配置提交仍在同一 PR 中以 merge commit 合并，保持 origin 可达。
+
+发布、正式 tag、正式采用三者任一发生后，相关源目录和配置不可改写；之后的修正必须新建源目录与配置，
+按[换掉已发布的文件](#换掉已发布的文件)办理。未发布候选的修正不放宽固定输入、精确英文匹配或其他来源校验。
+
 ## 换掉已发布的文件
 
 1. 按[新补丁](#新补丁)第 1–2 步准备输入并生成新文件。

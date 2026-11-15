@@ -69,6 +69,9 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
   // Preserve old same-patch bytes; carried text must not match a whitespace-only English change.
   const englishAlias = text => strip(text, gamePatch === catalog.game_patch);
   const runtimeScopes = new Set(projection.scopes);
+  const classes = game?.itemClasses;
+  requireValue(!runtimeScopes.has(ITEM_CLASS_SCOPE) || classes instanceof Map,
+    `${ITEM_CLASS_SCOPE} needs the pinned game package's item class targets`);
   const owned = new Set(tables?.scopes.keys() ?? []);
   for (const scope of owned) requireValue(runtimeScopes.has(scope), `official_tables: ${scope} is not in projection.scopes`);
   requireValue(!(official && owned.has(NAME_SCOPE)), `${NAME_SCOPE} comes from official_names or official_tables, not both`);
@@ -129,7 +132,8 @@ export function projectDisplayTexts(catalog, lookup, catalogSha256, projection =
     requireValue(!identities.has(key), 'Duplicate projected display identity');
     identities.add(key);
     if (owned.has(scope)) ownedCatalogRows++;
-    else if (runtimeScopes.has(scope)) {
+    else if (runtimeScopes.has(scope) && (scope !== ITEM_CLASS_SCOPE
+      || (classes.has(String(row.id)) && classes.get(String(row.id)) === row.english))) {
       if (!scopes.has(scope)) scopes.set(scope, new Map());
       scopes.get(scope).set(String(row.id), [row.english, localized]);
       markScope(scope, String(row.id), origin);
@@ -428,15 +432,16 @@ export async function createDisplayTexts(request, out) {
   };
   const names = pinnedJson('names'), official = pinnedJson('official_names');
   const tableScopes = new Set(tableSpecs?.flatMap(spec => spec.scopes) ?? []);
+  const classScope = projection.scopes.includes(ITEM_CLASS_SCOPE);
   // The target English of each id: the pinned game package (`game_package`, a RePoE Release asset
   // pobr-game-<patch>.zip), required with either names input and with official_tables: monster
   // names from overlay/minions.json and spectres.json, gem descriptions from gem_descriptions.json.
   let game = null, targets = null;
-  if (names || official || tableSpecs) {
+  if (names || official || tableSpecs || classScope) {
     const spec = request.game_package;
     requireValue(spec && typeof spec.file === 'string' && Number.isSafeInteger(spec.bytes)
       && spec.asset === `pobr-game-${request.game_patch}.zip`,
-    `Monster names and official tables need game_package {file, bytes, sha256, asset: pobr-game-${request.game_patch}.zip}`);
+    `Monster names, official tables and ${ITEM_CLASS_SCOPE} need game_package {file, bytes, sha256, asset: pobr-game-${request.game_patch}.zip}`);
     const archive = readZip(readPinned(spec.file, spec, reads));
     const member = name => {
       const raw = archive.get(`data/${request.game_patch}/overlay/${name}`)?.raw;
@@ -444,11 +449,12 @@ export async function createDisplayTexts(request, out) {
       return strictJson(raw);
     };
     const monsters = names || official || tableScopes.has(TABLE_NAME_SCOPE) ? monsterTargets(member('minions.json'), member('spectres.json')) : null;
-    game = { sha256: spec.sha256, targets: monsters ?? new Map() };
+    const classes = classScope || tableScopes.has(ITEM_CLASS_SCOPE)
+      ? itemClassTargets(archive, { game: 'poe2', game_patch: request.game_patch, realm: request.realm }) : null;
+    game = { sha256: spec.sha256, targets: monsters ?? new Map(), ...(classes ? { itemClasses: classes } : {}) };
     targets = new Map([...(GEM_SCOPES.some(scope => tableScopes.has(scope)) ? gemTargets(member('gem_descriptions.json'), request.game_patch) : []),
       ...(monsters ? [[TABLE_NAME_SCOPE, monsters]] : [])]);
-    if (tableScopes.has(ITEM_CLASS_SCOPE)) targets.set(ITEM_CLASS_SCOPE,
-      itemClassTargets(archive, { game: 'poe2', game_patch: request.game_patch, realm: request.realm }));
+    if (classes) targets.set(ITEM_CLASS_SCOPE, classes);
   }
   // Official table rows, paired against those targets; each source is a pinned RePoE input zip.
   let tables = null;
