@@ -1,7 +1,7 @@
 # 发布 PoBR 语言包
 
 PoBR 的语言包是本仓库的 GitHub Release `locale/<patch>-<n>`。附件：`pobr-locale-<patch>.zip`、
-`receipt.json`、`SHA256SUMS`（只有已发布的 -2、-3 配置声明了 `support_display`，它们另带简中辅助宝石说明
+`receipt.json`、`SHA256SUMS`（只有已发布的 `locale/0.5.5.5-2`、`-3` 配置声明了 `support_display`，它们另带简中辅助宝石说明
 `support-display.zh-CN.json` 和 `supportDescriptions.zh-CN.json`；新配置不再声明）。PoBR 用 `data:bump` 把这个 Release
 （仓库、tag、附件和 SHA-256）写进它的 `pipeline/data.lock.json`；三个仓库的分工和 PoBR 的核对方式见
 [PoBR 数据架构](https://github.com/ackness/pobr/blob/master/docs/data-architecture.md)。
@@ -22,8 +22,8 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 - 新的游戏补丁：新的源目录、v1 配置和重新生成配方，见[新补丁](#新补丁)。
 - 换掉已发布包里的文件：新的源目录和配置，见[换掉已发布的文件](#换掉已发布的文件)。
-- 在已发布的包上做声明过的改动（例如把一张表改成按英文为键）：新的 v2 配置，`base` 指向已发布的 v1 配置。
-- RePoE 重新发布游戏包（`game/<patch>-<n+1>`）且宝石说明、召唤物名的目标英文变了：这些行只在英文逐字节
+- 基于已发布的包做声明式变换（例如把一张表改成按英文为键）：新的 v2 配置，`base` 指向已发布的 v1 配置。
+- RePoE 重新发布游戏包（`game/<patch>-<n+1>`）且宝石说明、召唤生物名的目标英文变了：这些行只在英文逐字节
   相同时才采用，所以按[换掉已发布的文件](#换掉已发布的文件)新建源目录和配置。
 
 **已发布的配置一律不改**，包括带 `published` 的旧配置和只带 `expect.package` 的新配置：CI 靠它持续证明已发布的字节可以重现。
@@ -31,12 +31,12 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 ## 新补丁
 
-1. **准备官方输入**：新配置不再声明 `support_display`。宝石说明、召唤物名和国服词条随
+1. **准备官方输入**：新配置不再声明 `support_display`。宝石说明、召唤生物／灵体名和国服词条随
    `display_texts.json`、`stat_lines.json` 发布。生成前要等 RePoE 发布这个补丁的游戏包
-   `game/<patch>-<n>`；官方文本输入 Release（`inputs/<patch>-<k>`）可以来自旧补丁，按英文逐字节相等采用。
+   `game/<patch>-<n>`；官方文本输入 Release（RePoE `inputs/<patch>-<k>`）可以来自旧补丁，按英文逐字节相等采用。
    显示目录也可以沿用旧补丁，输出写目标补丁，另记 `carried_from`；逐 ID scope 的使用方仍须比较当前英文。
    配方固定 `official_tables`、`official`、目标 `game_package` 等输入（见
-   [语言包配置参考](docs/release-config.md#重新生成配方releaseregeneratepatchjson)）。
+   [语言包配置参考](docs/release-config.md#重新生成配方releaseregeneratepatch-njson)）。
 2. **生成文件**：用[PoBR 语言文件生产者](docs/pobr-locale-producers.md)（`pobr:display-texts`、
    `pobr:names`、`pobr:stat-lines`、`pobr:supplement-lines`）或[简中词典生成](docs/locale-generation.md)把文件生成到 `.cache/`，
    核对 `receipt.json`。
@@ -88,11 +88,11 @@ mise run release:publish -- --yes           # 打 tag、推送、创建 Release�
 
 示例（0.5.5.5）：`locale/0.5.5.5-3` 给 `display_texts.json` 加 `PassiveSkills.Name` scope。它是 v1 配置
 `release/0.5.5.5-3.json`，源目录 `inputs/locale-0.5.5.5-3/` 复制 `locale/0.5.5.5-2` 的 12 个其他成员（包括按英文为键
-的繁中 `mods.json`），辅助宝石说明与 -2 相同；`release/regenerate/0.5.5.5-3.json` 重新生成全部简中成员。
+的繁中 `mods.json`），辅助宝石说明与 `locale/0.5.5.5-2` 相同；`release/regenerate/0.5.5.5-3.json` 重新生成全部简中成员。
 `locale/0.5.5.5-4` 换掉三个简中成员（`stat_lines.json`、`_meta.json`、`display_texts.json`）并新增繁中
-`display_texts.json`：国服官方词条（RePoE `inputs/0.5.5.5-1`）先于补译，宝石说明和召唤物名来自官方客户端表
+`display_texts.json`：国服官方词条（RePoE `inputs/0.5.5.5-1`）先于补译，宝石说明和召唤生物名来自官方客户端表
 （国服 `inputs/0.5.5.5-1`、国际服繁中 `inputs/0.5.5.5-2`），英文来自 `game/0.5.5.5-3`；不再声明 `support_display`。
-源目录 `inputs/locale-0.5.5.5-4/` 的其余成员与 -3 相同。
+源目录 `inputs/locale-0.5.5.5-4/` 的其余成员与 `locale/0.5.5.5-3` 相同。
 
 ## CI 核对什么
 

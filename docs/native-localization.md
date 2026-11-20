@@ -21,21 +21,21 @@ mise run native:check -- \
 它核对 source-lock 原字节、选定来源、game／realm／patch、资源清单、根文件、
 记录范围、stat 索引、语言／handler 汇总及诊断的具体分支引用。
 重复 JSON 键、非法 Unicode、越界数字、文件 symlink、缺失／循环／过深 include、
-未知分支字段及不一致证据均使读取失败。文件深度按图检查，重复 include 不展开成指数工作。
-最多 128 个原始文件、64 MiB 原始资源、256 MiB 包 payload、64 层 JSON。
-这些是已固定事实包的完整性检查，不重新解码或认证原始客户端文件。
+未知分支字段及不一致证据均会导致读取失败。文件深度按图检查，重复 include 不作指数展开。
+最多支持 128 个原始文件、64 MiB 原始资源、256 MiB 包载荷、64 层 JSON。
+这些检查仅校验已固定事实包的完整性，不重新解码或认证原始客户端文件。
 producer 必须是非空的文件／SHA-256 指纹表。候选检查以非阻塞方式打开文件，
-再按描述符核对普通文件和大小；FIFO 不会等待写入方。不能序列化的值直接报错。
+再按文件描述符核对普通文件与大小；遇到 FIFO 管道时立即拒绝而不会阻塞等待写入方。不能序列化的值直接报错。
 
 每个描述只在同一文件、同一记录内配对隐式默认语言与显式 `Simplified Chinese`。
 条件、限制、按序 handler、参数编号／格式／出现次数和显式符号必须一致，允许参数重排。
 参数编号按固定 PyPoE `66d1` 的 `TranslationString._set_string` 解释：每个模板的
-next_index 从 0 开始，显式 `{k}` 使用 k 并将 next_index 设为 k+1，`{}` / `{:fmt}`
-使用 next_index 后递增。因此 `{1}` 后的 `{}` 指向 2。该投影只用于配对比较；
-输出的 raw 模板、token、位置与分支引用不改写，消费方共享 renderer 生成其显式参数投影。
-仅接受默认格式、`d`、`-d`、`+d`，并检查编号小于有序 stat_ids 的长度。
+`next_index` 从 0 开始，显式 `{k}` 使用 `k` 并将 `next_index` 设为 `k+1`，`{}`／`{:fmt}`
+先取当前 `next_index` 再自增 1。因此 `{1}` 后的 `{}` 指向 2。该投影只用于配对比较；
+输出的原始模板、token、位置与分支引用不作改写，由消费方通过共享渲染器生成显式参数。
+仅接受默认格式、`d`、`-d`、`+d`，并检查编号小于有序 `stat_ids` 的长度。
 `d` / `-d` 不给正数添加 `+`；`+d` 表示显式正号。这里不替换参数或计算 formatter。
-`{{` / `}}` 在编号扫描中是字面括号，不消费自动参数编号；但原件 lexer 已给出的
+`{{` / `}}` 在编号扫描中是字面括号，不消费自动参数编号；但原生 lexer 已给出的
 语法诊断仍完整保留并阻止配对，不在本层修补或抹去来源诊断。
 ASCII `+`／`-` 和数学负号 `−` 都保留在显式符号比较中；不会将负号当作无符号。
 两边匹配必须各自唯一；多分支不能按位置配对。字面数字不一致、缺少中文、重复候选、
@@ -59,7 +59,7 @@ ASCII `+`／`-` 和数学负号 `−` 都保留在显式符号比较中；不会
 `unresolved-template-syntax` 167、`missing-simplified-chinese-group` 40、`nonunique-branch-signature` 14、
 `no-han-in-declared-chinese` 6），约 9 秒、1.3 GB RSS。`pobr:supplement-lines` 的官方层用它产出 zh-CN 官方词条
 （见 [PoBR 语言文件生产者](pobr-locale-producers.md#补译与修正supplement-lines)）。读取器与上限没有改动：
-`descriptions.json` 约 199 MB，接近 256 MiB 的载荷上限，更大的国服补丁会按设计失败关闭。
+`descriptions.json` 约 199 MB，接近 256 MiB 的载荷上限，更大的国服补丁会在超限时直接报错拒绝。
 
 `stat_ids` 为原生 ID 列表；文件／记录／分支位置只是该精确 manifest 内的证据地址，
 不能当作跨版本实体 ID。完整原始事实继续在输入 RePoE 包中保存。

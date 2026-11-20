@@ -54,7 +54,7 @@ catalog 与投影相关字段：
   [`src/pobr/display-projection.json`](../src/pobr/display-projection.json)。
   这个文件只是新候选的默认值：重新生成配方在 `display-texts` 任务里固定自己的
   `projection` 并随请求传入，所以改这个文件不会改变已发布成员的重新生成结果
-  （见[语言包配置参考](release-config.md#重新生成配方releaseregeneratepatchjson)）。
+  （见[语言包配置参考](release-config.md#重新生成配方releaseregeneratepatch-njson)）。
   唯一支持的 literal 策略是 `all-catalog-conflict-participants`：选择 scope 不会
   把未解决或冲突的记录移出 literal 歧义检查。
 
@@ -128,7 +128,7 @@ catalog 与投影相关字段：
   `package_texts` 或 catalog 的官方值里已有官方译文时，catalog 行回到未翻译（`null`，decision 记
   `skipped: "official-elsewhere"`）；怪物名的英文在这些地方或已采用的官方怪物名里已有官方译文时记
   `official-elsewhere`（`official`、`source`），都不出货。receipt 的 `official_elsewhere` 记录跳过条数 `skipped` 和每一行 `rows`
-  （`kind`、`identity`、`english`、`origin`、我们的 `text`、`official`、`source`）。例：-3 的 `display_texts.json`
+  （`kind`、`identity`、`english`、`origin`、我们的 `text`、`official`、`source`）。例：`locale/0.5.5.5-3` 的 `display_texts.json`
   里 `Bulwark` 为 `null`，而 `stat_lines.json` 有官方 `壁垒`，补译不能填它。
 
 怪物名逐 ID 按目标英文决定：
