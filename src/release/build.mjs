@@ -307,7 +307,7 @@ export function packageMembers(target, source) {
 function outputDirectory(repo, out, loaded) {
   out = path.resolve(out ?? path.join(repo, '.cache/release', buildName(loaded)));
   const inside = !path.relative(repo, out).startsWith('..');
-  require(!inside || !path.relative(path.join(repo, '.cache'), out).startsWith('..'), 'Output must be under .cache/');
+  require(!inside || !path.relative(path.join(repo, '.cache'), out).startsWith('..'), 'Output must be under .cache/ (or outside the repository)');
   return out;
 }
 
@@ -568,7 +568,7 @@ export async function main(argv = process.argv.slice(2)) {
     console.log('usage: release:build [--config release/<patch>[-<n>].json] [--out .cache/DIR] [--fetch] [--check] [--check-release]\n'
       + '  --fetch          fetch the source (and retained support display) origin commits from origin when missing,\n'
       + '                   and download the support display\'s pinned inputs into .cache/release/inputs\n'
-      + '  --check          exit 1 unless the build is clean, the source equals its origin tag tree and\n'
+      + '  --check          exit 1 unless the build is clean, the source equals its pinned origin.revision tree and\n'
       + '                   the zip equals the config\'s expected and published pins (when declared); a retained\n'
       + '                   support display must equal its origin tree and regenerate from its declared inputs\n'
       + '  --check-release  verify every locale/* Release against its mapped config\'s published or expect.package pin;\n'

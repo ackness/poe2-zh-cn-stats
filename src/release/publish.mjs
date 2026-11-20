@@ -314,7 +314,7 @@ export function main(argv = process.argv.slice(2), { repo = ROOT, runner, print 
     help: { type: 'boolean', short: 'h' },
   } });
   if (values.help) {
-    print('usage: release:publish [--config release/<patch>.json] [--dry-run | --yes] [--reuse]');
+    print('usage: release:publish [--config release/<patch>-<n>.json] [--dry-run | --yes] [--reuse]');
     return 0;
   }
   require(!(values.yes && values['dry-run']), '--dry-run and --yes are mutually exclusive');

@@ -55,7 +55,7 @@ export function markupProblem(text) {
 
 /**
  * The fields of one official table source (a recipe job entry; a request adds `file`). Returns the
- * spec. `keys` restricts the fields (the recipe form).
+ * spec. When `{ exact: true }` is set, rejects unknown fields (the recipe form).
  */
 export function validateTableSpec(spec, label, { exact = false } = {}) {
   require(object(spec) && /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/u.test(spec.repository ?? '') && typeof spec.tag === 'string' && spec.tag
@@ -201,8 +201,9 @@ const emptyCounts = () => ({ adopted: 0, shadowed: 0, 'not-in-game': 0, 'ambiguo
 
 /**
  * Pure core. sources: readOfficialTables() results, newest first; targets: Map scope -> Map id ->
- * target English (null when ambiguous). Returns {scopes: Map scope -> Map id -> [english, localized]},
- * per-source counts per scope, the target ids no source adopted, and the decided source of each id.
+ * target English (null when ambiguous). Returns {scopes, counts, missing}, where `scopes` is
+ * Map scope -> Map id -> [english, localized], `counts` records per-source reason tallies per
+ * scope, and `missing` counts unambiguous target ids not adopted by any source.
  * Throws on unpaired markup in the target English of a row it would adopt; a localized value with
  * unpaired markup is omitted ('broken-markup').
  */
