@@ -57,11 +57,12 @@ The split is maintained once, in
 Why the frozen parts stay as they are:
 
 - The seven native-library modules stay flat in `src/` with unchanged bytes. The catalog that
-  `release/regenerate/0.5.5.5.json` pins (`e61f1332:handoff/windows-fk-20261101/catalog.zip`) records
-  `src/<name>` keys with their hashes as its producer closure, and the modules locate the repository from
-  their own path. The catalog's client inputs exist only as hashes, so it cannot be rebuilt with moved or
-  edited code; any edit fails the `regenerate` CI job.
-- `inputs/` trees must equal their current origin commits (`--check`). Historical and frozen inputs
+  `release/regenerate/0.5.5.5.json` pins (`e61f1332`, tagged `handoff/windows-sc-20261101`, archive path
+  `handoff/windows-fk-20261101/catalog.zip`) records `src/<name>` keys with their hashes as its producer
+  closure, and the modules locate the repository from their own path. The catalog's client inputs exist
+  only as hashes, so it cannot be rebuilt with moved or edited code; any edit fails the `regenerate` CI
+  job.
+- `inputs/` trees must equal their pinned origin commits (`--check`). Historical and frozen inputs
   retain their README and evidence bytes, including old paths. Only new, unpublished PR candidates
   may be corrected through the appended commits described in [RELEASING.md](RELEASING.md#未发布候选的修正).
 - `release/`, `release/regenerate/`, `data/`, `sources/`, `docs/` and the mise task names are referenced
@@ -138,7 +139,7 @@ CI runs all of this anyway; run locally what your change can break.
 - Branch from `main`. Commit subjects follow `type(scope): imperative lowercase` (`feat`, `fix`,
   `refactor`, `chore`, `docs`, `test`; scopes such as `release`, `trade`, `pobr`, `native`); the body
   says why. Code and comments are in English; documents are in Chinese, except `README.md` (English, with
-  `README.zh-CN.md`), `AGENTS.md`, `CONTRIBUTING.md` and `sources/README.md`. `README.md` (English,
+  `README.zh-CN.md`), `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md` and `sources/README.md`. `README.md` (English,
   the default) and `README.zh-CN.md` must stay in sync: change both in the same PR.
 - Merge with a merge commit, never squash or rebase: `source.origin.revision` can be a commit on the PR
   branch, and only a merge commit keeps it in `main`'s history. A new `inputs/` directory, its config

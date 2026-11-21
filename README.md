@@ -80,7 +80,7 @@ What to edit, by purpose:
 
 | To change | Edit |
 | --- | --- |
-| A missing translation for an existing trade ID + English branch | [`curation/translations.json`](curation/translations.json): `manual_chinese`, `manual_note`, `manual_source_url` (optional `manual_origin`, `manual_status`, `manual_review` for agent work) |
+| A missing translation for an existing trade ID + English branch | [`curation/translations.json`](curation/translations.json): `manual_chinese`, `manual_note`, `manual_source_url` (agent translations also require `manual_origin`, `manual_author`, `manual_status` and, once reviewed/rejected, `manual_review`) |
 | Explicitly override an existing trade translation | [`curation/overrides.json`](curation/overrides.json), with reason and source |
 | Non-trade templates, multi-slot templates, rare-name words | [`curation/curated.json`](curation/curated.json) |
 | Native name or description supplements | [`curation/native-translations.json`](curation/native-translations.json), reviewed through the [workbench flow](docs/translation-workbench.md) (Chinese) |
@@ -90,13 +90,15 @@ What to edit, by purpose:
 ## Layout
 
 ```text
-curation/                       hand-maintained inputs
-data/CURRENT, data/snapshots/   trade dictionary snapshots (raw responses and generated files)
-reports/                        committed workbench queues, generated
-release/                        language package configs and regeneration recipes
+curation/                       hand-maintained inputs (trade, templates, overrides, native/display supplements, sources)
+data/CURRENT                    current trade dictionary snapshot directory name
+data/snapshots/<id>/            trade dictionary snapshots (raw responses and generated files)
+reports/                        committed workbench queues, generated (not an input)
+release/<patch>[-<n>].json      language package configs
+release/regenerate/<patch>[-<n>].json  regeneration recipes for release configs
 inputs/                         source bytes the configs pin (read-only)
 src/cli.mjs                     command entry for the trade dictionary and native text
-src/trade/                      trade dictionary
+src/trade/                      trade dictionary: fetch, pairing, generation, checks
 src/release/                    release:build, release:publish, release:regenerate
 src/pobr/                       PoBR locale producers and the historical zh-CN dictionary producer
 src/*.mjs (the other seven)     native catalog library; paths and bytes are frozen (see AGENTS.md)

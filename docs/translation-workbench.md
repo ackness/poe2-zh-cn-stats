@@ -1,11 +1,13 @@
-# 原件补译与区服工作表
+# 原生补译工作台
+
+（注：冻结的底层模块 [`src/translation-workbench.mjs`](../src/translation-workbench.mjs) 导出的报告标题仍保留早期命名“原件补译工作表”，文档中统一称“原生”与“补译工作台”。）
 
 `curation/native-translations.json` 保存人工或 agent 的补译，原始官方 catalog 保持不可变。
-`reports/native-translation-worklist.json` 是已提交的可读待办快照；它记录输入 catalog 的摘要，
+`reports/native-translation-worklist.json` 是已提交的可读待办清单快照；它记录输入 catalog 的摘要，
 不是当前游戏的完整语言包。`reports/native-regional-candidates.json` 单列目标表中缺少的来源条目，
 这些条目可能属于区服或版本差异，不能仅凭简体中文路径认定国服专属。
 
-交易 stat 的补译仍使用 `curation/translations.json`。本入口处理原件名称、技能说明等有明确
+交易 stat 的补译仍使用 `curation/translations.json`。本工作台处理原生名称、技能说明等有明确
 table/field/ID 的文本，不把交易 ID 当成原生 ID，也不生成游戏数值或词缀关系。
 
 ## 查看和更新
@@ -45,7 +47,7 @@ JSON 文件大小上限；仍核对 manifest 声明的字节数、SHA 和实际�
 v1/v2 catalog 的行为保留。v3 manifest 还必须固定同目录的原始 `verification.json`，
 其 `{bytes, sha256}` 必须与 catalog 的 `fk_verification` 完全一致。读取器每个输入只读取一份
 原始 Buffer，交给 `createCatalogLookup(catalog, {game_patch, realm, locale, verification})` 完整验证
-FK 结构及绑定投影；不能重新 stringify 后替代原件，也不能只信投影上的 accepted 标记。
+FK 结构及绑定投影；绝不能重新 stringify 后替代原始文件校验，也不能只信投影上的 accepted 标记。
 sidecar 留在原输入目录，不复制到输出或每条 workbench entry；`sources[].fk_verification`
 只保留一个文件名／字节数／摘要。观察源 patch/realm 的 null 不会被目标身份填充。
 
@@ -56,7 +58,7 @@ sidecar 留在原输入目录，不复制到输出或每条 workbench entry；`s
 
 | 字段 | 含义 |
 | --- | --- |
-| `official_translation.status` | `available` 官方有可用译文；`missing` 已对应的原件仍为英文或空译文；`unverified` 来源／模板／配对未解决；`not-applicable` 英文为空 |
+| `official_translation.status` | `available` 官方有可用译文；`missing` 已对应的原生条目仍为英文或空译文；`unverified` 来源／模板／配对未解决；`not-applicable` 英文为空 |
 | `official_translation.reason` | 原 catalog 的精确诊断，原译文与物理 row 继续保留 |
 | `translation` | 可选的 agent／人工译文及作者、备注、审核、依据 catalog 和 patch |
 | `translation_review` | 草稿、已审核、已拒绝或因来源变化／格式问题待复核 |
@@ -162,8 +164,8 @@ v1/v2 源的 `verification` 为 null。空的 `records: []` 是有效运行包�
 仍由工作表保留。上面的审核者和文本仅为合成示例，不是对真实草稿的批准。
 
 加载器对来源清单逐项核对；旧 patch/catalog/sidecar、未知或重复来源、越界 source 索引、
-重复 entry/原件身份、缺少实际审核人、草稿、英文/context/ID 摘要不符、参数或数字冲突、
-非官方缺译及未验证的源绑定都会拒绝整个运行包。`entry_id` 的规则保持原工作表定义：
+重复 entry／原生身份、缺少审核人、草稿、英文／context／ID 摘要不符、参数或数字冲突、
+非官方缺译以及未验证的源绑定都会导致整个运行包被拒绝。`entry_id` 的规则保持原工作表定义：
 对 `[identity, english, context]` 的递归排序键 JSON 做 UTF-8 SHA256，其中 identity 包括
 `game, realm, locale, table, field, id`。运行包的外部 SHA 同时固定译文与审核说明。
 
@@ -172,8 +174,8 @@ v1/v2 源的 `verification` 为 null。空的 `records: []` 是有效运行包�
 table/field/id/English/完整 context，返回
 `{status:'translated', text, reason:'reviewed-supplement', ids:[id], origin:'agent'|'human'}`。
 其余返回原官方 fallback 的 `{status, text, reason, ids}` 并加 `origin:null`，保留英文与诊断；
-不会利用文本同名、部分 context 或未知 ID 去猜补译。缺少／冲突绑定不是 official-missing。
-加载失败由调用者保留官方独立入口，不得把未验证运行包降级为可用补译。
+不会根据同名文本、局部 context 或未知 ID 猜测补译；缺少或冲突的绑定也不会视作 `official-missing`。
+即使加载失败，调用方仍会保留官方独立入口，绝不把未通过校验的运行包降级当作可用补译。
 
 可从同一个固定请求重放紧凑导出：
 
@@ -188,13 +190,13 @@ edits SHA 和全部七个 producer 模块 SHA。导出忽略 `previous`，因为
 
 ## 显示补译与来源标记
 
-原件目录覆盖不到的两类显示文本，以及对已发布词条行的修正，放在
+原生目录覆盖不到的两类显示文本，以及对已发布词条行的修正，放在
 [`curation/display-supplements.json`](../curation/display-supplements.json)
 （`poe2-display-supplements/v1`，校验在 `src/pobr/display-supplements.mjs`）：
 
 - PoBR 词条模板（`kind: "stat-line"`）：游戏 `stat_descriptions` 里有、交易目录和 `stat_lines.json` 都没有的
   英文模板；
-- 没有原件表的名称（`kind: "monster-name"`）：召唤生物、幽魂、同伴的 `MonsterVarieties.Name`；
+- 没有原生表的名称（`kind: "monster-name"`）：召唤生物、灵体、同伴的 `MonsterVarieties.Name`；
 - `corrections`：对作为底的 `stat_lines.json` 的逐行修正，例如 RePoE 硬编码留在 src 里的英文前缀，或官方文本里本该是换行的字面反斜杠。
 
 官方文本始终优先于本项目的补译。每条补译都要写 `origin`（`agent` 或 `human`）；即使逐字照抄或
@@ -262,8 +264,8 @@ zh-TW 的 `display_texts.json`（`GemEffects.SupportText`、`ActiveSkills.Descri
 ## 国服专属内容
 
 区服和语言是两个独立维度。相同 ID／英文的 `china/zh-CN`、`international/zh-CN` 和
-`international/zh-TW` 是三个独立条目，补译及查询不能串用。已确认的国服事实应由独立
-China catalog 提供，不能把 international target-missing-key 直接改为国服事实。
+`international/zh-TW` 是三个独立条目，补译和查询均不能混用。已确认的国服事实应由独立的
+China catalog 提供，不能将 international 的 `target-missing-key` 直接修改为国服事实。
 
 当前 Windows 观察源 patch/realm 为 null。它对应到国际服目标的已接受文本，只证明该
 文本的目标适用范围；source-only 记录保留在 regional-candidates 中待核。确认“国服专属”

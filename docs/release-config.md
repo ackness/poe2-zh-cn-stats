@@ -23,7 +23,7 @@
 | `expect.package` | 可选的 zip `bytes`、`sha256`；新发布前必须在配置 PR 里写好，构建不符就失败并列出期望和实际 pin |
 | `published` | 旧配置保留的 Release pin：`tag`、`asset`、`bytes`、`sha256`；`tag` 必须符合文件名对应关系，新配置不再补写 |
 | `hold` | 可选，一句原因。有它时 `release:publish` 拒绝发布、它也不作默认配置；点名构建与核对照常 |
-| `support_display` | 已停用于新配置：只有已发布的配置（-2、-3）保留，见下文 |
+| `support_display` | 已停用于新配置：只有已发布的 `locale/0.5.5.5-2`、`-3` 配置保留，见下文 |
 
 `source.origin`：
 
@@ -125,7 +125,7 @@ v2 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`me
 ## 回执与输出
 
 输出在 `.cache/release/<game>-<realm>-<配置名>/`：`pobr-locale-<patch>.zip`、`manifest.json`（包内同名
-文件的副本）、`receipt.json`（`poe2-locale-release-receipt/v1`）、`SHA256SUMS`，以及声明了时的两个
+文件的副本）、`receipt.json`（`poe2-locale-release-receipt/v1`）、`SHA256SUMS`，以及已发布的 `locale/0.5.5.5-2`、`-3` 配置所声明的两个
 辅助宝石说明文件。
 
 回执记录：
@@ -138,14 +138,14 @@ v2 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`me
   条数；某语言 `_meta.json` 写了 `fallback` 时还有回退链和对回退语言同名表的键覆盖。索引只在回执里，
   不进 zip。
 
-## 重新生成配方：`release/regenerate/<patch>.json`
+## 重新生成配方：`release/regenerate/<patch>[-<n>].json`
 
 `poe2-locale-regeneration/v1`。`release:build` 只打包冻结的源字节；配方证明这些字节能由本库的生产者
 从固定输入重新算出来。文件名必须与它复现的 v1 配置相同。
 
 | 字段 | 含义 |
 | --- | --- |
-| `reproduces` | 复现的 v1 配置（`release/<patch>.json`） |
+| `reproduces` | 复现的 v1 配置（`release/<patch>[-<n>].json`） |
 | `categories` | 冻结成员和组合证据可用的类别及说明 |
 | `jobs` | 生产任务，每个列出它的 `members` |
 | `frozen` | 暂时无法重新生成的成员：`bytes`、`sha256`、`category`、`reason`、`exit`（退出条件） |
@@ -161,7 +161,7 @@ v2 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`me
 - `display-texts`：`src/pobr/display-texts.mjs` 跑固定的 `catalog` 与审核补译 `supplement`（都是本仓库
   某个提交里的 zip）。可选 `official_tables`（zh-CN 或 zh-TW）是官方客户端表来源数组，新的在前，每项正好是
   `{repository, tag, asset, bytes, sha256, default, default_manifest_sha256, localized, localized_manifest_sha256, scopes}`：
-  RePoE 输入 Release 资产（例如 `inputs/0.5.5.5-1` 的 `repoe-input-china_text-0.5.5.5.zip`，`default` 为
+  RePoE 输入 Release 资产（例如 RePoE `inputs/0.5.5.5-1` 的 `repoe-input-china_text-0.5.5.5.zip`，`default` 为
   `display-tables/default/`，`localized` 为 `display-tables/simplified-chinese/`），`--fetch` 下载到
   `.cache/regenerate/inputs/<sha256>`，此时 `game_package` 必填；任务摘要的 `official_tables` 记各 scope 采用与缺少的条数。
   没有 catalog 的 locale（zh-TW）可以不写 `catalog`、`supplement`、`supplement_module`，但必须有 `official_tables`。库模块用本 checkout 的，v3 catalog 的 producer 闭包必须等于它们；
@@ -170,12 +170,12 @@ v2 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`me
   scope 不会改变已发布成员的重新生成结果；要发布新 scope，就在新配置的配方里写新的 `projection`。
   `regeneration.json` 的任务摘要记录生产者回执里的 `projection`。可选 `names`（本仓库某个提交里的
   `curation/display-supplements.json`，带 `bytes`、`sha256`）作为请求的 `names` 传入，为
-  `MonsterVarieties.Name` 提供已审核的怪物名补译；可选 `official_names`（本仓库某个提交里的文件
+  `MonsterVarieties.Name` 提供已审核的召唤生物／灵体名补译；可选 `official_names`（本仓库某个提交里的文件
   `{revision, path, bytes, sha256}`，或 HTTPS 下载 `{url, bytes, sha256}`，例如 RePoE Release 资产）作为请求的
-  `official_names` 传入，提供官方怪物名。两者都要求 `projection.scopes` 含该 scope，并要求
+  `official_names` 传入，提供官方名称。两者都要求 `projection.scopes` 含该 scope，并要求
   `game_package`（`{repository, tag, asset, bytes, sha256}`，RePoE 游戏 Release 资产，`asset` 必须是
   `pobr-game-<patch>.zip`，与 `supplement-lines` 相同）：`--fetch` 下载并核对后作为请求的 `game_package`
-  传入，怪物名按其中的目标英文决定。给出 `names` 时还要 `package_texts: {stat_lines, passive_names}`（各为本仓库
+  传入，名称按其中的目标英文决定。给出 `names` 时还要 `package_texts: {stat_lines, passive_names}`（各为本仓库
   某个提交里的文件 `{revision, path, bytes, sha256}`，通常是作为底的已发布成员），作为请求的 `package_texts`
   传入：补译不得遮住这些官方文本，跳过的条数记在任务摘要 `official_elsewhere_skipped`。`passive_names` 必须等于
   源目录的成员，`stat_lines` 必须等于源目录成员（带 `origin` 的行不计入）；同 locale 的 `supplement-lines` 任务没有
@@ -187,7 +187,7 @@ v2 包内 `manifest.json` 的 `source` 多出 `transforms`（`id`、`kind`、`me
   `{repository, tag, asset, bytes, sha256}`（`--fetch` 下载）。`members` 依次为
   `i18n/<locale>/stat_lines.json`，固定了 `meta` 时再加 `i18n/<locale>/_meta.json`。可选 `official`（仅 zh-CN，
   且要固定 `meta`）是官方层的来源数组，新的在前，每项正好是 `{repository, tag, asset, bytes, sha256, member,
-  manifest_sha256}`：RePoE 输入 Release 资产（例如 `inputs/0.5.5.5-1` 的 `repoe-input-china_text-0.5.5.5.zip`，
+  manifest_sha256}`：RePoE 输入 Release 资产（例如 RePoE `inputs/0.5.5.5-1` 的 `repoe-input-china_text-0.5.5.5.zip`，
   `member` 为 `stat-descriptions/china/`），`--fetch` 下载到 `.cache/regenerate/inputs/<sha256>`；任务摘要的
   `official` 是官方层计数。官方层每个来源约 9 秒、1.3 GB RSS。
 

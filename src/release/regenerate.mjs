@@ -1,10 +1,11 @@
 // release:regenerate — rebuild the members of a v1 release config's frozen source publication from
-// their producers' pinned inputs and compare them byte for byte. Input: release/regenerate/<patch>.json
+// their producers' pinned inputs and compare them byte for byte. Input: release/regenerate/<patch>[-<n>].json
 // (poe2-locale-regeneration/v1), which names the config it reproduces, the producer jobs and the
 // members that cannot be regenerated yet (frozen, each with a reason and an exit condition). Every
 // i18n member of the source is covered exactly once. The regenerated and frozen members are packaged
-// exactly as release:build packages the source; the zip must equal the config's published pin.
-// Output under .cache/regenerate/<game>-<realm>-<recipe name>/: regeneration.json and the zip.
+// exactly as release:build packages the source; the zip must equal the config's published or
+// expect.package pin (when present). Output under .cache/regenerate/<game>-<realm>-<recipe name>/:
+// regeneration.json and the zip.
 //
 // Inputs are Git objects of this repository ({revision, path}; --fetch fetches a missing revision)
 // or HTTPS URLs (downloaded with --fetch into .cache/regenerate/inputs/<sha256>); every one has a
@@ -490,9 +491,9 @@ export async function main(argv = process.argv.slice(2)) {
     help: { type: 'boolean', short: 'h' },
   } });
   if (values.help) {
-    console.log('usage: release:regenerate [--recipe release/regenerate/<patch>.json] [--out .cache/DIR] [--fetch] [--keep-work]\n'
+    console.log('usage: release:regenerate [--recipe release/regenerate/<patch>[-<n>].json] [--out .cache/DIR] [--fetch] [--keep-work]\n'
       + '  rebuilds the frozen source members of the recipe\'s release config from pinned producer inputs and exits 1\n'
-      + '  unless every regenerated member and the package equal the source and the published pin\n'
+      + '  unless every regenerated member and the package equal the source and the declared published or expect.package pin\n'
       + '  --fetch      fetch missing Git revisions from origin and download URL inputs into .cache/regenerate/inputs\n'
       + '  --keep-work  keep the materialized inputs and producer outputs under <out>/work');
     return;

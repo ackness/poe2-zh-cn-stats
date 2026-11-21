@@ -25,9 +25,9 @@
 
 | 想做什么 | 入口 |
 | --- | --- |
-| 配对原件名称、技能说明等显示字段 | [原件显示目录](native-catalog.md) |
+| 配对原生名称、技能说明等显示字段 | [原生显示目录](native-catalog.md) |
 | 配对原生 stat 描述 | [原生描述接入口](native-localization.md) |
-| 审核原生文本补译、区服差异 | [补译与区服工作表](translation-workbench.md) |
+| 审核原生文本补译、区服差异 | [原生补译工作台](translation-workbench.md) |
 
 ## 跨仓库
 

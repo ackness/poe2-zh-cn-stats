@@ -201,9 +201,9 @@ export function regeneratedFiles(repo, spec, target, configPath, cache) {
   return { manifestRaw, assetRaw };
 }
 
-// The manifest and asset must describe this target, catalog and each other, as PoBR checks them
-// (pipeline/imports/display_assets.py check_manifest/check_asset), and the asset's dictionary
-// commit must be the language package's (PoBR's web test compares it with i18n/zh-CN/_meta.json).
+// The manifest and asset must describe this target, catalog and each other, as PoBR's
+// release verifier checks them, and the asset's dictionary commit must match the language
+// package's (PoBR compares it with i18n/zh-CN/_meta.json).
 export function verifyDisplay(manifestRaw, assetRaw, spec, target, members) {
   const manifest = strictJson(manifestRaw), asset = strictJson(assetRaw);
   require(object(manifest) && manifest.schema === DISPLAY_SCHEMA && JSON.stringify(manifest.target) === JSON.stringify(manifestTarget(target))

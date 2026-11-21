@@ -1,4 +1,4 @@
-# PoE2 中文语言数据（简中／繁中）
+# PoE2 语言数据（英文／简中／繁中）
 
 [English](README.md) | **简体中文**
 
@@ -19,8 +19,8 @@
 | 发布或更新 PoBR 语言包 | [RELEASING.md](RELEASING.md) |
 | 在自己的工具里使用交易词条翻译 | [交易词典读取示例](docs/trade-dictionary.md#其他仓库如何接入) |
 | 采集交易目录、补一条译文、修正模板 | [交易词典维护](docs/trade-dictionary.md) |
-| 配对原件名称、技能说明或 stat 描述 | [原件显示目录](docs/native-catalog.md)／[原生描述接入口](docs/native-localization.md) |
-| 审核原生文本补译和区服差异 | [补译与区服工作表](docs/translation-workbench.md) |
+| 配对原生名称、技能说明或 stat 描述 | [原生显示目录](docs/native-catalog.md)／[原生描述接入口](docs/native-localization.md) |
+| 审核原生文本补译和区服差异 | [原生补译工作台](docs/translation-workbench.md) |
 | 改代码或提交 PR | [AGENTS.md](AGENTS.md)（目录、命令、校验、约定）、[CONTRIBUTING.md](CONTRIBUTING.md) |
 
 全部文档见[文档导航](docs/README.md)。
@@ -40,7 +40,7 @@ tag、附件和 SHA-256，运行时只使用打包好的文件。分工和共同
 | 交易词条 | GGG／腾讯交易目录、分裂词缀译文复用、PoE2DB 补缺；`data/snapshots/<id>/generated/` 的 `dictionary.json`、`pairs.json` | 主键为完整交易 ID **加英文分支** |
 | 编号模板 | 交易词典的保守转换及 `curation/curated.json`；`templates.json` | 自动转换只接受零／单数值槽，多参数由人工审核 |
 | 原生描述与名称 | 固定的 RePoE 客户端事实、CSD 描述和显式语言表 | 保留 stat ID、表身份、条件和分支，按精确上下文查询 |
-| PoBR 语言包 | 名称、显示文本（含宝石说明和召唤物名）、在固定的历史简中词典上叠加国服客户端官方文本的词条行，以及简中和繁中显示文本表 | 以 `locale/<patch>-<n>` Release 发布，PoBR 固定其附件的 SHA-256；自 `locale/0.5.5.5-4` 起不再单独发布辅助宝石说明（-2、-3 保留） |
+| PoBR 语言包 | 名称、显示文本（含宝石说明和召唤生物／灵体名）、在固定的历史简中词典上叠加国服客户端官方文本的词条行，以及简中和繁中显示文本表 | 以 `locale/<patch>-<n>` Release 发布，PoBR 固定其附件的 SHA-256；自 `locale/0.5.5.5-4` 起不再单独发布辅助宝石说明（-2、-3 保留） |
 | 人工补译 | `curation/` 下的工作表及审核记录 | 草稿不进入已审核输出，来源变化后需要复核；官方文本始终优先于补译，出货的补译行带 `origin`（`agent` 或 `human`） |
 
 交易 ID、游戏 stat ID 和显示文本各有用途，不能互相代替。交易覆盖率也不代表完整汉化或计算机制覆盖率。
@@ -67,34 +67,36 @@ mise exec -- npm run build     # 编辑 curation/ 后，用保存的原始响应
 mise run report                # 查看覆盖报告
 ```
 
+按需要修改的内容选择编辑位置：
+
 | 要改的内容 | 编辑位置 |
 | --- | --- |
-| 已有交易 ID＋英文分支缺译 | [`curation/translations.json`](curation/translations.json) 的 `manual_chinese`、`manual_note`、`manual_source_url`（agent 补译另写可选的 `manual_origin`、`manual_status`、`manual_review`） |
+| 已有交易 ID＋英文分支缺译 | [`curation/translations.json`](curation/translations.json) 的 `manual_chinese`、`manual_note`、`manual_source_url`（agent 补译须另填 `manual_origin`、`manual_author`、`manual_status`，审核或拒绝时再写 `manual_review`） |
 | 明确覆盖既有交易译文 | [`curation/overrides.json`](curation/overrides.json)，附理由与来源 |
 | 非交易模板、多参数模板、稀有名组成词 | [`curation/curated.json`](curation/curated.json) |
-| 原生名称／描述补译 | [`curation/native-translations.json`](curation/native-translations.json)，按[工作表流程](docs/translation-workbench.md)审核 |
-| 交易目录以外的词条模板、召唤生物／幽魂名称、已发布 `stat_lines.json` 行的修正 | [`curation/display-supplements.json`](curation/display-supplements.json)；每条都写 `origin`（`agent` 或 `human`），一直带到 PoBR（[显示补译与来源标记](docs/translation-workbench.md#显示补译与来源标记)） |
+| 原生名称／描述补译 | [`curation/native-translations.json`](curation/native-translations.json)，按[工作台流程](docs/translation-workbench.md)审核 |
+| 交易目录以外的词条模板、召唤生物／灵体名称、已发布 `stat_lines.json` 行的修正 | [`curation/display-supplements.json`](curation/display-supplements.json)；每条都写 `origin`（`agent` 或 `human`），一直带到 PoBR（[显示补译与来源标记](docs/translation-workbench.md#显示补译与来源标记)） |
 | 补充采集页面 | [`curation/trade-sources.json`](curation/trade-sources.json) |
 
 ## 目录
 
 ```text
-curation/                     人工维护的输入（交易补译、模板、修正、原生补译、显示补译、采集页面）
-data/CURRENT                  当前交易快照的目录名
-data/snapshots/<id>/          原始交易响应与页面证据（raw/）、词典与报告（generated/）
-reports/                      已提交的可读待办快照，由 workbench 命令生成，不是输入
-release/<patch>[-<n>].json    语言包 Release 的构建配置
-release/regenerate/<patch>[-<n>].json 从固定输入重新生成该包各成员的配方
-inputs/                       配置固定的源字节（只读，与原提交相同）
-src/cli.mjs                   交易词典与原生文本命令入口
-src/trade/                    交易词典：采集、配对、生成与验证
-src/release/                  release:build／release:publish／release:regenerate
-src/pobr/                     PoBR 语言文件生产者与历史简中词典生成
-src/*.mjs（其余 7 个）         原生目录库，路径与字节冻结（见 AGENTS.md）
-test/<领域>/                  按 src/ 领域分组的离线测试（test/native/ 对应原生目录库）
-docs/                         数据契约和维护指南
-sources/                      语言来源台账
-.cache/                       本地候选与临时文件，不提交
+curation/                              人工维护的输入（交易补译、模板、修正、原生补译、显示补译、采集页面）
+data/CURRENT                           当前交易快照的目录名
+data/snapshots/<id>/                   原始交易响应与页面证据（raw/）、词典与报告（generated/）
+reports/                               已提交的可读待办快照，由 workbench 命令生成，不是输入
+release/<patch>[-<n>].json             语言包 Release 的构建配置
+release/regenerate/<patch>[-<n>].json  从固定输入重新生成该包各成员的配方
+inputs/                                配置固定的源字节（只读，与原提交相同）
+src/cli.mjs                            交易词典与原生文本命令入口
+src/trade/                             交易词典：采集、配对、生成与验证
+src/release/                           release:build／release:publish／release:regenerate
+src/pobr/                              PoBR 语言文件生产者与历史简中词典生成
+src/*.mjs（其余 7 个）                 原生目录库，路径与字节冻结（见 AGENTS.md）
+test/<领域>/                           按 src/ 领域分组的离线测试（test/native/ 对应原生目录库）
+docs/                                  数据契约和维护指南
+sources/                               语言来源台账
+.cache/                                本地候选与临时文件，不提交
 ```
 
 哪些可编辑、哪些冻结或生成，以及 7 个原生模块为何冻结在 `src/`，见 [AGENTS.md](AGENTS.md#layout)。

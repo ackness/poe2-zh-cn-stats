@@ -34,7 +34,7 @@ export function validateBundle(bundle, snapshot) {
   }
 }
 
-// Match the conservative bucket used by apps/pobr-wasm/src/zh.rs. A bucket
+// Match PoBR's conservative template bucketing rule. A bucket
 // collision is not proof of equivalent mechanics, so new automatic text loses.
 function skeleton(template) {
   return template.replace(/\{[^{}]*\}/g, '').replace(/[0-9+\-.,\s]/gu, '')

@@ -1,8 +1,8 @@
-# 原件显示目录
+# 原生显示目录
 
 `src/native-catalog.mjs` 在现有 RePoE 物理表读取器上导出
 `poe2-native-catalog/v1`。输入为 `poe2-native-catalog-request/v1`，
-其 `language`、`localized`、`english` 与下文[原件名称](#原件名称native-names)的请求相同。
+其 `language`、`localized`、`english` 与下文[原生名称](#原生名称native-names)的请求相同。
 可选 `tables` 明确限定本次已获取的表；省略时必须提供全部九表。
 `english[].tables` 必须恰好拥有所选范围，各表一个 owner。
 这允许真实简中来源先提供 Words / Ascendancy 的小范围候选，不能把其余表算作已覆盖。
@@ -79,14 +79,14 @@ const result = lookup({
 ## 观察客户端与目标绑定 v2
 
 `poe2-native-catalog-request/v2` 使用相同 `language` / `tables` / `localized` /
-`english` 请求字段，显式读取 SOURCE 的 `repoe-localized-tables/v2`。目前该入口要求真实索引
-路径声明 `Simplified Chinese`，源 `game_patch`、`realm` 仍为 null；v1 的已知同补丁/服别约束不放松。
+`english` 请求字段，显式读取 source 的 `repoe-localized-tables/v2`。目前该入口要求真实索引
+路径声明为 `Simplified Chinese`，source 中的 `game_patch` 与 `realm` 仍为 `null`，并沿用 v1 的同补丁、同服别约束。
 v2 输入的 `tables.json` 是 SC 全列原行，`default-tables.json` 是同次观察的 default 全列原行。
 两个 payload 及 `target_binding.json`、`transfer-receipt.json`、`target-lock.json`、
-`wire-observations.json` 必须全部由外部固定 manifest 校验；单 payload 最多128MiB，总量最多256MiB。
+`wire-observations.json` 必须全部由外部固定 manifest 校验；单 payload 最多 128 MiB，总量最多 256 MiB。
 输入 decoder 方法是 `stdlib-memory-schema-decoder/v2`，Mac ingest 方法及 receipt 单独保存，
-不声称用旧 PyPoE producer 再解码了源 DAT。实际索引路径原样保留，只按规范路径进行大小写等价验证，
-重复 case alias 拒绝；不将 raw pin 迁移到改写后的路径。
+不声称复用旧 PyPoE producer 重新解码过源 DAT。实际索引路径原样保留，只按规范路径校验大小写等价，
+拒绝重复的大小写别名（case alias）；也不会将原始 pin 迁移到改写后的路径。
 
 目标英文包仍由请求逐表明确指定并固定。独立的 `target_binding` 使用
 `stable-key-current-english-all-nontext/v1`，声明已知目标 game/patch/realm、逐表 manifest、
@@ -144,9 +144,9 @@ const lookup = createCatalogLookup(catalog, {
 });
 ```
 
-加载时先核原字节长度／SHA，再独立重建 FK binding，并与目录投影比较；
-缺失、错误 sidecar 或伪造 accepted 投影均拒绝。拒绝的记录、英文同名 null blocker、
-完整上下文和查询回退继续保留。不能重新 stringify 后替代验证原件。
+加载时先核对原字节长度／SHA，再独立重建 FK binding，并与目录投影比较；
+缺失、错误 sidecar 或伪造 accepted 投影都会被拒绝。被拒绝的记录、英文同名 null blocker、
+完整上下文和查询回退继续保留；绝不能用重新 stringify 后的结果替代原件校验。
 
 当前固定 SC 产物有 58588 字段／18 列，lookup 状态为 25097 translated／33491 fallback；
 这是该固定目录的结果，不是全游戏汉化率。观察客户端 patch／realm 仍为 null，
@@ -155,7 +155,7 @@ const lookup = createCatalogLookup(catalog, {
 [PoBR 语言文件生产者](pobr-locale-producers.md#显示文本display_textsjson)）；原大 sidecar 只作构建和离线校验输入，
 不进入玩家运行包。
 
-## 原件名称（native-names）
+## 原生名称（native-names）
 
 `src/native-names.mjs` 离线配对同游戏、补丁、服别与 schema 的英文事实和显式语言事实，输出
 `poe2-native-names/v1`，不修改交易快照或 `CURRENT`：
