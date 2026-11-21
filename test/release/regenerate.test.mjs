@@ -6,7 +6,7 @@ import { DICTIONARY_FILES, produceLocale } from '../../src/pobr/locale-producer.
 import { ROOT, build, pin, releaseUrl } from '../../src/release/build.mjs';
 import { createSupplementLines } from '../../src/pobr/supplement-lines.mjs';
 import { storedZip } from '../../src/release/stored-zip.mjs';
-import { loadRecipe, problems, recipeFiles, regenerate } from '../../src/release/regenerate.mjs';
+import { loadRecipe, problems, recipeFiles, regenerate, report } from '../../src/release/regenerate.mjs';
 import { strictJson } from '../../src/strict-json.mjs';
 import { chinaPackage, tablePackage } from '../pobr/official-fixture.mjs';
 import { createDisplayTexts } from '../../src/pobr/display-texts.mjs';
@@ -183,6 +183,30 @@ test('regenerate: a source member that its producer does not reproduce is report
   assert.equal(done.result.members['i18n/zh-CN/mods.json'].class, 'generated-different');
   // The published pin was built from the edited source, so the regenerated package differs too.
   assert.deepEqual(problems(done).map(p => p.split(' ')[0]), ['i18n/zh-CN/mods.json', 'the']);
+});
+
+test('regenerate: expect-only configs enforce expect.package on match and mismatch', async t => {
+  const { repo, recipeFile, fetcher, published } = await setup(t);
+  const configPath = path.join(repo, 'release/9.9-1.json');
+  const { published: _, ...baseConfig } = strictJson(readFileSync(configPath));
+  const expected = { bytes: published.bytes, sha256: published.sha256 };
+  write(repo, 'release/9.9-1.json', bytes({ ...baseConfig, expect: { package: expected } }));
+  commitAll(repo, 'expect-only config');
+  const matched = await regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+  assert.deepEqual(problems(matched), []);
+  assert.equal(matched.result.reproduces.published, null);
+  assert.deepEqual(matched.result.reproduces.expect, expected);
+  assert.equal(matched.result.package.equals_published, null);
+  assert.equal(matched.result.package.equals_expected, true);
+  assert.match(report(matched), /\(equals expect\.package\)/u);
+  for (const wrong of [{ ...expected, sha256: '0'.repeat(64) }, { ...expected, bytes: expected.bytes + 1 }]) {
+    write(repo, 'release/9.9-1.json', bytes({ ...baseConfig, expect: { package: wrong } }));
+    const mismatched = await regenerate({ repo, recipe: recipeFile, fetch: true, fetcher });
+    assert.equal(mismatched.result.package.equals_expected, false);
+    assert.deepEqual(problems(mismatched),
+      [`the package ${matched.result.package.sha256} differs from expect.package ${wrong.sha256}`]);
+    assert.match(report(mismatched), /\(DIFFERS from expect\.package\)/u);
+  }
 });
 
 test('recipe: covers the source exactly once, pins frozen bytes and checks declared passthrough', async t => {

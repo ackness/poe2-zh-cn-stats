@@ -13,7 +13,7 @@
 // separately rebuilds a v1 source's members from their producers' pinned inputs.
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -442,12 +442,15 @@ export function releaseUrl(repository, tag, asset, base = process.env.POBR_RELEA
 }
 
 // GET with retries on network errors, 429 and 5xx; other HTTP errors are answers.
-export async function download(url, { fetchImpl = fetch, attempts = 3, backoff = 1000, sleep } = {}) {
+export async function download(url, { fetchImpl = fetch, attempts = 3, backoff = 1000, sleep, timeoutMs = 120_000 } = {}) {
   sleep ??= ms => new Promise(resolve => setTimeout(resolve, ms));
   for (let attempt = 1; ; attempt++) {
     let failure;
     try {
-      const response = await fetchImpl(url, { headers: { 'user-agent': 'poe2-zh-cn-stats-release' } });
+      const response = await fetchImpl(url, {
+        headers: { 'user-agent': 'poe2-zh-cn-stats-release' },
+        signal: AbortSignal.timeout(timeoutMs),
+      });
       if (response.ok) return Buffer.from(await response.arrayBuffer());
       require(response.status === 429 || response.status >= 500, `GET ${url}: HTTP ${response.status}`);
       failure = `HTTP ${response.status}`;
@@ -460,16 +463,25 @@ export async function download(url, { fetchImpl = fetch, attempts = 3, backoff =
   }
 }
 
+function releaseCacheDirectory(repo, dir) {
+  require(typeof dir === 'string' && dir.trim(), 'Release cache must be a non-empty directory path');
+  dir = path.resolve(dir);
+  const inside = !path.relative(repo, dir).startsWith('..');
+  require(!inside || !path.relative(path.join(repo, '.cache'), dir).startsWith('..'),
+    'Release cache must be under .cache/ (or outside the repository)');
+  return dir;
+}
+
 // Verify a Release against its config pin; when rebuilt here, also compare the zip and support display.
-async function checkReleaseAsset(loaded, built, tag, fetcher) {
+async function checkReleaseAsset(loaded, built, tag, fetchAsset) {
   const { published, expect, target } = loaded.config;
   const expected = published ?? expect?.package;
   require(isPin(expected), `${loaded.display}: Release ${tag} requires published or expect.package`);
   const asset = assetName(target.game_patch);
-  const sums = (await fetcher(releaseUrl(REPOSITORY, tag, 'SHA256SUMS'))).toString('utf8');
+  const sums = (await fetchAsset(tag, 'SHA256SUMS')).toString('utf8');
   require(sums.split('\n').includes(`${expected.sha256}  ${asset}`),
     `${tag} SHA256SUMS does not list ${asset} ${expected.sha256}`);
-  const zip = await fetcher(releaseUrl(REPOSITORY, tag, asset));
+  const zip = await fetchAsset(tag, asset);
   require(samePin(pin(zip), expected), `${tag} ${asset} differs from its ${published ? 'published' : 'expect.package'} pin: `
     + `expected ${JSON.stringify(pinFields(expected))}; downloaded ${JSON.stringify(pin(zip))}`);
   if (!built) return;
@@ -484,16 +496,29 @@ async function checkReleaseAsset(loaded, built, tag, fetcher) {
 
 export async function checkRelease(built, fetcher = download) {
   const tag = built.loaded.config.published?.tag ?? `locale/${path.basename(built.loaded.file, '.json')}`;
-  await checkReleaseAsset(built.loaded, built, tag, fetcher);
+  await checkReleaseAsset(built.loaded, built, tag, (t, asset) => fetcher(releaseUrl(REPOSITORY, t, asset)));
 }
 
-export async function checkReleases(repo, built, tags, fetcher = download) {
+export async function checkReleases(repo, built, tags, fetcher = download, { cache } = {}) {
   const problems = unpinnedTags(repo, tags);
   require(!problems.length, `check-release failed:\n${problems.map(p => `  - ${p}`).join('\n')}`);
+  const dir = cache !== undefined && cache !== null ? releaseCacheDirectory(repo, cache) : null;
+  // Keyed by (tag, asset) rather than expected sha256 so live Release tampering is still caught.
+  const fetchAsset = async (tag, asset) => {
+    if (!dir) return fetcher(releaseUrl(REPOSITORY, tag, asset));
+    const file = path.join(dir, safeRelative(tag), safeRelative(asset));
+    if (existsSync(file)) return readFileSync(file);
+    const raw = await fetcher(releaseUrl(REPOSITORY, tag, asset));
+    mkdirSync(path.dirname(file), { recursive: true });
+    const tmp = `${file}.tmp-${process.pid}`;
+    writeFileSync(tmp, raw);
+    renameSync(tmp, file);
+    return raw;
+  };
   for (const tag of tags) {
     const file = path.join(repo, configForTag(tag));
     const loaded = path.resolve(built.loaded.file) === file ? built.loaded : loadConfig(file, repo);
-    await checkReleaseAsset(loaded, loaded === built.loaded ? built : null, tag, fetcher);
+    await checkReleaseAsset(loaded, loaded === built.loaded ? built : null, tag, fetchAsset);
   }
   return tags;
 }
@@ -562,19 +587,22 @@ export function report(built) {
 export async function main(argv = process.argv.slice(2)) {
   const { values } = parseArgs({ args: argv, options: {
     config: { type: 'string' }, out: { type: 'string' }, fetch: { type: 'boolean' },
-    check: { type: 'boolean' }, 'check-release': { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
+    check: { type: 'boolean' }, 'check-release': { type: 'boolean' }, 'release-cache': { type: 'string' },
+    help: { type: 'boolean', short: 'h' },
   } });
   if (values.help) {
-    console.log('usage: release:build [--config release/<patch>[-<n>].json] [--out .cache/DIR] [--fetch] [--check] [--check-release]\n'
+    console.log('usage: release:build [--config release/<patch>[-<n>].json] [--out .cache/DIR] [--fetch] [--check] [--check-release] [--release-cache .cache/DIR]\n'
       + '  --fetch          fetch the source (and retained support display) origin commits from origin when missing,\n'
       + '                   and download the support display\'s pinned inputs into .cache/release/inputs\n'
       + '  --check          exit 1 unless the build is clean, the source equals its pinned origin.revision tree and\n'
       + '                   the zip equals the config\'s expected and published pins (when declared); a retained\n'
       + '                   support display must equal its origin tree and regenerate from its declared inputs\n'
       + '  --check-release  verify every locale/* Release against its mapped config\'s published or expect.package pin;\n'
-      + '                   compare this build byte for byte when released, and require every published tag on origin');
+      + '                   compare this build byte for byte when released, and require every published tag on origin\n'
+      + '  --release-cache  run-scoped directory under .cache/ to reuse downloaded Release assets across --check-release calls');
     return;
   }
+  if (values['release-cache'] !== undefined) releaseCacheDirectory(ROOT, values['release-cache']);
   if (values.fetch) {
     // Before the build: a regenerated support display needs its downloads.
     const loaded = loadConfig(values.config ?? defaultConfig(ROOT));
@@ -597,7 +625,7 @@ export async function main(argv = process.argv.slice(2)) {
   }
   if (values['check-release']) {
     const tags = remoteLocaleTags(ROOT);
-    await checkReleases(ROOT, built, tags);
+    await checkReleases(ROOT, built, tags, download, { cache: values['release-cache'] });
     console.log(`check-release: origin's ${tags.length} locale/* Releases match their mapped configs' pins; every published pin is on origin`);
   }
 }
