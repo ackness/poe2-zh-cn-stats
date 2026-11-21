@@ -10,6 +10,8 @@ export class PoE2DBDecodeError extends SyntaxError {
   }
 }
 
+const MODS_VIEW_CALL = /new\s+ModsView\s*\(/yu;
+
 // Read JSON literals, never JavaScript expressions. Quoted/commented examples
 // are not constructors. Remote scripts and HTML event handlers never execute.
 function payloads($, url) {
@@ -36,8 +38,11 @@ function payloads($, url) {
         i = end < 0 ? source.length : end + 2;
         continue;
       }
-      const call = (i === 0 || !/[\w$]/u.test(source[i - 1]))
-        && /^new\s+ModsView\s*\(/u.exec(source.slice(i));
+      let call = null;
+      if (i === 0 || !/[\w$]/u.test(source[i - 1])) {
+        MODS_VIEW_CALL.lastIndex = i;
+        call = MODS_VIEW_CALL.exec(source);
+      }
       if (!call) { i++; continue; }
       let start = i + call[0].length;
       while (/\s/u.test(source[start] ?? '') && start < source.length) start++;
@@ -206,7 +211,7 @@ function readPage(html, url, locale, issues) {
       const scopeBadge = item.children('.badge.bg-secondary');
       const value = badge.length === 1 && numericValue(badge.text());
       const scopeText = normalizeText(scopeBadge.text());
-      const scope = ({ Local: 'local', '区域': 'local', Global: 'global' })[scopeText];
+      const scope = ({ Local: 'local', '区域': 'local', Global: 'global', '全局': 'global' })[scopeText];
       const copy = item.clone();
       copy.find('.badge').remove();
       const name = normalizeText(copy.text());
