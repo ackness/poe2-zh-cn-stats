@@ -4,7 +4,7 @@ import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { build, loadConfig, packageArchive, packageOf, pin, sha256 } from '../../src/release/build.mjs';
 import {
-  commands, main, nextSequence, plan, preflight, remoteTags, sequences, stage, tagName,
+  commands, listRemoteTags, main, nextSequence, plan, preflight, remoteTags, sequences, stage, tagName,
 } from '../../src/release/publish.mjs';
 import { bytes, commitAll, config, fixture, gitIn, write } from './fixture.mjs';
 import { addRetainedDisplay, retained } from './support-display-fixture.mjs';
@@ -128,12 +128,19 @@ test('preflight: a clean commit on origin/main passes; dirty, unpushed and unrea
   write(repo, 'scratch.txt', 'x');
   assert.match(preflight(repo).problems.join(), /working tree is not clean \(1 paths, e\.g\. scratch\.txt\)/u);
   rmSync(path.join(repo, 'scratch.txt'));
+  write(repo, '中文 临时.txt', 'x');
+  assert.match(preflight(repo).problems.join(), /working tree is not clean \(1 paths, e\.g\. 中文 临时\.txt\)/u);
+  rmSync(path.join(repo, '中文 临时.txt'));
+  gitIn(repo, 'tag', '--annotate', '-m', 'annotated', 'locale/9.9-1', commit);
+  gitIn(repo, 'push', '-q', 'origin', 'refs/tags/locale/9.9-1');
+  assert.deepEqual(listRemoteTags(repo), { 'locale/9.9-1': commit });
   const local = commitAll(repo, 'not pushed');
   assert.deepEqual(preflight(repo).problems, [`HEAD ${local} is not on origin/main`]);
   gitIn(repo, 'remote', 'set-url', 'origin', path.join(repo, 'missing.git'));
   const offline = preflight(repo);
   assert.match(offline.warnings.join(), /could not fetch origin\/main/u);
   assert.deepEqual(offline.problems, [`HEAD ${local} is not on origin/main`]);
+  assert.equal(listRemoteTags(repo), null);
 });
 
 test('plan: next number, resume an unpushed tag, recognise a pushed one, never renumber HEAD', t => {

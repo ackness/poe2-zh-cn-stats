@@ -158,8 +158,8 @@ test('unrecognized marked content is diagnosed, not erased into a slot', () => {
   assert.ok(result.issues.some(i => i.type === 'unsupported-value-span'));
 });
 
-const detail = (header, stats, { family = 'SameFamily', locale = 'en', scope = 'global' } = {}) => {
-  const scopeText = scope === 'local' ? (locale === 'cn' ? '区域' : 'Local') : 'Global';
+const detail = (header, stats, { family = 'SameFamily', locale = 'en', scope = 'global', scopeBadge } = {}) => {
+  const scopeText = scopeBadge ?? (scope === 'local' ? (locale === 'cn' ? '区域' : 'Local') : 'Global');
   return `<div class="card"><h5 class="card-header"><span class="item_magic">${header}</span></h5>
     <table><tr><th>Family</th><td>${family}</td></tr>
     <tr><th>Domains</th><td>${locale === 'cn' ? '物品' : 'Item'} (1)</td></tr>
@@ -193,6 +193,11 @@ test('detail cards require identical raw definitions, ranges and local/global sc
     const cn = detail(`此武器速度 ${span('(10—20)')}%`, [[stat, min, max]], { scope, locale: 'cn' });
     assert.equal(extractPagePairs(en, cn, urls).pairs.length, 0);
   }
+  const enGlobal = detail(`${span('(10—20)')}% increased damage`, [['damage +%', 10, 20]], { scope: 'global' });
+  const cnGlobal = detail(`伤害提高 ${span('(10—20)')}%`, [['damage +%', 10, 20]], { locale: 'cn', scopeBadge: '全局' });
+  assert.equal(extractPagePairs(enGlobal, cnGlobal, urls).pairs.length, 1);
+  const enLocal = detail(`${span('(10—20)')}% increased damage`, [['damage +%', 10, 20]], { scope: 'local' });
+  assert.equal(extractPagePairs(enLocal, cnGlobal, urls).pairs.length, 0);
 });
 
 test('raw secondary detail headers cannot pretend to be translations', () => {

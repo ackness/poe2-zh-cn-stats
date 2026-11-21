@@ -444,17 +444,21 @@ export async function regenerate({ repo = ROOT, recipe: recipeFile, out, fetch =
   const sorted = Object.fromEntries(Object.keys(members).sort(compare).map(name => [name, members[name]]));
   const counts = {};
   for (const { class: kind } of Object.values(sorted)) counts[kind] = (counts[kind] ?? 0) + 1;
+  const zipPin = pin(zip), expected = config.expect?.package;
   const result = {
     schema: RESULT_SCHEMA,
     target,
     producer: { ...producerIdentity(repo, recipe.config), recipe: { [recipe.display]: pin(recipe.raw) } },
-    reproduces: { config: recipe.config.display, source: config.source.manifest.path, published: config.published ?? null },
+    reproduces: { config: recipe.config.display, source: config.source.manifest.path, published: config.published ?? null,
+      ...(expected ? { expect: expected } : {}) },
     categories: recipe.recipe.categories,
     inputs: Object.fromEntries(Object.keys(inputs.used).sort(compare).map(name => [name, inputs.used[name]])),
     jobs,
     members: sorted,
     summary: counts,
-    package: { asset: assetName(target.game_patch), ...pin(zip), equals_published: config.published ? samePin(pin(zip), config.published) : null },
+    package: { asset: assetName(target.game_patch), ...zipPin,
+      equals_published: config.published ? samePin(zipPin, config.published) : null,
+      ...(expected ? { equals_expected: samePin(zipPin, expected) } : {}) },
   };
   const raw = encoded(result);
   writeFileSync(path.join(out, 'regeneration.json'), raw);
@@ -463,12 +467,15 @@ export async function regenerate({ repo = ROOT, recipe: recipeFile, out, fetch =
   return { out, result, raw, zip };
 }
 
-// Failures of a regeneration that claims to reproduce its config's published package.
+// Failures of a regeneration that claims to reproduce its config's published or expected package.
 export function problems({ result }) {
   const found = Object.entries(result.members).filter(([, entry]) => entry.class.endsWith('-different'))
     .map(([name, entry]) => `${name} regenerates as ${entry.sha256}, the source has ${entry.reference.sha256}`);
   if (result.package.equals_published === false) {
     found.push(`the package ${result.package.sha256} differs from the published ${result.reproduces.published.tag} ${result.reproduces.published.sha256}`);
+  }
+  if (result.package.equals_expected === false) {
+    found.push(`the package ${result.package.sha256} differs from expect.package ${result.reproduces.expect.sha256}`);
   }
   return found;
 }
@@ -479,8 +486,12 @@ export function report({ out, result }) {
     lines.push(`  ${entry.class.padEnd(22)} ${name}${entry.job ? ` <- ${entry.job}` : ` (${entry.category})`}`);
   }
   lines.push(`summary: ${Object.entries(result.summary).map(([kind, n]) => `${n} ${kind}`).join(', ')}`);
+  const notes = [
+    result.package.equals_published === null ? '' : result.package.equals_published ? 'equals the published pin' : 'DIFFERS from the published pin',
+    result.package.equals_expected === undefined ? '' : result.package.equals_expected ? 'equals expect.package' : 'DIFFERS from expect.package',
+  ].filter(Boolean);
   lines.push(`${result.package.asset}: ${result.package.bytes} bytes sha256 ${result.package.sha256}`
-    + (result.package.equals_published === null ? '' : result.package.equals_published ? ' (equals the published pin)' : ' (DIFFERS from the published pin)'));
+    + (notes.length ? ` (${notes.join('; ')})` : ''));
   lines.push(`output: ${out}`);
   return lines.join('\n');
 }

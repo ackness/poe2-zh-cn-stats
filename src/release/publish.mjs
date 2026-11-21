@@ -163,7 +163,9 @@ export function preflight(repo, { remote = REMOTE, branch = BRANCH, fetch = true
   const head = git(repo, ['rev-parse', '--verify', 'HEAD^{commit}']);
   require(head.status === 0, `${repo}: no HEAD commit`);
   const commit = head.stdout.trim();
-  const status = git(repo, ['status', '--porcelain', '--untracked-files=all']).stdout.split('\n').filter(Boolean);
+  const statusResult = git(repo, ['--no-optional-locks', 'status', '--porcelain=v1', '-z', '--no-renames', '--untracked-files=all']);
+  require(statusResult.status === 0, `git status failed: ${statusResult.stderr}`);
+  const status = statusResult.stdout.split('\0').filter(Boolean);
   if (status.length) problems.push(`the working tree is not clean (${status.length} paths, e.g. ${status[0].slice(3)})`);
   const tracking = `refs/remotes/${remote}/${branch}`;
   if (fetch) {
@@ -178,8 +180,14 @@ export function preflight(repo, { remote = REMOTE, branch = BRANCH, fetch = true
 
 // {tag: commit} of the remote's locale/* tags, or null when the remote cannot be listed.
 export function listRemoteTags(repo, remote = REMOTE) {
-  const result = git(repo, ['ls-remote', '--tags', remote, `refs/tags/${TAG_PREFIX}*`], { online: true });
-  if (result.status) {
+  let result;
+  try {
+    result = git(repo, ['ls-remote', '--tags', remote, `refs/tags/${TAG_PREFIX}*`], { online: true, timeout: 60_000 });
+  } catch (error) {
+    say(`could not list ${remote}'s tags: ${error.message}`);
+    return null;
+  }
+  if (result.status !== 0) {
     say(`could not list ${remote}'s tags: ${result.stderr}`);
     return null;
   }

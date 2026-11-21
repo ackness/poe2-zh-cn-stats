@@ -360,12 +360,49 @@ for (const state of ['published', 'expect only', 'no Release yet']) {
   });
 }
 
+test('check-release: run-scoped release cache deduplicates downloads across configs without hiding tampering', async t => {
+  const { root, repo, manifestRaw } = fixture();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+  const baseZip = build({ repo }).zip, expected = pin(baseZip);
+  write(repo, 'release/9.9-1.json', bytes(config(manifestRaw, { published: { tag: 'locale/9.9-1', asset: 'pobr-locale-9.9.zip', ...expected } })));
+  write(repo, 'release/9.9-2.json', bytes(config(manifestRaw, { expect: { package: expected } })));
+  const built1 = build({ repo, config: path.join(repo, 'release/9.9-1.json'), out: path.join(repo, '.cache/out-1') });
+  const built2 = build({ repo, config: path.join(repo, 'release/9.9-2.json'), out: path.join(repo, '.cache/out-2') });
+  const tags = ['locale/9.9-1', 'locale/9.9-2'];
+  const calls = [];
+  const fetcher = async url => {
+    calls.push(url);
+    return url.endsWith('/SHA256SUMS') ? Buffer.from(`${expected.sha256}  ${built1.asset}\n`) : baseZip;
+  };
+  const cache = path.join(repo, '.cache/release/ci-remote');
+  assert.deepEqual(await releases.checkReleases(repo, built1, tags, fetcher, { cache }), tags);
+  assert.equal(calls.length, tags.length * 2);
+  // Second config reuses cached remote bytes (zero extra fetches) while still checking its own rebuilt zip.
+  assert.deepEqual(await releases.checkReleases(repo, built2, tags, fetcher, { cache }), tags);
+  assert.equal(calls.length, tags.length * 2);
+  await assert.rejects(
+    releases.checkReleases(repo, { ...built2, zip: Buffer.from('rebuilt-mismatch') }, tags, fetcher, { cache }),
+    /differs from the rebuilt package/u,
+  );
+  // Keyed by (tag, asset), never expected sha256: tampered bytes fail immediately and stay detected.
+  const tamperedCache = path.join(repo, '.cache/release/ci-tampered');
+  const tamperedFetcher = async url => url.endsWith('/SHA256SUMS')
+    ? Buffer.from(`${expected.sha256}  ${built1.asset}\n`) : Buffer.from('tampered');
+  await assert.rejects(releases.checkReleases(repo, built1, tags, tamperedFetcher, { cache: tamperedCache }), /differs from.*pin/u);
+  await assert.rejects(releases.checkReleases(repo, built1, tags, fetcher, { cache: tamperedCache }), /differs from.*pin/u);
+  await assert.rejects(releases.checkReleases(repo, built1, tags, fetcher, { cache: path.join(repo, 'release') }),
+    /Release cache must be under \.cache/u);
+  await assert.rejects(releases.checkReleases(repo, built1, tags, fetcher, { cache: '' }),
+    /non-empty directory path/u);
+});
+
 test('download retries network errors, 429 and 5xx, never other HTTP errors', async () => {
   const response = (status, body = '') => ({ ok: status === 200, status, arrayBuffer: async () => Buffer.from(body) });
   const scripted = steps => {
-    const calls = [];
-    return { calls, fetchImpl: async url => {
+    const calls = [], signals = [];
+    return { calls, signals, fetchImpl: async (url, options) => {
       calls.push(url);
+      signals.push(options?.signal);
       const step = steps.shift();
       if (step instanceof Error) throw step;
       return response(step, 'payload');
@@ -376,6 +413,7 @@ test('download retries network errors, 429 and 5xx, never other HTTP errors', as
   let server = scripted([new Error('ECONNRESET'), 503, 200]);
   assert.deepEqual(await download('u', { ...server, sleep }), Buffer.from('payload'));
   assert.deepEqual([server.calls.length, waits], [3, [1000, 2000]]);
+  assert.ok(server.signals.every(signal => signal instanceof AbortSignal));
   server = scripted([429, 502, 500]);
   await assert.rejects(download('u', { ...server, sleep }), /GET u: HTTP 500 after 3 attempts/u);
   server = scripted([404]);
