@@ -442,17 +442,26 @@ export async function createDisplayTexts(request, out) {
     requireValue(spec && typeof spec.file === 'string' && Number.isSafeInteger(spec.bytes)
       && spec.asset === `pobr-game-${request.game_patch}.zip`,
     `Monster names, official tables and ${ITEM_CLASS_SCOPE} need game_package {file, bytes, sha256, asset: pobr-game-${request.game_patch}.zip}`);
-    const archive = readZip(readPinned(spec.file, spec, reads));
+    const prefix = `data/${request.game_patch}/`;
+    const needMonsters = Boolean(names || official || tableScopes.has(TABLE_NAME_SCOPE));
+    const needClasses = Boolean(classScope || tableScopes.has(ITEM_CLASS_SCOPE));
+    const needGems = GEM_SCOPES.some(scope => tableScopes.has(scope));
+    const needed = new Set([
+      ...(needMonsters ? [`${prefix}overlay/minions.json`, `${prefix}overlay/spectres.json`] : []),
+      ...(needClasses ? ['manifest.json', `${prefix}manifest.json`, `${prefix}overlay/item_class_names.json`] : []),
+      ...(needGems ? [`${prefix}overlay/gem_descriptions.json`] : []),
+    ]);
+    const archive = readZip(readPinned(spec.file, spec, reads), name => needed.has(name));
     const member = name => {
-      const raw = archive.get(`data/${request.game_patch}/overlay/${name}`)?.raw;
-      requireValue(raw, `game_package: data/${request.game_patch}/overlay/${name} is missing`);
+      const raw = archive.get(`${prefix}overlay/${name}`)?.raw;
+      requireValue(raw, `game_package: ${prefix}overlay/${name} is missing`);
       return strictJson(raw);
     };
-    const monsters = names || official || tableScopes.has(TABLE_NAME_SCOPE) ? monsterTargets(member('minions.json'), member('spectres.json')) : null;
-    const classes = classScope || tableScopes.has(ITEM_CLASS_SCOPE)
+    const monsters = needMonsters ? monsterTargets(member('minions.json'), member('spectres.json')) : null;
+    const classes = needClasses
       ? itemClassTargets(archive, { game: 'poe2', game_patch: request.game_patch, realm: request.realm }) : null;
     game = { sha256: spec.sha256, targets: monsters ?? new Map(), ...(classes ? { itemClasses: classes } : {}) };
-    targets = new Map([...(GEM_SCOPES.some(scope => tableScopes.has(scope)) ? gemTargets(member('gem_descriptions.json'), request.game_patch) : []),
+    targets = new Map([...(needGems ? gemTargets(member('gem_descriptions.json'), request.game_patch) : []),
       ...(monsters ? [[TABLE_NAME_SCOPE, monsters]] : [])]);
     if (classes) targets.set(ITEM_CLASS_SCOPE, classes);
   }

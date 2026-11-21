@@ -4,18 +4,10 @@
 // the zlib build (Node's bundled zlib differs from the system one), so stored
 // bytes are the only choice that any platform or language reproduces exactly:
 // Python's zipfile writes the same bytes for the same ZipInfo fields.
-import { inflateRawSync } from 'node:zlib';
-
-const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
-  let c = n;
-  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
-  return c >>> 0;
-});
+import { crc32 as zlibCrc32, inflateRawSync } from 'node:zlib';
 
 export function crc32(raw) {
-  let crc = 0xffffffff;
-  for (const byte of raw) crc = CRC_TABLE[(crc ^ byte) & 0xff] ^ (crc >>> 8);
-  return (crc ^ 0xffffffff) >>> 0;
+  return zlibCrc32(raw) >>> 0;
 }
 
 const VERSION = 20;

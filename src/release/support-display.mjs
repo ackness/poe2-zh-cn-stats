@@ -139,7 +139,7 @@ export async function fetchDisplayInputs(repo, spec, { cache, fetcher = download
 
 // The trade catalog member of the pinned game package; it must hash to `catalog_sha256`.
 export function catalogBytes(zip, spec) {
-  const members = readZip(zip);
+  const members = readZip(zip, name => name === spec.catalog.member || name === 'manifest.json');
   const raw = members.get(spec.catalog.member)?.raw;
   require(raw, `${spec.catalog.tag} ${spec.catalog.asset} has no ${spec.catalog.member}`);
   const listed = members.has('manifest.json') ? strictJson(members.get('manifest.json').raw).files?.[spec.catalog.member] : undefined;
