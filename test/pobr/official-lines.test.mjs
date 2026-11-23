@@ -15,6 +15,18 @@ test('plain() reads the markup the way the shipped rows spell it', () => {
   // The China client writes [Flask|] for a keyword link that shows no text.
   assert.equal(plain('附加相当于[Flask|]药剂回复量'), '附加相当于药剂回复量');
   assert.equal(plain('献祭 {0}%\\n完全献祭'), '献祭 {0}%\n完全献祭');
+  // Malformed multi-pipe tags keep their brackets so officialLayer skips them as unresolved markup.
+  assert.equal(plain('[Hit|Hits|命中] {0}'), '[Hit|Hits|命中] {0}');
+  assert.equal(plain('[Rarity||稀有度] {0}'), '[Rarity||稀有度] {0}');
+});
+
+test('officialLayer skips malformed multi-pipe markup as skipped-unresolved-markup', () => {
+  const base = [{ src: '旧命中 {0}', en: 'Hit {0}' }];
+  const templates = new Map([['Hit {0}', ['x']]]);
+  const newer = source({ 'Hit {0}': [plain('[Hit|Hits|命中] {0}')] });
+  const layer = officialLayer(base, [newer], templates);
+  assert.equal(layer.decisions[0].decision, 'skipped-unresolved-markup');
+  assert.deepEqual(layer.lines, base);
 });
 
 test('officialLayer: confirmed, revised, partial, incomplete, added, skipped and kept, per English', () => {

@@ -49,7 +49,7 @@ const pairKey = row => JSON.stringify([row.src, row.en]);
 // `[A|B]` -> B, `[A]` -> A, a literal `\n` -> a line break. Placeholders stay as they are. Unlike
 // that module, an empty label is allowed: the China client writes `[Flask|]` for a keyword link that
 // shows no text (`…附加相当于[Flask|]药剂回复量…`), so it becomes the empty string.
-export const plain = text => text.replace(/\[([^\]|]+)(?:\|([^\]]*))?\]/gu, (_, id, label) => label ?? id)
+export const plain = text => text.replace(/\[([^\]|]+)(?:\|([^\]|]*))?\]/gu, (_, id, label) => label ?? id)
   .replace(/\\n/gu, '\n');
 // A bracket left after plain() is a markup form this layer does not know; such an English never ships.
 const unresolved = text => /[[\]]/u.test(text);
