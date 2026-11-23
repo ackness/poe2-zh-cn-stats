@@ -11,7 +11,6 @@
 // supportDescriptions.zh-CN.json are written beside the zip, listed in SHA256SUMS and pinned in the
 // receipt, and never change the zip. release:regenerate (src/release/regenerate.mjs)
 // separately rebuilds a v1 source's members from their producers' pinned inputs.
-import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -19,7 +18,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { strictJson } from '../strict-json.mjs';
 import { readZip, storedZip } from './stored-zip.mjs';
-import { applyTransforms, localeIndex, validateTransforms } from './package.mjs';
+import { applyTransforms, encoded, localeIndex, pin, sha256, validateTransforms } from './package.mjs';
 import {
   DISPLAY_ASSET, MANIFEST_ASSET, displayOrigin, displayProblems, fetchDisplayInputs, supportDisplay, validateSupportDisplay,
 } from './support-display.mjs';
@@ -47,11 +46,8 @@ export function require(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-export const sha256 = raw => createHash('sha256').update(raw).digest('hex');
-export const pin = raw => ({ bytes: raw.length, sha256: sha256(raw) });
+export { encoded, pin, sha256 };
 export const samePin = (a, b) => a?.bytes === b?.bytes && a?.sha256 === b?.sha256;
-// PoBR's JSON layout: insertion order, two-space indent, final newline.
-export const encoded = value => Buffer.from(JSON.stringify(value, null, 2) + '\n');
 export const assetName = patch => `pobr-locale-${patch}.zip`;
 export const targetName = target => `${target.game}-${target.realm}-${target.game_patch}`;
 export const log = (task, message) => process.stderr.write(`${task}: ${message}\n`);
