@@ -4,14 +4,13 @@
 // locale, renders numeric placeholders, or changes facts.
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { NAME_SCOPE, monsterTargets, validateOfficialNames, validateSupplements } from './display-supplements.mjs';
 import { readZip } from '../release/stored-zip.mjs';
 import { GEM_SCOPES, ITEM_CLASS_SCOPE, NAME_SCOPE as TABLE_NAME_SCOPE, gemTargets, itemClassTargets, pairOfficialTables, readOfficialTables, validateTableSpec } from './official-tables.mjs';
+import { parseRequiredArgs, readPinned as readPinnedFile, sha256 as digest } from './pinned.mjs';
 
 const requireValue = (value, message) => { if (!value) throw new Error(message); };
-const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const sorted = entries => Object.fromEntries([...entries].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0));
 const serialize = value => JSON.stringify(value, null, 2) + '\n';
 const LIBRARY_FILES = ['src/native-catalog.mjs', 'src/native-names.mjs', 'src/strict-json.mjs'];
@@ -285,21 +284,10 @@ function projectNames({ names, official, tableNames = null, game, catalogIndexSh
 }
 
 function readPinned(file, pin, reads) {
-  requireValue(pin && /^[a-f0-9]{64}$/u.test(pin.sha256), 'Missing external SHA256');
-  requireValue(pin.bytes === undefined || (Number.isSafeInteger(pin.bytes) && pin.bytes >= 0), 'Invalid declared input size');
-  const absolute = path.resolve(file);
-  requireValue(fs.realpathSync(absolute) === absolute, 'Input path contains a symlink');
-  const fd = fs.openSync(absolute, fs.constants.O_RDONLY | fs.constants.O_NONBLOCK | fs.constants.O_NOFOLLOW);
-  try {
-    const stat = fs.fstatSync(fd);
-    requireValue(stat.isFile(), 'Input must be a regular file');
-    requireValue(pin.bytes === undefined || stat.size === pin.bytes, 'Input size differs from manifest');
-    const raw = fs.readFileSync(fd);
-    requireValue(raw.length === stat.size, 'Input size changed while reading');
-    requireValue(digest(raw) === pin.sha256, `Input SHA256 mismatch: ${absolute}`);
-    reads.set(absolute, { sha256: pin.sha256, bytes: raw.length });
-    return raw;
-  } finally { fs.closeSync(fd); }
+  requireValue(pin && typeof pin === 'object', 'Missing external SHA256');
+  const raw = readPinnedFile(file, pin.sha256, { bytes: pin.bytes, rejectSymlinkPath: true });
+  reads.set(path.resolve(file), { sha256: pin.sha256, bytes: raw.length });
+  return raw;
 }
 
 // The pinned catalog (and its optional reviewed supplement) of a display request.
@@ -531,8 +519,10 @@ export async function createDisplayTexts(request, out) {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [flag, file, outFlag, out] = process.argv.slice(2);
-  requireValue(flag === '--request' && outFlag === '--out' && out && process.argv.length === 6, 'Usage: --request file.json --out .cache/fresh');
+  const { request: file, out } = parseRequiredArgs(process.argv.slice(2), ['request', 'out'], {
+    invalidMessage: 'Usage: --request file.json --out .cache/fresh',
+    missingMessage: 'Usage: --request file.json --out .cache/fresh',
+  });
   const receipt = await createDisplayTexts(JSON.parse(fs.readFileSync(file, 'utf8')), out);
   console.log(JSON.stringify({ files: receipt.files, records: receipt.decisions.length, conflicts: receipt.conflicts.length }));
 }

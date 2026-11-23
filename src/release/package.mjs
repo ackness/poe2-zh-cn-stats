@@ -5,9 +5,10 @@
 import { createHash } from 'node:crypto';
 import { strictJson } from '../strict-json.mjs';
 
-const sha256 = raw => createHash('sha256').update(raw).digest('hex');
-const pin = raw => ({ bytes: raw.length, sha256: sha256(raw) });
-const encoded = value => Buffer.from(JSON.stringify(value, null, 2) + '\n');
+export const sha256 = raw => createHash('sha256').update(raw).digest('hex');
+export const pin = raw => ({ bytes: raw.length, sha256: sha256(raw) });
+// PoBR's JSON layout: insertion order, two-space indent, final newline.
+export const encoded = value => Buffer.from(JSON.stringify(value, null, 2) + '\n');
 const compare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 function require(condition, message) {
   if (!condition) throw new Error(message);

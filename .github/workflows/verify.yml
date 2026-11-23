@@ -13,24 +13,24 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5
+      - uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
-          version: '2026.10.23'
+          version: '2026.11.12'
       - run: mise run setup
       - run: mise run check
   release:
     name: release:build reproduces the locale package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5
+      - uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
-          version: '2026.10.23'
+          version: '2026.11.12'
       # --fetch fetches each source's origin commit (Git only). --check fails unless
       # the checkout is clean, the frozen source tree equals that origin commit's tree,
       # and the zip equals the config's expected and published pins; --check-release
@@ -52,7 +52,7 @@ jobs:
             cmp "$first"/pobr-locale-*.zip "$second"/pobr-locale-*.zip
             cmp "$first/receipt.json" "$second/receipt.json"
           done
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: locale-release-receipt
@@ -66,13 +66,13 @@ jobs:
     name: release:regenerate rebuilds the published members from pinned inputs
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
-      - uses: jdx/mise-action@6be3c7ed4c21d4f76b208d351d95aac273ebb76d # v5
+      - uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
-          version: '2026.10.23'
-      - uses: actions/cache@v4
+          version: '2026.11.12'
+      - uses: actions/cache@v6
         with:
           path: .cache/regenerate/inputs
           key: locale-regenerate-inputs-${{ hashFiles('release/regenerate/*.json') }}
@@ -86,7 +86,7 @@ jobs:
           for recipe in release/regenerate/*.json; do
             mise run release:regenerate -- --recipe "$recipe" --fetch
           done
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@v7.0.2
         if: always()
         with:
           name: locale-regeneration-receipt

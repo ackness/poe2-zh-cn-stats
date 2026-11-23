@@ -130,18 +130,14 @@ export function buildDictionary({ english, chinese, supplementalPairs = [], over
   const pairs = [...pairMap.values()].map(pair => ({ ...pair,
     ids: sorted(new Set(pair.ids)), methods: sorted(new Set(pair.methods)),
   })).sort((a, b) => compare(JSON.stringify([a.english, a.chinese]), JSON.stringify([b.english, b.chinese])));
-  const textVariants = new Map();
-  for (const pair of pairs) {
-    if (!textVariants.has(pair.english)) textVariants.set(pair.english, []);
-    textVariants.get(pair.english).push(pair.chinese);
-  }
+  const textVariants = Map.groupBy(pairs, pair => pair.english);
   const report = {
     scope: 'Current English trade2 catalog, excluding pseudo; structural translation coverage, not numerical game-mechanic coverage.',
     totals: tally(entries), stages, methods, unresolved_reasons: reasons,
     categories: Object.fromEntries(Object.entries(categories).map(([key, rows]) => [key, tally(rows)])),
     distinct_bilingual_pairs: pairs.length,
     ambiguous_text_translations: [...textVariants].filter(([, values]) => values.length > 1)
-      .map(([english, translations]) => ({ english, translations })),
+      .map(([english, values]) => ({ english, translations: values.map(pair => pair.chinese) })),
     cn_only: trade.cnOnly,
     trade_issues: trade.issues,
     supplemental_candidates: supplementalPairs.length,

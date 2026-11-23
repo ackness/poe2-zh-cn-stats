@@ -13,24 +13,21 @@
 // Output: a fresh .cache candidate (stat_lines.json[, _meta.json], receipt.json); nothing is adopted.
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { readZip } from '../release/stored-zip.mjs';
 import { strictJson } from '../strict-json.mjs';
 import { SCHEMA, statTemplates, validateSupplements } from './display-supplements.mjs';
 import { OFFICIAL_REALMS, officialLayer, readOfficialSource, validateOfficialSpec } from './official-lines.mjs';
+import { HEX64, parseRequiredArgs, pinOf, readPinned as readPinnedFile, sha256 as digest } from './pinned.mjs';
 
 export const REQUEST_SCHEMA = 'pobr-supplement-lines-request/v1';
 export const RECEIPT_SCHEMA = 'pobr-supplement-lines-receipt/v1';
-const IMPLEMENTATION = ['supplement-lines.mjs', 'display-supplements.mjs', 'official-lines.mjs'];
+const IMPLEMENTATION = ['supplement-lines.mjs', 'display-supplements.mjs', 'official-lines.mjs', 'pinned.mjs'];
 // The one correction basis that still applies over official text: it changes only the layout of that
 // text (a stray backslash where a line break belongs), never its wording.
 const FORMAT_REPAIR = 'official-typo-format-fix';
 const REPO_ROOT = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
-const HEX64 = /^[0-9a-f]{64}$/u;
 const require = (ok, message) => { if (!ok) throw new Error(message); };
-const digest = bytes => createHash('sha256').update(bytes).digest('hex');
-const pinOf = raw => ({ bytes: raw.length, sha256: digest(raw) });
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const pairKey = row => JSON.stringify([row.src, row.en]);
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -183,15 +180,9 @@ export function officialBlock(locale, sources, layer) {
 function readPinned(spec, label, reads) {
   require(object(spec) && typeof spec.file === 'string' && HEX64.test(spec.sha256 ?? '') && Number.isSafeInteger(spec.bytes),
     `${label}: needs {file, bytes, sha256}`);
-  const absolute = path.resolve(spec.file);
-  const fd = fs.openSync(absolute, fs.constants.O_RDONLY | fs.constants.O_NONBLOCK | fs.constants.O_NOFOLLOW);
-  try {
-    require(fs.fstatSync(fd).isFile(), `${label}: not a regular file`);
-    const raw = fs.readFileSync(fd);
-    require(raw.length === spec.bytes && digest(raw) === spec.sha256, `${label}: ${absolute} differs from its pin`);
-    reads[label] = pinOf(raw);
-    return raw;
-  } finally { fs.closeSync(fd); }
+  const raw = readPinnedFile(spec.file, spec.sha256, { bytes: spec.bytes, label });
+  reads[label] = pinOf(raw);
+  return raw;
 }
 
 export function validateRequest(request) {
@@ -274,8 +265,10 @@ export async function createSupplementLines(request, out) {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [flag, file, outFlag, out] = process.argv.slice(2);
-  require(flag === '--request' && outFlag === '--out' && out && process.argv.length === 6, 'Usage: --request file.json --out .cache/fresh');
+  const { request: file, out } = parseRequiredArgs(process.argv.slice(2), ['request', 'out'], {
+    invalidMessage: 'Usage: --request file.json --out .cache/fresh',
+    missingMessage: 'Usage: --request file.json --out .cache/fresh',
+  });
   createSupplementLines(JSON.parse(fs.readFileSync(file, 'utf8')), out).then(receipt => {
     console.log(JSON.stringify({ files: receipt.files, counts: receipt.counts, ...(receipt.official ? { official: receipt.official.counts } : {}) }));
   }).catch(error => { console.error(error.message); process.exitCode = 1; });

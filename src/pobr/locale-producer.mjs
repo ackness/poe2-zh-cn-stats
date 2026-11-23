@@ -1,19 +1,17 @@
 #!/usr/bin/env node
 // Offline legacy dictionary projection and explicit selected-literal composition.
-import { createHash } from 'node:crypto';
 import { readFile, mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { strictJson } from '../strict-json.mjs';
 import { mergeTranslations, validateBundle } from './legacy-translation-merge.mjs';
+import { parseRequiredArgs, pinOf as pin, sha256 as hash } from './pinned.mjs';
 
 export const DICTIONARY_FILES = ['lookup/stat_lines.json', 'lookup/en_to_cn.json',
   'tables/BaseItemTypes.json', 'tables/ActiveSkills.json', 'tables/Characters.json',
   'tables/Ascendancy.json', 'tables/Words.json', 'tables/PassiveSkills.json',
   'tables/Mods.json', 'meta.json'];
-const hash = b => createHash('sha256').update(b).digest('hex');
-const pin = b => ({ bytes: b.length, sha256: hash(b) });
 const jsonBytes = value => Buffer.from(JSON.stringify(value, null, 2) + '\n');
 const equal = isDeepStrictEqual;
 const assert = (ok, message) => { if (!ok) throw new Error(message); };
@@ -170,13 +168,10 @@ export async function produceLocale({ manifestPath, manifestSha256, inputDir, ou
 }
 
 async function main(args) {
-  const options = {};
-  for (let i = 0; i < args.length; i += 2) {
-    const key = args[i];
-    assert(['--manifest', '--manifest-sha256', '--input-dir', '--out'].includes(key) && args[i + 1] && !options[key], 'invalid or duplicate option');
-    options[key] = args[i + 1];
-  }
-  assert(['--manifest', '--manifest-sha256', '--input-dir', '--out'].every(k => options[k]), 'all options are required');
-  await produceLocale({ manifestPath: options['--manifest'], manifestSha256: options['--manifest-sha256'], inputDir: options['--input-dir'], out: options['--out'] });
+  const options = parseRequiredArgs(args, ['manifest', 'manifest-sha256', 'input-dir', 'out'], {
+    invalidMessage: 'invalid or duplicate option',
+    missingMessage: 'all options are required',
+  });
+  await produceLocale({ manifestPath: options.manifest, manifestSha256: options['manifest-sha256'], inputDir: options['input-dir'], out: options.out });
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) main(process.argv.slice(2)).catch(e => { console.error(e.message); process.exitCode = 1; });

@@ -9,9 +9,9 @@
 // Ids that fail are omitted, never written as null: in PoBR null means "show English", which would
 // block zh-TW from falling back to converted zh-CN. Every reason is counted for the receipt.
 // Realm is recorded apart from language: official zh-CN is China-client text, zh-TW international.
-import { createHash } from 'node:crypto';
 import { readZip } from '../release/stored-zip.mjs';
 import { strictJson } from '../strict-json.mjs';
+import { HEX64, sha256 as digest } from './pinned.mjs';
 
 export const INPUT_SCHEMA = 'repoe-release-input/v1';
 export const GEM_DESCRIPTIONS_SCHEMA = 'repoe-gem-descriptions/v1';
@@ -24,10 +24,8 @@ const LANGUAGES = { 'zh-CN': 'Simplified Chinese', 'zh-TW': 'Traditional Chinese
 const FORMATS = { default: 'repoe-native-tables/v1', localized: 'repoe-localized-tables/v1' };
 const SPEC_KEYS = ['repository', 'tag', 'asset', 'bytes', 'sha256', 'default', 'default_manifest_sha256', 'localized',
   'localized_manifest_sha256', 'scopes'];
-const HEX64 = /^[0-9a-f]{64}$/u;
 const DIRECTORY = /^(?:[A-Za-z0-9_.-]+\/)+$/u;
 const require = (ok, message) => { if (!ok) throw new Error(message); };
-const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const han = text => /\p{Script=Han}/u.test(text);
