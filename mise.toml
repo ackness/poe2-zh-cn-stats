@@ -1,4 +1,4 @@
-min_version = "2026.10.23"
+min_version = "2026.11.12"
 
 [tools]
 # Keep the resolved runtime aligned with PoBR via the committed mise.lock.
