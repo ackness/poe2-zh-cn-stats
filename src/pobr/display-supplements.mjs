@@ -7,7 +7,7 @@
 // Every record names its origin (agent | human); nothing here is ever official. Only `reviewed`
 // records ship. The producers (pobr:supplement-lines, pobr:display-texts) compute the lifecycle
 // against their pinned inputs: official text always wins, a record is never relabelled or deleted.
-import { createHash } from 'node:crypto';
+import { HEX64, sha256 } from './pinned.mjs';
 
 export const SCHEMA = 'poe2-display-supplements/v1';
 export const ORIGINS = ['agent', 'human'];
@@ -21,7 +21,6 @@ export const BASES = ['official-same-id-branch', 'official-same-text', 'official
 export const CORRECTION_BASES = ['official-terms', 'official-same-text', 'official-typo-format-fix'];
 export const NAME_SCOPE = 'MonsterVarieties.Name';
 
-const HEX64 = /^[0-9a-f]{64}$/u;
 const SLUG = /^[a-z0-9][a-z0-9-]*$/u;
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const nonempty = value => typeof value === 'string' && value.trim().length > 0;
@@ -38,7 +37,7 @@ const keys = (value, required, optional, label) => {
 export const canonical = value => Array.isArray(value) ? `[${value.map(canonical).join(',')}]`
   : object(value) ? `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}`
     : JSON.stringify(value);
-export const entryId = identity => createHash('sha256').update(canonical(identity)).digest('hex');
+export const entryId = identity => sha256(canonical(identity));
 
 // --- template form ---------------------------------------------------------------------------------
 

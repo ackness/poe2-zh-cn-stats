@@ -4,38 +4,22 @@
 // pairs. Output is a fresh .cache candidate plus a receipt; nothing is adopted.
 import fs from 'node:fs';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { nativeSelectedTranslations } from './native-selected-translations.mjs';
+import { parseRequiredArgs, readPinnedJson, sha256 as digest } from './pinned.mjs';
 
 // The receipt pins every module this producer executes.
-const IMPLEMENTATION = ['stat-lines.mjs', 'native-selected-translations.mjs'];
+const IMPLEMENTATION = ['stat-lines.mjs', 'native-selected-translations.mjs', 'pinned.mjs'];
 
 const required = (ok, message) => { if (!ok) throw new Error(message); };
-const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const FLAGS = ['selection', 'selection-sha256', 'native', 'native-sha256', 'legacy', 'legacy-sha256', 'out'];
-
-function pinned(file, expected) {
-  required(/^[a-f0-9]{64}$/u.test(expected), 'invalid external SHA256');
-  const fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NONBLOCK | fs.constants.O_NOFOLLOW);
-  try {
-    const stat = fs.fstatSync(fd);
-    required(stat.isFile() && stat.size <= 128 * 1024 * 1024, 'translation input is not a bounded regular file');
-    const bytes = fs.readFileSync(fd);
-    required(digest(bytes) === expected, 'translation input SHA256 mismatch');
-    return JSON.parse(bytes.toString('utf8'));
-  } finally { fs.closeSync(fd); }
-}
+const pinned = (file, expected) => readPinnedJson(file, expected, { kind: 'translation input' });
 
 export function parseStatLineArgs(argv) {
-  const options = {};
-  for (let i = 0; i < argv.length; i += 2) {
-    const flag = argv[i].replace(/^--/u, '');
-    required(FLAGS.includes(flag) && !Object.hasOwn(options, flag) && argv[i + 1], 'invalid or duplicate translation option');
-    options[flag] = argv[i + 1];
-  }
-  required(FLAGS.every(f => options[f]), 'missing translation argument');
-  return options;
+  return parseRequiredArgs(argv, FLAGS, {
+    invalidMessage: 'invalid or duplicate translation option',
+    missingMessage: 'missing translation argument',
+  });
 }
 
 export function createStatLines(options) {

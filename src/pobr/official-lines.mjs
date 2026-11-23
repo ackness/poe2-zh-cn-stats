@@ -22,10 +22,10 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import { buildNativeLocalization, readNativeDescriptions } from '../native-localization.mjs';
 import { readZip } from '../release/stored-zip.mjs';
 import { strictJson } from '../strict-json.mjs';
+import { HEX64, sha256 as digest } from './pinned.mjs';
 
 export const INPUT_SCHEMA = 'repoe-release-input/v1';
 export const CAPTURE_RECEIPT_SCHEMA = 'repoe-client-capture-receipt/v1';
@@ -38,9 +38,7 @@ export const NATIVE_FILES = ['descriptions.json', 'diagnostics.json', 'manifest.
 export const OFFICIAL_REALMS = { 'zh-CN': 'china' };
 export const CLASSES = ['confirmed', 'revised', 'revised-partial', 'kept-pairing-incomplete', 'added',
   'skipped-not-game-template', 'skipped-other-stats', 'skipped-unresolved-markup'];
-const HEX64 = /^[0-9a-f]{64}$/u;
 const require = (ok, message) => { if (!ok) throw new Error(message); };
-const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const compare = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 const pairKey = row => JSON.stringify([row.src, row.en]);

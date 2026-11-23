@@ -3,9 +3,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHash } from 'node:crypto';
+import { parseRequiredArgs, readPinnedJson, sha256 as digest } from './pinned.mjs';
 const required = (ok, message) => { if (!ok) throw new Error(message); };
-const digest = raw => createHash('sha256').update(raw).digest('hex');
 const domains = { BaseItemTypes: ['Name', 'base_items.json'], ActiveSkills: ['DisplayedName', 'skills.json'], Mods: ['Name', 'mods.json'] };
 const nameMap = value => value && !Array.isArray(value) && typeof value === 'object'
   && Object.values(value).every(v => typeof v === 'string');
@@ -61,17 +60,7 @@ export function nativeNameSidecars(candidate, legacy, version, locale) {
     library_producer: candidate.producer, scope: 'Three existing ID-keyed zh-TW sidecars only; target translations override by exact ID. Current missing/unchanged text removes stale translation; unknown historical IDs retain pinned compatibility. Other locales, game facts and calculations are unchanged.' } };
 }
 
-function pinned(file, expected) {
-  required(/^[a-f0-9]{64}$/u.test(expected), 'Invalid external SHA256');
-  const fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NONBLOCK | fs.constants.O_NOFOLLOW);
-  try {
-    const stat = fs.fstatSync(fd);
-    required(stat.isFile() && stat.size <= 128 * 1024 * 1024, 'Expected bounded regular file');
-    const raw = fs.readFileSync(fd);
-    required(digest(raw) === expected, 'Name input SHA256 mismatch');
-    return JSON.parse(raw.toString('utf8'));
-  } finally { fs.closeSync(fd); }
-}
+const pinned = (file, expected) => readPinnedJson(file, expected, { kind: 'Name input' });
 
 export function createNameSidecars(request, out) {
   required(request.schema === 'pobr-native-name-request/v1', 'Invalid request');
@@ -97,8 +86,10 @@ export function createNameSidecars(request, out) {
   return receipt;
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const [flag, file, outFlag, out] = process.argv.slice(2);
-  required(flag === '--request' && outFlag === '--out' && out && process.argv.length === 6, 'Usage: --request file.json --out .cache/fresh');
+  const { request: file, out } = parseRequiredArgs(process.argv.slice(2), ['request', 'out'], {
+    invalidMessage: 'Usage: --request file.json --out .cache/fresh',
+    missingMessage: 'Usage: --request file.json --out .cache/fresh',
+  });
   const result = createNameSidecars(JSON.parse(fs.readFileSync(file, 'utf8')), out);
   console.log(JSON.stringify(Object.fromEntries(Object.entries(result.records).map(([k, v]) => [k,
     { adopted: v.adopted.length, removed: v.removed.length, historical: v.historical_compatibility.length }]))));
