@@ -2,6 +2,7 @@
 import { readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parseArgs } from 'node:util';
 import { fetchSnapshot, currentSnapshot, cloneCandidate } from './trade/snapshots.mjs';
 import { checkNativeLocalizationCandidate, generateNativeLocalization, nativeBytes } from './native-localization.mjs';
 
@@ -34,19 +35,28 @@ async function main() {
     return;
   }
   if (command === 'native' || command === 'native-check') {
-    const options = new Map();
-    while (args.length) {
-      const flag = args.shift();
-      if (!['--facts', '--expected-manifest-sha256', ...(command === 'native-check' ? ['--candidate'] : [])].includes(flag)
-          || options.has(flag) || !args[0] || args[0].startsWith('--')) throw new Error(`Unknown or incomplete native option: ${flag}`);
-      options.set(flag, args.shift());
+    const flags = ['facts', 'expected-manifest-sha256', ...(command === 'native-check' ? ['candidate'] : [])];
+    let values;
+    try {
+      ({ values } = parseArgs({
+        args,
+        options: Object.fromEntries(flags.map(flag => [flag, { type: 'string', multiple: true }])),
+        allowPositionals: false,
+      }));
+    } catch (error) {
+      throw new Error(`Unknown or incomplete native option: ${error.message}`);
     }
-    if (!options.has('--facts') || !options.has('--expected-manifest-sha256')
-        || (command === 'native-check' && !options.has('--candidate'))) throw new Error(help);
-    const generated = nativeBytes(await generateNativeLocalization(options.get('--facts'), options.get('--expected-manifest-sha256')));
+    for (const flag of flags) {
+      const list = values[flag];
+      if (list && (list.length !== 1 || !list[0] || list[0].startsWith('--'))) {
+        throw new Error(`Unknown or incomplete native option: --${flag}`);
+      }
+    }
+    if (flags.some(flag => !values[flag]?.length)) throw new Error(help);
+    const generated = nativeBytes(await generateNativeLocalization(values.facts[0], values['expected-manifest-sha256'][0]));
     if (command === 'native') process.stdout.write(generated);
     else {
-      await checkNativeLocalizationCandidate(options.get('--candidate'), generated);
+      await checkNativeLocalizationCandidate(values.candidate[0], generated);
       console.log('Native localization input pin and byte-identical candidate verified.');
     }
     return;
@@ -54,14 +64,21 @@ async function main() {
   if (!['refresh', 'build', 'check', 'report', 'activate'].includes(command)) throw new Error(help);
   // Native compilation is stdlib-only; do not load the HTML parser for it.
   const { generateFiles, writeGenerated, checkGenerated, activateGenerated, formatReport } = await import('./trade/generate.mjs');
-  let tradeOnly = false;
-  let supplied;
-  while (args.length) {
-    const flag = args.shift();
-    if (flag === '--trade-only' && command === 'refresh' && !tradeOnly) tradeOnly = true;
-    else if (flag === '--snapshot' && command !== 'refresh' && !supplied && args[0] && !args[0].startsWith('--')) supplied = args.shift();
-    else throw new Error(`Unknown or incomplete option: ${flag}\n${help}`);
+  const cliOptions = command === 'refresh'
+    ? { 'trade-only': { type: 'boolean', multiple: true } }
+    : { snapshot: { type: 'string', multiple: true } };
+  let values;
+  try {
+    ({ values } = parseArgs({ args, options: cliOptions, allowPositionals: false }));
+  } catch (error) {
+    throw new Error(`Unknown or incomplete option: ${error.message}\n${help}`);
   }
+  if (values['trade-only']?.length > 1) throw new Error(`Unknown or incomplete option: --trade-only\n${help}`);
+  if (values.snapshot && (values.snapshot.length !== 1 || !values.snapshot[0] || values.snapshot[0].startsWith('--'))) {
+    throw new Error(`Unknown or incomplete option: --snapshot\n${help}`);
+  }
+  const tradeOnly = Boolean(values['trade-only']?.length);
+  const supplied = values.snapshot?.[0];
   if (command === 'refresh') {
     const { directory, manifest } = await fetchSnapshot(root, { tradeOnly });
     const files = await generateFiles(root, directory);
